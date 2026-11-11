@@ -263,7 +263,7 @@ static void RenderWorld(Game *g) {
                 if(it->index==4)DrawProp(4,p,72,68);
                 else if(it->index==5)DrawEnvProp(7,p,52,52);
                 else if(it->index==6)DrawProp(6,p,34,38);
-                else if(it->index==7)DrawEnvProp(10,p,84,112);
+                else if(it->index==7)DrawEnvProp(9,p,84,112);
                 else if(it->index==9)DrawProp(9,p,32,36);
                 else if(it->index==10)DrawProp(10,p,46,38);
                 else if(it->index==11)DrawProp(11,p,36,30);
