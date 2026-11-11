@@ -1,0 +1,8 @@
+build/
+cmake-build-*/
+*.user
+*.suo
+.vscode/
+.idea/
+__pycache__/
+*.pyc
