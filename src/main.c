@@ -238,7 +238,7 @@ static void UpdateGame(Game *g,float dt) {
     }
 
     Player *p=&g->player;
-    p->dashCooldown=fmaxf(0,p->dashCooldown-dt);
+    p->dashCd=fmaxf(0,p->dashCd-dt);
     p->invuln=fmaxf(0,p->invuln-dt);
     Vector2 in={0,0};
     if(IsKeyDown(KEY_W)||IsKeyDown(KEY_UP))in.y-=1;
@@ -247,7 +247,7 @@ static void UpdateGame(Game *g,float dt) {
     if(IsKeyDown(KEY_D)||IsKeyDown(KEY_RIGHT))in.x+=1;
     float l=Vector2Length(in);if(l>0.01f)in=Vector2Scale(in,1/l);
     float speed=3.3f;
-    if(IsKeyPressed(KEY_LEFT_SHIFT)&&p->dashCooldown<=0&&l>0.01f){speed=8.5f;p->dashCooldown=0.9f;p->invuln=0.18f;Burst(g,WorldScreen(p->pos),WHITE,8);}
+    if(IsKeyPressed(KEY_LEFT_SHIFT)&&p->dashCd<=0&&l>0.01f){speed=8.5f;p->dashCd=0.9f;p->invuln=0.18f;Burst(g,WorldScreen(p->pos),WHITE,8);}
     p->vel=Vector2Scale(in,speed);
     if (fabsf(in.x) > fabsf(in.y) && fabsf(in.x) > 0.01f) p->facing = in.x < 0 ? 1 : 2;
     else if (fabsf(in.y) > 0.01f) p->facing = in.y < 0 ? 3 : 0;
