@@ -11,7 +11,7 @@
 #define MAPW 22
 #define MAPH 18
 #define MAX_ENEMIES 8
-#define MAX_PARTICLES 260
+#define MAX_PARTICLES 300
 #define MAX_PICKUPS 32
 #define PI2 6.28318530718f
 
@@ -88,6 +88,11 @@ typedef struct {
     char toast[128];
     float toastTimer;
     bool journalOpen;
+    bool inventoryOpen;
+    bool mapOpen;
+    bool enemySoaked;
+    int battleRound;
+    int defeatedGuards;
     bool fireflyDiscovered;
     bool leaflingFed;
     float fireflyPhase;
@@ -219,7 +224,8 @@ static void ResetGame(Game *g,int seed) {
     g->splash=(Buddy){.pos={8,7},.owned=false,.level=1};
     g->spark=(Buddy){.pos={15,8},.owned=false,.level=1};
     g->cam.offset=(Vector2){SW/2.0f,SH/2.0f+20}; g->cam.zoom=1;
-    g->fireflyPhase=0; g->journalOpen=false; g->fireflyDiscovered=false; g->leaflingFed=false;
+    g->fireflyPhase=0; g->journalOpen=false; g->inventoryOpen=false; g->mapOpen=false;
+    g->fireflyDiscovered=false; g->leaflingFed=false; g->enemySoaked=false; g->battleRound=0; g->defeatedGuards=0;
 }
 static void InitPlay(Game *g) {
     g->scene=SCENE_PLAY; g->area=AREA_CAMP; g->player.pos=g->world.camp;
@@ -238,7 +244,7 @@ static Buddy *CurrentBuddy(Game *g) {
     return &g->lumi;
 }
 static void EnterBattle(Game *g,int idx) {
-    g->battleEnemy=idx;g->battleTurn=0;g->battleChoice=0;g->battleTimer=0;
+    g->battleEnemy=idx;g->battleTurn=0;g->battleChoice=0;g->battleTimer=0;g->battleRound=1;g->enemySoaked=false;
     g->scene=SCENE_BATTLE;
     g->battleMessage=0;
 }
@@ -249,7 +255,10 @@ static void StartStoryBattle(Game *g) {
 static void UpdateGame(Game *g,float dt) {
     g->time+=dt; if(g->toastTimer>0)g->toastTimer-=dt;
     g->fireflyPhase+=dt;
-    if(g->journalOpen) { if(IsKeyPressed(KEY_J)||IsKeyPressed(KEY_ESCAPE))g->journalOpen=false; return; }
+    if(g->journalOpen || g->inventoryOpen || g->mapOpen) {
+        if(IsKeyPressed(KEY_J)||IsKeyPressed(KEY_I)||IsKeyPressed(KEY_M)||IsKeyPressed(KEY_ESCAPE)) { g->journalOpen=false;g->inventoryOpen=false;g->mapOpen=false; }
+        return;
+    }
     for(int i=0;i<MAX_PARTICLES;i++) if(g->particles[i].life>0) {
         Particle *p=&g->particles[i];p->life-=dt;p->p=Vector2Add(p->p,Vector2Scale(p->v,dt));p->v.y-=0.3f*dt;
     }
@@ -277,16 +286,34 @@ static void UpdateGame(Game *g,float dt) {
         if(IsKeyPressed(KEY_THREE)||IsKeyPressed(KEY_E))g->battleChoice=2;
         if(IsKeyPressed(KEY_ENTER)||IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             if(g->battleTurn==0) {
-                if(g->battleChoice==0) {e->hp-=22;Burst(g,WorldScreen(e->pos),C_BLUE,18);Toast(g,"苔灯灵：星光治愈！");}
-                else if(g->battleChoice==1 && g->splash.owned){e->hp-=17;Burst(g,WorldScreen(e->pos),C_BLUE,24);Toast(g,"沫尾兽：泡泡水流！");}
-                else if(g->battleChoice==2 && g->spark.owned){e->hp-=27;Burst(g,WorldScreen(e->pos),C_LILAC,24);Toast(g,"鸣晶蜥：晶弧放电！");}
-                else {e->hp-=12;Toast(g,"伙伴发动了基础攻击！");}
-                g->battleTurn=1;
-                if(e->hp<=0){e->alive=false;g->battleTurn=0;g->scene=SCENE_PLAY;Toast(g,"守卫失去战斗能力！");}
+                float damage=0;
+                if(g->battleChoice==0 && g->lumi.owned) {
+                    g->player.hp=fminf(g->player.maxHp,g->player.hp+18.0f);
+                    damage=8.0f; Burst(g,WorldScreen(g->player.pos),C_GOLD,16);
+                    Toast(g,"苔灯灵：星光治愈，恢复18点生命！");
+                } else if(g->battleChoice==1 && g->splash.owned) {
+                    damage=20.0f; g->enemySoaked=true; Burst(g,WorldScreen(e->pos),C_BLUE,22);
+                    Toast(g,"沫尾兽：泡泡水流，敌人进入潮湿状态！");
+                } else if(g->battleChoice==2 && g->spark.owned) {
+                    damage=g->enemySoaked?38.0f:26.0f; Burst(g,WorldScreen(e->pos),C_LILAC,26);
+                    Toast(g,g->enemySoaked?"鸣晶蜥：潮湿导电！造成连锁伤害！":"鸣晶蜥：晶弧放电！");
+                    g->enemySoaked=false;
+                } else { damage=10.0f; Toast(g,"伙伴发动了基础攻击！"); }
+                e->hp-=damage; g->battleTurn=1;
+                if(e->hp<=0) {
+                    e->alive=false;g->battleTurn=0;g->scene=SCENE_PLAY;g->defeatedGuards++;
+                    Buddy *active=CurrentBuddy(g); active->xp+=20;
+                    if(active->xp>=50){active->xp-=50;active->level++;Toast(g,"伙伴成长了！等级提升。");}
+                    else Toast(g,"敌人被击退！伙伴获得20点经验。");
+                    if(e->type==ENEMY_BOSS){g->bossDefeated=true;g->player.crystals+=3;g->player.shells+=2;SaveGame(g);}
+                }
             } else {
-                g->player.hp-=12;Burst(g,WorldScreen(g->player.pos),C_PINK,10);
-                g->battleTurn=0;
-                if(g->player.hp<=0){g->player.hp=55;g->scene=SCENE_PLAY;Toast(g,"伙伴把你带回安全处，恢复了体力。");}
+                float incoming=e->type==ENEMY_BOSS?16.0f:10.0f;
+                if(g->enemySoaked)incoming*=0.8f;
+                g->player.hp-=incoming;Burst(g,WorldScreen(g->player.pos),C_PINK,10);
+                g->battleTurn=0;g->battleRound++;
+                if(g->player.hp<=0){g->player.hp=55;g->scene=SCENE_PLAY;Toast(g,"伙伴把你带回营地，恢复了体力。");}
+                else Toast(g,TextFormat("敌人发动攻击！受到 %.0f 点伤害。",incoming));
             }
         }
         return;
@@ -294,6 +321,8 @@ static void UpdateGame(Game *g,float dt) {
 
     Player *p=&g->player;
     if(IsKeyPressed(KEY_J)){g->journalOpen=true;return;}
+    if(IsKeyPressed(KEY_I)){g->inventoryOpen=true;return;}
+    if(IsKeyPressed(KEY_M)){g->mapOpen=true;return;}
     if(IsKeyPressed(KEY_F5)){SaveGame(g);Toast(g,"旅程已保存！");return;}
     if(IsKeyPressed(KEY_F9)){LoadGame(g);return;}
     p->dashCd=fmaxf(0,p->dashCd-dt);
@@ -700,7 +729,7 @@ static void RenderHUD(Game *g) {
     DrawText(TextFormat("沫尾兽 %s",g->splash.owned?"已同行":"未发现"),1040,79,16,C_INK);
     DrawText(TextFormat("鸣晶蜥 %s",g->spark.owned?"已同行":"未发现"),1040,101,16,C_INK);
     Panel((Rectangle){20,652,720,48});
-    DrawText("WASD 移动   SHIFT 冲刺   E 互动   TAB 伙伴   J 手记   F5 保存 / F9 读取",38,667,14,(Color){91,115,96,255});
+    DrawText("WASD移动 SHIFT冲刺 E互动 TAB伙伴 J手记 I背包 M地图 F5保存",38,667,13,(Color){91,115,96,255});
     if(!g->lumi.owned && Dist(g->player.pos,(Vector2){4,12})<1.65f) {
         Panel((Rectangle){530,585,220,40});
         DrawText("E  救助苔灯灵",550,596,17,(Color){91,115,96,255});
@@ -733,6 +762,36 @@ static void RenderJournal(Game *g) {
     DrawText(TextFormat("果实 %d     潮汐贝壳 %d     星晶 %d",g->player.berries,g->player.shells,g->player.crystals),303,560,18,C_INK);
     DrawText("F5 保存   F9 读取   按 J 或 ESC 关闭",760,570,16,(Color){132,137,111,255});
 }
+static void RenderInventory(Game *g) {
+    DrawRectangle(0,0,SW,SH,Fade((Color){35,55,48,255},.48f));
+    Panel((Rectangle){300,120,680,470});
+    DrawText("探 险 背 包",350,150,32,(Color){74,105,83,255});
+    DrawLine(350,200,930,200,(Color){220,211,183,255});
+    DrawText(TextFormat("岛屿果实       x %d",g->player.berries),360,238,22,C_INK);
+    DrawText(TextFormat("潮汐贝壳       x %d",g->player.shells),360,285,22,C_INK);
+    DrawText(TextFormat("星晶           x %d",g->player.crystals),360,332,22,C_INK);
+    DrawText(TextFormat("生命           %d / %d",(int)g->player.hp,(int)g->player.maxHp),360,379,22,C_INK);
+    DrawText("伙伴成长",360,432,22,(Color){104,135,94,255});
+    DrawText(TextFormat("苔灯灵 Lv.%d   沫尾兽 Lv.%d   鸣晶蜥 Lv.%d",g->lumi.level,g->splash.level,g->spark.level),360,470,19,C_INK);
+    DrawText("按 I / ESC 关闭",760,550,16,(Color){132,137,111,255});
+}
+static void RenderMap(Game *g) {
+    DrawRectangle(0,0,SW,SH,Fade((Color){35,55,48,255},.48f));
+    Panel((Rectangle){250,90,780,540});
+    DrawText("岛 屿 地 图",300,120,32,(Color){74,105,83,255});
+    const char *names[4]={"海岸营地","辉光林地","潮汐遗迹","灯塔庭院"};
+    Vector2 pts[4]={{390,320},{560,250},{745,330},{900,220}};
+    for(int i=0;i<4;i++) {
+        bool unlocked=(i==0)||(i==1&&g->lumi.owned)||(i==2&&g->splash.owned)||(i==3&&g->shrineSolved);
+        DrawCircleV(pts[i],28,unlocked?(Color){144,190,132,255}:(Color){181,184,164,255});
+        DrawCircleV(pts[i],13,(Color){255,240,196,255});
+        DrawText(names[i],(int)pts[i].x-45,(int)pts[i].y+42,17,C_INK);
+        if(i<3)DrawLineEx(pts[i],pts[i+1],5,(Color){185,177,139,255});
+    }
+    DrawCircleV((Vector2){390+(g->player.pos.x-3)*27,320+(g->player.pos.y-12)*15},7,C_RED);
+    DrawText("红点：当前位置   灰色区域：尚未解锁",320,545,18,(Color){105,121,97,255});
+    DrawText("按 M / ESC 关闭",800,580,16,(Color){132,137,111,255});
+}
 static void RenderDialogue(Game *g) {
     DrawRectangle(0,0,SW,SH,Fade((Color){35,55,48,255},.26f));
     Panel((Rectangle){125,510,1030,165});
@@ -756,7 +815,8 @@ static void RenderBattle(Game *g) {
     DrawTriangle((Vector2){864,205},(Vector2){901,164},(Vector2){916,222},(Color){183,160,192,255});
     DrawCircle(852,232,6,C_INK);DrawCircle(888,232,6,C_INK);
     DrawCircle(852,230,2,WHITE);DrawCircle(888,230,2,WHITE);
-    DrawText("遭遇战",55,40,30,WHITE);
+    DrawText("伙伴协同战斗",55,40,30,WHITE);
+    DrawText(TextFormat("回合 %d   %s",g->battleRound,g->enemySoaked?"敌人：潮湿（电击伤害提升）":"观察敌人状态"),55,82,18,(Color){224,232,215,255});
     Enemy *e=&g->enemies[g->battleEnemy];
     DrawText(TextFormat("守卫 HP  %d / %d",(int)e->hp,(int)e->maxHp),760,80,22,WHITE);
     DrawRectangle(760,112,340,17,(Color){70,75,85,255});
@@ -765,13 +825,14 @@ static void RenderBattle(Game *g) {
     DrawCircle(380,365,30,(Color){219,232,180,255});
     DrawCircle(370,361,3,C_INK);DrawCircle(390,361,3,C_INK);
     DrawText("选择伙伴技能",70,525,23,WHITE);
-    const char *opts[3]={"1  苔灯灵：星光治愈","2  沫尾兽：泡泡水流","3  鸣晶蜥：晶弧放电"};
+    const char *opts[3]={"1  苔灯灵：治疗 + 微光攻击","2  沫尾兽：潮湿水流","3  鸣晶蜥：晶弧放电（潮湿克制）"};
     for(int i=0;i<3;i++) {
         Rectangle r={70,565+i*42,440,34};
         DrawRectangleRounded(r,.2f,8,i==g->battleChoice?(Color){255,226,158,255}:(Color){238,236,218,235});
         DrawText(opts[i],88,573+i*42,18,(Color){64,82,76,255});
     }
     DrawText(g->battleTurn==0?"选择技能并按 Enter":"敌方行动：按 Enter 继续",760,570,21,WHITE);
+    DrawText("技能联动：先喷水，再使用晶弧可造成额外伤害。",760,610,17,(Color){226,236,222,255});
 }
 static void RenderTitle(Game *g) {
     ClearBackground((Color){187,222,211,255});
@@ -828,7 +889,7 @@ int main(void) {
         if(g.scene==SCENE_TITLE)RenderTitle(&g);
         else if(g.scene==SCENE_BATTLE)RenderBattle(&g);
         else if(g.scene==SCENE_END)RenderEnd(&g);
-        else {RenderWorld(&g);RenderHUD(&g);if(g.scene==SCENE_DIALOGUE)RenderDialogue(&g);if(g.journalOpen)RenderJournal(&g);}
+        else {RenderWorld(&g);RenderHUD(&g);if(g.scene==SCENE_DIALOGUE)RenderDialogue(&g);if(g.journalOpen)RenderJournal(&g);if(g.inventoryOpen)RenderInventory(&g);if(g.mapOpen)RenderMap(&g);}
         EndDrawing();
     }
     if(TEX_HERO_WALK.id)UnloadTexture(TEX_HERO_WALK);
