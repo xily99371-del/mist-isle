@@ -345,6 +345,13 @@ static void DrawTree(Vector2 p,float s,float t) {
 }
 static void DrawLumi(Vector2 p,float t,float bob) {
     DrawEllipse((int)p.x,(int)p.y+7,16,6,(Color){72,109,77,75});
+    if (TEX_LUMI_PIXEL.id) {
+        int frame=(int)(t*2.5f)%2;
+        Rectangle src={(float)(frame*32),0,32,32};
+        Rectangle dst={p.x-18,p.y-38-sinf(t*4.4f)*2.0f,36,36};
+        DrawTexturePro(TEX_LUMI_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
+        return;
+    }
     if (TEX_LUMI.id) { DrawPortrait(TEX_LUMI,p,58,58,sinf(t*4.4f)*3.0f); return; }
     p.y-=bob*16;
     DrawCircleV((Vector2){p.x,p.y-11},14,(Color){159,202,145,255});
@@ -417,7 +424,12 @@ static void RenderWorld(Game *g) {
     if(g->splash.owned) {
         Vector2 p=Iso(g->splash.pos.x,g->splash.pos.y,0);
         DrawEllipse((int)p.x,(int)p.y+6,15,5,(Color){75,112,130,75});
-        if(TEX_MOATAIL.id) DrawPortrait(TEX_MOATAIL,p,58,58,sinf(g->time*4)*2.5f);
+        if(TEX_MOATAIL_PIXEL.id) {
+            int frame=(int)(g->time*2.5f)%2;
+            Rectangle src={(float)(frame*32),0,32,32};
+            Rectangle dst={p.x-18,p.y-38-sinf(g->time*4)*2.0f,36,36};
+            DrawTexturePro(TEX_MOATAIL_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
+        } else if(TEX_MOATAIL.id) DrawPortrait(TEX_MOATAIL,p,58,58,sinf(g->time*4)*2.5f);
         else {
             DrawCircleV((Vector2){p.x,p.y-11},12,(Color){121,202,215,255});
             DrawCircleV((Vector2){p.x-5,p.y-20},5,(Color){151,220,224,255});
@@ -429,7 +441,12 @@ static void RenderWorld(Game *g) {
     if(g->spark.owned) {
         Vector2 p=Iso(g->spark.pos.x,g->spark.pos.y,0);
         DrawEllipse((int)p.x,(int)p.y+6,15,5,(Color){83,91,130,75});
-        if(TEX_GECKO.id) DrawPortrait(TEX_GECKO,p,58,58,sinf(g->time*5)*2.0f);
+        if(TEX_GECKO_PIXEL.id) {
+            int frame=(int)(g->time*2.5f)%2;
+            Rectangle src={(float)(frame*32),0,32,32};
+            Rectangle dst={p.x-18,p.y-38-sinf(g->time*5)*2.0f,36,36};
+            DrawTexturePro(TEX_GECKO_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
+        } else if(TEX_GECKO.id) DrawPortrait(TEX_GECKO,p,58,58,sinf(g->time*5)*2.0f);
         else {
             DrawCircleV((Vector2){p.x,p.y-10},11,(Color){155,154,214,255});
             DrawTriangle((Vector2){p.x-7,p.y-17},(Vector2){p.x,p.y-32},(Vector2){p.x+7,p.y-17},(Color){179,218,229,255});
