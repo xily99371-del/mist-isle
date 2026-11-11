@@ -44,3 +44,7 @@ The generated game assets include:
 - `assets/tiles/png/island_iso_tiles.png`
 
 Sprite textures use nearest-neighbor filtering to preserve pixel edges. Missing PNGs fall back to primitive placeholder rendering.
+
+
+## CI build artifact
+Every successful push to `main` builds the Windows executable and publishes a GitHub Actions artifact named `MistIsle-Windows-Prototype`, including the generated PNG assets. Download it from the repository's Actions run page.
