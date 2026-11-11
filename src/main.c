@@ -26,7 +26,7 @@ typedef struct {
     float px, py, hp;
     int berries, shells, crystals;
     int lumi, splash, spark, selected;
-    int shrineSolved, bossDefeated, fireflyDiscovered, leaflingFed;
+    int shrineSolved, bossDefeated, fireflyDiscovered, leaflingFed, groveMoteDefeated;
     int lumiLevel,lumiXp,splashLevel,splashXp,sparkLevel,sparkXp;
     unsigned char pickupTaken[MAX_PICKUPS];
 } SaveData;
@@ -96,6 +96,7 @@ typedef struct {
     int defeatedGuards;
     bool fireflyDiscovered;
     bool leaflingFed;
+    bool groveMoteDefeated;
     float fireflyPhase;
 } Game;
 
@@ -191,12 +192,12 @@ static void AddEnemy(Game *g,EnemyType t,float x,float y,float hp) {
 static void ResetGame(Game *g,int seed);
 static void SaveGame(Game *g) {
     SaveData s={0};
-    s.magic=0x4D495354; s.version=1; s.seed=g->lastSeed;
+    s.magic=0x4D495354; s.version=2; s.seed=g->lastSeed;
     s.px=g->player.pos.x; s.py=g->player.pos.y; s.hp=g->player.hp;
     s.berries=g->player.berries; s.shells=g->player.shells; s.crystals=g->player.crystals;
     s.lumi=g->lumi.owned; s.splash=g->splash.owned; s.spark=g->spark.owned; s.selected=g->selectedBuddy;
     s.shrineSolved=g->shrineSolved; s.bossDefeated=g->bossDefeated;
-    s.fireflyDiscovered=g->fireflyDiscovered; s.leaflingFed=g->leaflingFed;
+    s.fireflyDiscovered=g->fireflyDiscovered; s.leaflingFed=g->leaflingFed; s.groveMoteDefeated=g->groveMoteDefeated;
     s.lumiLevel=g->lumi.level;s.lumiXp=g->lumi.xp;s.splashLevel=g->splash.level;s.splashXp=g->splash.xp;s.sparkLevel=g->spark.level;s.sparkXp=g->spark.xp;
     for(int i=0;i<g->world.pickupCount && i<MAX_PICKUPS;i++)s.pickupTaken[i]=(unsigned char)g->world.pickups[i].taken;
     if(!SaveFileData("mist_isle_save.dat",&s,(int)sizeof(s)))Toast(g,"保存失败：无法写入存档文件。");
@@ -205,13 +206,13 @@ static bool LoadGame(Game *g) {
     int size=0; unsigned char *raw=LoadFileData("mist_isle_save.dat",&size);
     if(!raw || size!=(int)sizeof(SaveData)){if(raw)UnloadFileData(raw);Toast(g,"没有找到有效存档。");return false;}
     SaveData s; memcpy(&s,raw,sizeof(s)); UnloadFileData(raw);
-    if(s.magic!=0x4D495354 || s.version!=1){Toast(g,"存档版本不兼容。");return false;}
+    if(s.magic!=0x4D495354 || s.version!=2){Toast(g,"存档版本不兼容。");return false;}
     ResetGame(g,s.seed);
     g->scene=SCENE_PLAY; g->player.pos=(Vector2){s.px,s.py};g->player.hp=fmaxf(1.0f,fminf(100.0f,s.hp));
     g->player.berries=s.berries;g->player.shells=s.shells;g->player.crystals=s.crystals;
     g->lumi.owned=s.lumi!=0;g->splash.owned=s.splash!=0;g->spark.owned=s.spark!=0;g->selectedBuddy=s.selected;
     g->shrineSolved=s.shrineSolved!=0;g->bossDefeated=s.bossDefeated!=0;
-    g->fireflyDiscovered=s.fireflyDiscovered!=0;g->leaflingFed=s.leaflingFed!=0;
+    g->fireflyDiscovered=s.fireflyDiscovered!=0;g->leaflingFed=s.leaflingFed!=0;g->groveMoteDefeated=s.groveMoteDefeated!=0;
     g->lumi.level=s.lumiLevel;g->lumi.xp=s.lumiXp;g->splash.level=s.splashLevel;g->splash.xp=s.splashXp;g->spark.level=s.sparkLevel;g->spark.xp=s.sparkXp;
     for(int i=0;i<g->world.pickupCount && i<MAX_PICKUPS;i++)g->world.pickups[i].taken=s.pickupTaken[i]!=0;
     if(g->lumi.owned)g->lumi.pos=Vector2Add(g->player.pos,(Vector2){-.55f,.42f});
@@ -228,7 +229,7 @@ static void ResetGame(Game *g,int seed) {
     g->spark=(Buddy){.pos={15,8},.owned=false,.level=1};
     g->cam.offset=(Vector2){SW/2.0f,SH/2.0f+20}; g->cam.zoom=1;
     g->fireflyPhase=0; g->journalOpen=false; g->inventoryOpen=false; g->mapOpen=false;
-    g->fireflyDiscovered=false; g->leaflingFed=false; g->enemySoaked=false; g->battleRound=0; g->defeatedGuards=0;
+    g->fireflyDiscovered=false; g->leaflingFed=false; g->groveMoteDefeated=false; g->enemySoaked=false; g->battleRound=0; g->defeatedGuards=0;
 }
 static void InitPlay(Game *g) {
     g->scene=SCENE_PLAY; g->area=AREA_CAMP; g->player.pos=g->world.camp;
@@ -310,6 +311,7 @@ static void UpdateGame(Game *g,float dt) {
                     Buddy *active=CurrentBuddy(g); active->xp+=20;
                     if(active->xp>=50){active->xp-=50;active->level++;Toast(g,"伙伴成长了！等级提升。");}
                     else Toast(g,"敌人被击退！伙伴获得20点经验。");
+                    if(e->type==ENEMY_MOTE){g->groveMoteDefeated=true;g->player.berries+=2;Toast(g,"击退林地微光兽，获得2颗果实！");}
                     if(e->type==ENEMY_BOSS){g->bossDefeated=true;g->player.crystals+=3;g->player.shells+=2;SaveGame(g);}
                 }
             } else {
@@ -409,6 +411,12 @@ static void UpdateGame(Game *g,float dt) {
                 Burst(g,WorldScreen((Vector2){12.4f,8.0f}),C_GREEN,18);
                 SetDialogueAs(g,"叶团","叶团闻到了果实的香气，开心地蹦了起来。","它拨开藤蔓，露出一枚被藏起来的星晶！","探索时多留意会主动回应你的生物。");
             } else Toast(g,"叶团饿了：给它一颗岛屿果实吧。");
+            return;
+        }
+        // A small wild mote guards the old grove path. Win once to clear the route.
+        if(!g->groveMoteDefeated && Dist(p->pos,(Vector2){13.2f,9.2f})<1.45f) {
+            AddEnemy(g,ENEMY_MOTE,13.2f,9.2f,34.0f);
+            EnterBattle(g,g->enemyCount-1);
             return;
         }
         // Water companion encounter.
@@ -511,6 +519,14 @@ static void DrawFirefly(Vector2 p,float t) {
     DrawCircleV((Vector2){p.x-9,p.y-18-bob},2,Fade(WHITE,.75f));
     DrawCircleV((Vector2){p.x+9,p.y-29-bob},2,Fade(C_GOLD,.75f));
 }
+static void DrawMote(Vector2 p,float t) {
+    float bob=sinf(t*4.6f)*3.0f;
+    DrawEllipse((int)p.x,(int)p.y+5,12,4,(Color){71,92,100,75});
+    DrawCircleV((Vector2){p.x,p.y-11-bob},11,(Color){168,183,211,255});
+    DrawTriangle((Vector2){p.x-7,p.y-17-bob},(Vector2){p.x,p.y-29-bob},(Vector2){p.x+7,p.y-17-bob},(Color){202,195,226,255});
+    DrawCircleV((Vector2){p.x-4,p.y-12-bob},1.7f,C_INK);
+    DrawCircleV((Vector2){p.x+4,p.y-12-bob},1.7f,C_INK);
+}
 static void DrawLeafling(Vector2 p,float t) {
     float bob=sinf(t*4.0f)*2.5f;
     DrawEllipse((int)p.x,(int)p.y+5,11,4,(Color){70,105,76,75});
@@ -587,7 +603,7 @@ static void DrawPickup(Pickup *p) {
 }
 typedef enum {
     RENDER_TREE, RENDER_PROP, RENDER_FIRE, RENDER_PICKUP, RENDER_SHRINE,
-    RENDER_KEEPER, RENDER_LUMI, RENDER_MOATAIL, RENDER_GECKO, RENDER_PLAYER, RENDER_FIREFLY, RENDER_LEAFLING
+    RENDER_KEEPER, RENDER_LUMI, RENDER_MOATAIL, RENDER_GECKO, RENDER_PLAYER, RENDER_FIREFLY, RENDER_LEAFLING, RENDER_MOTE
 } RenderKind;
 typedef struct { float depth; RenderKind kind; int index; Vector2 grid; float scale; } RenderItem;
 static void PushRenderItem(RenderItem *items,int *count,RenderKind kind,int index,Vector2 grid,float scale) {
@@ -680,6 +696,7 @@ static void RenderWorld(Game *g) {
     Vector2 fireflyGrid={10.6f+sinf(g->fireflyPhase*0.8f)*0.22f,6.2f+cosf(g->fireflyPhase*0.65f)*0.18f};
     PushRenderItem(items,&count,RENDER_FIREFLY,0,fireflyGrid,1.0f);
     if(!g->leaflingFed)PushRenderItem(items,&count,RENDER_LEAFLING,0,(Vector2){12.4f,8.0f},1.0f);
+    if(!g->groveMoteDefeated)PushRenderItem(items,&count,RENDER_MOTE,0,(Vector2){13.2f,9.2f},1.0f);
     PushRenderItem(items,&count,RENDER_PLAYER,0,g->player.pos,1.0f);
 
     for(int i=1;i<count;i++) {
@@ -713,6 +730,7 @@ static void RenderWorld(Game *g) {
             case RENDER_GECKO: DrawGecko(p,g->time); break;
             case RENDER_FIREFLY: DrawFirefly(p,g->time); break;
             case RENDER_LEAFLING: DrawLeafling(p,g->time); break;
+            case RENDER_MOTE: DrawMote(p,g->time); break;
             case RENDER_PLAYER: DrawPlayer(p,g->time,Vector2Length(g->player.vel)>.1f,g->player.facing); break;
         }
     }
