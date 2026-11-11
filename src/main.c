@@ -780,7 +780,8 @@ static void RenderTitle(Game *g) {
     DrawText("一段关于伙伴、勇气与重新点亮世界的旅程",350,315,23,(Color){89,119,103,255});
     DrawRectangleRounded((Rectangle){500,425,280,62},.2f,16,(Color){255,249,224,245});
     DrawText("按 Enter 开始旅程",535,444,23,(Color){70,115,87,255});
-    DrawText("CARTOON 2.5D ADVENTURE",490,650,17,(Color){110,143,119,255});
+    DrawText(FileExists("mist_isle_save.dat")?"F9 继续上次旅程":"F9 读取存档",565,500,18,(Color){94,127,101,255});
+    DrawText("CARTOON PIXEL ADVENTURE",470,650,17,(Color){110,143,119,255});
 }
 static void RenderEnd(Game *g) {
     ClearBackground((Color){35,59,72,255});
@@ -814,7 +815,8 @@ int main(void) {
         float dt=GetFrameTime();if(dt>.05f)dt=.05f;
         if(g.scene==SCENE_TITLE) {
             g.time+=dt;
-            if(IsKeyPressed(KEY_ENTER)||IsMouseButtonPressed(MOUSE_BUTTON_LEFT))InitPlay(&g);
+            if(IsKeyPressed(KEY_F9)) { if(LoadGame(&g)) { /* restored directly into play */ } }
+            else if(IsKeyPressed(KEY_ENTER)||IsMouseButtonPressed(MOUSE_BUTTON_LEFT))InitPlay(&g);
         } else if(g.scene==SCENE_END) {
             if(IsKeyPressed(KEY_R))ResetGame(&g,g.lastSeed+1);
         } else {
