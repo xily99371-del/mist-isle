@@ -159,6 +159,7 @@ static void BuildWorld(World *w,int seed) {
     for(int x=2;x<20;x++) { w->kind[9][x]=0; w->kind[10][x]=0; }
     for(int y=3;y<15;y++) { w->kind[y][4]=0; w->kind[y][5]=0; }
     for(int y=5;y<14;y++) { w->kind[y][14]=0; w->kind[y][15]=0; }
+    for(int y=4;y<=8;y++)for(int x=8;x<=13;x++)w->kind[y][x]=0;
     w->camp=(Vector2){3,12}; w->groveGate=(Vector2){8,8};
     w->ruinGate=(Vector2){14,9}; w->shrine=(Vector2){17,5};
     w->bossPos=(Vector2){18,13};
@@ -191,8 +192,7 @@ static void SaveGame(Game *g) {
     s.shrineSolved=g->shrineSolved; s.bossDefeated=g->bossDefeated;
     s.fireflyDiscovered=g->fireflyDiscovered; s.leaflingFed=g->leaflingFed;
     for(int i=0;i<g->world.pickupCount && i<MAX_PICKUPS;i++)s.pickupTaken[i]=(unsigned char)g->world.pickups[i].taken;
-    if(SaveFileData("mist_isle_save.dat",&s,(int)sizeof(s)))Toast(g,"旅程已保存！");
-    else Toast(g,"保存失败：无法写入存档文件。");
+    if(!SaveFileData("mist_isle_save.dat",&s,(int)sizeof(s)))Toast(g,"保存失败：无法写入存档文件。");
 }
 static bool LoadGame(Game *g) {
     int size=0; unsigned char *raw=LoadFileData("mist_isle_save.dat",&size);
@@ -294,7 +294,7 @@ static void UpdateGame(Game *g,float dt) {
 
     Player *p=&g->player;
     if(IsKeyPressed(KEY_J)){g->journalOpen=true;return;}
-    if(IsKeyPressed(KEY_F5)){SaveGame(g);return;}
+    if(IsKeyPressed(KEY_F5)){SaveGame(g);Toast(g,"旅程已保存！");return;}
     if(IsKeyPressed(KEY_F9)){LoadGame(g);return;}
     p->dashCd=fmaxf(0,p->dashCd-dt);
     p->invuln=fmaxf(0,p->invuln-dt);
@@ -625,6 +625,16 @@ static void RenderWorld(Game *g) {
     PushRenderItem(items,&count,RENDER_PROP,9,(Vector2){5.9f,10.3f},1.0f);
     PushRenderItem(items,&count,RENDER_PROP,10,(Vector2){6.6f,12.5f},1.0f);
     PushRenderItem(items,&count,RENDER_PROP,11,(Vector2){2.4f,14.0f},1.0f);
+    // Dense grove dressing gives the forest its own visual identity.
+    PushRenderItem(items,&count,RENDER_PROP,12,(Vector2){9.0f,4.0f},1.0f);
+    PushRenderItem(items,&count,RENDER_PROP,12,(Vector2){12.8f,6.8f},0.85f);
+    PushRenderItem(items,&count,RENDER_PROP,13,(Vector2){10.0f,8.0f},1.0f);
+    PushRenderItem(items,&count,RENDER_PROP,14,(Vector2){13.0f,5.0f},0.9f);
+    PushRenderItem(items,&count,RENDER_PROP,15,(Vector2){8.4f,7.4f},1.0f);
+    for(int i=0;i<7;i++) {
+        int gx=8+(i*3)%6, gy=3+(i*5)%6;
+        PushRenderItem(items,&count,RENDER_TREE,20+i,(Vector2){(float)gx,(float)gy},0.68f+(i%3)*0.08f);
+    }
     for(int i=0;i<g->world.pickupCount;i++) if(!g->world.pickups[i].taken)
         PushRenderItem(items,&count,RENDER_PICKUP,i,g->world.pickups[i].tile,1.0f);
     PushRenderItem(items,&count,RENDER_SHRINE,0,g->world.shrine,1.0f);
@@ -652,6 +662,10 @@ static void RenderWorld(Game *g) {
                 else if(it->index==9)DrawProp(9,p,32,36);
                 else if(it->index==10)DrawProp(10,p,46,38);
                 else if(it->index==11)DrawProp(11,p,36,30);
+                else if(it->index==12)DrawProp(12,p,42*it->scale,48*it->scale);
+                else if(it->index==13)DrawProp(13,p,54*it->scale,34*it->scale);
+                else if(it->index==14)DrawProp(14,p,42*it->scale,54*it->scale);
+                else if(it->index==15)DrawProp(15,p,50*it->scale,42*it->scale);
                 break;
             case RENDER_FIRE: DrawCampfire(p,g->time); break;
             case RENDER_PICKUP: DrawPickup(&g->world.pickups[it->index]); break;
@@ -684,7 +698,7 @@ static void RenderHUD(Game *g) {
     DrawText(TextFormat("沫尾兽 %s",g->splash.owned?"已同行":"未发现"),1040,79,16,C_INK);
     DrawText(TextFormat("鸣晶蜥 %s",g->spark.owned?"已同行":"未发现"),1040,101,16,C_INK);
     Panel((Rectangle){20,652,720,48});
-    DrawText("WASD 移动   SHIFT 冲刺   E 互动   TAB 伙伴   J 手记   F5 保存",38,667,15,(Color){91,115,96,255});
+    DrawText("WASD 移动   SHIFT 冲刺   E 互动   TAB 伙伴   J 手记   F5 保存 / F9 读取",38,667,14,(Color){91,115,96,255});
     if(!g->lumi.owned && Dist(g->player.pos,(Vector2){4,12})<1.65f) {
         Panel((Rectangle){530,585,220,40});
         DrawText("E  救助苔灯灵",550,596,17,(Color){91,115,96,255});
