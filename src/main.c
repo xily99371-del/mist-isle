@@ -84,6 +84,13 @@ static Color C_PAPER={255,250,232,246}, C_GREEN={112,166,116,255};
 static Color C_DARKGREEN={70,119,86,255}, C_GOLD={255,219,133,255};
 static Color C_BLUE={119,190,208,255}, C_LILAC={190,166,220,255};
 static Color C_PINK={239,169,177,255}, C_RED={217,105,106,255};
+static Texture2D TEX_HERO={0}, TEX_LUMI={0}, TEX_MOATAIL={0}, TEX_GECKO={0};
+static void DrawPortrait(Texture2D tex, Vector2 p, float w, float h, float bob) {
+    if (tex.id == 0) return;
+    Rectangle src={0,0,(float)tex.width,(float)tex.height};
+    Rectangle dst={p.x-w*0.5f,p.y-h-bob,w,h};
+    DrawTexturePro(tex,src,dst,(Vector2){0,0},0,WHITE);
+}
 
 static Vector2 Iso(float x,float y,float z) {
     return (Vector2){(x-y)*31.0f,(x+y)*15.5f-z};
@@ -334,8 +341,9 @@ static void DrawTree(Vector2 p,float s,float t) {
     DrawCircleV((Vector2){p.x+4*s,p.y-49*s},4*s,Fade(C_GOLD,.3f+.1f*sinf(t+p.x)));
 }
 static void DrawLumi(Vector2 p,float t,float bob) {
+    DrawEllipse((int)p.x,(int)p.y+7,16,6,(Color){72,109,77,75});
+    if (TEX_LUMI.id) { DrawPortrait(TEX_LUMI,p,58,58,sinf(t*4.4f)*3.0f); return; }
     p.y-=bob*16;
-    DrawEllipse((int)p.x,(int)p.y+7,14,5,(Color){72,109,77,90});
     DrawCircleV((Vector2){p.x,p.y-11},14,(Color){159,202,145,255});
     DrawCircleV((Vector2){p.x-7,p.y-21},8,(Color){128,181,121,255});
     DrawCircleV((Vector2){p.x+7,p.y-21},8,(Color){128,181,121,255});
@@ -348,7 +356,8 @@ static void DrawLumi(Vector2 p,float t,float bob) {
 }
 static void DrawPlayer(Vector2 p,float t,bool moving) {
     float bob=moving?fabsf(sinf(t*13))*2.5f:sinf(t*2)*.6f;
-    DrawEllipse((int)p.x,(int)p.y+7,13,5,(Color){67,88,101,85});
+    DrawEllipse((int)p.x,(int)p.y+8,17,6,(Color){67,88,101,85});
+    if (TEX_HERO.id) { DrawPortrait(TEX_HERO,p,66,72,bob); return; }
     DrawTriangle((Vector2){p.x-12,p.y-20-bob},(Vector2){p.x+12,p.y-20-bob},(Vector2){p.x,p.y+2-bob},(Color){105,161,190,255});
     DrawCircleV((Vector2){p.x,p.y-32-bob},11,(Color){250,218,185,255});
     DrawCircleV((Vector2){p.x-4,p.y-33-bob},2,(Color){59,65,75,255});
@@ -396,21 +405,27 @@ static void RenderWorld(Game *g) {
     DrawShrine(Iso(g->world.shrine.x,g->world.shrine.y,0),g->time,g->shrineSolved);
     if(g->lumi.owned)DrawLumi(Iso(g->lumi.pos.x,g->lumi.pos.y,0),g->time,g->lumi.bob);
     if(g->splash.owned) {
-        Vector2 p=Iso(g->splash.pos.x,g->splash.pos.y,0);p.y-=sinf(g->time*4)*2;
-        DrawEllipse((int)p.x,(int)p.y+5,12,4,(Color){75,112,130,80});
-        DrawCircleV((Vector2){p.x,p.y-11},12,(Color){121,202,215,255});
-        DrawCircleV((Vector2){p.x-5,p.y-20},5,(Color){151,220,224,255});
-        DrawCircleV((Vector2){p.x+5,p.y-20},5,(Color){151,220,224,255});
-        DrawCircleV((Vector2){p.x-4,p.y-12},2,(Color){52,83,94,255});
-        DrawCircleV((Vector2){p.x+4,p.y-12},2,(Color){52,83,94,255});
+        Vector2 p=Iso(g->splash.pos.x,g->splash.pos.y,0);
+        DrawEllipse((int)p.x,(int)p.y+6,15,5,(Color){75,112,130,75});
+        if(TEX_MOATAIL.id) DrawPortrait(TEX_MOATAIL,p,58,58,sinf(g->time*4)*2.5f);
+        else {
+            DrawCircleV((Vector2){p.x,p.y-11},12,(Color){121,202,215,255});
+            DrawCircleV((Vector2){p.x-5,p.y-20},5,(Color){151,220,224,255});
+            DrawCircleV((Vector2){p.x+5,p.y-20},5,(Color){151,220,224,255});
+            DrawCircleV((Vector2){p.x-4,p.y-12},2,(Color){52,83,94,255});
+            DrawCircleV((Vector2){p.x+4,p.y-12},2,(Color){52,83,94,255});
+        }
     }
     if(g->spark.owned) {
-        Vector2 p=Iso(g->spark.pos.x,g->spark.pos.y,0);p.y-=sinf(g->time*5)*2;
-        DrawEllipse((int)p.x,(int)p.y+5,12,4,(Color){83,91,130,80});
-        DrawCircleV((Vector2){p.x,p.y-10},11,(Color){155,154,214,255});
-        DrawTriangle((Vector2){p.x-7,p.y-17},(Vector2){p.x,p.y-32},(Vector2){p.x+7,p.y-17},(Color){179,218,229,255});
-        DrawCircleV((Vector2){p.x-4,p.y-11},2,(Color){50,60,88,255});
-        DrawCircleV((Vector2){p.x+4,p.y-11},2,(Color){50,60,88,255});
+        Vector2 p=Iso(g->spark.pos.x,g->spark.pos.y,0);
+        DrawEllipse((int)p.x,(int)p.y+6,15,5,(Color){83,91,130,75});
+        if(TEX_GECKO.id) DrawPortrait(TEX_GECKO,p,58,58,sinf(g->time*5)*2.0f);
+        else {
+            DrawCircleV((Vector2){p.x,p.y-10},11,(Color){155,154,214,255});
+            DrawTriangle((Vector2){p.x-7,p.y-17},(Vector2){p.x,p.y-32},(Vector2){p.x+7,p.y-17},(Color){179,218,229,255});
+            DrawCircleV((Vector2){p.x-4,p.y-11},2,(Color){50,60,88,255});
+            DrawCircleV((Vector2){p.x+4,p.y-11},2,(Color){50,60,88,255});
+        }
     }
     DrawPlayer(Iso(g->player.pos.x,g->player.pos.y,0),g->time,Vector2Length(g->player.vel)>.1f);
     for(int i=0;i<MAX_PARTICLES;i++)if(g->particles[i].life>0) {
@@ -502,6 +517,10 @@ static void RenderEnd(Game *g) {
 int main(void) {
     SetConfigFlags(FLAG_VSYNC_HINT|FLAG_MSAA_4X_HINT);
     InitWindow(SW,SH,"雾屿回响 - 第一章：失落的灯塔");
+    if (FileExists("assets/characters/png/hero_explorer.png")) TEX_HERO=LoadTexture("assets/characters/png/hero_explorer.png");
+    if (FileExists("assets/characters/png/moss_lumi.png")) TEX_LUMI=LoadTexture("assets/characters/png/moss_lumi.png");
+    if (FileExists("assets/characters/png/moatail.png")) TEX_MOATAIL=LoadTexture("assets/characters/png/moatail.png");
+    if (FileExists("assets/characters/png/crystal_gecko.png")) TEX_GECKO=LoadTexture("assets/characters/png/crystal_gecko.png");
     SetTargetFPS(60);
     SetExitKey(KEY_NULL);
     Game g; ResetGame(&g,(int)time(NULL));
@@ -522,5 +541,9 @@ int main(void) {
         else {RenderWorld(&g);RenderHUD(&g);if(g.scene==SCENE_DIALOGUE)RenderDialogue(&g);}
         EndDrawing();
     }
+    if(TEX_HERO.id)UnloadTexture(TEX_HERO);
+    if(TEX_LUMI.id)UnloadTexture(TEX_LUMI);
+    if(TEX_MOATAIL.id)UnloadTexture(TEX_MOATAIL);
+    if(TEX_GECKO.id)UnloadTexture(TEX_GECKO);
     CloseWindow();return 0;
 }
