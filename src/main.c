@@ -60,6 +60,7 @@ typedef struct {
     int chapterFlags;
     int dialoguePage;
     char dialogue[4][180];
+    char dialogueSpeaker[32];
     int dialogueCount;
     int battleEnemy;
     int battleTurn;
@@ -112,12 +113,16 @@ static void AddParticle(Game *g,Vector2 p,Color c,float size) {
 static void Burst(Game *g,Vector2 p,Color c,int n) {
     for(int i=0;i<n;i++) AddParticle(g,p,c,(float)GetRandomValue(2,6));
 }
-static void SetDialogue(Game *g,const char *a,const char *b,const char *c) {
+static void SetDialogueAs(Game *g,const char *speaker,const char *a,const char *b,const char *c) {
+    snprintf(g->dialogueSpeaker,sizeof(g->dialogueSpeaker),"%s",speaker?speaker:"旁白");
     g->dialogueCount=0;
     if(a){snprintf(g->dialogue[g->dialogueCount++],180,"%s",a);}
     if(b){snprintf(g->dialogue[g->dialogueCount++],180,"%s",b);}
     if(c){snprintf(g->dialogue[g->dialogueCount++],180,"%s",c);}
     g->dialoguePage=0; g->scene=SCENE_DIALOGUE;
+}
+static void SetDialogue(Game *g,const char *a,const char *b,const char *c) {
+    SetDialogueAs(g,"苔灯灵",a,b,c);
 }
 static void AddPickup(World *w,int kind,float x,float y) {
     if(w->pickupCount>=18)return;
@@ -171,9 +176,9 @@ static void ResetGame(Game *g,int seed) {
 }
 static void InitPlay(Game *g) {
     g->scene=SCENE_PLAY; g->area=AREA_CAMP; g->player.pos=g->world.camp;
-    SetDialogue(g,"你在海岸边醒来，远处的灯塔已经熄灭。",
+    SetDialogueAs(g,"旅人手记","你在海岸边醒来，远处的灯塔已经熄灭。",
         "一只小小的苔灯灵躲在营火旁。它似乎受了伤。",
-        "靠近它，按 E 互动。WASD 移动，鼠标点击观察。");
+        "靠近它，按 E 互动。WASD 移动，SHIFT 冲刺。");
 }
 static void AddBuddyFriend(Game *g,int id) {
     if(id==0){g->lumi.owned=true;g->lumi.pos=Vector2Add(g->player.pos,(Vector2){-0.7f,0.4f});}
@@ -311,6 +316,13 @@ static void UpdateGame(Game *g,float dt) {
             else Toast(g,"鸣晶蜥需要一枚星晶才愿意同行。");
             return;
         }
+        // Rest beside the campfire after rescuing the first companion.
+        if(g->lumi.owned && Dist(p->pos,(Vector2){4.1f,12.5f})<1.25f) {
+            p->hp=fminf(p->maxHp,p->hp+22.0f);
+            Toast(g,"在营火旁休息了一会儿，恢复了生命。");
+            Burst(g,WorldScreen((Vector2){4.1f,12.5f}),C_GOLD,10);
+            return;
+        }
         // Ruin puzzle.
         if(Dist(p->pos,g->world.shrine)<1.7f&&!g->shrineSolved) {
             if(g->lumi.owned&&g->splash.owned&&g->spark.owned&&p->shells>=1) {
@@ -326,7 +338,7 @@ static void UpdateGame(Game *g,float dt) {
         }
         // NPC at camp.
         if(Dist(p->pos,(Vector2){3,10})<1.6f) {
-            SetDialogue(g,"营地守望者：灯塔熄灭后，岛上的小生灵都变得不安。","找到三位伙伴，唤醒潮汐遗迹，灯塔就能重新点亮。","果实、贝壳和星晶散落在岛上，按 E 采集。");
+            SetDialogueAs(g,"守望者","灯塔熄灭后，岛上的小生灵都变得不安。","找到三位伙伴，唤醒潮汐遗迹，灯塔就能重新点亮。","果实、贝壳和星晶散落在岛上，按 E 采集。");
             return;
         }
     }
@@ -583,9 +595,12 @@ static void RenderHUD(Game *g) {
     if(!g->lumi.owned && Dist(g->player.pos,(Vector2){4,12})<1.65f) {
         Panel((Rectangle){530,585,220,40});
         DrawText("E  救助苔灯灵",550,596,17,(Color){91,115,96,255});
-    } else if(!g->lumi.owned && Dist(g->player.pos,(Vector2){3,10})<2.0f) {
+    } else if(Dist(g->player.pos,(Vector2){3,10})<2.0f) {
         Panel((Rectangle){530,585,220,40});
         DrawText("E  与守望者交谈",550,596,17,(Color){91,115,96,255});
+    } else if(g->lumi.owned && Dist(g->player.pos,(Vector2){4.1f,12.5f})<1.5f) {
+        Panel((Rectangle){530,585,220,40});
+        DrawText("E  在营火旁休息",550,596,17,(Color){91,115,96,255});
     }
     if(g->toastTimer>0) {
         Panel((Rectangle){380,600,520,42});
@@ -598,7 +613,7 @@ static void RenderDialogue(Game *g) {
     DrawCircle(190,510,43,(Color){157,201,143,255});
     DrawCircle(190,510,29,(Color){220,233,183,255});
     DrawCircle(180,506,3,C_INK);DrawCircle(200,506,3,C_INK);
-    DrawText("苔灯灵",245,535,18,(Color){125,149,112,255});
+    DrawText(g->dialogueSpeaker,245,535,18,(Color){125,149,112,255});
     DrawText(g->dialogue[g->dialoguePage],245,568,23,C_INK);
     DrawText("按 E / Enter / 鼠标左键继续",820,635,16,(Color){135,135,107,255});
 }
