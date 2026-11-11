@@ -115,4 +115,10 @@ See `docs/APPROVED_ART_ASSETS.md` for sheet layouts, source archive details and 
 
 
 ## Approved art integration v2
-Extract `MistIsle_ArtIntegration_v2.zip` into the repository root (merge the `assets/` directory). The renderer now uses 64x64-cell player/companion sprites, an approved environment prop atlas, and a six-variant textured isometric ground atlas. Environment source bands are retained for future tile/prop selection.
+Extract `MistIsle_ArtIntegration_v2.zip` into the repository root (merge the `assets/` directory). The renderer uses 32x32 source cells for the approved player/companion sheets, 96x96 cells for the environment prop atlas, and a six-variant 64x32 isometric ground atlas. Environment source bands are retained for future tile/prop selection.
+
+
+## Art integration v2.1 — Windows playtest preparation
+The updated art archive is available in ChatGPT Library as `MistIsle_ArtIntegration_v2_1.zip`. Extract it into the repository root and merge `assets/`. This release includes the hand-projected grass, flower-grass, sand, stone and water isometric tiles. The asset generator now preserves an imported ground atlas instead of overwriting it with procedural placeholders.
+
+The renderer source frame size is 32x32 (the `_64` filename refers to the intended display scale, not the source-cell dimensions). The environment prop atlas uses 96x96 cells.
