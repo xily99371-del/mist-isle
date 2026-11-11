@@ -18,7 +18,7 @@ static Vector2 WorldScreen(Vector2 p) { return Iso(p.x,p.y,0); }
 static void Toast(Game *g,const char *s) {
     snprintf(g->toast,sizeof(g->toast),"%s",s); g->toastTimer=2.4f;
 }
-static float Dist(Vector2 a,Vector2 b) { return Vector2Distance(a,b); }
+float Dist(Vector2 a,Vector2 b) { return Vector2Distance(a,b); }
 static void AddParticle(Game *g,Vector2 p,Color c,float size) {
     for(int i=0;i<MAX_PARTICLES;i++) if(g->particles[i].life<=0) {
         float a=(float)GetRandomValue(0,628)/100.0f;
