@@ -99,7 +99,8 @@ for i,col in enumerate(colors):
         d.line((x+9,12,x+22,12,x+34,13,x+48,12),fill=(174,226,219,255),width=2)
         d.line((x+8,21,x+20,21,x+32,22,x+46,21),fill=(174,226,219,255),width=2)
     else:d.line((x+13,9,x+24,9,x+24,15,x+42,15,x+42,23,x+52,23),fill=(91,108,99,255),width=2)
-atlas.save(TILES/"island_iso_tiles.png")
+if not (TILES/"island_iso_tiles.png").exists():
+    atlas.save(TILES/"island_iso_tiles.png")
 
 # 8 original 64x64 pixel props: three trees, bush, tent, crate, sign, lighthouse.
 props=Image.new("RGBA",(512,64),(0,0,0,0));d=ImageDraw.Draw(props)
