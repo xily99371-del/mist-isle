@@ -225,6 +225,9 @@ static void RenderWorld(Game *g) {
     PushRenderItem(items,&count,RENDER_PROP,5,(Vector2){4.6f,10.8f},1.0f);
     PushRenderItem(items,&count,RENDER_PROP,6,(Vector2){5.5f,11.7f},1.0f);
     PushRenderItem(items,&count,RENDER_PROP,7,(Vector2){19.0f,2.2f},1.0f);
+    PushRenderItem(items,&count,RENDER_PROP,16,(Vector2){2.1f,10.5f},1.0f);
+    PushRenderItem(items,&count,RENDER_PROP,17,(Vector2){6.6f,10.9f},.82f);
+    PushRenderItem(items,&count,RENDER_PROP,18,(Vector2){6.3f,12.2f},.72f);
     PushRenderItem(items,&count,RENDER_FIRE,8,(Vector2){4.1f,12.5f},1.0f);
     PushRenderItem(items,&count,RENDER_PROP,9,(Vector2){5.9f,10.3f},1.0f);
     PushRenderItem(items,&count,RENDER_PROP,10,(Vector2){6.6f,12.5f},1.0f);
@@ -274,6 +277,9 @@ static void RenderWorld(Game *g) {
                 else if(it->index==13)DrawEnvProp(4,p,62*it->scale,40*it->scale);
                 else if(it->index==14)DrawEnvProp(5,p,54*it->scale,62*it->scale);
                 else if(it->index==15)DrawEnvProp(2,p,62*it->scale,48*it->scale);
+                else if(it->index==16)DrawEnvProp(10,p,76*it->scale,82*it->scale);
+                else if(it->index==17)DrawEnvProp(11,p,68*it->scale,38*it->scale);
+                else if(it->index==18)DrawEnvProp(8,p,38*it->scale,46*it->scale);
                 break;
             case RENDER_FIRE: DrawCampfire(p,g->time); break;
             case RENDER_PICKUP: DrawPickup(&g->world.pickups[it->index]); break;
@@ -302,6 +308,7 @@ static void Panel(Rectangle r) { DrawRectangleRounded(r,.13f,18,C_PAPER);DrawRec
 static void RenderHUD(Game *g) {
     Panel((Rectangle){20,18,405,112});
     DrawText("MIST ISLE  /  CHAPTER 01",40,32,15,(Color){119,145,116,255});
+    DrawCircle(397,42,8,Fade(C_GOLD,.75f));
     DrawText("失落的灯塔",40,54,28,C_INK);
     DrawText(TextFormat("生命 %d    果实 %d    贝壳 %d    星晶 %d",(int)g->player.hp,g->player.berries,g->player.shells,g->player.crystals),40,96,17,(Color){104,119,93,255});
     Panel((Rectangle){1020,18,238,92});
@@ -405,9 +412,21 @@ static void RenderBattle(Game *g) {
     DrawText(TextFormat("守卫 HP  %d / %d",(int)e->hp,(int)e->maxHp),760,80,22,WHITE);
     DrawRectangle(760,112,340,17,(Color){70,75,85,255});
     DrawRectangle(760,112,(int)(340*fmaxf(0,e->hp/e->maxHp)),17,C_PINK);
-    DrawCircle(380,365,42,(Color){153,201,143,255});
-    DrawCircle(380,365,30,(Color){219,232,180,255});
-    DrawCircle(370,361,3,C_INK);DrawCircle(390,361,3,C_INK);
+    // Show the selected companion as a real sprite in the battle party panel.
+    if(g->selectedBuddy==0 && g->lumi.owned)DrawLumi((Vector2){380,390},g->time,0);
+    else if(g->selectedBuddy==1 && g->splash.owned)DrawMoatail((Vector2){380,390},g->time);
+    else if(g->selectedBuddy==2 && g->spark.owned)DrawGecko((Vector2){380,390},g->time);
+    else DrawPlayer((Vector2){380,390},g->time,false,0);
+    if(e->type==ENEMY_MOTE)DrawMote((Vector2){870,300},g->time);
+    else {
+        Color enemyColor=e->type==ENEMY_BOSS?(Color){103,94,145,255}:(Color){166,143,163,255};
+        DrawCircle(870,235,55,enemyColor);
+        DrawTriangle((Vector2){830,206},(Vector2){855,150},(Vector2){879,206},(Color){204,181,205,255});
+        DrawTriangle((Vector2){864,205},(Vector2){901,164},(Vector2){916,222},(Color){183,160,192,255});
+        DrawCircle(852,232,6,C_INK);DrawCircle(888,232,6,C_INK);
+        DrawCircle(852,230,2,WHITE);DrawCircle(888,230,2,WHITE);
+        if(e->type==ENEMY_BOSS)DrawCircle(870,235,78,Fade(C_LILAC,.15f));
+    }
     DrawText("选择伙伴技能",70,525,23,WHITE);
     const char *opts[3]={"1  苔灯灵：治疗 + 微光攻击","2  沫尾兽：潮湿水流","3  鸣晶蜥：晶弧放电（潮湿克制）"};
     for(int i=0;i<3;i++) {
