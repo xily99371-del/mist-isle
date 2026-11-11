@@ -9,6 +9,13 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate pixel assets
+        run: |
+          python -m pip install pillow
+          python tools/generate_pixel_assets.py
       - name: Configure
         run: cmake -S . -B build -A x64
       - name: Build
