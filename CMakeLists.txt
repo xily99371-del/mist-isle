@@ -10,12 +10,6 @@ FetchContent_Declare(raylib
   GIT_TAG 5.5
 )
 FetchContent_MakeAvailable(raylib)
-
-# Unpack the checked-in native-resolution pixel art on configure.
-set(MIST_PIXEL_ARCHIVE "${CMAKE_SOURCE_DIR}/assets/MistIsle_PixelArt_v1.zip")
-if(EXISTS "${MIST_PIXEL_ARCHIVE}")
-  file(ARCHIVE_EXTRACT INPUT "${MIST_PIXEL_ARCHIVE}" DESTINATION "${CMAKE_SOURCE_DIR}")
-endif()
 add_executable(mist_isle src/main.c)
 target_link_libraries(mist_isle PRIVATE raylib)
 set_property(TARGET mist_isle PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
