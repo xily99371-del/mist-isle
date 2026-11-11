@@ -48,3 +48,13 @@ Sprite textures use nearest-neighbor filtering to preserve pixel edges. Missing 
 
 ## CI build artifact
 Every successful push to `main` builds the Windows executable and publishes a GitHub Actions artifact named `MistIsle-Windows-Prototype`, including the generated PNG assets. Download it from the repository's Actions run page.
+
+
+## Coastal camp milestone
+The current coastal-camp scene includes a generated pixel-art campsite prop atlas and a friendly keeper sprite:
+- Tent, supply crate, signpost, lighthouse, campfire, mailbox, flower patch and shore rock.
+- The keeper NPC is visible at the camp and can be spoken to with **E**.
+- Campfire flicker and glow are animated in the renderer.
+- All pixel textures use nearest-neighbor filtering.
+
+Run `RUN_WINDOWS.bat` to regenerate all PNG assets before building. The GitHub Actions workflow packages the executable together with its runtime asset folders.
