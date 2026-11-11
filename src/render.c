@@ -158,7 +158,7 @@ typedef enum {
 } RenderKind;
 typedef struct { float depth; RenderKind kind; int index; Vector2 grid; float scale; } RenderItem;
 static void PushRenderItem(RenderItem *items,int *count,RenderKind kind,int index,Vector2 grid,float scale) {
-    if(*count>=64)return;
+    if(*count>=128)return;
     items[*count]=(RenderItem){grid.x+grid.y,kind,index,grid,scale};
     (*count)++;
 }
@@ -216,7 +216,7 @@ static void RenderWorld(Game *g) {
     for(int y=3;y<6;y++)for(int x=2;x<6;x++)DrawIsoTile(x,y,4,(Color){119,191,199,255});
 
     // Sort elevated objects by isometric depth (x+y): characters can pass behind trees.
-    RenderItem items[64]; int count=0;
+    RenderItem items[128]; int count=0;
     for(int y=1;y<MAPH-1;y++)for(int x=1;x<MAPW-1;x++) {
         if(g->world.kind[y][x]==1)
             PushRenderItem(items,&count,RENDER_TREE,(x*3+y)%3,(Vector2){(float)x,(float)y},.82f+((x+y)%3)*.08f);
