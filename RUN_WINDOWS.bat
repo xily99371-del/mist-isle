@@ -23,9 +23,23 @@ cmake --build build --config Release
 if errorlevel 1 goto failed
 
 echo.
-echo Build complete. Launching Mist Isle...
-start "" "%~dp0build\Release\mist_isle.exe"
-exit /b 0
+echo Build complete.
+if exist "%~dp0assets\environment\environment_props_96.png" (
+  echo Approved art pack detected. Loading imported character and environment assets.
+) else (
+  echo NOTE: Approved art pack not found. The game will use fallback visuals.
+  echo Extract MistIsle_ArtIntegration_v2_1.zip into this folder to enable approved art.
+)
+if exist "%~dp0build\Release\mist_isle.exe" (
+  start "" "%~dp0build\Release\mist_isle.exe"
+  exit /b 0
+)
+if exist "%~dp0build\mist_isle.exe" (
+  start "" "%~dp0build\mist_isle.exe"
+  exit /b 0
+)
+echo Could not locate mist_isle.exe after build.
+goto failed
 
 :failed
 echo.
