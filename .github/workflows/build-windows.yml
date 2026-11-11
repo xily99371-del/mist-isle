@@ -20,3 +20,17 @@ jobs:
         run: cmake -S . -B build -A x64
       - name: Build
         run: cmake --build build --config Release
+      - name: Package Windows build
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Copy-Item build/Release/mist_isle.exe dist/
+          New-Item -ItemType Directory -Force -Path dist/assets/characters dist/assets/tiles | Out-Null
+          Copy-Item assets/characters/png/* dist/assets/characters/
+          Copy-Item assets/tiles/png/* dist/assets/tiles/
+      - name: Upload playable Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: MistIsle-Windows-Prototype
+          path: dist/
+          if-no-files-found: error
