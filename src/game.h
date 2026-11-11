@@ -102,6 +102,8 @@ extern Color C_BG,C_INK,C_PAPER,C_GREEN,C_DARKGREEN,C_GOLD,C_BLUE,C_LILAC,C_PINK
 void GameReset(Game *g,int seed);
 void GameUpdate(Game *g,float dt);
 void GameRender(Game *g);
+void RenderInit(void);
+void RenderClose(void);
 void GameSave(Game *g);
 bool GameLoad(Game *g);
 void GameStart(Game *g);
