@@ -85,7 +85,7 @@ static Color C_DARKGREEN={70,119,86,255}, C_GOLD={255,219,133,255};
 static Color C_BLUE={119,190,208,255}, C_LILAC={190,166,220,255};
 static Color C_PINK={239,169,177,255}, C_RED={217,105,106,255};
 static Texture2D TEX_HERO={0}, TEX_LUMI={0}, TEX_MOATAIL={0}, TEX_GECKO={0};
-static Texture2D TEX_HERO_WALK={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, TEX_GECKO_PIXEL={0};
+static Texture2D TEX_HERO_WALK={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, TEX_GECKO_PIXEL={0}, TEX_ISO_TILES={0};
 static void DrawPortrait(Texture2D tex, Vector2 p, float w, float h, float bob) {
     if (tex.id == 0) return;
     Rectangle src={0,0,(float)tex.width,(float)tex.height};
@@ -330,10 +330,16 @@ static void UpdateGame(Game *g,float dt) {
     g->cam.target=Iso(p->pos.x,p->pos.y,0);
     if(g->toastTimer>0)g->toastTimer-=dt;
 }
-static void DrawIsoTile(int x,int y,Color c) {
+static void DrawIsoTile(int x,int y,int tile,Color fallback) {
     Vector2 p=Iso((float)x,(float)y,0);
+    if (TEX_ISO_TILES.id) {
+        Rectangle src={(float)(tile*64),0,64,32};
+        Rectangle dst={p.x-32,p.y-16,64,32};
+        DrawTexturePro(TEX_ISO_TILES,src,dst,(Vector2){0,0},0,WHITE);
+        return;
+    }
     Vector2 a={p.x,p.y-15.5f},b={p.x+31,p.y},d={p.x-31,p.y},e={p.x,p.y+15.5f};
-    DrawTriangle(a,b,d,c);DrawTriangle(b,e,d,c);
+    DrawTriangle(a,b,d,fallback);DrawTriangle(b,e,d,fallback);
 }
 static void DrawTree(Vector2 p,float s,float t) {
     DrawEllipse((int)p.x,(int)p.y+5,15*s,5*s,(Color){67,101,76,75});
@@ -408,12 +414,15 @@ static void RenderWorld(Game *g) {
         if(g->world.kind[y][x]==2)c=(Color){192,181,143,255};
         if(x>=8&&x<=11&&y>=3&&y<=7)c=(Color){133,190,175,255};
         if(x>=14&&x<=19&&y>=4&&y<=10)c=(Color){184,181,151,255};
-        DrawIsoTile(x,y,c);
+        int tile=(g->world.kind[y][x]==1)?2:(g->world.kind[y][x]==2)?3:((x+y)%3);
+        if(x>=8&&x<=11&&y>=3&&y<=7)tile=4;
+        if(x>=14&&x<=19&&y>=4&&y<=10)tile=5;
+        DrawIsoTile(x,y,tile,c);
         Vector2 p=Iso(x,y,0);
         if(g->world.kind[y][x]==1)DrawCircleV((Vector2){p.x,p.y-5},7,(Color){102,143,107,255});
     }
     // Water pool and stepping stones.
-    for(int y=3;y<6;y++)for(int x=2;x<6;x++)DrawIsoTile(x,y,(Color){119,191,199,255});
+    for(int y=3;y<6;y++)for(int x=2;x<6;x++)DrawIsoTile(x,y,4,(Color){119,191,199,255});
     for(int i=0;i<15;i++) {
         int x=2+(i*7)%17,y=2+(i*11)%13;
         if(g->world.kind[y][x]!=1)DrawTree(Iso(x,y,0),.72f+(i%3)*.1f,g->time);
@@ -549,6 +558,7 @@ int main(void) {
     if (FileExists("assets/characters/png/lumi_idle_pixel.png")) { TEX_LUMI_PIXEL=LoadTexture("assets/characters/png/lumi_idle_pixel.png"); SetTextureFilter(TEX_LUMI_PIXEL,TEXTURE_FILTER_POINT); }
     if (FileExists("assets/characters/png/moatail_idle_pixel.png")) { TEX_MOATAIL_PIXEL=LoadTexture("assets/characters/png/moatail_idle_pixel.png"); SetTextureFilter(TEX_MOATAIL_PIXEL,TEXTURE_FILTER_POINT); }
     if (FileExists("assets/characters/png/gecko_idle_pixel.png")) { TEX_GECKO_PIXEL=LoadTexture("assets/characters/png/gecko_idle_pixel.png"); SetTextureFilter(TEX_GECKO_PIXEL,TEXTURE_FILTER_POINT); }
+    if (FileExists("assets/tiles/png/island_iso_tiles.png")) { TEX_ISO_TILES=LoadTexture("assets/tiles/png/island_iso_tiles.png"); SetTextureFilter(TEX_ISO_TILES,TEXTURE_FILTER_POINT); }
     if (FileExists("assets/characters/png/moss_lumi.png")) TEX_LUMI=LoadTexture("assets/characters/png/moss_lumi.png");
     if (FileExists("assets/characters/png/moatail.png")) TEX_MOATAIL=LoadTexture("assets/characters/png/moatail.png");
     if (FileExists("assets/characters/png/crystal_gecko.png")) TEX_GECKO=LoadTexture("assets/characters/png/crystal_gecko.png");
@@ -576,6 +586,7 @@ int main(void) {
     if(TEX_LUMI_PIXEL.id)UnloadTexture(TEX_LUMI_PIXEL);
     if(TEX_MOATAIL_PIXEL.id)UnloadTexture(TEX_MOATAIL_PIXEL);
     if(TEX_GECKO_PIXEL.id)UnloadTexture(TEX_GECKO_PIXEL);
+    if(TEX_ISO_TILES.id)UnloadTexture(TEX_ISO_TILES);
     if(TEX_HERO.id)UnloadTexture(TEX_HERO);
     if(TEX_LUMI.id)UnloadTexture(TEX_LUMI);
     if(TEX_MOATAIL.id)UnloadTexture(TEX_MOATAIL);
