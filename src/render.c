@@ -138,11 +138,18 @@ static void DrawPlayer(Vector2 p,float t,bool moving,int facing) {
 }
 static void DrawShrine(Vector2 p,float t,bool solved) {
     Color c=solved?C_GOLD:(Color){158,185,166,255};
-    DrawEllipse((int)p.x,(int)p.y+7,29,9,(Color){66,95,85,95});
-    DrawRectangle((int)p.x-14,(int)p.y-25,28,31,(Color){156,174,149,255});
-    DrawRectangle((int)p.x-8,(int)p.y-45,16,22,(Color){198,209,171,255});
-    DrawCircleV((Vector2){p.x,p.y-56-sinf(t*2)*3},8,c);
-    if(solved)DrawCircleV((Vector2){p.x,p.y-55},29,Fade(c,.18f));
+    DrawEllipse((int)p.x,(int)p.y+8,34,10,(Color){66,95,85,95});
+    if(TEX_ENV_PROPS.id) DrawEnvProp(4,p,82,82);
+    else {
+        DrawRectangle((int)p.x-14,(int)p.y-25,28,31,(Color){156,174,149,255});
+        DrawRectangle((int)p.x-8,(int)p.y-45,16,22,(Color){198,209,171,255});
+    }
+    DrawCircleV((Vector2){p.x,p.y-56-sinf(t*2)*3},solved?11:7,c);
+    DrawCircleV((Vector2){p.x,p.y-56-sinf(t*2)*3},3,WHITE);
+    if(solved) {
+        DrawCircleV((Vector2){p.x,p.y-55},38,Fade(c,.15f));
+        for(int i=0;i<4;i++){float a=t*.7f+i*PI2/4;DrawCircleV((Vector2){p.x+cosf(a)*35,p.y-42+sinf(a)*22},2.5f,Fade(C_GOLD,.8f));}
+    }
 }
 static void DrawPickup(Pickup *p) {
     Vector2 s=Iso(p->tile.x,p->tile.y,0);float bob=sinf(p->phase)*3;
