@@ -84,7 +84,7 @@ static Color C_PAPER={255,250,232,246}, C_GREEN={112,166,116,255};
 static Color C_DARKGREEN={70,119,86,255}, C_GOLD={255,219,133,255};
 static Color C_BLUE={119,190,208,255}, C_LILAC={190,166,220,255};
 static Color C_PINK={239,169,177,255}, C_RED={217,105,106,255};
-static Texture2D TEX_HERO={0}, TEX_LUMI={0}, TEX_MOATAIL={0}, TEX_GECKO={0};
+static Texture2D TEX_HERO={0}, TEX_LUMI={0}, TEX_MOATAIL={0}, TEX_GECKO={0}, TEX_KEEPER={0};
 static Texture2D TEX_HERO_WALK={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, TEX_GECKO_PIXEL={0}, TEX_ISO_TILES={0}, TEX_PROPS={0};
 static void DrawPortrait(Texture2D tex, Vector2 p, float w, float h, float bob) {
     if (tex.id == 0) return;
@@ -371,6 +371,29 @@ static void DrawProp(int index,Vector2 p,float w,float h) {
     Rectangle dst={p.x-w*.5f,p.y-h,w,h};
     DrawTexturePro(TEX_PROPS,src,dst,(Vector2){0,0},0,WHITE);
 }
+static void DrawKeeper(Vector2 p,float t) {
+    DrawEllipse((int)p.x,(int)p.y+7,13,4,(Color){67,88,76,80});
+    if(TEX_KEEPER.id) {
+        Rectangle src={0,0,32,32};
+        Rectangle dst={p.x-18,p.y-39+sinf(t*2.0f)*0.5f,36,36};
+        DrawTexturePro(TEX_KEEPER,src,dst,(Vector2){0,0},0,WHITE);
+        return;
+    }
+    DrawCircleV((Vector2){p.x,p.y-29},10,(Color){229,222,198,255});
+    DrawCircleV((Vector2){p.x-3,p.y-30},1.5f,C_INK);
+    DrawCircleV((Vector2){p.x+3,p.y-30},1.5f,C_INK);
+    DrawRectangle((int)p.x-9,(int)p.y-19,18,18,(Color){111,151,116,255});
+}
+static void DrawCampfire(Vector2 p,float t) {
+    DrawProp(8,p,48,48);
+    float pulse=0.5f+0.5f*sinf(t*7.0f);
+    DrawCircleV((Vector2){p.x,p.y-30},18,Fade((Color){255,177,91,255},0.10f+0.06f*pulse));
+    DrawCircleV((Vector2){p.x,p.y-28},7,Fade((Color){255,220,132,255},0.15f+0.10f*pulse));
+    if(((int)(t*8.0f))%3==0) {
+        DrawCircleV((Vector2){p.x-8,p.y-47-(t*9.0f-floorf(t*9.0f))*7},2,Fade(C_GOLD,0.7f));
+        DrawCircleV((Vector2){p.x+7,p.y-41-(t*7.0f-floorf(t*7.0f))*6},1.5f,Fade(WHITE,0.65f));
+    }
+}
 static void DrawLumi(Vector2 p,float t,float bob) {
     DrawEllipse((int)p.x,(int)p.y+7,16,6,(Color){72,109,77,75});
     if (TEX_LUMI_PIXEL.id) {
@@ -452,8 +475,13 @@ static void RenderWorld(Game *g) {
     // Storybook props: campsite, supply crate, signpost and distant lighthouse.
     DrawProp(4,Iso(3.2f,11.4f,0),72,68);
     DrawProp(5,Iso(4.6f,10.8f,0),38,38);
-    DrawProp(6,Iso(5.2f,11.7f,0),34,38);
+    DrawProp(6,Iso(5.5f,11.7f,0),34,38);
     DrawProp(7,Iso(19.0f,2.2f,0),62,112);
+    DrawCampfire(Iso(4.1f,12.5f,0),g->time);
+    DrawProp(9,Iso(5.9f,10.3f,0),32,36);
+    DrawProp(10,Iso(6.6f,12.5f,0),46,38);
+    DrawProp(11,Iso(2.4f,14.0f,0),36,30);
+    DrawKeeper(Iso(3.0f,10.0f,0),g->time);
     for(int i=0;i<g->world.pickupCount;i++)if(!g->world.pickups[i].taken)DrawPickup(&g->world.pickups[i]);
     DrawShrine(Iso(g->world.shrine.x,g->world.shrine.y,0),g->time,g->shrineSolved);
     if(g->lumi.owned)DrawLumi(Iso(g->lumi.pos.x,g->lumi.pos.y,0),g->time,g->lumi.bob);
@@ -510,6 +538,10 @@ static void RenderHUD(Game *g) {
     DrawText(TextFormat("鸣晶蜥 %s",g->spark.owned?"已同行":"未发现"),1040,101,16,C_INK);
     Panel((Rectangle){20,652,720,48});
     DrawText("WASD 移动   SHIFT 冲刺   E 互动/采集   TAB 切换伙伴",38,667,17,(Color){91,115,96,255});
+    if(!g->lumi.owned && Dist(g->player.pos,(Vector2){3,10})<2.0f) {
+        Panel((Rectangle){530,585,220,40});
+        DrawText("E  与守望者交谈",550,596,17,(Color){91,115,96,255});
+    }
     if(g->toastTimer>0) {
         Panel((Rectangle){380,600,520,42});
         DrawText(g->toast,400,612,18,(Color){78,112,91,255});
@@ -585,6 +617,7 @@ int main(void) {
     if (FileExists("assets/characters/png/lumi_idle_pixel.png")) { TEX_LUMI_PIXEL=LoadTexture("assets/characters/png/lumi_idle_pixel.png"); SetTextureFilter(TEX_LUMI_PIXEL,TEXTURE_FILTER_POINT); }
     if (FileExists("assets/characters/png/moatail_idle_pixel.png")) { TEX_MOATAIL_PIXEL=LoadTexture("assets/characters/png/moatail_idle_pixel.png"); SetTextureFilter(TEX_MOATAIL_PIXEL,TEXTURE_FILTER_POINT); }
     if (FileExists("assets/characters/png/gecko_idle_pixel.png")) { TEX_GECKO_PIXEL=LoadTexture("assets/characters/png/gecko_idle_pixel.png"); SetTextureFilter(TEX_GECKO_PIXEL,TEXTURE_FILTER_POINT); }
+    if (FileExists("assets/characters/png/camp_keeper.png")) { TEX_KEEPER=LoadTexture("assets/characters/png/camp_keeper.png"); SetTextureFilter(TEX_KEEPER,TEXTURE_FILTER_POINT); }
     if (FileExists("assets/tiles/png/island_iso_tiles.png")) { TEX_ISO_TILES=LoadTexture("assets/tiles/png/island_iso_tiles.png"); SetTextureFilter(TEX_ISO_TILES,TEXTURE_FILTER_POINT); }
     if (FileExists("assets/tiles/png/environment_props.png")) { TEX_PROPS=LoadTexture("assets/tiles/png/environment_props.png"); SetTextureFilter(TEX_PROPS,TEXTURE_FILTER_POINT); }
     if (FileExists("assets/characters/png/moss_lumi.png")) TEX_LUMI=LoadTexture("assets/characters/png/moss_lumi.png");
@@ -614,6 +647,7 @@ int main(void) {
     if(TEX_LUMI_PIXEL.id)UnloadTexture(TEX_LUMI_PIXEL);
     if(TEX_MOATAIL_PIXEL.id)UnloadTexture(TEX_MOATAIL_PIXEL);
     if(TEX_GECKO_PIXEL.id)UnloadTexture(TEX_GECKO_PIXEL);
+    if(TEX_KEEPER.id)UnloadTexture(TEX_KEEPER);
     if(TEX_ISO_TILES.id)UnloadTexture(TEX_ISO_TILES);
     if(TEX_PROPS.id)UnloadTexture(TEX_PROPS);
     if(TEX_HERO.id)UnloadTexture(TEX_HERO);
