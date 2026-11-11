@@ -3,7 +3,7 @@
 #include <stdio.h>
 static Texture2D TEX_HERO={0}, TEX_LUMI={0}, TEX_MOATAIL={0}, TEX_GECKO={0}, TEX_KEEPER={0};
 static Texture2D TEX_HERO_PIXEL={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, TEX_GECKO_PIXEL={0}, TEX_TILES={0}, TEX_PROPS={0};
-static Texture2D TEX_ISO_TILES={0}, TEX_HERO_WALK={0};
+static Texture2D TEX_ISO_TILES={0}, TEX_HERO_WALK={0}, TEX_ENV_PROPS={0}, TEX_LEAFLING={0}, TEX_GROVE_MOTE={0};
 static void DrawPortrait(Texture2D tex, Vector2 p, float w, float h, float bob) {
     if (tex.id == 0) return;
     Rectangle src={0,0,(float)tex.width,(float)tex.height};
@@ -22,12 +22,16 @@ static void DrawIsoTile(int x,int y,int tile,Color fallback) {
     Vector2 a={p.x,p.y-15.5f},b={p.x+31,p.y},d={p.x-31,p.y},e={p.x,p.y+15.5f};
     DrawTriangle(a,b,d,fallback);DrawTriangle(b,e,d,fallback);
 }
+static void DrawEnvProp(int index,Vector2 p,float w,float h) {
+    if(!TEX_ENV_PROPS.id)return;
+    Rectangle src={(float)(index*96),0,96,96};
+    Rectangle dst={p.x-w*.5f,p.y-h,w,h};
+    DrawTexturePro(TEX_ENV_PROPS,src,dst,(Vector2){0,0},0,WHITE);
+}
 static void DrawTree(Vector2 p,float s,float t) {
-    if(TEX_PROPS.id) {
+    if(TEX_ENV_PROPS.id) {
         int variant=((int)(p.x+p.y))%3;
-        Rectangle src={(float)(variant*64),0,64,64};
-        Rectangle dst={p.x-32*s,p.y-62*s,64*s,64*s};
-        DrawTexturePro(TEX_PROPS,src,dst,(Vector2){0,0},0,WHITE);
+        DrawEnvProp(variant,p,82*s,92*s);
         return;
     }
     DrawEllipse((int)p.x,(int)p.y+5,15*s,5*s,(Color){67,101,76,75});
@@ -67,6 +71,7 @@ static void DrawFirefly(Vector2 p,float t) {
 static void DrawMote(Vector2 p,float t) {
     float bob=sinf(t*4.6f)*3.0f;
     DrawEllipse((int)p.x,(int)p.y+5,12,4,(Color){71,92,100,75});
+    if(TEX_GROVE_MOTE.id){int frame=(int)(t*2.5f)%4;Rectangle src={(float)(frame*64),0,64,64};Rectangle dst={p.x-26,p.y-55-bob,52,52};DrawTexturePro(TEX_GROVE_MOTE,src,dst,(Vector2){0,0},0,WHITE);return;}
     DrawCircleV((Vector2){p.x,p.y-11-bob},11,(Color){168,183,211,255});
     DrawTriangle((Vector2){p.x-7,p.y-17-bob},(Vector2){p.x,p.y-29-bob},(Vector2){p.x+7,p.y-17-bob},(Color){202,195,226,255});
     DrawCircleV((Vector2){p.x-4,p.y-12-bob},1.7f,C_INK);
@@ -75,6 +80,7 @@ static void DrawMote(Vector2 p,float t) {
 static void DrawLeafling(Vector2 p,float t) {
     float bob=sinf(t*4.0f)*2.5f;
     DrawEllipse((int)p.x,(int)p.y+5,11,4,(Color){70,105,76,75});
+    if(TEX_LEAFLING.id){int frame=(int)(t*2.5f)%4;Rectangle src={(float)(frame*64),0,64,64};Rectangle dst={p.x-26,p.y-55-bob,52,52};DrawTexturePro(TEX_LEAFLING,src,dst,(Vector2){0,0},0,WHITE);return;}
     DrawCircleV((Vector2){p.x,p.y-10-bob},10,(Color){157,192,118,255});
     DrawTriangle((Vector2){p.x-5,p.y-16-bob},(Vector2){p.x+1,p.y-29-bob},(Vector2){p.x+7,p.y-15-bob},(Color){102,160,94,255});
     DrawCircleV((Vector2){p.x-3,p.y-11-bob},1.6f,C_INK);
@@ -95,8 +101,8 @@ static void DrawLumi(Vector2 p,float t,float bob) {
     DrawEllipse((int)p.x,(int)p.y+7,16,6,(Color){72,109,77,75});
     if (TEX_LUMI_PIXEL.id) {
         int frame=(int)(t*2.5f)%4;
-        Rectangle src={(float)(frame*32),0,32,32};
-        Rectangle dst={p.x-18,p.y-38-sinf(t*4.4f)*2.0f,36,36};
+        Rectangle src={(float)(frame*64),0,64,64};
+        Rectangle dst={p.x-27,p.y-56-sinf(t*4.4f)*2.0f,54,54};
         DrawTexturePro(TEX_LUMI_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
         return;
     }
@@ -117,8 +123,8 @@ static void DrawPlayer(Vector2 p,float t,bool moving,int facing) {
     DrawEllipse((int)p.x,(int)p.y+8,13,4,(Color){67,88,101,85});
     if (TEX_HERO_WALK.id) {
         int frame = moving ? ((int)(t*8.0f)%4) : 0;
-        Rectangle src={(float)(frame*32),(float)(facing*32),32,32};
-        Rectangle dst={p.x-18,p.y-39-bob,36,40};
+        Rectangle src={(float)(frame*64),(float)(facing*64),64,64};
+        Rectangle dst={p.x-28,p.y-59-bob,56,60};
         DrawTexturePro(TEX_HERO_WALK,src,dst,(Vector2){0,0},0,WHITE);
         return;
     }
@@ -159,9 +165,9 @@ static void PushRenderItem(RenderItem *items,int *count,RenderKind kind,int inde
 static void DrawMoatail(Vector2 p,float t) {
     DrawEllipse((int)p.x,(int)p.y+6,15,5,(Color){75,112,130,75});
     if(TEX_MOATAIL_PIXEL.id) {
-        int frame=(int)(t*2.5f)%2;
-        Rectangle src={(float)(frame*32),0,32,32};
-        Rectangle dst={p.x-18,p.y-38-sinf(t*4)*2.0f,36,36};
+        int frame=(int)(t*2.5f)%4;
+        Rectangle src={(float)(frame*64),0,64,64};
+        Rectangle dst={p.x-27,p.y-56-sinf(t*4)*2.0f,54,54};
         DrawTexturePro(TEX_MOATAIL_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_MOATAIL.id) DrawPortrait(TEX_MOATAIL,p,58,58,sinf(t*4)*2.5f);
     else {
@@ -175,9 +181,9 @@ static void DrawMoatail(Vector2 p,float t) {
 static void DrawGecko(Vector2 p,float t) {
     DrawEllipse((int)p.x,(int)p.y+6,15,5,(Color){83,91,130,75});
     if(TEX_GECKO_PIXEL.id) {
-        int frame=(int)(t*2.5f)%2;
-        Rectangle src={(float)(frame*32),0,32,32};
-        Rectangle dst={p.x-18,p.y-38-sinf(t*5)*2.0f,36,36};
+        int frame=(int)(t*2.5f)%4;
+        Rectangle src={(float)(frame*64),0,64,64};
+        Rectangle dst={p.x-27,p.y-56-sinf(t*5)*2.0f,54,54};
         DrawTexturePro(TEX_GECKO_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_GECKO.id) DrawPortrait(TEX_GECKO,p,58,58,sinf(t*5)*2.0f);
     else {
@@ -255,16 +261,16 @@ static void RenderWorld(Game *g) {
             case RENDER_TREE: DrawTree(p,it->scale,g->time); break;
             case RENDER_PROP:
                 if(it->index==4)DrawProp(4,p,72,68);
-                else if(it->index==5)DrawProp(5,p,38,38);
+                else if(it->index==5)DrawEnvProp(7,p,52,52);
                 else if(it->index==6)DrawProp(6,p,34,38);
-                else if(it->index==7)DrawProp(7,p,62,112);
+                else if(it->index==7)DrawEnvProp(10,p,84,112);
                 else if(it->index==9)DrawProp(9,p,32,36);
                 else if(it->index==10)DrawProp(10,p,46,38);
                 else if(it->index==11)DrawProp(11,p,36,30);
-                else if(it->index==12)DrawProp(12,p,42*it->scale,48*it->scale);
-                else if(it->index==13)DrawProp(13,p,54*it->scale,34*it->scale);
-                else if(it->index==14)DrawProp(14,p,42*it->scale,54*it->scale);
-                else if(it->index==15)DrawProp(15,p,50*it->scale,42*it->scale);
+                else if(it->index==12)DrawEnvProp(3,p,48*it->scale,52*it->scale);
+                else if(it->index==13)DrawEnvProp(4,p,62*it->scale,40*it->scale);
+                else if(it->index==14)DrawEnvProp(5,p,54*it->scale,62*it->scale);
+                else if(it->index==15)DrawEnvProp(2,p,62*it->scale,48*it->scale);
                 break;
             case RENDER_FIRE: DrawCampfire(p,g->time); break;
             case RENDER_PICKUP: DrawPickup(&g->world.pickups[it->index]); break;
@@ -444,12 +450,15 @@ void RenderInit(void) {
         "assets/characters/companions/moss_lumi_idle_64.png",
         "assets/characters/companions/moatail_idle_64.png",
         "assets/characters/companions/crystal_gecko_idle_64.png",
+        "assets/characters/companions/leafling_idle_64.png",
+        "assets/characters/companions/grove_mote_idle_64.png",
+        "assets/environment/environment_props_96.png",
         "assets/characters/png/camp_keeper.png",
         "assets/tiles/png/island_iso_tiles.png",
         "assets/tiles/png/environment_props.png"
     };
-    Texture2D *targets[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
-    for(int i=0;i<7;i++) {
+    Texture2D *targets[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
+    for(int i=0;i<10;i++) {
         if(FileExists(paths[i])) {
             *targets[i]=LoadTexture(paths[i]);
             if(targets[i]->id)SetTextureFilter(*targets[i],TEXTURE_FILTER_POINT);
@@ -457,8 +466,8 @@ void RenderInit(void) {
     }
 }
 void RenderClose(void) {
-    Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
-    for(int i=0;i<7;i++)if(textures[i]->id)UnloadTexture(*textures[i]);
+    Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
+    for(int i=0;i<10;i++)if(textures[i]->id)UnloadTexture(*textures[i]);
 }
 void GameRender(Game *g) {
     if(g->scene==SCENE_TITLE)RenderTitle(g);
