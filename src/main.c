@@ -553,7 +553,7 @@ static void DrawPickup(Pickup *p) {
 }
 typedef enum {
     RENDER_TREE, RENDER_PROP, RENDER_FIRE, RENDER_PICKUP, RENDER_SHRINE,
-    RENDER_KEEPER, RENDER_LUMI, RENDER_MOATAIL, RENDER_GECKO, RENDER_PLAYER
+    RENDER_KEEPER, RENDER_LUMI, RENDER_MOATAIL, RENDER_GECKO, RENDER_PLAYER, RENDER_FIREFLY, RENDER_LEAFLING
 } RenderKind;
 typedef struct { float depth; RenderKind kind; int index; Vector2 grid; float scale; } RenderItem;
 static void PushRenderItem(RenderItem *items,int *count,RenderKind kind,int index,Vector2 grid,float scale) {
@@ -601,10 +601,10 @@ static void RenderWorld(Game *g) {
         Color c=((x+y)&1)?(Color){151,198,144,255}:(Color){160,205,150,255};
         if(g->world.kind[y][x]==1)c=(Color){116,157,117,255};
         if(g->world.kind[y][x]==2)c=(Color){192,181,143,255};
-        if(x>=8&&x<=11&&y>=3&&y<=7)c=(Color){133,190,175,255};
+        if(x>=8&&x<=13&&y>=3&&y<=8)c=(Color){130,181,123,255};
         if(x>=14&&x<=19&&y>=4&&y<=10)c=(Color){184,181,151,255};
         int tile=(g->world.kind[y][x]==1)?2:(g->world.kind[y][x]==2)?3:((x+y)%3);
-        if(x>=8&&x<=11&&y>=3&&y<=7)tile=4;
+        if(x>=8&&x<=13&&y>=3&&y<=8)tile=(x+y)%3;
         if(x>=14&&x<=19&&y>=4&&y<=10)tile=5;
         DrawIsoTile(x,y,tile,c);
     }
@@ -643,6 +643,9 @@ static void RenderWorld(Game *g) {
     PushRenderItem(items,&count,RENDER_LUMI,0,lumiPos,1.0f);
     if(g->splash.owned)PushRenderItem(items,&count,RENDER_MOATAIL,0,g->splash.pos,1.0f);
     if(g->spark.owned)PushRenderItem(items,&count,RENDER_GECKO,0,g->spark.pos,1.0f);
+    Vector2 fireflyGrid={10.6f+sinf(g->fireflyPhase*0.8f)*0.22f,6.2f+cosf(g->fireflyPhase*0.65f)*0.18f};
+    PushRenderItem(items,&count,RENDER_FIREFLY,0,fireflyGrid,1.0f);
+    if(!g->leaflingFed)PushRenderItem(items,&count,RENDER_LEAFLING,0,(Vector2){12.4f,8.0f},1.0f);
     PushRenderItem(items,&count,RENDER_PLAYER,0,g->player.pos,1.0f);
 
     for(int i=1;i<count;i++) {
@@ -674,6 +677,8 @@ static void RenderWorld(Game *g) {
             case RENDER_LUMI: DrawLumi(p,g->time,g->lumi.bob); break;
             case RENDER_MOATAIL: DrawMoatail(p,g->time); break;
             case RENDER_GECKO: DrawGecko(p,g->time); break;
+            case RENDER_FIREFLY: DrawFirefly(p,g->time); break;
+            case RENDER_LEAFLING: DrawLeafling(p,g->time); break;
             case RENDER_PLAYER: DrawPlayer(p,g->time,Vector2Length(g->player.vel)>.1f,g->player.facing); break;
         }
     }
@@ -681,9 +686,6 @@ static void RenderWorld(Game *g) {
         Particle *p=&g->particles[i];
         DrawCircleV(p->p,p->size*(p->life/p->maxLife),Fade(p->c,p->life/p->maxLife));
     }
-    Vector2 fireflyPos={10.6f+sinf(g->fireflyPhase*0.8f)*0.22f,6.2f+cosf(g->fireflyPhase*0.65f)*0.18f};
-    DrawFirefly(Iso(fireflyPos.x,fireflyPos.y,0),g->time);
-    if(!g->leaflingFed)DrawLeafling(Iso(12.4f,8.0f,0),g->time);
     EndMode2D();
 }
 static void Panel(Rectangle r) { DrawRectangleRounded(r,.13f,18,C_PAPER);DrawRectangleRoundedLines(r,.13f,18,(Color){221,215,188,255});}
