@@ -121,7 +121,9 @@ static void SetDialogue(Game *g,const char *a,const char *b,const char *c) {
 }
 static void AddPickup(World *w,int kind,float x,float y) {
     if(w->pickupCount>=18)return;
-    w->pickups[w->pickupCount++]=(Pickup){{x,y},kind,false,(float)w->pickupCount*0.7f};
+    int index = w->pickupCount;
+    w->pickups[index] = (Pickup){{x,y},kind,false,(float)index*0.7f};
+    w->pickupCount++;
 }
 static void BuildWorld(World *w,int seed) {
     memset(w,0,sizeof(*w)); w->seed=seed;
@@ -252,20 +254,27 @@ static void UpdateGame(Game *g,float dt) {
     Vector2 n=p->pos;n.x+=p->vel.x*dt;if(!Solid(g,n))p->pos.x=n.x;
     n=p->pos;n.y+=p->vel.y*dt;if(!Solid(g,n))p->pos.y=n.y;
 
-    Buddy *b=CurrentBuddy(g);
-    if(b->owned) {
-        Vector2 target=Vector2Add(p->pos,(Vector2){-0.55f,0.45f});
-        b->pos=Vector2Add(b->pos,Vector2Scale(Vector2Subtract(target,b->pos),fminf(1,dt*4.5f)));
-        b->bob=sinf(g->time*4.4f)*0.12f;
-        b->blink-=dt;if(b->blink<=0)b->blink=2.5f;
+    Buddy *followers[3]={&g->lumi,&g->splash,&g->spark};
+    for(int bi=0;bi<3;bi++) {
+        Buddy *b=followers[bi];
+        if(!b->owned) continue;
+        Vector2 offset = bi==0 ? (Vector2){-0.55f,0.42f} : bi==1 ? (Vector2){-0.95f,0.85f} : (Vector2){-0.15f,0.95f};
+        Vector2 target=Vector2Add(p->pos,offset);
+        b->pos=Vector2Add(b->pos,Vector2Scale(Vector2Subtract(target,b->pos),fminf(1,dt*(4.2f+bi*.25f))));
+        b->bob=sinf(g->time*(4.0f+bi*.5f)+bi)*0.12f;
+        b->blink-=dt;if(b->blink<=0)b->blink=2.0f+(float)GetRandomValue(0,15)/10.0f;
     }
     for(int i=0;i<g->world.pickupCount;i++)g->world.pickups[i].phase+=dt*2.2f;
 
     if(IsKeyPressed(KEY_TAB)) {
-        if(g->lumi.owned)g->selectedBuddy=0;
-        if(g->splash.owned)g->selectedBuddy=1;
-        if(g->spark.owned)g->selectedBuddy=2;
-        Toast(g,"切换伙伴：TAB");
+        int start = g->selectedBuddy;
+        for (int step=1; step<=3; ++step) {
+            int candidate = (start + step) % 3;
+            bool available = candidate==0 ? g->lumi.owned : candidate==1 ? g->splash.owned : g->spark.owned;
+            if (available) { g->selectedBuddy=candidate; break; }
+        }
+        const char *names[3]={"苔灯灵","沫尾兽","鸣晶蜥"};
+        Toast(g,TextFormat("当前伙伴：%s",names[g->selectedBuddy]));
     }
     if(IsKeyPressed(KEY_E)) {
         // Rescue Moss Lumi at the camp.
