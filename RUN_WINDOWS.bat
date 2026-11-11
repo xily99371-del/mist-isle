@@ -17,7 +17,7 @@ python tools\generate_pixel_assets.py
 if errorlevel 1 goto failed
 
 echo [3/3] Configuring and building...
-cmake -S . -B build -A x64
+cmake -S . -B build
 if errorlevel 1 goto failed
 cmake --build build --config Release
 if errorlevel 1 goto failed
