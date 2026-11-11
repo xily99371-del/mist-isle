@@ -80,3 +80,9 @@ See `docs/GROVE_EXPLORATION.md` for the milestone details.
 - Companion XP: active companion gains XP after victory and levels up at 50 XP.
 
 See `docs/CHAPTER1_RPG_MILESTONE.md`.
+
+
+## Chapter content expansion
+The grove now contains a discoverable firefly, a fruit-loving Leafling that reveals a hidden crystal, and a one-time wild mote battle with a fruit reward. The field journal tracks these encounters. The inventory and route map are available with I and M. Companion combat now has healing, Soaked status, electric bonus damage and XP-based levels.
+
+See `docs/CHAPTER1_CONTENT_EXPANSION.md` for the current milestone and remaining work.
