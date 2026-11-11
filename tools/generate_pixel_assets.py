@@ -115,3 +115,57 @@ x=384;d.rectangle((x+29,31,x+36,62),fill=(138,101,72,255),outline=INK,width=2);d
 x=448;d.polygon([(x+17,60),(x+22,19),(x+43,19),(x+48,60)],fill=(240,228,201,255),outline=INK);d.rectangle((x+20,24,x+45,30),fill=(197,111,104,255));d.rectangle((x+22,40,x+43,46),fill=(197,111,104,255));d.rectangle((x+19,11,x+46,20),fill=(119,97,83,255),outline=INK,width=2);d.rectangle((x+25,3,x+40,12),fill=(255,217,125,255),outline=INK,width=2);d.rectangle((x+28,48,x+36,60),fill=(103,144,151,255))
 props.save(TILES/"environment_props.png")
 print("Generated pixel art:", *(str(p.relative_to(ROOT)) for p in [CHAR/"hero_walk_4dir.png",CHAR/"lumi_idle_pixel.png",CHAR/"moatail_idle_pixel.png",CHAR/"gecko_idle_pixel.png",TILES/"island_iso_tiles.png",TILES/"environment_props.png"]), sep="\n - ")
+
+
+
+# Extend the environment atlas with campsite props and generate the camp keeper.
+base_props=Image.open(TILES/"environment_props.png").convert("RGBA")
+extended=Image.new("RGBA",(768,64),(0,0,0,0))
+extended.alpha_composite(base_props,(0,0))
+d=ImageDraw.Draw(extended)
+# 8: campfire with logs and warm flame.
+x=512
+d.ellipse((x+8,47,x+56,61),fill=(83,75,67,255),outline=INK,width=2)
+d.polygon([(x+13,48),(x+25,39),(x+48,51),(x+39,56)],fill=(137,92,63,255),outline=INK)
+d.polygon([(x+20,51),(x+31,37),(x+43,51)],fill=(177,117,70,255),outline=INK)
+d.polygon([(x+24,42),(x+27,22),(x+33,30),(x+38,14),(x+43,43)],fill=(248,151,75,255),outline=(166,89,67,255))
+d.polygon([(x+29,43),(x+34,28),(x+39,43)],fill=(255,222,115,255))
+# 9: mailbox / little message post.
+x=576
+d.rectangle((x+29,30,x+35,62),fill=(135,99,71,255),outline=INK,width=2)
+d.rectangle((x+9,11,x+55,37),fill=(182,123,83,255),outline=INK,width=2)
+d.rectangle((x+15,17,x+49,31),fill=(228,195,147,255))
+d.rectangle((x+38,7,x+54,13),fill=(194,91,91,255),outline=INK,width=1)
+# 10: flower patch.
+x=640
+for px,py,col in [(15,39,(246,190,207,255)),(31,26,(255,220,128,255)),(47,40,(180,177,224,255))]:
+    d.line((x+px,py+8,x+px,py+20),fill=(71,128,83,255),width=2)
+    for dx,dy in [(-4,0),(4,0),(0,-4),(0,4)]:
+        d.rectangle((x+px+dx-2,py+dy-2,x+px+dx+2,py+dy+2),fill=col)
+    d.rectangle((x+px-2,py-2,x+px+2,py+2),fill=(255,231,152,255))
+d.ellipse((x+5,50,x+59,62),fill=(81,141,86,255))
+# 11: rounded shore rock.
+x=704
+d.polygon([(x+7,55),(x+12,31),(x+25,17),(x+43,21),(x+57,43),(x+52,59)],fill=(139,150,143,255),outline=INK)
+d.polygon([(x+17,36),(x+27,22),(x+39,27),(x+32,43)],fill=(179,188,169,255))
+d.line((x+39,29,x+48,43),fill=(100,118,111,255),width=2)
+extended.save(TILES/"environment_props.png")
+
+# Camp keeper: a friendly, elderly island caretaker in a green cap and apron.
+keeper=Image.new("RGBA",(32,32),(0,0,0,0));kd=ImageDraw.Draw(keeper)
+keeper_ink=(67,65,78,255); keeper_skin=(239,197,160,255); keeper_hair=(224,222,201,255)
+keeper_coat=(111,151,116,255); keeper_apron=(229,215,183,255); keeper_brown=(123,91,69,255)
+kd.ellipse((7,27,25,30),fill=(55,76,65,90))
+kd.rectangle((10,16,22,25),fill=keeper_coat,outline=keeper_ink)
+kd.rectangle((12,17,20,24),fill=keeper_apron)
+kd.rectangle((9,22,13,27),fill=keeper_brown);kd.rectangle((19,22,23,27),fill=keeper_brown)
+kd.rectangle((9,7,23,17),fill=keeper_skin,outline=keeper_ink)
+kd.rectangle((8,9,10,16),fill=keeper_hair);kd.rectangle((22,9,24,16),fill=keeper_hair)
+kd.rectangle((8,5,24,9),fill=keeper_hair);kd.rectangle((10,3,22,6),fill=keeper_hair)
+kd.rectangle((7,3,25,6),fill=(92,119,91,255),outline=keeper_ink)
+kd.rectangle((11,2,21,4),fill=(157,180,126,255))
+kd.point((12,11),fill=keeper_ink);kd.point((20,11),fill=keeper_ink)
+kd.line((14,14,18,14),fill=(166,101,88,255),width=1)
+kd.rectangle((6,18,9,22),fill=keeper_skin);kd.rectangle((23,18,26,22),fill=keeper_skin)
+keeper.save(CHAR/"camp_keeper.png")
+print("Generated campsite assets:", TILES/"environment_props.png", CHAR/"camp_keeper.png")
