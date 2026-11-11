@@ -30,13 +30,13 @@ Original vector character portraits are included under `assets/characters/svg/`:
 - `moatail.svg`
 - `crystal_gecko.svg`
 
-Editable original SVG sprite sheets are stored in the repository. Before building, rasterize them to native-resolution PNGs:
+The native-resolution pixel PNGs are bundled in `assets/MistIsle_BinaryAssets_v2.zip`; CMake extracts the bundle automatically during configuration. Editable SVG concept sheets are also retained in the repository:
 
 See `docs/ART_DIRECTION.md` and `docs/ASSET_MANIFEST.md` for the visual style and asset/license record.
 
 
 ## Pixel-art assets
-Generate the native-resolution sprite PNGs and isometric tile atlas with `python tools/rasterize_assets.py`. The game loads:
+The game loads:
 - `assets/characters/png/hero_walk_4dir.png`
 - `assets/characters/png/lumi_idle_pixel.png`
 - `assets/characters/png/moatail_idle_pixel.png`
