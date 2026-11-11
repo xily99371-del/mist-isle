@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="64" viewBox="0 0 512 64" shape-rendering="crispEdges">
+<defs><style>.o{stroke:#4f5d4f;stroke-width:3;stroke-linejoin:round;stroke-linecap:square}</style></defs>
+<!-- 0 round oak -->
+<g transform="translate(0 0)"><rect x="28" y="38" width="9" height="23" fill="#8b6247" class="o"/><rect x="12" y="18" width="39" height="29" rx="8" fill="#6fa66d" class="o"/><rect x="17" y="10" width="29" height="24" rx="7" fill="#91bf7a" class="o"/><rect x="24" y="7" width="12" height="10" fill="#b5d48a"/><rect x="12" y="31" width="8" height="7" fill="#4e8e63"/></g>
+<!-- 1 pink blossom -->
+<g transform="translate(64 0)"><rect x="28" y="38" width="9" height="23" fill="#8b6247" class="o"/><rect x="10" y="18" width="43" height="29" rx="8" fill="#d78eaa" class="o"/><rect x="16" y="9" width="33" height="26" rx="8" fill="#efb4c5" class="o"/><rect x="23" y="6" width="13" height="10" fill="#f6d2d3"/><rect x="14" y="29" width="8" height="7" fill="#bd7397"/></g>
+<!-- 2 pine -->
+<g transform="translate(128 0)"><rect x="28" y="42" width="8" height="19" fill="#8b6247" class="o"/><path d="M32 3L9 31H20L7 47H56L43 31H54Z" fill="#4f8b69" class="o"/><rect x="26" y="13" width="12" height="6" fill="#77ad78"/></g>
+<!-- 3 flowering bush -->
+<g transform="translate(192 0)"><rect x="7" y="35" width="50" height="23" rx="8" fill="#5e9868" class="o"/><rect x="13" y="24" width="36" height="25" rx="8" fill="#85b875" class="o"/><rect x="16" y="17" width="8" height="8" fill="#f4c4d0"/><rect x="38" y="15" width="8" height="8" fill="#f4c4d0"/><rect x="28" y="28" width="7" height="7" fill="#ffe28e"/></g>
+<!-- 4 canvas tent -->
+<g transform="translate(256 0)"><path d="M5 56L32 7L59 56Z" fill="#d5a96f" class="o"/><path d="M32 7L32 56H59Z" fill="#b87c5a" class="o"/><path d="M22 56L32 33L43 56Z" fill="#6b6258" class="o"/><rect x="8" y="54" width="48" height="6" fill="#8d654c"/></g>
+<!-- 5 crate -->
+<g transform="translate(320 0)"><rect x="9" y="20" width="46" height="39" fill="#b47e4d" class="o"/><rect x="14" y="25" width="36" height="29" fill="#d09a5d" stroke="#805a3f" stroke-width="2"/><path d="M14 25L50 54M50 25L14 54M14 39H50" stroke="#805a3f" stroke-width="3"/></g>
+<!-- 6 sign -->
+<g transform="translate(384 0)"><rect x="29" y="31" width="7" height="30" fill="#8a6548" class="o"/><rect x="7" y="10" width="52" height="28" rx="3" fill="#bd8d5c" class="o"/><rect x="13" y="16" width="40" height="16" fill="#e1bd82"/><path d="M20 23H45" stroke="#856347" stroke-width="3"/></g>
+<!-- 7 lighthouse -->
+<g transform="translate(448 0)"><path d="M18 58L23 19H42L47 58Z" fill="#f0e3c4" class="o"/><rect x="20" y="24" width="25" height="6" fill="#c66e67"/><rect x="22" y="39" width="21" height="6" fill="#c66e67"/><rect x="20" y="12" width="25" height="8" fill="#7c6557" class="o"/><rect x="25" y="3" width="15" height="10" fill="#ffd77d" class="o"/><path d="M32 0L58 8L32 11Z" fill="#ffe8a4" opacity=".5"/><rect x="28" y="48" width="9" height="10" fill="#668c91"/></g>
+</svg>
