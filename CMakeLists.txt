@@ -1,11 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
 project(MistIsle C)
-
-# Unpack the verified native-resolution pixel art bundle at configure time.
-set(MIST_PIXEL_ARCHIVE "${CMAKE_SOURCE_DIR}/assets/MistIsle_BinaryAssets_v2.zip")
-if(EXISTS "${MIST_PIXEL_ARCHIVE}")
-  file(ARCHIVE_EXTRACT INPUT "${MIST_PIXEL_ARCHIVE}" DESTINATION "${CMAKE_SOURCE_DIR}")
-endif()
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 include(FetchContent)
