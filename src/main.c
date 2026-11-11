@@ -449,10 +449,52 @@ static void DrawPickup(Pickup *p) {
     DrawCircleV((Vector2){s.x-2,s.y-13-bob},2,Fade(WHITE,.8f));
     DrawCircleV((Vector2){s.x,s.y-10-bob},12,Fade(c,.12f));
 }
+typedef enum {
+    RENDER_TREE, RENDER_PROP, RENDER_FIRE, RENDER_PICKUP, RENDER_SHRINE,
+    RENDER_KEEPER, RENDER_LUMI, RENDER_MOATAIL, RENDER_GECKO, RENDER_PLAYER
+} RenderKind;
+typedef struct { float depth; RenderKind kind; int index; Vector2 grid; float scale; } RenderItem;
+static void PushRenderItem(RenderItem *items,int *count,RenderKind kind,int index,Vector2 grid,float scale) {
+    if(*count>=64)return;
+    items[*count]=(RenderItem){grid.x+grid.y,kind,index,grid,scale};
+    (*count)++;
+}
+static void DrawMoatail(Vector2 p,float t) {
+    DrawEllipse((int)p.x,(int)p.y+6,15,5,(Color){75,112,130,75});
+    if(TEX_MOATAIL_PIXEL.id) {
+        int frame=(int)(t*2.5f)%2;
+        Rectangle src={(float)(frame*32),0,32,32};
+        Rectangle dst={p.x-18,p.y-38-sinf(t*4)*2.0f,36,36};
+        DrawTexturePro(TEX_MOATAIL_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
+    } else if(TEX_MOATAIL.id) DrawPortrait(TEX_MOATAIL,p,58,58,sinf(t*4)*2.5f);
+    else {
+        DrawCircleV((Vector2){p.x,p.y-11},12,(Color){121,202,215,255});
+        DrawCircleV((Vector2){p.x-5,p.y-20},5,(Color){151,220,224,255});
+        DrawCircleV((Vector2){p.x+5,p.y-20},5,(Color){151,220,224,255});
+        DrawCircleV((Vector2){p.x-4,p.y-12},2,(Color){52,83,94,255});
+        DrawCircleV((Vector2){p.x+4,p.y-12},2,(Color){52,83,94,255});
+    }
+}
+static void DrawGecko(Vector2 p,float t) {
+    DrawEllipse((int)p.x,(int)p.y+6,15,5,(Color){83,91,130,75});
+    if(TEX_GECKO_PIXEL.id) {
+        int frame=(int)(t*2.5f)%2;
+        Rectangle src={(float)(frame*32),0,32,32};
+        Rectangle dst={p.x-18,p.y-38-sinf(t*5)*2.0f,36,36};
+        DrawTexturePro(TEX_GECKO_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
+    } else if(TEX_GECKO.id) DrawPortrait(TEX_GECKO,p,58,58,sinf(t*5)*2.0f);
+    else {
+        DrawCircleV((Vector2){p.x,p.y-10},11,(Color){155,154,214,255});
+        DrawTriangle((Vector2){p.x-7,p.y-17},(Vector2){p.x,p.y-32},(Vector2){p.x+7,p.y-17},(Color){179,218,229,255});
+        DrawCircleV((Vector2){p.x-4,p.y-11},2,(Color){50,60,88,255});
+        DrawCircleV((Vector2){p.x+4,p.y-11},2,(Color){50,60,88,255});
+    }
+}
 static void RenderWorld(Game *g) {
     ClearBackground(C_BG);
     BeginMode2D(g->cam);
-    // Soft distant island backdrop.
+
+    // Ground first: every tile is drawn before any elevated object.
     for(int y=0;y<MAPH;y++)for(int x=0;x<MAPW;x++) {
         Color c=((x+y)&1)?(Color){151,198,144,255}:(Color){160,205,150,255};
         if(g->world.kind[y][x]==1)c=(Color){116,157,117,255};
@@ -463,67 +505,65 @@ static void RenderWorld(Game *g) {
         if(x>=8&&x<=11&&y>=3&&y<=7)tile=4;
         if(x>=14&&x<=19&&y>=4&&y<=10)tile=5;
         DrawIsoTile(x,y,tile,c);
-        Vector2 p=Iso(x,y,0);
-        if(g->world.kind[y][x]==1)DrawCircleV((Vector2){p.x,p.y-5},7,(Color){102,143,107,255});
     }
-    // Water pool and stepping stones.
+    // A small tidal pool and stepping-stone edge.
     for(int y=3;y<6;y++)for(int x=2;x<6;x++)DrawIsoTile(x,y,4,(Color){119,191,199,255});
+
+    // Sort elevated objects by isometric depth (x+y): characters can pass behind trees.
+    RenderItem items[64]; int count=0;
     for(int i=0;i<15;i++) {
         int x=2+(i*7)%17,y=2+(i*11)%13;
-        if(g->world.kind[y][x]!=1)DrawTree(Iso(x,y,0),.72f+(i%3)*.1f,g->time);
+        if(g->world.kind[y][x]!=1)PushRenderItem(items,&count,RENDER_TREE,i,(Vector2){(float)x,(float)y},.72f+(i%3)*.1f);
     }
-    // Storybook props: campsite, supply crate, signpost and distant lighthouse.
-    DrawProp(4,Iso(3.2f,11.4f,0),72,68);
-    DrawProp(5,Iso(4.6f,10.8f,0),38,38);
-    DrawProp(6,Iso(5.5f,11.7f,0),34,38);
-    DrawProp(7,Iso(19.0f,2.2f,0),62,112);
-    DrawCampfire(Iso(4.1f,12.5f,0),g->time);
-    DrawProp(9,Iso(5.9f,10.3f,0),32,36);
-    DrawProp(10,Iso(6.6f,12.5f,0),46,38);
-    DrawProp(11,Iso(2.4f,14.0f,0),36,30);
-    DrawKeeper(Iso(3.0f,10.0f,0),g->time);
-    for(int i=0;i<g->world.pickupCount;i++)if(!g->world.pickups[i].taken)DrawPickup(&g->world.pickups[i]);
-    DrawShrine(Iso(g->world.shrine.x,g->world.shrine.y,0),g->time,g->shrineSolved);
-    // Before joining the party, Moss Lumi waits beside the campfire as the first rescue encounter.
-    if(g->lumi.owned) DrawLumi(Iso(g->lumi.pos.x,g->lumi.pos.y,0),g->time,g->lumi.bob);
-    else DrawLumi(Iso(4.0f,12.0f,0),g->time,sinf(g->time*3.0f)*0.08f);
-    if(g->splash.owned) {
-        Vector2 p=Iso(g->splash.pos.x,g->splash.pos.y,0);
-        DrawEllipse((int)p.x,(int)p.y+6,15,5,(Color){75,112,130,75});
-        if(TEX_MOATAIL_PIXEL.id) {
-            int frame=(int)(g->time*2.5f)%2;
-            Rectangle src={(float)(frame*32),0,32,32};
-            Rectangle dst={p.x-18,p.y-38-sinf(g->time*4)*2.0f,36,36};
-            DrawTexturePro(TEX_MOATAIL_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
-        } else if(TEX_MOATAIL.id) DrawPortrait(TEX_MOATAIL,p,58,58,sinf(g->time*4)*2.5f);
-        else {
-            DrawCircleV((Vector2){p.x,p.y-11},12,(Color){121,202,215,255});
-            DrawCircleV((Vector2){p.x-5,p.y-20},5,(Color){151,220,224,255});
-            DrawCircleV((Vector2){p.x+5,p.y-20},5,(Color){151,220,224,255});
-            DrawCircleV((Vector2){p.x-4,p.y-12},2,(Color){52,83,94,255});
-            DrawCircleV((Vector2){p.x+4,p.y-12},2,(Color){52,83,94,255});
+    PushRenderItem(items,&count,RENDER_PROP,4,(Vector2){3.2f,11.4f},1.0f);
+    PushRenderItem(items,&count,RENDER_PROP,5,(Vector2){4.6f,10.8f},1.0f);
+    PushRenderItem(items,&count,RENDER_PROP,6,(Vector2){5.5f,11.7f},1.0f);
+    PushRenderItem(items,&count,RENDER_PROP,7,(Vector2){19.0f,2.2f},1.0f);
+    PushRenderItem(items,&count,RENDER_FIRE,8,(Vector2){4.1f,12.5f},1.0f);
+    PushRenderItem(items,&count,RENDER_PROP,9,(Vector2){5.9f,10.3f},1.0f);
+    PushRenderItem(items,&count,RENDER_PROP,10,(Vector2){6.6f,12.5f},1.0f);
+    PushRenderItem(items,&count,RENDER_PROP,11,(Vector2){2.4f,14.0f},1.0f);
+    for(int i=0;i<g->world.pickupCount;i++) if(!g->world.pickups[i].taken)
+        PushRenderItem(items,&count,RENDER_PICKUP,i,g->world.pickups[i].tile,1.0f);
+    PushRenderItem(items,&count,RENDER_SHRINE,0,g->world.shrine,1.0f);
+    PushRenderItem(items,&count,RENDER_KEEPER,0,(Vector2){3.0f,10.0f},1.0f);
+    Vector2 lumiPos=g->lumi.owned?g->lumi.pos:(Vector2){4.0f,12.0f};
+    PushRenderItem(items,&count,RENDER_LUMI,0,lumiPos,1.0f);
+    if(g->splash.owned)PushRenderItem(items,&count,RENDER_MOATAIL,0,g->splash.pos,1.0f);
+    if(g->spark.owned)PushRenderItem(items,&count,RENDER_GECKO,0,g->spark.pos,1.0f);
+    PushRenderItem(items,&count,RENDER_PLAYER,0,g->player.pos,1.0f);
+
+    for(int i=1;i<count;i++) {
+        RenderItem key=items[i]; int j=i-1;
+        while(j>=0 && items[j].depth>key.depth) { items[j+1]=items[j]; j--; }
+        items[j+1]=key;
+    }
+    for(int i=0;i<count;i++) {
+        RenderItem *it=&items[i]; Vector2 p=Iso(it->grid.x,it->grid.y,0);
+        switch(it->kind) {
+            case RENDER_TREE: DrawTree(p,it->scale,g->time); break;
+            case RENDER_PROP:
+                if(it->index==4)DrawProp(4,p,72,68);
+                else if(it->index==5)DrawProp(5,p,38,38);
+                else if(it->index==6)DrawProp(6,p,34,38);
+                else if(it->index==7)DrawProp(7,p,62,112);
+                else if(it->index==9)DrawProp(9,p,32,36);
+                else if(it->index==10)DrawProp(10,p,46,38);
+                else if(it->index==11)DrawProp(11,p,36,30);
+                break;
+            case RENDER_FIRE: DrawCampfire(p,g->time); break;
+            case RENDER_PICKUP: DrawPickup(&g->world.pickups[it->index]); break;
+            case RENDER_SHRINE: DrawShrine(p,g->time,g->shrineSolved); break;
+            case RENDER_KEEPER: DrawKeeper(p,g->time); break;
+            case RENDER_LUMI: DrawLumi(p,g->time,g->lumi.bob); break;
+            case RENDER_MOATAIL: DrawMoatail(p,g->time); break;
+            case RENDER_GECKO: DrawGecko(p,g->time); break;
+            case RENDER_PLAYER: DrawPlayer(p,g->time,Vector2Length(g->player.vel)>.1f,g->player.facing); break;
         }
     }
-    if(g->spark.owned) {
-        Vector2 p=Iso(g->spark.pos.x,g->spark.pos.y,0);
-        DrawEllipse((int)p.x,(int)p.y+6,15,5,(Color){83,91,130,75});
-        if(TEX_GECKO_PIXEL.id) {
-            int frame=(int)(g->time*2.5f)%2;
-            Rectangle src={(float)(frame*32),0,32,32};
-            Rectangle dst={p.x-18,p.y-38-sinf(g->time*5)*2.0f,36,36};
-            DrawTexturePro(TEX_GECKO_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
-        } else if(TEX_GECKO.id) DrawPortrait(TEX_GECKO,p,58,58,sinf(g->time*5)*2.0f);
-        else {
-            DrawCircleV((Vector2){p.x,p.y-10},11,(Color){155,154,214,255});
-            DrawTriangle((Vector2){p.x-7,p.y-17},(Vector2){p.x,p.y-32},(Vector2){p.x+7,p.y-17},(Color){179,218,229,255});
-            DrawCircleV((Vector2){p.x-4,p.y-11},2,(Color){50,60,88,255});
-            DrawCircleV((Vector2){p.x+4,p.y-11},2,(Color){50,60,88,255});
-        }
-    }
-    DrawPlayer(Iso(g->player.pos.x,g->player.pos.y,0),g->time,Vector2Length(g->player.vel)>.1f,g->player.facing);
     for(int i=0;i<MAX_PARTICLES;i++)if(g->particles[i].life>0) {
         Particle *p=&g->particles[i];
-        DrawCircleV(p->p,p->size* (p->life/p->maxLife),Fade(p->c,p->life/p->maxLife));
+        DrawCircleV(p->p,p->size*(p->life/p->maxLife),Fade(p->c,p->life/p->maxLife));
     }
     EndMode2D();
 }
