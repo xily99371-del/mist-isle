@@ -762,6 +762,8 @@ static void RenderHUD(Game *g) {
     DrawText(TextFormat("苔灯灵 %s",g->lumi.owned?"已同行":"未发现"),1040,57,16,C_INK);
     DrawText(TextFormat("沫尾兽 %s",g->splash.owned?"已同行":"未发现"),1040,79,16,C_INK);
     DrawText(TextFormat("鸣晶蜥 %s",g->spark.owned?"已同行":"未发现"),1040,101,16,C_INK);
+    Buddy *active=CurrentBuddy(g);
+    DrawText(TextFormat("当前伙伴 Lv.%d  XP %d/50",active->level,active->xp),1040,124,13,(Color){104,119,93,255});
     Panel((Rectangle){20,652,720,48});
     DrawText("WASD移动 SHIFT冲刺 E互动 TAB伙伴 J手记 I背包 M地图 F5保存",38,667,13,(Color){91,115,96,255});
     if(!g->lumi.owned && Dist(g->player.pos,(Vector2){4,12})<1.65f) {
@@ -888,6 +890,12 @@ static void RenderEnd(Game *g) {
     DrawRectangle(610,140,60,310,(Color){210,205,168,255});
     DrawTriangle((Vector2){590,160},(Vector2){640,65},(Vector2){690,160},(Color){234,220,166,255});
     DrawCircle(640,160,23,C_GOLD);
+    for(int i=0;i<12;i++) {
+        float a=g->time*0.35f+i*PI2/12.0f;
+        Vector2 q={640+cosf(a)*(190+12*sinf(g->time*2+i)),150+sinf(a)*(110+10*cosf(g->time+i))};
+        DrawCircleV(q,3.0f,Fade(i%2?C_GOLD:C_BLUE,.65f));
+    }
+    DrawCircle(640,160,62,Fade(C_GOLD,.10f+.06f*sinf(g->time*2)));
     DrawText("灯塔重新亮起了",435,475,38,(Color){255,246,218,255});
     DrawText("伙伴们的光芒，照亮了整座岛屿。",405,535,23,(Color){218,231,211,255});
     DrawText("第一章 完成   ·   按 R 再次探索",430,620,20,(Color){255,222,154,255});
