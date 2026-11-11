@@ -69,3 +69,14 @@ Run `RUN_WINDOWS.bat` to regenerate all PNG assets before building. The GitHub A
 - The save file is `mist_isle_save.dat` in the game working directory.
 
 See `docs/GROVE_EXPLORATION.md` for the milestone details.
+
+
+## Expanded RPG systems
+- `J`: field journal, wildlife discoveries and chapter objectives.
+- `I`: inventory, resources, health and companion levels.
+- `M`: island route map and progression unlocks.
+- `F5`: save; `F9`: load. Key progression events autosave.
+- Combat skill synergy: Moatail applies Soaked, then Crystal Gecko deals bonus electric damage.
+- Companion XP: active companion gains XP after victory and levels up at 50 XP.
+
+See `docs/CHAPTER1_RPG_MILESTONE.md`.
