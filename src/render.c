@@ -94,7 +94,7 @@ static void DrawCampfire(Vector2 p,float t) {
 static void DrawLumi(Vector2 p,float t,float bob) {
     DrawEllipse((int)p.x,(int)p.y+7,16,6,(Color){72,109,77,75});
     if (TEX_LUMI_PIXEL.id) {
-        int frame=(int)(t*2.5f)%2;
+        int frame=(int)(t*2.5f)%4;
         Rectangle src={(float)(frame*32),0,32,32};
         Rectangle dst={p.x-18,p.y-38-sinf(t*4.4f)*2.0f,36,36};
         DrawTexturePro(TEX_LUMI_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
@@ -440,10 +440,10 @@ static void RenderEnd(Game *g) {
 }
 void RenderInit(void) {
     const char *paths[]={
-        "assets/characters/png/hero_walk_4dir.png",
-        "assets/characters/png/lumi_idle_pixel.png",
-        "assets/characters/png/moatail_idle_pixel.png",
-        "assets/characters/png/gecko_idle_pixel.png",
+        "assets/characters/hero/hero_walk_4dir_64.png",
+        "assets/characters/companions/moss_lumi_idle_64.png",
+        "assets/characters/companions/moatail_idle_64.png",
+        "assets/characters/companions/crystal_gecko_idle_64.png",
         "assets/characters/png/camp_keeper.png",
         "assets/tiles/png/island_iso_tiles.png",
         "assets/tiles/png/environment_props.png"
