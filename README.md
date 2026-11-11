@@ -21,3 +21,22 @@ Controls: WASD move, Shift dash, E interact, Tab switch companion, 1/2/3 select 
 
 ## Art direction
 Cute anime / storybook fantasy, rounded silhouettes, expressive companions, warm island palette, painterly outlines and soft magical lighting. See `docs/ART_DIRECTION.md`.
+
+
+## Art assets
+Original vector character portraits are included under `assets/characters/svg/`:
+- `hero_explorer.svg`
+- `moss_lumi.svg`
+- `moatail.svg`
+- `crystal_gecko.svg`
+
+The C renderer loads the rasterized PNG versions when present and falls back to the code-drawn placeholder if they are absent. Generate the PNGs before running:
+
+```powershell
+python -m pip install cairosvg
+python tools/rasterize_assets.py
+```
+
+Then run the executable with the repository root as the working directory so relative asset paths resolve.
+
+See `docs/ART_DIRECTION.md` and `docs/ASSET_MANIFEST.md` for the visual style and asset/license record.
