@@ -5,7 +5,7 @@ The user selected the generated art direction consisting of:
 - Stardew-like cozy pixel environment mood (warm natural palette, handcrafted props and tiles; not Stardew Valley assets).
 
 ## Runtime assets
-The repository contains `assets/approved_art/MistIsle_RuntimeSprites_v1.zip`. Both the local Windows launcher and Windows CI extract it into the repository root before building.
+The approved runtime sprite archive is saved in ChatGPT Library at `/Game Projects/Mist Isle/MistIsle_RuntimeSprites_v1.zip`. Download and extract it into the repository root once; it creates the runtime folders listed below. The GitHub CI remains able to compile without the optional art folders, but a CI package built without them will use fallback sprites.
 
 After extraction:
 - `assets/characters/hero/hero_walk_4dir_64.png`: 4x4 sprite sheet, 32x32 cells; rows front/left/right/back, columns animation frames.
