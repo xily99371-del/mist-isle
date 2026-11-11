@@ -1,17 +1,19 @@
-# Pixel movement and companion animation
+# Pixel art pipeline
 
-The island exploration camera now uses the cozy top-down pixel-RPG movement style: 32×32 characters, nearest-neighbor texture sampling, four facing directions and four walk frames per direction.
-
-## Sprite sheets
+## Movement sprites
 - `hero_walk_4dir.svg`: 128×128, 4 columns × 4 rows, each cell 32×32. Rows: down, left, right, up.
 - `lumi_idle_pixel.svg`, `moatail_idle_pixel.svg`, `gecko_idle_pixel.svg`: 64×32, two 32×32 idle frames per companion.
-- Existing painted portrait SVGs remain available for dialogue/profile presentation.
+- Nearest-neighbor filtering is required. Do not bilinear-smooth pixel sprites.
 
-## Build assets
+## Isometric ground tiles
+- `assets/tiles/island_iso_tiles.svg`: six 64×32 diamond tiles: three grass variants, sandy path, water, ruin stone.
+- Render tile sprites with nearest-neighbor sampling and depth-sort entities by their ground Y coordinate.
+
+## Rasterization
 ```powershell
 python -m pip install cairosvg
 python tools/rasterize_assets.py
 ```
-The generated PNGs are loaded from `assets/characters/png/`. Keep the renderer's nearest-neighbor filtering for pixel sprites.
+The rasterizer outputs PNGs to `assets/characters/png/` and `assets/tiles/png/`.
 
-The visual direction is an original cozy pixel adventure inspired by the broad conventions of top-down farming/adventure RPGs; no Stardew Valley character, sprite, tile or audio assets are copied.
+The visual direction is an original cozy pixel adventure inspired by broad top-down farming/adventure RPG conventions; no Stardew Valley character, sprite, tile, or audio assets are copied.
