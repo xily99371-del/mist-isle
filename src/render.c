@@ -3,6 +3,7 @@
 #include <stdio.h>
 static Texture2D TEX_HERO={0}, TEX_LUMI={0}, TEX_MOATAIL={0}, TEX_GECKO={0}, TEX_KEEPER={0};
 static Texture2D TEX_HERO_PIXEL={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, TEX_GECKO_PIXEL={0}, TEX_TILES={0}, TEX_PROPS={0};
+static Texture2D TEX_ISO_TILES={0}, TEX_HERO_WALK={0};
 static void DrawPortrait(Texture2D tex, Vector2 p, float w, float h, float bob) {
     if (tex.id == 0) return;
     Rectangle src={0,0,(float)tex.width,(float)tex.height};
@@ -436,6 +437,28 @@ static void RenderEnd(Game *g) {
     DrawText("灯塔重新亮起了",435,475,38,(Color){255,246,218,255});
     DrawText("伙伴们的光芒，照亮了整座岛屿。",405,535,23,(Color){218,231,211,255});
     DrawText("第一章 完成   ·   按 R 再次探索",430,620,20,(Color){255,222,154,255});
+}
+void RenderInit(void) {
+    const char *paths[]={
+        "assets/characters/png/hero_walk_4dir.png",
+        "assets/characters/png/lumi_idle_pixel.png",
+        "assets/characters/png/moatail_idle_pixel.png",
+        "assets/characters/png/gecko_idle_pixel.png",
+        "assets/characters/png/camp_keeper.png",
+        "assets/tiles/png/island_iso_tiles.png",
+        "assets/tiles/png/environment_props.png"
+    };
+    Texture2D *targets[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
+    for(int i=0;i<7;i++) {
+        if(FileExists(paths[i])) {
+            *targets[i]=LoadTexture(paths[i]);
+            if(targets[i]->id)SetTextureFilter(*targets[i],TEXTURE_FILTER_POINT);
+        }
+    }
+}
+void RenderClose(void) {
+    Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
+    for(int i=0;i<7;i++)if(textures[i]->id)UnloadTexture(*textures[i]);
 }
 void GameRender(Game *g) {
     if(g->scene==SCENE_TITLE)RenderTitle(g);
