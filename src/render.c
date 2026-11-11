@@ -204,9 +204,12 @@ static void RenderWorld(Game *g) {
         if(g->world.kind[y][x]==2)c=(Color){192,181,143,255};
         if(x>=8&&x<=13&&y>=3&&y<=8)c=(Color){130,181,123,255};
         if(x>=14&&x<=19&&y>=4&&y<=10)c=(Color){184,181,151,255};
-        int tile=(g->world.kind[y][x]==1)?2:(g->world.kind[y][x]==2)?3:((x+y)%3);
-        if(x>=8&&x<=13&&y>=3&&y<=8)tile=(x+y)%3;
-        if(x>=14&&x<=19&&y>=4&&y<=10)tile=5;
+        int tile=((x+y)&1)?0:1;                 // grass variants
+        if(g->world.kind[y][x]==1)tile=3;        // solid rocks/tree roots
+        if(g->world.kind[y][x]==2)tile=2;        // sandy footpaths
+        if(g->world.kind[y][x]==3)tile=3;        // island boundary stone
+        if(x>=8&&x<=13&&y>=3&&y<=8)tile=(x+y)%2; // flower grove grass
+        if(x>=14&&x<=19&&y>=4&&y<=10)tile=3;    // old stone ruins
         DrawIsoTile(x,y,tile,c);
     }
     // A small tidal pool and stepping-stone edge.
@@ -214,9 +217,9 @@ static void RenderWorld(Game *g) {
 
     // Sort elevated objects by isometric depth (x+y): characters can pass behind trees.
     RenderItem items[64]; int count=0;
-    for(int i=0;i<15;i++) {
-        int x=2+(i*7)%17,y=2+(i*11)%13;
-        if(g->world.kind[y][x]!=1)PushRenderItem(items,&count,RENDER_TREE,i,(Vector2){(float)x,(float)y},.72f+(i%3)*.1f);
+    for(int y=1;y<MAPH-1;y++)for(int x=1;x<MAPW-1;x++) {
+        if(g->world.kind[y][x]==1)
+            PushRenderItem(items,&count,RENDER_TREE,(x*3+y)%3,(Vector2){(float)x,(float)y},.82f+((x+y)%3)*.08f);
     }
     PushRenderItem(items,&count,RENDER_PROP,4,(Vector2){3.2f,11.4f},1.0f);
     PushRenderItem(items,&count,RENDER_PROP,5,(Vector2){4.6f,10.8f},1.0f);
@@ -262,7 +265,7 @@ static void RenderWorld(Game *g) {
             case RENDER_PROP:
                 if(it->index==4)DrawProp(4,p,72,68);
                 else if(it->index==5)DrawEnvProp(7,p,52,52);
-                else if(it->index==6)DrawProp(6,p,34,38);
+                else if(it->index==6)DrawEnvProp(5,p,44,46);
                 else if(it->index==7)DrawEnvProp(9,p,84,112);
                 else if(it->index==9)DrawProp(9,p,32,36);
                 else if(it->index==10)DrawProp(10,p,46,38);
