@@ -108,4 +108,5 @@ void GameSave(Game *g);
 bool GameLoad(Game *g);
 void GameStart(Game *g);
 Buddy *CurrentBuddy(Game *g);
+float Dist(Vector2 a,Vector2 b);
 #endif
