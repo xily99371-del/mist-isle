@@ -20,7 +20,7 @@ cmake --build build --config Release
 Controls: WASD move, Shift dash, E interact, Tab switch companion, 1/2/3 select battle skill, Enter confirm.
 
 ## Art direction
-Cute anime / storybook fantasy, rounded silhouettes, expressive companions, warm island palette, painterly outlines and soft magical lighting. See `docs/ART_DIRECTION.md`.
+Cozy top-down pixel-RPG exploration inspired by classic farming/adventure games, with anime-style character concepts, rounded silhouettes, expressive companions, warm island palette, and soft magical lighting. The in-game explorer uses a 4-direction 4-frame 32×32 walking sheet; companions have 2-frame idle sheets; isometric ground uses a crisp 64×32 diamond tile atlas. See `docs/ART_DIRECTION.md`.
 
 
 ## Art assets
@@ -40,3 +40,19 @@ python tools/rasterize_assets.py
 Then run the executable with the repository root as the working directory so relative asset paths resolve.
 
 See `docs/ART_DIRECTION.md` and `docs/ASSET_MANIFEST.md` for the visual style and asset/license record.
+
+
+## Pixel-art assets
+Generate native-resolution sprite PNGs and the isometric tile atlas:
+```powershell
+python -m pip install cairosvg
+python tools/rasterize_assets.py
+```
+The game loads:
+- `assets/characters/png/hero_walk_4dir.png`
+- `assets/characters/png/lumi_idle_pixel.png`
+- `assets/characters/png/moatail_idle_pixel.png`
+- `assets/characters/png/gecko_idle_pixel.png`
+- `assets/tiles/png/island_iso_tiles.png`
+
+Sprite textures use nearest-neighbor filtering to preserve pixel edges. Missing PNGs fall back to primitive placeholder rendering.
