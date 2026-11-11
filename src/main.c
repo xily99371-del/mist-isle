@@ -21,6 +21,14 @@ typedef enum { ENEMY_MOTE, ENEMY_GUARD, ENEMY_BOSS } EnemyType;
 typedef enum { SKILL_GLOW, SKILL_SPLASH, SKILL_SPARK } SkillType;
 
 typedef struct { Vector2 p, v; float life, maxLife, size; Color c; } Particle;
+typedef struct {
+    int magic, version, seed;
+    float px, py, hp;
+    int berries, shells, crystals;
+    int lumi, splash, spark, selected;
+    int shrineSolved, bossDefeated, fireflyDiscovered, leaflingFed;
+    unsigned char pickupTaken[MAX_PICKUPS];
+} SaveData;
 typedef struct { Vector2 tile; int kind; bool taken; float phase; } Pickup;
 typedef struct {
     Vector2 pos, vel;
@@ -173,6 +181,35 @@ static void AddEnemy(Game *g,EnemyType t,float x,float y,float hp) {
     if(g->enemyCount>=MAX_ENEMIES)return;
     g->enemies[g->enemyCount++]=(Enemy){{x,y},t,hp,hp,(float)GetRandomValue(0,628)/100.0f,1.2f,true};
 }
+static void SaveGame(Game *g) {
+    SaveData s={0};
+    s.magic=0x4D495354; s.version=1; s.seed=g->lastSeed;
+    s.px=g->player.pos.x; s.py=g->player.pos.y; s.hp=g->player.hp;
+    s.berries=g->player.berries; s.shells=g->player.shells; s.crystals=g->player.crystals;
+    s.lumi=g->lumi.owned; s.splash=g->splash.owned; s.spark=g->spark.owned; s.selected=g->selectedBuddy;
+    s.shrineSolved=g->shrineSolved; s.bossDefeated=g->bossDefeated;
+    s.fireflyDiscovered=g->fireflyDiscovered; s.leaflingFed=g->leaflingFed;
+    for(int i=0;i<g->world.pickupCount && i<MAX_PICKUPS;i++)s.pickupTaken[i]=(unsigned char)g->world.pickups[i].taken;
+    if(SaveFileData("mist_isle_save.dat",&s,(int)sizeof(s)))Toast(g,"旅程已保存！");
+    else Toast(g,"保存失败：无法写入存档文件。");
+}
+static bool LoadGame(Game *g) {
+    int size=0; unsigned char *raw=LoadFileData("mist_isle_save.dat",&size);
+    if(!raw || size!=(int)sizeof(SaveData)){if(raw)UnloadFileData(raw);Toast(g,"没有找到有效存档。");return false;}
+    SaveData s; memcpy(&s,raw,sizeof(s)); UnloadFileData(raw);
+    if(s.magic!=0x4D495354 || s.version!=1){Toast(g,"存档版本不兼容。");return false;}
+    ResetGame(g,s.seed);
+    g->scene=SCENE_PLAY; g->player.pos=(Vector2){s.px,s.py};g->player.hp=Clamp(s.hp,1,100);
+    g->player.berries=s.berries;g->player.shells=s.shells;g->player.crystals=s.crystals;
+    g->lumi.owned=s.lumi!=0;g->splash.owned=s.splash!=0;g->spark.owned=s.spark!=0;g->selectedBuddy=s.selected;
+    g->shrineSolved=s.shrineSolved!=0;g->bossDefeated=s.bossDefeated!=0;
+    g->fireflyDiscovered=s.fireflyDiscovered!=0;g->leaflingFed=s.leaflingFed!=0;
+    for(int i=0;i<g->world.pickupCount && i<MAX_PICKUPS;i++)g->world.pickups[i].taken=s.pickupTaken[i]!=0;
+    if(g->lumi.owned)g->lumi.pos=Vector2Add(g->player.pos,(Vector2){-.55f,.42f});
+    if(g->splash.owned)g->splash.pos=Vector2Add(g->player.pos,(Vector2){-.95f,.85f});
+    if(g->spark.owned)g->spark.pos=Vector2Add(g->player.pos,(Vector2){-.15f,.95f});
+    Toast(g,"已读取上次的旅程。"); return true;
+}
 static void ResetGame(Game *g,int seed) {
     memset(g,0,sizeof(*g)); g->scene=SCENE_TITLE; g->area=AREA_CAMP;
     g->lastSeed=seed; BuildWorld(&g->world,seed);
@@ -216,6 +253,7 @@ static void UpdateGame(Game *g,float dt) {
         Particle *p=&g->particles[i];p->life-=dt;p->p=Vector2Add(p->p,Vector2Scale(p->v,dt));p->v.y-=0.3f*dt;
     }
     if(g->scene==SCENE_TITLE) {
+        if(IsKeyPressed(KEY_F9)) { if(LoadGame(g)) return; }
         if(IsKeyPressed(KEY_ENTER)||IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) InitPlay(g);
         return;
     }
@@ -255,6 +293,8 @@ static void UpdateGame(Game *g,float dt) {
 
     Player *p=&g->player;
     if(IsKeyPressed(KEY_J)){g->journalOpen=true;return;}
+    if(IsKeyPressed(KEY_F5)){SaveGame(g);return;}
+    if(IsKeyPressed(KEY_F9)){LoadGame(g);return;}
     p->dashCd=fmaxf(0,p->dashCd-dt);
     p->invuln=fmaxf(0,p->invuln-dt);
     Vector2 in={0,0};
@@ -297,6 +337,7 @@ static void UpdateGame(Game *g,float dt) {
         // Rescue Moss Lumi at the camp.
         if(!g->lumi.owned&&Dist(p->pos,(Vector2){4,12})<1.5f) {
             AddBuddyFriend(g,0);
+            SaveGame(g);
             SetDialogue(g,"苔灯灵抬起头，灯囊重新亮了起来。",
                 "它决定跟着你。靠近暗处时，它会照亮隐藏的纹路。",
                 "按 TAB 可以切换已获得的伙伴。");
@@ -313,6 +354,7 @@ static void UpdateGame(Game *g,float dt) {
                 if(q->kind==3)p->berries++;
                 Burst(g,WorldScreen(q->tile),C_GOLD,12);
                 Toast(g,q->kind==1?"获得潮汐贝壳！":q->kind==2?"获得星晶！":"获得岛屿果实！");
+                SaveGame(g);
                 return;
             }
         }
@@ -336,13 +378,13 @@ static void UpdateGame(Game *g,float dt) {
         }
         // Water companion encounter.
         if(!g->splash.owned&&Dist(p->pos,(Vector2){9,5})<1.6f) {
-            if(p->berries>=1){p->berries--;AddBuddyFriend(g,1);SetDialogue(g,"沫尾兽被果实吸引，开心地绕着你转了一圈。","它可以喷水清理蒸汽，也能让遗迹机关显形。","按 TAB 切换伙伴。");}
+            if(p->berries>=1){p->berries--;AddBuddyFriend(g,1);SaveGame(g);SetDialogue(g,"沫尾兽被果实吸引，开心地绕着你转了一圈。","它可以喷水清理蒸汽，也能让遗迹机关显形。","按 TAB 切换伙伴。");}
             else Toast(g,"沫尾兽想吃一颗岛屿果实。");
             return;
         }
         // Crystal companion encounter.
         if(!g->spark.owned&&Dist(p->pos,(Vector2){15,7})<1.6f) {
-            if(p->crystals>=1){p->crystals--;AddBuddyFriend(g,2);SetDialogue(g,"鸣晶蜥吸收了星晶，背上的宝石依次亮起。","它能为古代装置供能，也能在战斗中放电。","按 TAB 切换伙伴。");}
+            if(p->crystals>=1){p->crystals--;AddBuddyFriend(g,2);SaveGame(g);SetDialogue(g,"鸣晶蜥吸收了星晶，背上的宝石依次亮起。","它能为古代装置供能，也能在战斗中放电。","按 TAB 切换伙伴。");}
             else Toast(g,"鸣晶蜥需要一枚星晶才愿意同行。");
             return;
         }
@@ -356,7 +398,7 @@ static void UpdateGame(Game *g,float dt) {
         // Ruin puzzle.
         if(Dist(p->pos,g->world.shrine)<1.7f&&!g->shrineSolved) {
             if(g->lumi.owned&&g->splash.owned&&g->spark.owned&&p->shells>=1) {
-                g->shrineSolved=true;p->shells--;
+                g->shrineSolved=true;p->shells--;SaveGame(g);
                 Burst(g,WorldScreen(g->world.shrine),C_GOLD,40);
                 SetDialogue(g,"三种伙伴的力量在遗迹中央交汇。","水纹显现了线路，星光照亮符文，晶弧重新接通能源。","灯塔庭院的封印解除了。");
             } else Toast(g,"遗迹需要三位伙伴协力，并带来一枚潮汐贝壳。");
@@ -641,7 +683,7 @@ static void RenderHUD(Game *g) {
     DrawText(TextFormat("沫尾兽 %s",g->splash.owned?"已同行":"未发现"),1040,79,16,C_INK);
     DrawText(TextFormat("鸣晶蜥 %s",g->spark.owned?"已同行":"未发现"),1040,101,16,C_INK);
     Panel((Rectangle){20,652,720,48});
-    DrawText("WASD 移动   SHIFT 冲刺   E 互动/采集   TAB 切换伙伴   J 手记",38,667,16,(Color){91,115,96,255});
+    DrawText("WASD 移动   SHIFT 冲刺   E 互动   TAB 伙伴   J 手记   F5 保存",38,667,15,(Color){91,115,96,255});
     if(!g->lumi.owned && Dist(g->player.pos,(Vector2){4,12})<1.65f) {
         Panel((Rectangle){530,585,220,40});
         DrawText("E  救助苔灯灵",550,596,17,(Color){91,115,96,255});
@@ -672,7 +714,7 @@ static void RenderJournal(Game *g) {
     DrawText(TextFormat("苔灯灵  %s       沫尾兽  %s       鸣晶蜥  %s",g->lumi.owned?"同行中":"未发现",g->splash.owned?"同行中":"未发现",g->spark.owned?"同行中":"未发现"),303,480,18,C_INK);
     DrawText("资源",303,525,21,(Color){104,135,94,255});
     DrawText(TextFormat("果实 %d     潮汐贝壳 %d     星晶 %d",g->player.berries,g->player.shells,g->player.crystals),303,560,18,C_INK);
-    DrawText("按 J 或 ESC 关闭",820,570,16,(Color){132,137,111,255});
+    DrawText("F5 保存   F9 读取   按 J 或 ESC 关闭",760,570,16,(Color){132,137,111,255});
 }
 static void RenderDialogue(Game *g) {
     DrawRectangle(0,0,SW,SH,Fade((Color){35,55,48,255},.26f));
