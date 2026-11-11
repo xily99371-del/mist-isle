@@ -311,7 +311,7 @@ static void UpdateGame(Game *g,float dt) {
                     Buddy *active=CurrentBuddy(g); active->xp+=20;
                     if(active->xp>=50){active->xp-=50;active->level++;Toast(g,"伙伴成长了！等级提升。");}
                     else Toast(g,"敌人被击退！伙伴获得20点经验。");
-                    if(e->type==ENEMY_MOTE){g->groveMoteDefeated=true;g->player.berries+=2;Toast(g,"击退林地微光兽，获得2颗果实！");}
+                    if(e->type==ENEMY_MOTE){g->groveMoteDefeated=true;g->player.berries+=2;SaveGame(g);Toast(g,"击退林地微光兽，获得2颗果实！");}
                     if(e->type==ENEMY_BOSS){g->bossDefeated=true;g->player.crystals+=3;g->player.shells+=2;SaveGame(g);}
                 }
             } else {
@@ -779,6 +779,7 @@ static void RenderJournal(Game *g) {
     DrawText("岛屿发现",303,320,21,(Color){104,135,94,255});
     DrawText(g->fireflyDiscovered?"萤芽  —  已记录：会在林间微光处出现。":"萤芽  —  未发现：留意林地里漂浮的微光。",303,355,18,C_INK);
     DrawText(g->leaflingFed?"叶团  —  已帮助：它为你找到了隐藏星晶。":"叶团  —  未帮助：它似乎很喜欢岛屿果实。",303,388,18,C_INK);
+    DrawText(g->groveMoteDefeated?"微光兽 — 已击退：林间小径恢复安全。":"微光兽 — 尚未击退：它守在林地旧路旁。",303,416,18,C_INK);
     DrawText("伙伴同行",303,445,21,(Color){104,135,94,255});
     DrawText(TextFormat("苔灯灵  %s       沫尾兽  %s       鸣晶蜥  %s",g->lumi.owned?"同行中":"未发现",g->splash.owned?"同行中":"未发现",g->spark.owned?"同行中":"未发现"),303,480,18,C_INK);
     DrawText("资源",303,525,21,(Color){104,135,94,255});
