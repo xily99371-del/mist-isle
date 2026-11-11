@@ -316,8 +316,8 @@ static void UpdateGame(Game *g,float dt) {
                     e->alive=false;g->battleTurn=0;g->scene=SCENE_PLAY;g->defeatedGuards++;
                     Buddy *active=CurrentBuddy(g); active->xp+=20;
                     if(active->xp>=50){active->xp-=50;active->level++;Toast(g,"伙伴成长了！技能效果也得到提升。");}
-                    SaveGame(g);
                     else Toast(g,"敌人被击退！伙伴获得20点经验。");
+                    SaveGame(g);
                     if(e->type==ENEMY_MOTE){g->groveMoteDefeated=true;g->player.berries+=2;SaveGame(g);Toast(g,"击退林地微光兽，获得2颗果实！");}
                     if(e->type==ENEMY_BOSS){g->bossDefeated=true;g->player.crystals+=3;g->player.shells+=2;SaveGame(g);}
                 }
