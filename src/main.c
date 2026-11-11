@@ -85,6 +85,7 @@ static Color C_DARKGREEN={70,119,86,255}, C_GOLD={255,219,133,255};
 static Color C_BLUE={119,190,208,255}, C_LILAC={190,166,220,255};
 static Color C_PINK={239,169,177,255}, C_RED={217,105,106,255};
 static Texture2D TEX_HERO={0}, TEX_LUMI={0}, TEX_MOATAIL={0}, TEX_GECKO={0};
+static Texture2D TEX_HERO_WALK={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, TEX_GECKO_PIXEL={0};
 static void DrawPortrait(Texture2D tex, Vector2 p, float w, float h, float bob) {
     if (tex.id == 0) return;
     Rectangle src={0,0,(float)tex.width,(float)tex.height};
@@ -246,6 +247,8 @@ static void UpdateGame(Game *g,float dt) {
     float speed=3.3f;
     if(IsKeyPressed(KEY_LEFT_SHIFT)&&p->dashCooldown<=0&&l>0.01f){speed=8.5f;p->dashCooldown=0.9f;p->invuln=0.18f;Burst(g,WorldScreen(p->pos),WHITE,8);}
     p->vel=Vector2Scale(in,speed);
+    if (fabsf(in.x) > fabsf(in.y) && fabsf(in.x) > 0.01f) p->facing = in.x < 0 ? 1 : 2;
+    else if (fabsf(in.y) > 0.01f) p->facing = in.y < 0 ? 3 : 0;
     Vector2 n=p->pos;n.x+=p->vel.x*dt;if(!Solid(g,n))p->pos.x=n.x;
     n=p->pos;n.y+=p->vel.y*dt;if(!Solid(g,n))p->pos.y=n.y;
 
@@ -354,9 +357,16 @@ static void DrawLumi(Vector2 p,float t,float bob) {
     DrawCircleV((Vector2){p.x,p.y-34},7,Fade(C_GOLD,.45f+.3f*sinf(t*2)));
     DrawCircleV((Vector2){p.x,p.y-34},3.3f,(Color){255,244,185,255});
 }
-static void DrawPlayer(Vector2 p,float t,bool moving) {
-    float bob=moving?fabsf(sinf(t*13))*2.5f:sinf(t*2)*.6f;
-    DrawEllipse((int)p.x,(int)p.y+8,17,6,(Color){67,88,101,85});
+static void DrawPlayer(Vector2 p,float t,bool moving,int facing) {
+    float bob=moving?fabsf(sinf(t*13))*1.5f:sinf(t*2)*0.4f;
+    DrawEllipse((int)p.x,(int)p.y+8,13,4,(Color){67,88,101,85});
+    if (TEX_HERO_WALK.id) {
+        int frame = moving ? ((int)(t*8.0f)%4) : 0;
+        Rectangle src={(float)(frame*32),(float)(facing*32),32,32};
+        Rectangle dst={p.x-18,p.y-39-bob,36,40};
+        DrawTexturePro(TEX_HERO_WALK,src,dst,(Vector2){0,0},0,WHITE);
+        return;
+    }
     if (TEX_HERO.id) { DrawPortrait(TEX_HERO,p,66,72,bob); return; }
     DrawTriangle((Vector2){p.x-12,p.y-20-bob},(Vector2){p.x+12,p.y-20-bob},(Vector2){p.x,p.y+2-bob},(Color){105,161,190,255});
     DrawCircleV((Vector2){p.x,p.y-32-bob},11,(Color){250,218,185,255});
@@ -427,7 +437,7 @@ static void RenderWorld(Game *g) {
             DrawCircleV((Vector2){p.x+4,p.y-11},2,(Color){50,60,88,255});
         }
     }
-    DrawPlayer(Iso(g->player.pos.x,g->player.pos.y,0),g->time,Vector2Length(g->player.vel)>.1f);
+    DrawPlayer(Iso(g->player.pos.x,g->player.pos.y,0),g->time,Vector2Length(g->player.vel)>.1f,g->player.facing);
     for(int i=0;i<MAX_PARTICLES;i++)if(g->particles[i].life>0) {
         Particle *p=&g->particles[i];
         DrawCircleV(p->p,p->size* (p->life/p->maxLife),Fade(p->c,p->life/p->maxLife));
@@ -518,6 +528,10 @@ int main(void) {
     SetConfigFlags(FLAG_VSYNC_HINT|FLAG_MSAA_4X_HINT);
     InitWindow(SW,SH,"雾屿回响 - 第一章：失落的灯塔");
     if (FileExists("assets/characters/png/hero_explorer.png")) TEX_HERO=LoadTexture("assets/characters/png/hero_explorer.png");
+    if (FileExists("assets/characters/png/hero_walk_4dir.png")) { TEX_HERO_WALK=LoadTexture("assets/characters/png/hero_walk_4dir.png"); SetTextureFilter(TEX_HERO_WALK,TEXTURE_FILTER_POINT); }
+    if (FileExists("assets/characters/png/lumi_idle_pixel.png")) { TEX_LUMI_PIXEL=LoadTexture("assets/characters/png/lumi_idle_pixel.png"); SetTextureFilter(TEX_LUMI_PIXEL,TEXTURE_FILTER_POINT); }
+    if (FileExists("assets/characters/png/moatail_idle_pixel.png")) { TEX_MOATAIL_PIXEL=LoadTexture("assets/characters/png/moatail_idle_pixel.png"); SetTextureFilter(TEX_MOATAIL_PIXEL,TEXTURE_FILTER_POINT); }
+    if (FileExists("assets/characters/png/gecko_idle_pixel.png")) { TEX_GECKO_PIXEL=LoadTexture("assets/characters/png/gecko_idle_pixel.png"); SetTextureFilter(TEX_GECKO_PIXEL,TEXTURE_FILTER_POINT); }
     if (FileExists("assets/characters/png/moss_lumi.png")) TEX_LUMI=LoadTexture("assets/characters/png/moss_lumi.png");
     if (FileExists("assets/characters/png/moatail.png")) TEX_MOATAIL=LoadTexture("assets/characters/png/moatail.png");
     if (FileExists("assets/characters/png/crystal_gecko.png")) TEX_GECKO=LoadTexture("assets/characters/png/crystal_gecko.png");
@@ -541,6 +555,10 @@ int main(void) {
         else {RenderWorld(&g);RenderHUD(&g);if(g.scene==SCENE_DIALOGUE)RenderDialogue(&g);}
         EndDrawing();
     }
+    if(TEX_HERO_WALK.id)UnloadTexture(TEX_HERO_WALK);
+    if(TEX_LUMI_PIXEL.id)UnloadTexture(TEX_LUMI_PIXEL);
+    if(TEX_MOATAIL_PIXEL.id)UnloadTexture(TEX_MOATAIL_PIXEL);
+    if(TEX_GECKO_PIXEL.id)UnloadTexture(TEX_GECKO_PIXEL);
     if(TEX_HERO.id)UnloadTexture(TEX_HERO);
     if(TEX_LUMI.id)UnloadTexture(TEX_LUMI);
     if(TEX_MOATAIL.id)UnloadTexture(TEX_MOATAIL);
