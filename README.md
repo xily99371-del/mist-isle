@@ -58,3 +58,14 @@ The current coastal-camp scene includes a generated pixel-art campsite prop atla
 - All pixel textures use nearest-neighbor filtering.
 
 Run `RUN_WINDOWS.bat` to regenerate all PNG assets before building. The GitHub Actions workflow packages the executable together with its runtime asset folders.
+
+
+## New in the grove milestone
+- A field journal (`J`) tracks wildlife discoveries, companion collection and chapter objectives.
+- A drifting firefly can be discovered and registered.
+- Feed the hungry Leafling one island fruit to reveal a hidden star crystal.
+- Grove environment now includes mushroom clusters, a fallen log, rune stone and flower patch.
+- Save manually with `F5`; load with `F9`. The game also autosaves after key progression events.
+- The save file is `mist_isle_save.dat` in the game working directory.
+
+See `docs/GROVE_EXPLORATION.md` for the milestone details.
