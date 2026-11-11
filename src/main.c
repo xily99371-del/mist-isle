@@ -484,7 +484,9 @@ static void RenderWorld(Game *g) {
     DrawKeeper(Iso(3.0f,10.0f,0),g->time);
     for(int i=0;i<g->world.pickupCount;i++)if(!g->world.pickups[i].taken)DrawPickup(&g->world.pickups[i]);
     DrawShrine(Iso(g->world.shrine.x,g->world.shrine.y,0),g->time,g->shrineSolved);
-    if(g->lumi.owned)DrawLumi(Iso(g->lumi.pos.x,g->lumi.pos.y,0),g->time,g->lumi.bob);
+    // Before joining the party, Moss Lumi waits beside the campfire as the first rescue encounter.
+    if(g->lumi.owned) DrawLumi(Iso(g->lumi.pos.x,g->lumi.pos.y,0),g->time,g->lumi.bob);
+    else DrawLumi(Iso(4.0f,12.0f,0),g->time,sinf(g->time*3.0f)*0.08f);
     if(g->splash.owned) {
         Vector2 p=Iso(g->splash.pos.x,g->splash.pos.y,0);
         DrawEllipse((int)p.x,(int)p.y+6,15,5,(Color){75,112,130,75});
@@ -538,7 +540,10 @@ static void RenderHUD(Game *g) {
     DrawText(TextFormat("鸣晶蜥 %s",g->spark.owned?"已同行":"未发现"),1040,101,16,C_INK);
     Panel((Rectangle){20,652,720,48});
     DrawText("WASD 移动   SHIFT 冲刺   E 互动/采集   TAB 切换伙伴",38,667,17,(Color){91,115,96,255});
-    if(!g->lumi.owned && Dist(g->player.pos,(Vector2){3,10})<2.0f) {
+    if(!g->lumi.owned && Dist(g->player.pos,(Vector2){4,12})<1.65f) {
+        Panel((Rectangle){530,585,220,40});
+        DrawText("E  救助苔灯灵",550,596,17,(Color){91,115,96,255});
+    } else if(!g->lumi.owned && Dist(g->player.pos,(Vector2){3,10})<2.0f) {
         Panel((Rectangle){530,585,220,40});
         DrawText("E  与守望者交谈",550,596,17,(Color){91,115,96,255});
     }
