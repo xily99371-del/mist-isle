@@ -112,3 +112,7 @@ The approved art direction combines cute, expressive monster-companion character
 The runtime sprite archive is stored at `assets/approved_art/MistIsle_RuntimeSprites_v1.zip`. `RUN_WINDOWS.bat` and Windows CI extract it before building. The renderer loads the new hero four-direction walk sheet and the Moss Lumi, Moatail and Crystal Gecko idle strips.
 
 See `docs/APPROVED_ART_ASSETS.md` for sheet layouts, source archive details and remaining environment integration work.
+
+
+## Approved art integration v2
+Extract `MistIsle_ArtIntegration_v2.zip` into the repository root (merge the `assets/` directory). The renderer now uses 64x64-cell player/companion sprites, an approved environment prop atlas, and a six-variant textured isometric ground atlas. Environment source bands are retained for future tile/prop selection.
