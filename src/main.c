@@ -3,6 +3,7 @@
 int main(void) {
     SetConfigFlags(FLAG_VSYNC_HINT|FLAG_MSAA_4X_HINT);
     InitWindow(SW,SH,"雾屿回响 - 第一章：失落的灯塔");
+    RenderInit();
     SetTargetFPS(60); SetExitKey(KEY_NULL);
     Game g; GameReset(&g,(int)time(NULL));
     while(!WindowShouldClose()) {
@@ -16,5 +17,6 @@ int main(void) {
         } else GameUpdate(&g,dt);
         BeginDrawing(); GameRender(&g); EndDrawing();
     }
+    RenderClose();
     CloseWindow(); return 0;
 }
