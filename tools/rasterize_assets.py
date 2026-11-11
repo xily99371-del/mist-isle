@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-"""Rasterize Mist Isle SVG source art to transparent PNGs.
-
+"""Rasterize editable Mist Isle SVG character sheets to pixel-crisp PNGs.
 Install: python -m pip install cairosvg
-Run:    python tools/rasterize_assets.py
+Run from repository root: python tools/rasterize_assets.py
 """
 from pathlib import Path
 import cairosvg
@@ -12,8 +11,15 @@ SRC = ROOT / "assets" / "characters" / "svg"
 OUT = ROOT / "assets" / "characters" / "png"
 OUT.mkdir(parents=True, exist_ok=True)
 
+SIZES = {
+    "hero_walk_4dir.svg": (128, 128),
+    "lumi_idle_pixel.svg": (64, 32),
+    "moatail_idle_pixel.svg": (64, 32),
+    "gecko_idle_pixel.svg": (64, 32),
+}
 for svg in sorted(SRC.glob("*.svg")):
+    width, height = SIZES.get(svg.name, (256, 256))
     target = OUT / f"{svg.stem}.png"
     cairosvg.svg2png(url=str(svg), write_to=str(target),
-                     output_width=256, output_height=256)
+                     output_width=width, output_height=height)
     print(f"created {target.relative_to(ROOT)}")
