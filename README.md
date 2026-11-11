@@ -98,3 +98,9 @@ See `docs/CHAPTER1_CONTENT_EXPANSION.md` for the current milestone and remaining
 - Restored lighthouse finale includes companion dialogue and animated light motes.
 
 See `docs/CHAPTER1_POLISH_MILESTONE.md` for the implementation boundary and remaining polish.
+
+
+## Windows playtest candidate
+The current milestone is feature-frozen for the first full Windows playthrough. Please use the packaged Windows artifact from GitHub Actions once the latest build succeeds. The playtest checklist is in `docs/WINDOWS_PLAYTEST_CANDIDATE.md`.
+
+After this package is delivered, feature work pauses. The next development cycle should focus on defects and usability issues discovered in the Windows playthrough, not another round of speculative features.
