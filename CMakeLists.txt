@@ -5,14 +5,12 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 include(FetchContent)
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(BUILD_GAMES OFF CACHE BOOL "" FORCE)
-FetchContent_Declare(raylib
-  GIT_REPOSITORY https://github.com/raysan5/raylib.git
-  GIT_TAG 5.5
-)
+FetchContent_Declare(raylib GIT_REPOSITORY https://github.com/raysan5/raylib.git GIT_TAG 5.5)
 FetchContent_MakeAvailable(raylib)
-add_executable(mist_isle src/main.c)
+add_executable(mist_isle src/main.c src/game.c src/render.c)
+target_include_directories(mist_isle PRIVATE src)
 target_link_libraries(mist_isle PRIVATE raylib)
 set_property(TARGET mist_isle PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 if(UNIX AND NOT APPLE)
-  target_link_libraries(mist_isle PRIVATE m pthread dl rt)
+ target_link_libraries(mist_isle PRIVATE m pthread dl rt)
 endif()
