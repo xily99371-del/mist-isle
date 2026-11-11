@@ -71,7 +71,7 @@ static void DrawFirefly(Vector2 p,float t) {
 static void DrawMote(Vector2 p,float t) {
     float bob=sinf(t*4.6f)*3.0f;
     DrawEllipse((int)p.x,(int)p.y+5,12,4,(Color){71,92,100,75});
-    if(TEX_GROVE_MOTE.id){int frame=(int)(t*2.5f)%4;Rectangle src={(float)(frame*64),0,64,64};Rectangle dst={p.x-26,p.y-55-bob,52,52};DrawTexturePro(TEX_GROVE_MOTE,src,dst,(Vector2){0,0},0,WHITE);return;}
+    if(TEX_GROVE_MOTE.id){int frame=(int)(t*2.5f)%4;Rectangle src={(float)(frame*32),0,32,32};Rectangle dst={p.x-21,p.y-45-bob,42,42};DrawTexturePro(TEX_GROVE_MOTE,src,dst,(Vector2){0,0},0,WHITE);return;}
     DrawCircleV((Vector2){p.x,p.y-11-bob},11,(Color){168,183,211,255});
     DrawTriangle((Vector2){p.x-7,p.y-17-bob},(Vector2){p.x,p.y-29-bob},(Vector2){p.x+7,p.y-17-bob},(Color){202,195,226,255});
     DrawCircleV((Vector2){p.x-4,p.y-12-bob},1.7f,C_INK);
@@ -80,7 +80,7 @@ static void DrawMote(Vector2 p,float t) {
 static void DrawLeafling(Vector2 p,float t) {
     float bob=sinf(t*4.0f)*2.5f;
     DrawEllipse((int)p.x,(int)p.y+5,11,4,(Color){70,105,76,75});
-    if(TEX_LEAFLING.id){int frame=(int)(t*2.5f)%4;Rectangle src={(float)(frame*64),0,64,64};Rectangle dst={p.x-26,p.y-55-bob,52,52};DrawTexturePro(TEX_LEAFLING,src,dst,(Vector2){0,0},0,WHITE);return;}
+    if(TEX_LEAFLING.id){int frame=(int)(t*2.5f)%4;Rectangle src={(float)(frame*32),0,32,32};Rectangle dst={p.x-21,p.y-45-bob,42,42};DrawTexturePro(TEX_LEAFLING,src,dst,(Vector2){0,0},0,WHITE);return;}
     DrawCircleV((Vector2){p.x,p.y-10-bob},10,(Color){157,192,118,255});
     DrawTriangle((Vector2){p.x-5,p.y-16-bob},(Vector2){p.x+1,p.y-29-bob},(Vector2){p.x+7,p.y-15-bob},(Color){102,160,94,255});
     DrawCircleV((Vector2){p.x-3,p.y-11-bob},1.6f,C_INK);
@@ -101,8 +101,8 @@ static void DrawLumi(Vector2 p,float t,float bob) {
     DrawEllipse((int)p.x,(int)p.y+7,16,6,(Color){72,109,77,75});
     if (TEX_LUMI_PIXEL.id) {
         int frame=(int)(t*2.5f)%4;
-        Rectangle src={(float)(frame*64),0,64,64};
-        Rectangle dst={p.x-27,p.y-56-sinf(t*4.4f)*2.0f,54,54};
+        Rectangle src={(float)(frame*32),0,32,32};
+        Rectangle dst={p.x-22,p.y-46-sinf(t*4.4f)*2.0f,44,44};
         DrawTexturePro(TEX_LUMI_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
         return;
     }
@@ -123,8 +123,8 @@ static void DrawPlayer(Vector2 p,float t,bool moving,int facing) {
     DrawEllipse((int)p.x,(int)p.y+8,13,4,(Color){67,88,101,85});
     if (TEX_HERO_WALK.id) {
         int frame = moving ? ((int)(t*8.0f)%4) : 0;
-        Rectangle src={(float)(frame*64),(float)(facing*64),64,64};
-        Rectangle dst={p.x-28,p.y-59-bob,56,60};
+        Rectangle src={(float)(frame*32),(float)(facing*32),32,32};
+        Rectangle dst={p.x-22,p.y-48-bob,44,48};
         DrawTexturePro(TEX_HERO_WALK,src,dst,(Vector2){0,0},0,WHITE);
         return;
     }
@@ -166,8 +166,8 @@ static void DrawMoatail(Vector2 p,float t) {
     DrawEllipse((int)p.x,(int)p.y+6,15,5,(Color){75,112,130,75});
     if(TEX_MOATAIL_PIXEL.id) {
         int frame=(int)(t*2.5f)%4;
-        Rectangle src={(float)(frame*64),0,64,64};
-        Rectangle dst={p.x-27,p.y-56-sinf(t*4)*2.0f,54,54};
+        Rectangle src={(float)(frame*32),0,32,32};
+        Rectangle dst={p.x-22,p.y-46-sinf(t*4)*2.0f,44,44};
         DrawTexturePro(TEX_MOATAIL_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_MOATAIL.id) DrawPortrait(TEX_MOATAIL,p,58,58,sinf(t*4)*2.5f);
     else {
@@ -182,8 +182,8 @@ static void DrawGecko(Vector2 p,float t) {
     DrawEllipse((int)p.x,(int)p.y+6,15,5,(Color){83,91,130,75});
     if(TEX_GECKO_PIXEL.id) {
         int frame=(int)(t*2.5f)%4;
-        Rectangle src={(float)(frame*64),0,64,64};
-        Rectangle dst={p.x-27,p.y-56-sinf(t*5)*2.0f,54,54};
+        Rectangle src={(float)(frame*32),0,32,32};
+        Rectangle dst={p.x-22,p.y-46-sinf(t*5)*2.0f,44,44};
         DrawTexturePro(TEX_GECKO_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_GECKO.id) DrawPortrait(TEX_GECKO,p,58,58,sinf(t*5)*2.0f);
     else {
