@@ -169,3 +169,41 @@ kd.line((14,14,18,14),fill=(166,101,88,255),width=1)
 kd.rectangle((6,18,9,22),fill=keeper_skin);kd.rectangle((23,18,26,22),fill=keeper_skin)
 keeper.save(CHAR/"camp_keeper.png")
 print("Generated campsite assets:", TILES/"environment_props.png", CHAR/"camp_keeper.png")
+
+
+
+# Additional grove dressing: mushroom cluster, fallen log, rune stone, flower patch.
+old_atlas=Image.open(TILES/"environment_props.png").convert("RGBA")
+grove=Image.new("RGBA",(1024,64),(0,0,0,0))
+grove.alpha_composite(old_atlas,(0,0))
+gd=ImageDraw.Draw(grove)
+# 12: mushroom cluster
+x=768
+gd.ellipse((x+4,43,x+60,62),fill=(81,125,79,255))
+gd.rectangle((x+15,28,x+24,53),fill=(238,225,191,255),outline=INK,width=1)
+gd.ellipse((x+8,15,x+31,34),fill=(220,119,128,255),outline=INK,width=2)
+gd.ellipse((x+36,34,x+44,54),fill=(238,225,191,255),outline=INK,width=1)
+gd.ellipse((x+30,25,x+51,40),fill=(240,184,132,255),outline=INK,width=2)
+for px,py in [(x+17,20),(x+25,25),(x+39,30),(x+47,31)]:
+    gd.rectangle((px,py,px+3,py+3),fill=(255,239,205,255))
+# 13: fallen log with moss
+x=832
+gd.ellipse((x+5,39,x+60,59),fill=(111,145,97,255))
+gd.rectangle((x+7,25,x+56,47),fill=(145,101,72,255),outline=INK,width=2)
+gd.ellipse((x+3,25,x+18,47),fill=(205,164,121,255),outline=INK,width=2)
+gd.ellipse((x+7,29,x+14,43),outline=(132,94,72,255),width=2)
+gd.rectangle((x+25,19,x+42,28),fill=(106,164,98,255))
+# 14: old rune stone
+x=896
+gd.polygon([(x+13,59),(x+9,25),(x+20,8),(x+47,10),(x+57,30),(x+51,59)],fill=(137,151,137,255),outline=INK)
+gd.polygon([(x+20,27),(x+32,16),(x+44,28),(x+32,43)],outline=(222,205,142,255),width=3)
+gd.line((x+32,23,x+32,49),fill=(222,205,142,255),width=2)
+# 15: flower patch
+x=960
+gd.ellipse((x+4,48,x+60,62),fill=(87,143,87,255))
+for px,py,col in [(x+15,30,(242,178,198,255)),(x+31,20,(255,220,130,255)),(x+47,32,(184,175,226,255))]:
+    gd.line((px,py+5,px,py+20),fill=(71,128,83,255),width=2)
+    gd.ellipse((px-7,py-2,px+7,py+10),fill=col,outline=INK,width=1)
+    gd.ellipse((px-2,py+1,px+2,py+5),fill=(255,238,170,255))
+grove.save(TILES/"environment_props.png")
+print("Extended grove prop atlas:", TILES/"environment_props.png")
