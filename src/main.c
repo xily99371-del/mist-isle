@@ -98,6 +98,9 @@ typedef struct {
     bool leaflingFed;
     bool groveMoteDefeated;
     float fireflyPhase;
+    float dayClock;
+    float weatherClock;
+    int weather;
 } Game;
 
 static Color C_BG={207,232,222,255}, C_INK={67,83,73,255};
@@ -228,7 +231,7 @@ static void ResetGame(Game *g,int seed) {
     g->splash=(Buddy){.pos={8,7},.owned=false,.level=1};
     g->spark=(Buddy){.pos={15,8},.owned=false,.level=1};
     g->cam.offset=(Vector2){SW/2.0f,SH/2.0f+20}; g->cam.zoom=1;
-    g->fireflyPhase=0; g->journalOpen=false; g->inventoryOpen=false; g->mapOpen=false;
+    g->fireflyPhase=0; g->dayClock=0.28f; g->weatherClock=0; g->weather=0; g->journalOpen=false; g->inventoryOpen=false; g->mapOpen=false;
     g->fireflyDiscovered=false; g->leaflingFed=false; g->groveMoteDefeated=false; g->enemySoaked=false; g->battleRound=0; g->defeatedGuards=0;
 }
 static void InitPlay(Game *g) {
@@ -259,6 +262,9 @@ static void StartStoryBattle(Game *g) {
 static void UpdateGame(Game *g,float dt) {
     g->time+=dt; if(g->toastTimer>0)g->toastTimer-=dt;
     g->fireflyPhase+=dt;
+    g->dayClock=fmodf(g->dayClock+dt/420.0f,1.0f);
+    g->weatherClock+=dt;
+    if(g->weatherClock>95.0f){g->weatherClock=0;g->weather=GetRandomValue(0,3);Toast(g,g->weather==0?"海风轻轻吹过。":g->weather==1?"林间飘起了细雨。":g->weather==2?"萤火虫开始活跃。":"云层散开，阳光洒进林地。");}
     if(g->journalOpen || g->inventoryOpen || g->mapOpen) {
         if(IsKeyPressed(KEY_F5)){SaveGame(g);Toast(g,"旅程已保存！");}
         if(IsKeyPressed(KEY_F9))LoadGame(g);
@@ -294,14 +300,14 @@ static void UpdateGame(Game *g,float dt) {
             if(g->battleTurn==0) {
                 float damage=0;
                 if(g->battleChoice==0 && g->lumi.owned) {
-                    g->player.hp=fminf(g->player.maxHp,g->player.hp+18.0f);
-                    damage=8.0f; Burst(g,WorldScreen(g->player.pos),C_GOLD,16);
+                    g->player.hp=fminf(g->player.maxHp,g->player.hp+18.0f+(g->lumi.level-1)*3.0f);
+                    damage=8.0f+(g->lumi.level-1)*2.0f; Burst(g,WorldScreen(g->player.pos),C_GOLD,16);
                     Toast(g,"苔灯灵：星光治愈，恢复18点生命！");
                 } else if(g->battleChoice==1 && g->splash.owned) {
-                    damage=20.0f; g->enemySoaked=true; Burst(g,WorldScreen(e->pos),C_BLUE,22);
+                    damage=20.0f+(g->splash.level-1)*3.0f; g->enemySoaked=true; Burst(g,WorldScreen(e->pos),C_BLUE,22);
                     Toast(g,"沫尾兽：泡泡水流，敌人进入潮湿状态！");
                 } else if(g->battleChoice==2 && g->spark.owned) {
-                    damage=g->enemySoaked?38.0f:26.0f; Burst(g,WorldScreen(e->pos),C_LILAC,26);
+                    damage=(g->enemySoaked?38.0f:26.0f)+(g->spark.level-1)*4.0f; Burst(g,WorldScreen(e->pos),C_LILAC,26);
                     Toast(g,g->enemySoaked?"鸣晶蜥：潮湿导电！造成连锁伤害！":"鸣晶蜥：晶弧放电！");
                     g->enemySoaked=false;
                 } else { damage=10.0f; Toast(g,"伙伴发动了基础攻击！"); }
@@ -309,7 +315,8 @@ static void UpdateGame(Game *g,float dt) {
                 if(e->hp<=0) {
                     e->alive=false;g->battleTurn=0;g->scene=SCENE_PLAY;g->defeatedGuards++;
                     Buddy *active=CurrentBuddy(g); active->xp+=20;
-                    if(active->xp>=50){active->xp-=50;active->level++;Toast(g,"伙伴成长了！等级提升。");}
+                    if(active->xp>=50){active->xp-=50;active->level++;Toast(g,"伙伴成长了！技能效果也得到提升。");}
+                    SaveGame(g);
                     else Toast(g,"敌人被击退！伙伴获得20点经验。");
                     if(e->type==ENEMY_MOTE){g->groveMoteDefeated=true;g->player.berries+=2;SaveGame(g);Toast(g,"击退林地微光兽，获得2颗果实！");}
                     if(e->type==ENEMY_BOSS){g->bossDefeated=true;g->player.crystals+=3;g->player.shells+=2;SaveGame(g);}
@@ -739,6 +746,10 @@ static void RenderWorld(Game *g) {
         DrawCircleV(p->p,p->size*(p->life/p->maxLife),Fade(p->c,p->life/p->maxLife));
     }
     EndMode2D();
+    float night=0.5f+0.5f*cosf(g->dayClock*PI2);
+    if(night>0.62f)DrawRectangle(0,0,SW,SH,Fade((Color){43,59,99,255},(night-0.62f)*0.22f));
+    if(g->weather==1) { for(int i=0;i<72;i++){int x=(i*173+(int)(g->time*115))%SW;int y=(i*97+(int)(g->time*205))%SH;DrawLine(x,y,x-5,y+11,Fade((Color){183,211,224,255},.55f));} }
+    else if(g->weather==2) { for(int i=0;i<24;i++){int x=(i*97+(int)(sinf(g->time+i)*18)+SW)%SW;int y=(i*53+(int)(cosf(g->time*.7f+i)*12)+SH)%SH;DrawCircle(x,y,2,Fade(C_GOLD,.6f));} }
 }
 static void Panel(Rectangle r) { DrawRectangleRounded(r,.13f,18,C_PAPER);DrawRectangleRoundedLines(r,.13f,18,(Color){221,215,188,255});}
 static void RenderHUD(Game *g) {
