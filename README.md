@@ -86,3 +86,15 @@ See `docs/CHAPTER1_RPG_MILESTONE.md`.
 The grove now contains a discoverable firefly, a fruit-loving Leafling that reveals a hidden crystal, and a one-time wild mote battle with a fruit reward. The field journal tracks these encounters. The inventory and route map are available with I and M. Companion combat now has healing, Soaked status, electric bonus damage and XP-based levels.
 
 See `docs/CHAPTER1_CONTENT_EXPANSION.md` for the current milestone and remaining work.
+
+
+## Chapter 1 polish
+- Player four-direction walk animation and animated companion idle sprites.
+- Isometric depth sorting for characters and environmental props.
+- Dynamic day/night tint and weather ambience (rain and firefly nights).
+- Companion levels scale healing and elemental skill damage.
+- Combat synergy: Soaked from Moatail increases Crystal Gecko electric damage.
+- Active companion level/XP shown in the HUD.
+- Restored lighthouse finale includes companion dialogue and animated light motes.
+
+See `docs/CHAPTER1_POLISH_MILESTONE.md` for the implementation boundary and remaining polish.
