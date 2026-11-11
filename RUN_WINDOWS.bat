@@ -15,8 +15,6 @@ if errorlevel 1 goto failed
 echo [2/3] Generating pixel-art assets...
 python tools\generate_pixel_assets.py
 if errorlevel 1 goto failed
-python -c "import zipfile; zipfile.ZipFile(r'assets\approved_art\MistIsle_RuntimeSprites_v1.zip').extractall('.')"
-if errorlevel 1 goto failed
 
 echo [3/3] Configuring and building...
 cmake -S . -B build
