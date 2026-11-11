@@ -6,7 +6,7 @@ A cute anime-inspired 2.5D companion adventure built in C with raylib. Windows-f
 Explore a small island, befriend three companions, solve an elemental ruin puzzle, and restore the lighthouse.
 
 ## Current status
-The repository is being initialized. The first commit will contain the playable chapter prototype, asset pipeline, source/license manifest, and Windows build instructions. Visual assets are being added separately from code-generated placeholders.
+The repository contains the first chapter gameplay prototype, original pixel-art character sheets, an isometric ground atlas, and a Windows-first CMake build. The current milestone is focused on making the coastal camp and first companion sequence feel like a cohesive pixel-art adventure.
 
 ## Build
 Requires CMake, Git, and a C compiler. CMake fetches raylib 5.5.
@@ -30,25 +30,13 @@ Original vector character portraits are included under `assets/characters/svg/`:
 - `moatail.svg`
 - `crystal_gecko.svg`
 
-The C renderer loads the rasterized PNG versions when present and falls back to the code-drawn placeholder if they are absent. Generate the PNGs before running:
-
-```powershell
-python -m pip install cairosvg
-python tools/rasterize_assets.py
-```
-
-Then run the executable with the repository root as the working directory so relative asset paths resolve.
+The original pixel-art PNG bundle is checked into `assets/MistIsle_PixelArt_v1.zip`. CMake extracts it automatically during configuration. The executable loads the sprite sheets and falls back to primitive placeholders only if an asset is missing.
 
 See `docs/ART_DIRECTION.md` and `docs/ASSET_MANIFEST.md` for the visual style and asset/license record.
 
 
 ## Pixel-art assets
-Generate native-resolution sprite PNGs and the isometric tile atlas:
-```powershell
-python -m pip install cairosvg
-python tools/rasterize_assets.py
-```
-The game loads:
+The native-resolution sprite PNGs and isometric tile atlas are bundled in the repository and automatically extracted by CMake. The game loads:
 - `assets/characters/png/hero_walk_4dir.png`
 - `assets/characters/png/lumi_idle_pixel.png`
 - `assets/characters/png/moatail_idle_pixel.png`
