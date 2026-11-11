@@ -11,7 +11,8 @@
 #define MAPW 22
 #define MAPH 18
 #define MAX_ENEMIES 8
-#define MAX_PARTICLES 220
+#define MAX_PARTICLES 260
+#define MAX_PICKUPS 32
 #define PI2 6.28318530718f
 
 typedef enum { SCENE_TITLE, SCENE_PLAY, SCENE_DIALOGUE, SCENE_BATTLE, SCENE_END } Scene;
@@ -43,7 +44,7 @@ typedef struct {
 typedef struct {
     int kind[MAPH][MAPW];
     int seed;
-    Pickup pickups[18];
+    Pickup pickups[MAX_PICKUPS];
     int pickupCount;
     Vector2 camp, groveGate, ruinGate, shrine, bossPos;
 } World;
@@ -78,6 +79,10 @@ typedef struct {
     int selectedBuddy;
     char toast[128];
     float toastTimer;
+    bool journalOpen;
+    bool fireflyDiscovered;
+    bool leaflingFed;
+    float fireflyPhase;
 } Game;
 
 static Color C_BG={207,232,222,255}, C_INK={67,83,73,255};
@@ -125,7 +130,7 @@ static void SetDialogue(Game *g,const char *a,const char *b,const char *c) {
     SetDialogueAs(g,"苔灯灵",a,b,c);
 }
 static void AddPickup(World *w,int kind,float x,float y) {
-    if(w->pickupCount>=18)return;
+    if(w->pickupCount>=MAX_PICKUPS)return;
     int index = w->pickupCount;
     w->pickups[index] = (Pickup){{x,y},kind,false,(float)index*0.7f};
     w->pickupCount++;
@@ -154,6 +159,9 @@ static void BuildWorld(World *w,int seed) {
     AddPickup(w,2,12,13); AddPickup(w,2,16,12);
     AddPickup(w,3,7,4); AddPickup(w,3,19,5);
     for(int i=0;i<8;i++) AddPickup(w,0,5+(i*3)%13,4+(i*5)%10);
+    // Forest-only forage, distributed away from the guaranteed path.
+    AddPickup(w,3,9,3); AddPickup(w,3,11,7); AddPickup(w,0,12,5);
+    AddPickup(w,0,7,6); AddPickup(w,1,13,6);
 }
 static bool Solid(Game *g,Vector2 p) {
     int x=(int)floorf(p.x+0.5f),y=(int)floorf(p.y+0.5f);
@@ -173,6 +181,7 @@ static void ResetGame(Game *g,int seed) {
     g->splash=(Buddy){.pos={8,7},.owned=false,.level=1};
     g->spark=(Buddy){.pos={15,8},.owned=false,.level=1};
     g->cam.offset=(Vector2){SW/2.0f,SH/2.0f+20}; g->cam.zoom=1;
+    g->fireflyPhase=0; g->journalOpen=false; g->fireflyDiscovered=false; g->leaflingFed=false;
 }
 static void InitPlay(Game *g) {
     g->scene=SCENE_PLAY; g->area=AREA_CAMP; g->player.pos=g->world.camp;
@@ -201,6 +210,8 @@ static void StartStoryBattle(Game *g) {
 }
 static void UpdateGame(Game *g,float dt) {
     g->time+=dt; if(g->toastTimer>0)g->toastTimer-=dt;
+    g->fireflyPhase+=dt;
+    if(g->journalOpen) { if(IsKeyPressed(KEY_J)||IsKeyPressed(KEY_ESCAPE))g->journalOpen=false; return; }
     for(int i=0;i<MAX_PARTICLES;i++) if(g->particles[i].life>0) {
         Particle *p=&g->particles[i];p->life-=dt;p->p=Vector2Add(p->p,Vector2Scale(p->v,dt));p->v.y-=0.3f*dt;
     }
@@ -243,6 +254,7 @@ static void UpdateGame(Game *g,float dt) {
     }
 
     Player *p=&g->player;
+    if(IsKeyPressed(KEY_J)){g->journalOpen=true;return;}
     p->dashCd=fmaxf(0,p->dashCd-dt);
     p->invuln=fmaxf(0,p->invuln-dt);
     Vector2 in={0,0};
@@ -303,6 +315,24 @@ static void UpdateGame(Game *g,float dt) {
                 Toast(g,q->kind==1?"获得潮汐贝壳！":q->kind==2?"获得星晶！":"获得岛屿果实！");
                 return;
             }
+        }
+        // A shy forest firefly can be registered in the field journal.
+        Vector2 fireflyPos={10.6f+sinf(g->fireflyPhase*0.8f)*0.22f,6.2f+cosf(g->fireflyPhase*0.65f)*0.18f};
+        if(!g->fireflyDiscovered && Dist(p->pos,fireflyPos)<1.35f) {
+            g->fireflyDiscovered=true;
+            Burst(g,WorldScreen(fireflyPos),C_GOLD,22);
+            SetDialogueAs(g,"萤芽","一只小小的萤芽停在叶片上，胸口的光一闪一闪。","它没有跟你走，只是把这片林地的秘密记在了旅人手记里。","按 J 打开手记，可以查看发现与当前目标。");
+            return;
+        }
+        // A hungry leafling accepts a berry and reveals a hidden grove cache.
+        if(!g->leaflingFed && Dist(p->pos,(Vector2){12.4f,8.0f})<1.4f) {
+            if(p->berries>0) {
+                p->berries--; g->leaflingFed=true;
+                AddPickup(&g->world,2,13.2f,8.6f);
+                Burst(g,WorldScreen((Vector2){12.4f,8.0f}),C_GREEN,18);
+                SetDialogueAs(g,"叶团","叶团闻到了果实的香气，开心地蹦了起来。","它拨开藤蔓，露出一枚被藏起来的星晶！","探索时多留意会主动回应你的生物。");
+            } else Toast(g,"叶团饿了：给它一颗岛屿果实吧。");
+            return;
         }
         // Water companion encounter.
         if(!g->splash.owned&&Dist(p->pos,(Vector2){9,5})<1.6f) {
@@ -395,6 +425,23 @@ static void DrawKeeper(Vector2 p,float t) {
     DrawCircleV((Vector2){p.x-3,p.y-30},1.5f,C_INK);
     DrawCircleV((Vector2){p.x+3,p.y-30},1.5f,C_INK);
     DrawRectangle((int)p.x-9,(int)p.y-19,18,18,(Color){111,151,116,255});
+}
+static void DrawFirefly(Vector2 p,float t) {
+    float bob=sinf(t*3.8f)*4.0f;
+    DrawCircleV((Vector2){p.x,p.y-22-bob},13,Fade(C_GOLD,.10f+.06f*sinf(t*2)));
+    DrawCircleV((Vector2){p.x,p.y-22-bob},5,(Color){255,232,150,255});
+    DrawCircleV((Vector2){p.x-2,p.y-24-bob},1.5f,WHITE);
+    DrawCircleV((Vector2){p.x-9,p.y-18-bob},2,Fade(WHITE,.75f));
+    DrawCircleV((Vector2){p.x+9,p.y-29-bob},2,Fade(C_GOLD,.75f));
+}
+static void DrawLeafling(Vector2 p,float t) {
+    float bob=sinf(t*4.0f)*2.5f;
+    DrawEllipse((int)p.x,(int)p.y+5,11,4,(Color){70,105,76,75});
+    DrawCircleV((Vector2){p.x,p.y-10-bob},10,(Color){157,192,118,255});
+    DrawTriangle((Vector2){p.x-5,p.y-16-bob},(Vector2){p.x+1,p.y-29-bob},(Vector2){p.x+7,p.y-15-bob},(Color){102,160,94,255});
+    DrawCircleV((Vector2){p.x-3,p.y-11-bob},1.6f,C_INK);
+    DrawCircleV((Vector2){p.x+3,p.y-11-bob},1.6f,C_INK);
+    DrawCircleV((Vector2){p.x,p.y-6-bob},1.4f,(Color){189,111,102,255});
 }
 static void DrawCampfire(Vector2 p,float t) {
     DrawProp(8,p,48,48);
@@ -577,6 +624,9 @@ static void RenderWorld(Game *g) {
         Particle *p=&g->particles[i];
         DrawCircleV(p->p,p->size*(p->life/p->maxLife),Fade(p->c,p->life/p->maxLife));
     }
+    Vector2 fireflyPos={10.6f+sinf(g->fireflyPhase*0.8f)*0.22f,6.2f+cosf(g->fireflyPhase*0.65f)*0.18f};
+    DrawFirefly(Iso(fireflyPos.x,fireflyPos.y,0),g->time);
+    if(!g->leaflingFed)DrawLeafling(Iso(12.4f,8.0f,0),g->time);
     EndMode2D();
 }
 static void Panel(Rectangle r) { DrawRectangleRounded(r,.13f,18,C_PAPER);DrawRectangleRoundedLines(r,.13f,18,(Color){221,215,188,255});}
@@ -591,7 +641,7 @@ static void RenderHUD(Game *g) {
     DrawText(TextFormat("沫尾兽 %s",g->splash.owned?"已同行":"未发现"),1040,79,16,C_INK);
     DrawText(TextFormat("鸣晶蜥 %s",g->spark.owned?"已同行":"未发现"),1040,101,16,C_INK);
     Panel((Rectangle){20,652,720,48});
-    DrawText("WASD 移动   SHIFT 冲刺   E 互动/采集   TAB 切换伙伴",38,667,17,(Color){91,115,96,255});
+    DrawText("WASD 移动   SHIFT 冲刺   E 互动/采集   TAB 切换伙伴   J 手记",38,667,16,(Color){91,115,96,255});
     if(!g->lumi.owned && Dist(g->player.pos,(Vector2){4,12})<1.65f) {
         Panel((Rectangle){530,585,220,40});
         DrawText("E  救助苔灯灵",550,596,17,(Color){91,115,96,255});
@@ -606,6 +656,23 @@ static void RenderHUD(Game *g) {
         Panel((Rectangle){380,600,520,42});
         DrawText(g->toast,400,612,18,(Color){78,112,91,255});
     }
+}
+static void RenderJournal(Game *g) {
+    DrawRectangle(0,0,SW,SH,Fade((Color){35,55,48,255},.48f));
+    Panel((Rectangle){250,105,780,510});
+    DrawText("旅 人 手 记",300,135,34,(Color){74,105,83,255});
+    DrawText("CHAPTER 01  /  THE LOST LIGHTHOUSE",303,179,15,(Color){132,145,112,255});
+    DrawLine(300,207,980,207,(Color){220,211,183,255});
+    DrawText("当前目标",303,230,21,(Color){104,135,94,255});
+    DrawText(g->shrineSolved?"遗迹已被唤醒，前往庭院寻找守卫。":"寻找三位伙伴，收集潮汐贝壳并唤醒古代遗迹。",303,265,19,C_INK);
+    DrawText("岛屿发现",303,320,21,(Color){104,135,94,255});
+    DrawText(g->fireflyDiscovered?"萤芽  —  已记录：会在林间微光处出现。":"萤芽  —  未发现：留意林地里漂浮的微光。",303,355,18,C_INK);
+    DrawText(g->leaflingFed?"叶团  —  已帮助：它为你找到了隐藏星晶。":"叶团  —  未帮助：它似乎很喜欢岛屿果实。",303,388,18,C_INK);
+    DrawText("伙伴同行",303,445,21,(Color){104,135,94,255});
+    DrawText(TextFormat("苔灯灵  %s       沫尾兽  %s       鸣晶蜥  %s",g->lumi.owned?"同行中":"未发现",g->splash.owned?"同行中":"未发现",g->spark.owned?"同行中":"未发现"),303,480,18,C_INK);
+    DrawText("资源",303,525,21,(Color){104,135,94,255});
+    DrawText(TextFormat("果实 %d     潮汐贝壳 %d     星晶 %d",g->player.berries,g->player.shells,g->player.crystals),303,560,18,C_INK);
+    DrawText("按 J 或 ESC 关闭",820,570,16,(Color){132,137,111,255});
 }
 static void RenderDialogue(Game *g) {
     DrawRectangle(0,0,SW,SH,Fade((Color){35,55,48,255},.26f));
@@ -700,7 +767,7 @@ int main(void) {
         if(g.scene==SCENE_TITLE)RenderTitle(&g);
         else if(g.scene==SCENE_BATTLE)RenderBattle(&g);
         else if(g.scene==SCENE_END)RenderEnd(&g);
-        else {RenderWorld(&g);RenderHUD(&g);if(g.scene==SCENE_DIALOGUE)RenderDialogue(&g);}
+        else {RenderWorld(&g);RenderHUD(&g);if(g.scene==SCENE_DIALOGUE)RenderDialogue(&g);if(g.journalOpen)RenderJournal(&g);}
         EndDrawing();
     }
     if(TEX_HERO_WALK.id)UnloadTexture(TEX_HERO_WALK);
