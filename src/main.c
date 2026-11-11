@@ -85,7 +85,7 @@ static Color C_DARKGREEN={70,119,86,255}, C_GOLD={255,219,133,255};
 static Color C_BLUE={119,190,208,255}, C_LILAC={190,166,220,255};
 static Color C_PINK={239,169,177,255}, C_RED={217,105,106,255};
 static Texture2D TEX_HERO={0}, TEX_LUMI={0}, TEX_MOATAIL={0}, TEX_GECKO={0};
-static Texture2D TEX_HERO_WALK={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, TEX_GECKO_PIXEL={0}, TEX_ISO_TILES={0};
+static Texture2D TEX_HERO_WALK={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, TEX_GECKO_PIXEL={0}, TEX_ISO_TILES={0}, TEX_PROPS={0};
 static void DrawPortrait(Texture2D tex, Vector2 p, float w, float h, float bob) {
     if (tex.id == 0) return;
     Rectangle src={0,0,(float)tex.width,(float)tex.height};
@@ -351,12 +351,25 @@ static void DrawIsoTile(int x,int y,int tile,Color fallback) {
     DrawTriangle(a,b,d,fallback);DrawTriangle(b,e,d,fallback);
 }
 static void DrawTree(Vector2 p,float s,float t) {
+    if(TEX_PROPS.id) {
+        int variant=((int)(p.x+p.y))%3;
+        Rectangle src={(float)(variant*64),0,64,64};
+        Rectangle dst={p.x-32*s,p.y-62*s,64*s,64*s};
+        DrawTexturePro(TEX_PROPS,src,dst,(Vector2){0,0},0,WHITE);
+        return;
+    }
     DrawEllipse((int)p.x,(int)p.y+5,15*s,5*s,(Color){67,101,76,75});
     DrawRectangle((int)(p.x-3*s),(int)(p.y-24*s),(int)(6*s),(int)(28*s),(Color){153,113,77,255});
     DrawCircleV((Vector2){p.x,p.y-36*s},16*s,(Color){99,163,109,255});
     DrawCircleV((Vector2){p.x-9*s,p.y-42*s},11*s,(Color){126,186,126,255});
     DrawCircleV((Vector2){p.x+9*s,p.y-42*s},11*s,(Color){112,177,119,255});
     DrawCircleV((Vector2){p.x+4*s,p.y-49*s},4*s,Fade(C_GOLD,.3f+.1f*sinf(t+p.x)));
+}
+static void DrawProp(int index,Vector2 p,float w,float h) {
+    if(!TEX_PROPS.id)return;
+    Rectangle src={(float)(index*64),0,64,64};
+    Rectangle dst={p.x-w*.5f,p.y-h,w,h};
+    DrawTexturePro(TEX_PROPS,src,dst,(Vector2){0,0},0,WHITE);
 }
 static void DrawLumi(Vector2 p,float t,float bob) {
     DrawEllipse((int)p.x,(int)p.y+7,16,6,(Color){72,109,77,75});
@@ -436,6 +449,11 @@ static void RenderWorld(Game *g) {
         int x=2+(i*7)%17,y=2+(i*11)%13;
         if(g->world.kind[y][x]!=1)DrawTree(Iso(x,y,0),.72f+(i%3)*.1f,g->time);
     }
+    // Storybook props: campsite, supply crate, signpost and distant lighthouse.
+    DrawProp(4,Iso(3.2f,11.4f,0),72,68);
+    DrawProp(5,Iso(4.6f,10.8f,0),38,38);
+    DrawProp(6,Iso(5.2f,11.7f,0),34,38);
+    DrawProp(7,Iso(19.0f,2.2f,0),62,112);
     for(int i=0;i<g->world.pickupCount;i++)if(!g->world.pickups[i].taken)DrawPickup(&g->world.pickups[i]);
     DrawShrine(Iso(g->world.shrine.x,g->world.shrine.y,0),g->time,g->shrineSolved);
     if(g->lumi.owned)DrawLumi(Iso(g->lumi.pos.x,g->lumi.pos.y,0),g->time,g->lumi.bob);
@@ -568,6 +586,7 @@ int main(void) {
     if (FileExists("assets/characters/png/moatail_idle_pixel.png")) { TEX_MOATAIL_PIXEL=LoadTexture("assets/characters/png/moatail_idle_pixel.png"); SetTextureFilter(TEX_MOATAIL_PIXEL,TEXTURE_FILTER_POINT); }
     if (FileExists("assets/characters/png/gecko_idle_pixel.png")) { TEX_GECKO_PIXEL=LoadTexture("assets/characters/png/gecko_idle_pixel.png"); SetTextureFilter(TEX_GECKO_PIXEL,TEXTURE_FILTER_POINT); }
     if (FileExists("assets/tiles/png/island_iso_tiles.png")) { TEX_ISO_TILES=LoadTexture("assets/tiles/png/island_iso_tiles.png"); SetTextureFilter(TEX_ISO_TILES,TEXTURE_FILTER_POINT); }
+    if (FileExists("assets/tiles/png/environment_props.png")) { TEX_PROPS=LoadTexture("assets/tiles/png/environment_props.png"); SetTextureFilter(TEX_PROPS,TEXTURE_FILTER_POINT); }
     if (FileExists("assets/characters/png/moss_lumi.png")) TEX_LUMI=LoadTexture("assets/characters/png/moss_lumi.png");
     if (FileExists("assets/characters/png/moatail.png")) TEX_MOATAIL=LoadTexture("assets/characters/png/moatail.png");
     if (FileExists("assets/characters/png/crystal_gecko.png")) TEX_GECKO=LoadTexture("assets/characters/png/crystal_gecko.png");
@@ -596,6 +615,7 @@ int main(void) {
     if(TEX_MOATAIL_PIXEL.id)UnloadTexture(TEX_MOATAIL_PIXEL);
     if(TEX_GECKO_PIXEL.id)UnloadTexture(TEX_GECKO_PIXEL);
     if(TEX_ISO_TILES.id)UnloadTexture(TEX_ISO_TILES);
+    if(TEX_PROPS.id)UnloadTexture(TEX_PROPS);
     if(TEX_HERO.id)UnloadTexture(TEX_HERO);
     if(TEX_LUMI.id)UnloadTexture(TEX_LUMI);
     if(TEX_MOATAIL.id)UnloadTexture(TEX_MOATAIL);
