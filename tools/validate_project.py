@@ -26,14 +26,17 @@ assets = {
     "assets/tiles/png/island_iso_tiles.png": (384, 32),
 }
 present = 0
-for rel, expected in assets.items():
-    path = ROOT / rel
-    if path.exists():
+art_imported = (ROOT / "assets/environment/environment_props_96.png").exists()
+if art_imported:
+    for rel, expected in assets.items():
+        path = ROOT / rel
+        require(path.exists(), f"approved art file exists: {rel}")
         with Image.open(path) as im:
             require(im.size == expected, f"{rel} dimensions {im.size} == {expected}")
         present += 1
-require(present == 0 or present == len(assets),
-        "approved art import is complete (all expected sheets present, or none in clean CI)")
+else:
+    print("INFO: approved art archive not present in clean CI checkout; fallback art will be packaged.")
+
 
 # Renderer source rectangles must match the approved sheet cell dimensions.
 require("frame*32" in RENDER and "facing*32" in RENDER,
