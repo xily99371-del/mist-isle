@@ -25,7 +25,7 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path dist | Out-Null
           Copy-Item build/Release/mist_isle.exe dist/
-          New-Item -ItemType Directory -Force -Path dist/assets/characters dist/assets/tiles | Out-Null
+          New-Item -ItemType Directory -Force -Path @('dist/assets/characters','dist/assets/tiles') | Out-Null
           Copy-Item assets/characters/png/* dist/assets/characters/
           Copy-Item assets/tiles/png/* dist/assets/tiles/
       - name: Upload playable Windows build
