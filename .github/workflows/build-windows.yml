@@ -36,6 +36,10 @@ jobs:
             New-Item -ItemType Directory -Force -Path dist/assets/characters/companions | Out-Null
             Copy-Item assets/characters/companions/* dist/assets/characters/companions/
           }
+          if (Test-Path assets/environment) {
+            New-Item -ItemType Directory -Force -Path dist/assets/environment | Out-Null
+            Copy-Item assets/environment/* dist/assets/environment/
+          }
           Copy-Item README.md dist/
       - name: Upload playable Windows build
         uses: actions/upload-artifact@v4
