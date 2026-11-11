@@ -27,6 +27,7 @@ typedef struct {
     int berries, shells, crystals;
     int lumi, splash, spark, selected;
     int shrineSolved, bossDefeated, fireflyDiscovered, leaflingFed;
+    int lumiLevel,lumiXp,splashLevel,splashXp,sparkLevel,sparkXp;
     unsigned char pickupTaken[MAX_PICKUPS];
 } SaveData;
 typedef struct { Vector2 tile; int kind; bool taken; float phase; } Pickup;
@@ -196,6 +197,7 @@ static void SaveGame(Game *g) {
     s.lumi=g->lumi.owned; s.splash=g->splash.owned; s.spark=g->spark.owned; s.selected=g->selectedBuddy;
     s.shrineSolved=g->shrineSolved; s.bossDefeated=g->bossDefeated;
     s.fireflyDiscovered=g->fireflyDiscovered; s.leaflingFed=g->leaflingFed;
+    s.lumiLevel=g->lumi.level;s.lumiXp=g->lumi.xp;s.splashLevel=g->splash.level;s.splashXp=g->splash.xp;s.sparkLevel=g->spark.level;s.sparkXp=g->spark.xp;
     for(int i=0;i<g->world.pickupCount && i<MAX_PICKUPS;i++)s.pickupTaken[i]=(unsigned char)g->world.pickups[i].taken;
     if(!SaveFileData("mist_isle_save.dat",&s,(int)sizeof(s)))Toast(g,"保存失败：无法写入存档文件。");
 }
@@ -210,6 +212,7 @@ static bool LoadGame(Game *g) {
     g->lumi.owned=s.lumi!=0;g->splash.owned=s.splash!=0;g->spark.owned=s.spark!=0;g->selectedBuddy=s.selected;
     g->shrineSolved=s.shrineSolved!=0;g->bossDefeated=s.bossDefeated!=0;
     g->fireflyDiscovered=s.fireflyDiscovered!=0;g->leaflingFed=s.leaflingFed!=0;
+    g->lumi.level=s.lumiLevel;g->lumi.xp=s.lumiXp;g->splash.level=s.splashLevel;g->splash.xp=s.splashXp;g->spark.level=s.sparkLevel;g->spark.xp=s.sparkXp;
     for(int i=0;i<g->world.pickupCount && i<MAX_PICKUPS;i++)g->world.pickups[i].taken=s.pickupTaken[i]!=0;
     if(g->lumi.owned)g->lumi.pos=Vector2Add(g->player.pos,(Vector2){-.55f,.42f});
     if(g->splash.owned)g->splash.pos=Vector2Add(g->player.pos,(Vector2){-.95f,.85f});
@@ -256,6 +259,8 @@ static void UpdateGame(Game *g,float dt) {
     g->time+=dt; if(g->toastTimer>0)g->toastTimer-=dt;
     g->fireflyPhase+=dt;
     if(g->journalOpen || g->inventoryOpen || g->mapOpen) {
+        if(IsKeyPressed(KEY_F5)){SaveGame(g);Toast(g,"旅程已保存！");}
+        if(IsKeyPressed(KEY_F9))LoadGame(g);
         if(IsKeyPressed(KEY_J)||IsKeyPressed(KEY_I)||IsKeyPressed(KEY_M)||IsKeyPressed(KEY_ESCAPE)) { g->journalOpen=false;g->inventoryOpen=false;g->mapOpen=false; }
         return;
     }
