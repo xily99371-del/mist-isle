@@ -104,3 +104,11 @@ See `docs/CHAPTER1_POLISH_MILESTONE.md` for the implementation boundary and rema
 The current milestone is feature-frozen for the first full Windows playthrough. Please use the packaged Windows artifact from GitHub Actions once the latest build succeeds. The playtest checklist is in `docs/WINDOWS_PLAYTEST_CANDIDATE.md`.
 
 After this package is delivered, feature work pauses. The next development cycle should focus on defects and usability issues discovered in the Windows playthrough, not another round of speculative features.
+
+
+## Approved art direction and runtime sprites
+The approved art direction combines cute, expressive monster-companion characters with a warm, cozy pixel-RPG environment mood. These are original generated project assets, not extracted Pokémon or Stardew Valley sprites.
+
+The runtime sprite archive is stored at `assets/approved_art/MistIsle_RuntimeSprites_v1.zip`. `RUN_WINDOWS.bat` and Windows CI extract it before building. The renderer loads the new hero four-direction walk sheet and the Moss Lumi, Moatail and Crystal Gecko idle strips.
+
+See `docs/APPROVED_ART_ASSETS.md` for sheet layouts, source archive details and remaining environment integration work.
