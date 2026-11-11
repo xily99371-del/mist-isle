@@ -181,6 +181,7 @@ static void AddEnemy(Game *g,EnemyType t,float x,float y,float hp) {
     if(g->enemyCount>=MAX_ENEMIES)return;
     g->enemies[g->enemyCount++]=(Enemy){{x,y},t,hp,hp,(float)GetRandomValue(0,628)/100.0f,1.2f,true};
 }
+static void ResetGame(Game *g,int seed);
 static void SaveGame(Game *g) {
     SaveData s={0};
     s.magic=0x4D495354; s.version=1; s.seed=g->lastSeed;
@@ -199,7 +200,7 @@ static bool LoadGame(Game *g) {
     SaveData s; memcpy(&s,raw,sizeof(s)); UnloadFileData(raw);
     if(s.magic!=0x4D495354 || s.version!=1){Toast(g,"存档版本不兼容。");return false;}
     ResetGame(g,s.seed);
-    g->scene=SCENE_PLAY; g->player.pos=(Vector2){s.px,s.py};g->player.hp=Clamp(s.hp,1,100);
+    g->scene=SCENE_PLAY; g->player.pos=(Vector2){s.px,s.py};g->player.hp=fmaxf(1.0f,fminf(100.0f,s.hp));
     g->player.berries=s.berries;g->player.shells=s.shells;g->player.crystals=s.crystals;
     g->lumi.owned=s.lumi!=0;g->splash.owned=s.splash!=0;g->spark.owned=s.spark!=0;g->selectedBuddy=s.selected;
     g->shrineSolved=s.shrineSolved!=0;g->bossDefeated=s.bossDefeated!=0;
