@@ -209,6 +209,8 @@ static bool SolidPoint(Game *g,Vector2 p) {
         if(InRect(p,12.55f,2.75f,15.45f,6.15f))return true; // red cottage
         if(InRect(p,7.15f,5.15f,9.05f,7.15f))return true;   // main tent
         if(InRect(p,12.55f,3.25f,13.65f,4.75f))return true; // supply tent
+        if(InRect(p,2.55f,9.55f,3.45f,10.45f))return true;  // camp keeper
+        if(!g->lumi.owned && InRect(p,3.55f,11.55f,4.45f,12.45f))return true; // Moss Lumi
         float nx=(p.x-10.5f)/11.0f, ny=(p.y-8.5f)/9.0f;
         bool onPath=((y>=8&&y<=10&&x>=3&&x<=19)||(x>=17&&x<=19&&y>=3&&y<=15));
         bool dockWater=(x>=1&&x<=3&&y>=11&&y<=15);
@@ -219,6 +221,7 @@ static bool SolidPoint(Game *g,Vector2 p) {
         if(InRect(p,14.95f,3.05f,17.05f,4.95f))return true;  // grove tree
         if(InRect(p,8.35f,11.15f,10.75f,12.95f))return true;// fallen log
         if(InRect(p,13.75f,11.45f,15.85f,13.15f))return true;// mushroom cluster
+        if(!g->splash.owned && InRect(p,8.55f,4.55f,9.45f,5.45f))return true; // Moatail
         bool stream=(x>=9&&x<=11&&y>=3&&y<=14);
         bool bridge=(y>=8&&y<=10&&x>=2&&x<=19);
         if(stream&&!bridge)return true;
@@ -230,6 +233,7 @@ static bool SolidPoint(Game *g,Vector2 p) {
         if(InRect(p,14.35f,11.05f,16.35f,13.15f))return true;// rune fountain
         if(InRect(p,17.05f,11.55f,19.05f,13.55f))return true;// east broken pillar
         if(InRect(p,16.25f,6.25f,17.75f,7.75f))return true;  // shrine plinth
+        if(!g->spark.owned && InRect(p,14.55f,6.55f,15.45f,7.45f))return true; // Crystal Gecko
         bool stream=(x>=9&&x<=11&&y>=3&&y<=14);
         bool bridge=(y>=8&&y<=10&&x>=2&&x<=19);
         if(stream&&!bridge)return true;
