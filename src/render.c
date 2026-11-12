@@ -235,46 +235,45 @@ static void RenderWorld(Game *g) {
     DrawRectangleGradientV(0,0,SW,SH,Fade(WHITE,.16f),Fade(backdrop,.10f));
     BeginMode2D(g->cam);
 
-    // Ground first: every tile is drawn before any elevated object.
+    // Dedicated ground palette and walkable layout for each independent sub-map.
     for(int y=0;y<MAPH;y++)for(int x=0;x<MAPW;x++) {
-        Color c=((x+y)&1)?(Color){151,198,144,255}:(Color){160,205,150,255};
-        if(g->world.kind[y][x]==1)c=(Color){116,157,117,255};
-        if(g->world.kind[y][x]==2)c=(Color){192,181,143,255};
-        if(x>=8&&x<=13&&y>=3&&y<=8)c=(Color){130,181,123,255};
-        if(x>=14&&x<=19&&y>=4&&y<=10)c=(Color){184,181,151,255};
         int tile=((x+y)&1)?0:1;
-        // Four connected biomes with distinct ground palettes.
-        if(x<=7 && y>=9) {
-            tile=((x+y)%4==0)?2:((x+y)&1); c=(Color){190,188,145,255};
-            if(y==9 || x==6)tile=2;
-        } else if(x>=7 && x<=13 && y<=9) {
-            tile=(x+y)&1; c=(Color){133,185,122,255};
-        } else if(x>=14 && y<=10) {
-            tile=3; c=(Color){173,169,145,255};
-        } else if(x>=14 && y>=11) {
-            tile=((x+y)%3==0)?2:3; c=(Color){190,180,145,255};
+        Color tint=(Color){151,198,144,255};
+        if(g->area==AREA_CAMP) {
+            tint=(Color){156,199,143,255};
+            if(x<5&&y>7){tile=2;tint=(Color){210,190,143,255};}
+            if(x<3&&y>11){tile=4;tint=(Color){110,180,197,255};}
+        } else if(g->area==AREA_GROVE) {
+            tint=(Color){119,171,113,255};tile=(x+y)%2;
+            if(x>=9&&x<=11&&y>=3&&y<=14){tile=4;tint=(Color){105,177,190,255};}
+            if((x*3+y)%11==0){tile=5;tint=(Color){142,188,116,255};}
+        } else if(g->area==AREA_RUINS) {
+            tile=3;tint=(Color){174,169,147,255};
+            if((x+y)%5==0){tile=2;tint=(Color){187,177,143,255};}
+            if(x>=9&&x<=11&&y>=3&&y<=14){tile=4;tint=(Color){104,165,181,255};}
+        } else {
+            tile=3;tint=(Color){190,180,150,255};
+            if(x<5||x>17||y<4||y>14){tile=2;tint=(Color){207,190,151,255};}
+            if((x+y)%7==0){tile=5;tint=(Color){145,183,119,255};}
         }
-        if(g->world.kind[y][x]==1 && !(x>=14&&y<=10))tile=3;
-        if(g->world.kind[y][x]==2 && tile!=3)tile=2;
-        if(g->world.kind[y][x]==3)tile=3;
-        if(x>=8&&x<=13&&y>=3&&y<=8){tile=(x+y)%2;c=(Color){128,180,117,255};}
-        if(x>=14&&x<=19&&y>=4&&y<=10){tile=3;c=(Color){174,168,145,255};}
-        if(x>=1&&x<=3&&y>=12&&y<=15){tile=4;c=(Color){105,177,190,255};}
-        DrawIsoTile(x,y,tile,c);
+        if(g->world.kind[y][x]==1 && g->area!=AREA_RUINS){tile=3;tint=(Color){116,144,111,255};}
+        if(g->world.kind[y][x]==2 && g->area==AREA_CAMP){tile=2;tint=(Color){207,190,151,255};}
+        if(g->world.kind[y][x]==3){tile=3;tint=(Color){145,151,133,255};}
+        DrawIsoTile(x,y,tile,tint);
     }
-    // Water channels separate the four biomes into distinct peninsulas.
-    for(int y=2;y<=8;y++) {
-        DrawIsoTile(7,y,4,(Color){105,177,190,255});
-        DrawIsoTile(13,y,4,(Color){105,177,190,255});
+    // Area-specific water and crossing details.
+    if(g->area==AREA_CAMP) {
+        for(int y=11;y<16;y++)for(int x=1;x<4;x++)DrawIsoTile(x,y,4,(Color){105,177,190,255});
+    } else if(g->area==AREA_GROVE) {
+        for(int y=3;y<15;y++)for(int x=9;x<12;x++)DrawIsoTile(x,y,4,(Color){105,177,190,255});
+        for(int x=8;x<13;x++)DrawIsoTile(x,9,0,(Color){142,185,123,255});
+    } else if(g->area==AREA_RUINS) {
+        for(int y=3;y<15;y++)for(int x=9;x<11;x++)DrawIsoTile(x,y,4,(Color){104,165,181,255});
+        for(int x=8;x<12;x++)DrawIsoTile(x,9,3,(Color){181,174,151,255});
+    } else {
+        for(int y=2;y<6;y++)for(int x=2;x<6;x++)DrawIsoTile(x,y,4,(Color){105,177,190,255});
+        for(int x=8;x<14;x++)DrawIsoTile(x,9,3,(Color){185,174,145,255});
     }
-    for(int x=8;x<=12;x++)DrawIsoTile(x,9,4,(Color){105,177,190,255});
-    // Stone crossings reconnect the coast, grove, ruins and lighthouse yard.
-    DrawIsoTile(7,9,3,(Color){176,166,137,255});
-    DrawIsoTile(10,9,3,(Color){176,166,137,255});
-    DrawIsoTile(13,9,3,(Color){176,166,137,255});
-    // Small reflective pond inside the grove and a tidal inlet by camp.
-    for(int y=3;y<6;y++)for(int x=2;x<6;x++)DrawIsoTile(x,y,4,(Color){119,191,199,255});
-    for(int y=12;y<16;y++)for(int x=1;x<3;x++)DrawIsoTile(x,y,4,(Color){105,177,190,255});
 
     // Sort elevated objects by isometric depth (x+y): characters can pass behind trees.
     RenderItem items[128]; int count=0;
