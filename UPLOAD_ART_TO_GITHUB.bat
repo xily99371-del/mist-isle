@@ -17,13 +17,13 @@ git remote get-url origin
 if errorlevel 1 goto failed
 
 if not exist "assets\environment\topdown_terrain_atlas_v1.png" (
-  if exist "MistIsle_ArtPack_v5_TopDown_Refined.zip" (
-    echo Extracting approved v5 art pack...
-    powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%CD%\MistIsle_ArtPack_v5_TopDown_Refined.zip' -DestinationPath '%CD%' -Force"
+  if exist "MistIsle_ArtPack_v6_TopDown_Polished.zip" (
+    echo Extracting approved v6 art pack...
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%CD%\MistIsle_ArtPack_v6_TopDown_Polished.zip' -DestinationPath '%CD%' -Force"
     if errorlevel 1 goto failed
   ) else (
     echo ERROR: Art pack not found.
-    echo Put MistIsle_ArtPack_v5_TopDown_Refined.zip beside this script.
+    echo Put MistIsle_ArtPack_v6_TopDown_Polished.zip beside this script.
     pause
     exit /b 1
   )
@@ -73,7 +73,7 @@ if not errorlevel 1 (
   exit /b 0
 )
 
-git commit -m "Add Mist Isle approved art pack v5"
+git commit -m "Add Mist Isle approved art pack v6"
 if errorlevel 1 goto failed
 git push origin main
 if errorlevel 1 goto failed
