@@ -17,6 +17,7 @@ jobs:
           python -m pip install pillow
           python tools/generate_pixel_assets.py
           python tools/validate_project.py
+          if (!(Test-Path assets/environment/area_props_96.png)) { throw "Approved v3 art pack is missing. Import it before producing the final playtest artifact." }
       - name: Configure
         run: cmake -S . -B build -A x64
       - name: Build
@@ -42,9 +43,11 @@ jobs:
             Copy-Item assets/environment/* dist/assets/environment/
           }
           Copy-Item README.md dist/
+          if (Test-Path docs/HUB_SUBMAPS.md) { New-Item -ItemType Directory -Force -Path dist/docs | Out-Null; Copy-Item docs/HUB_SUBMAPS.md dist/docs/ }
+          if (Test-Path RUN_WINDOWS.bat) { Copy-Item RUN_WINDOWS.bat dist/ }
       - name: Upload playable Windows build
         uses: actions/upload-artifact@v4
         with:
-          name: MistIsle-Windows-Prototype
+          name: MistIsle-Windows-Playtest-v1
           path: dist/
           if-no-files-found: error
