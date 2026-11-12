@@ -49,7 +49,7 @@ require("DrawAreaProp" in RENDER and "area_props_96.png" in RENDER, "area-specif
 require("DrawTopDownTile" in RENDER and "WorldToScreen" in RENDER, "orthographic top-down square-tile renderer is active")
 require("static Vector2 WorldScreen(Vector2 p)" in GAME and "TILE_SIZE" in HEADER, "gameplay and rendering share top-down world coordinates")
 require("grid.y+" in RENDER and "RENDER_PLAYER" in RENDER, "actor sorting uses top-down ground-contact depth")
-require("g->cam.zoom=1.10f" in GAME, "camera follows player at top-down exploration zoom")
+require("g->cam.zoom=1.15f" in GAME, "camera follows player at top-down exploration zoom")
 require("RenderItem items[192]" in RENDER and "*count>=192" in RENDER, "render queue has capacity for top-down forest canopy, props and actors")
 require("world.kind[y][x]==1" in RENDER and "RENDER_TREE" in RENDER,
         "visible forest trees are placed from the collision grid")
