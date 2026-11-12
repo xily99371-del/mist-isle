@@ -316,18 +316,18 @@ static void RenderWorld(Game *g) {
         PushRenderItem(items,&count,RENDER_PROP,10,(Vector2){6.6f,12.5f},1.0f);
         PushRenderItem(items,&count,RENDER_PROP,11,(Vector2){2.4f,14.0f},1.0f);
         // Gate markers on the hub plaza.
-        PushRenderItem(items,&count,RENDER_PROP,14,g->world.groveGate,0.8f);
-        PushRenderItem(items,&count,RENDER_PROP,14,g->world.ruinGate,0.8f);
-        PushRenderItem(items,&count,RENDER_PROP,14,g->world.shrine,0.8f);
+        PushRenderItem(items,&count,RENDER_PROP,28,g->world.groveGate,1.0f);
+        PushRenderItem(items,&count,RENDER_PROP,28,g->world.ruinGate,1.0f);
+        PushRenderItem(items,&count,RENDER_PROP,34,g->world.shrine,1.0f);
     } else if(g->area==AREA_GROVE) {
-        PushRenderItem(items,&count,RENDER_PROP,14,(Vector2){2,9},.8f);
+        PushRenderItem(items,&count,RENDER_PROP,28,(Vector2){2,9},.9f);
         for(int i=0;i<4;i++)PushRenderItem(items,&count,RENDER_PROP,24,(Vector2){6.0f+i*3.2f,3.0f+(i%2)*8.0f},.95f);
         PushRenderItem(items,&count,RENDER_PROP,25,(Vector2){7.5f,11.0f},1.0f);
         PushRenderItem(items,&count,RENDER_PROP,26,(Vector2){10.0f,13.0f},1.0f);
         PushRenderItem(items,&count,RENDER_PROP,27,(Vector2){15.0f,5.0f},.9f);
         PushRenderItem(items,&count,RENDER_PROP,12,(Vector2){6.0f,3.0f},.9f);
     } else if(g->area==AREA_RUINS) {
-        PushRenderItem(items,&count,RENDER_PROP,14,(Vector2){2,9},.8f);
+        PushRenderItem(items,&count,RENDER_PROP,34,(Vector2){2,9},.9f);
         PushRenderItem(items,&count,RENDER_PROP,28,(Vector2){16.0f,5.0f},1.25f);
         for(int i=0;i<4;i++)PushRenderItem(items,&count,RENDER_PROP,29,(Vector2){6.0f+i*3.6f,4.0f+(i%2)*8.0f},.95f);
         PushRenderItem(items,&count,RENDER_PROP,30,(Vector2){6.0f,13.0f},1.1f);
