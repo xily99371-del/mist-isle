@@ -125,7 +125,6 @@ static void SwitchArea(Game *g,Area area) {
     g->splash.pos=Vector2Add(g->player.pos,(Vector2){-1,1});
     g->spark.pos=Vector2Add(g->player.pos,(Vector2){0,1});
     g->transition=.35f;
-    GameSave(g);
 }
 
 static bool Solid(Game *g,Vector2 p) {
@@ -328,17 +327,17 @@ void GameUpdate(Game *g,float dt) {
     }
     if(IsKeyPressed(KEY_E)) {
         if(g->area==AREA_CAMP) {
-            if(Dist(p->pos,g->world.groveGate)<1.4f){SwitchArea(g,AREA_GROVE);Toast(g,"进入辉光林地");return;}
+            if(Dist(p->pos,g->world.groveGate)<1.4f){SwitchArea(g,AREA_GROVE);GameSave(g);Toast(g,"进入辉光林地");return;}
             if(Dist(p->pos,g->world.ruinGate)<1.4f){
                 if(!(g->lumi.owned&&g->splash.owned&&g->spark.owned)){Toast(g,"找到三位伙伴后，遗迹道路才会开启。");return;}
-                SwitchArea(g,AREA_RUINS);Toast(g,"进入潮汐遗迹");return;
+                SwitchArea(g,AREA_RUINS);GameSave(g);Toast(g,"进入潮汐遗迹");return;
             }
             if(Dist(p->pos,g->world.shrine)<1.4f){
                 if(!g->shrineSolved){Toast(g,"灯塔庭院仍被古老封印阻挡。");return;}
-                SwitchArea(g,AREA_LIGHTHOUSE);Toast(g,"进入灯塔庭院");return;
+                SwitchArea(g,AREA_LIGHTHOUSE);GameSave(g);Toast(g,"进入灯塔庭院");return;
             }
         } else if(Dist(p->pos,(Vector2){2,9})<1.6f) {
-            SwitchArea(g,AREA_CAMP);Toast(g,"返回海岸营地");return;
+            SwitchArea(g,AREA_CAMP);GameSave(g);Toast(g,"返回海岸营地");return;
         }
     }
     if(IsKeyPressed(KEY_E)) {
