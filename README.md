@@ -160,3 +160,7 @@ The complete generated art pack is maintained as a local ZIP in ChatGPT Library.
 4. The push triggers a Windows build. Download the artifact named `MistIsle-Windows-Playtest-v1` from that run.
 
 After this one-time import, all future source ZIPs and Windows build artifacts will contain the art assets. No separate art archive merge will be required.
+
+
+## Controls and movement coordinate convention
+The game uses an orthographic top-down grid. WASD and arrow keys are screen-cardinal: W/up decreases world Y, S/down increases world Y, A/left decreases world X, D/right increases world X. World tiles are 56x56 pixels. Camera tracking is clamped to the active sub-map bounds.
