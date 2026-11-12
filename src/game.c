@@ -140,6 +140,7 @@ static void SwitchArea(Game *g,Area area) {
     g->splash.pos=Vector2Add(g->player.pos,(Vector2){-1,1});
     g->spark.pos=Vector2Add(g->player.pos,(Vector2){0,1});
     g->transition=.35f;
+    g->cam.target=WorldScreen(g->player.pos);
 }
 
 static bool Solid(Game *g,Vector2 p) {
