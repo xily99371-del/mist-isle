@@ -89,7 +89,7 @@ static void AddEnemy(Game *g,EnemyType t,float x,float y,float hp) {
 void GameReset(Game *g,int seed);
 void GameSave(Game *g) {
     SaveData s={0};
-    s.magic=0x4D495354; s.version=2; s.seed=g->lastSeed;
+    s.magic=0x4D495354; s.version=3; s.seed=g->lastSeed; s.area=(int)g->area;
     s.px=g->player.pos.x; s.py=g->player.pos.y; s.hp=g->player.hp;
     s.berries=g->player.berries; s.shells=g->player.shells; s.crystals=g->player.crystals;
     s.lumi=g->lumi.owned; s.splash=g->splash.owned; s.spark=g->spark.owned; s.selected=g->selectedBuddy;
@@ -103,7 +103,7 @@ bool GameLoad(Game *g) {
     int size=0; unsigned char *raw=LoadFileData("mist_isle_save.dat",&size);
     if(!raw || size!=(int)sizeof(SaveData)){if(raw)UnloadFileData(raw);Toast(g,"没有找到有效存档。");return false;}
     SaveData s; memcpy(&s,raw,sizeof(s)); UnloadFileData(raw);
-    if(s.magic!=0x4D495354 || s.version!=2){Toast(g,"存档版本不兼容。");return false;}
+    if(s.magic!=0x4D495354 || s.version!=3){Toast(g,"存档版本不兼容。");return false;}
     GameReset(g,s.seed);
     g->scene=SCENE_PLAY; g->player.pos=(Vector2){s.px,s.py};g->player.hp=fmaxf(1.0f,fminf(100.0f,s.hp));
     g->player.berries=s.berries;g->player.shells=s.shells;g->player.crystals=s.crystals;
