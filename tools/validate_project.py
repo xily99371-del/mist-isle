@@ -79,7 +79,7 @@ require("static Vector2 WorldScreen(Vector2 p)" in GAME and "TILE_SIZE" in HEADE
 require("grid.y+" in RENDER and "RENDER_PLAYER" in RENDER, "actor sorting uses top-down ground-contact depth")
 require("g->cam.zoom=1.0f" in GAME and "UpdateCamera(g,dt)" in GAME and "MoveTowardsConstant" in GAME,
         "camera uses map bounds and direct constant-speed follow")
-require("RenderItem items[192]" in RENDER and "*count>=192" in RENDER, "render queue has capacity for top-down forest canopy, props and actors")
+require("RenderItem items[512]" in RENDER and "*count>=512" in RENDER, "render queue has capacity for expanded environment dressing and actors")
 require("world.kind[y][x]==1" in RENDER and "RENDER_TREE" in RENDER,
         "visible forest trees are placed from the collision grid")
 require("MoveTowardsConstant" in GAME and "680.0f*dt" in GAME,
