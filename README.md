@@ -172,3 +172,7 @@ The v4 art pack includes the approved v3 environment/character art plus `assets/
 
 ## Refined top-down art pack v5
 The v5 pack adds four runtime atlases: 56px grass/sand/stone/water terrain tiles; a 44-sprite flora and props atlas; a 30-sprite cliffs, shoreline, bridges and fences atlas; and a 10-sprite structures atlas for cottage, tent, shrine, fountain and campfire. The renderer now loads these atlases and uses the detailed square tiles and sprites for the top-down maps. Import once with `MistIsle_ArtPack_v5_TopDown_Refined.zip` and `UPLOAD_ART_TO_GITHUB.bat`.
+
+
+## Art pack v6 — polished original props
+The v6 art pack adds `assets/environment/original_props_16_v1.png`, a 4x4 atlas of 16 original project props normalized to 32x32 cells. The renderer uses it for the coastal dock, beach props, grove trees/mushrooms/log, ruin arch/pillar/rune platform/fountain, and lighthouse/courtyard structures. Use `MistIsle_ArtPack_v6_TopDown_Polished.zip` for the current full asset bundle and run `UPLOAD_ART_TO_GITHUB.bat` once to commit it into the cloned repository.
