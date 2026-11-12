@@ -70,7 +70,7 @@ static void DrawUITextWrapped(const char *text,int x,int y,int maxWidth,int size
 
 static Texture2D TEX_HERO={0}, TEX_LUMI={0}, TEX_MOATAIL={0}, TEX_GECKO={0}, TEX_KEEPER={0};
 static Texture2D TEX_HERO_PIXEL={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, TEX_GECKO_PIXEL={0}, TEX_TILES={0}, TEX_PROPS={0};
-static Texture2D TEX_ISO_TILES={0}, TEX_HERO_WALK={0}, TEX_ENV_PROPS={0}, TEX_LEAFLING={0}, TEX_GROVE_MOTE={0}, TEX_AREA_PROPS={0}, TEX_TOPDOWN_TILES={0}, TEX_FLORA_ATLAS={0}, TEX_CLIFF_ATLAS={0}, TEX_STRUCTURE_ATLAS={0}, TEX_ORIGINAL_PROPS={0}, TEX_KENNEY_BUILDINGS={0}, TEX_ENDING_CG={0};
+static Texture2D TEX_ISO_TILES={0}, TEX_HERO_WALK={0}, TEX_ENV_PROPS={0}, TEX_LEAFLING={0}, TEX_GROVE_MOTE={0}, TEX_AREA_PROPS={0}, TEX_TOPDOWN_TILES={0}, TEX_FLORA_ATLAS={0}, TEX_CLIFF_ATLAS={0}, TEX_STRUCTURE_ATLAS={0}, TEX_ORIGINAL_PROPS={0}, TEX_KENNEY_BUILDINGS={0};
 static void DrawPortrait(Texture2D tex, Vector2 p, float w, float h, float bob) {
     if (tex.id == 0) return;
     Rectangle src={0,0,(float)tex.width,(float)tex.height};
@@ -912,86 +912,83 @@ static void RenderTitle(Game *g) {
     DrawUIText("CARTOON PIXEL ADVENTURE",470,650,17,(Color){110,143,119,255});
 }
 static void RenderEnd(Game *g) {
-    ClearBackground((Color){12,24,39,255});
-    DrawRectangle(0,0,SW,SH,(Color){12,24,39,255});
-    DrawRectangle(0,0,310,SH,(Color){17,34,48,255});
-    DrawRectangle(970,0,310,SH,(Color){17,34,48,255});
-    DrawLineEx((Vector2){310,35},(Vector2){310,685},2.0f,Fade(C_GOLD,.35f));
-    DrawLineEx((Vector2){970,35},(Vector2){970,685},2.0f,Fade(C_GOLD,.35f));
-    if(TEX_ENDING_CG.id) {
-        int frame=(int)(g->endingTime/0.75f);
-        if(frame>5)frame=5;
-        float fw=(float)TEX_ENDING_CG.width/3.0f;
-        float fh=(float)TEX_ENDING_CG.height/2.0f;
-        Rectangle src={(float)(frame%3)*fw,(float)(frame/3)*fh,fw,fh};
-        Rectangle dst={340,52,580,580};
-        DrawTexturePro(TEX_ENDING_CG,src,dst,(Vector2){0,0},0,WHITE);
-        DrawRectangleLinesEx((Rectangle){336,48,588,588},3.0f,Fade(C_GOLD,.82f));
-    } else {
-        DrawCircle(630,280,210,Fade(C_GOLD,.12f));
-        DrawRectangle(600,150,60,310,(Color){210,205,168,255});
-        DrawTriangle((Vector2){580,170},(Vector2){630,70},(Vector2){680,170},(Color){234,220,166,255});
-        DrawCircle(630,160,23,C_GOLD);
-    }
-    DrawUIText("第一章",36,95,16,(Color){226,190,112,255});
-    DrawUIText("失落的灯塔",36,132,30,(Color){255,241,205,255});
-    DrawLineEx((Vector2){36,182},(Vector2){268,182},1.5f,Fade(C_GOLD,.55f));
-    DrawUITextWrapped("沉睡的灯火再次苏醒。",36,220,238,19,2,(Color){235,230,205,255});
-    DrawUITextWrapped("光越过海面，照亮了整座岛屿。",36,286,238,17,3,(Color){193,211,207,255});
-    DrawUIText("同行伙伴",996,95,17,(Color){226,190,112,255});
-    int row=0;
-    if(g->lumi.owned){DrawLumi((Vector2){1020,175},g->time,0);DrawUIText("苔灯灵",1055,155,18,(Color){242,238,214,255});row++;}
-    if(g->splash.owned){DrawMoatail((Vector2){1020,175+row*78},g->time);DrawUIText("沫尾兽",1055,155+row*78,18,(Color){242,238,214,255});row++;}
-    if(g->spark.owned){DrawGecko((Vector2){1020,175+row*78},g->time);DrawUIText("鸣晶蜥",1055,155+row*78,18,(Color){242,238,214,255});row++;}
-    DrawLineEx((Vector2){996,445},(Vector2){1242,445},1.5f,Fade(C_GOLD,.45f));
-    DrawUIText("旅程没有在此结束。",996,475,16,(Color){220,226,207,255});
-    DrawUIText("伙伴们仍在等你。",996,508,16,(Color){220,226,207,255});
-    float pulse=.6f+.4f*sinf(g->endingTime*3.2f);
-    DrawCircle(630,660,5,Fade(C_GOLD,pulse));
-    if(g->endingTime<4.5f) {
-        DrawUIText("灯塔的光正在越过海面……",475,656,17,(Color){255,235,183,255});
-    } else {
-        DrawUIText("第一章完成   ·   按 R 再次探索",440,656,18,(Color){255,235,183,255});
-    }
-}
-static int Base64Digit(unsigned char c) {
-    if(c>='A'&&c<='Z')return c-'A';
-    if(c>='a'&&c<='z')return c-'a'+26;
-    if(c>='0'&&c<='9')return c-'0'+52;
-    if(c=='+')return 62;
-    if(c=='/')return 63;
-    return -1;
-}
-static unsigned char *DecodeBase64(const char *encoded,int *outSize) {
-    size_t n=strlen(encoded);
-    unsigned char *out=(unsigned char*)malloc(n*3/4+4);
-    if(!out)return NULL;
-    unsigned int acc=0;int bits=0,count=0;
-    for(size_t i=0;i<n;i++) {
-        unsigned char c=(unsigned char)encoded[i];
-        if(c=='=')break;
-        int v=Base64Digit(c);if(v<0)continue;
-        acc=(acc<<6)|(unsigned int)v;bits+=6;
-        if(bits>=8){bits-=8;out[count++]=(unsigned char)((acc>>bits)&255u);}
-    }
-    *outSize=count;return out;
-}
-static void LoadEndingCG(void) {
-    char *encoded=LoadFileText("assets/cinematics/lighthouse_lighting_6frame.jpg.b64");
-    if(!encoded){TraceLog(LOG_WARNING,"Mist Isle: lighthouse ending CG data not found.");return;}
-    int byteCount=0;unsigned char *bytes=DecodeBase64(encoded,&byteCount);
-    if(bytes&&byteCount>0) {
-        Image image=LoadImageFromMemory(".jpg",bytes,byteCount);
-        if(image.data) {
-            if(image.width==336&&image.height==224) {
-                TEX_ENDING_CG=LoadTextureFromImage(image);
-                if(TEX_ENDING_CG.id)SetTextureFilter(TEX_ENDING_CG,TEXTURE_FILTER_BILINEAR);
-            } else TraceLog(LOG_WARNING,"Mist Isle: ending CG atlas has unexpected size %dx%d.",image.width,image.height);
-            UnloadImage(image);
+    float t=g->endingTime;
+    float pulse=.55f+.45f*sinf(t*3.0f);
+    float sweep=sinf(t*.78f)*.34f;
+    ClearBackground((Color){11,22,39,255});
+    DrawRectangleGradientV(0,0,SW,SH,(Color){22,43,67,255},(Color){42,75,91,255});
+    // Distant headlands, a warm horizon and a layered sea create a full-screen story shot.
+    DrawCircle(255,170,112,Fade((Color){255,207,139,255},.16f));
+    DrawCircle(255,170,72,Fade((Color){255,226,174,255},.13f));
+    DrawCloudPuff(190,118,1.0f,(Color){194,213,207,75});
+    DrawCloudPuff(570,154,.72f,(Color){202,216,207,55});
+    DrawCloudPuff(1050,120,.82f,(Color){190,210,206,60});
+    DrawTriangle((Vector2){0,385},(Vector2){140,275},(Vector2){315,390},(Color){35,67,75,255});
+    DrawTriangle((Vector2){150,392},(Vector2){365,292},(Vector2){560,405},(Color){43,78,81,255});
+    DrawTriangle((Vector2){820,410},(Vector2){1065,270},(Vector2){1280,405},(Color){36,67,75,255});
+    DrawRectangleGradientV(0,390,SW,330,(Color){37,111,128,255},(Color){14,54,77,255});
+    for(int row=0;row<12;row++) {
+        float y=420.0f+row*26.0f;
+        float phase=t*1.35f+row*.72f;
+        for(int x=-30;x<SW+40;x+=112) {
+            float yy=y+sinf(phase+x*.012f)*5.0f;
+            DrawLineEx((Vector2){(float)x,yy},(Vector2){x+52.0f,yy-2.0f},2.0f,Fade((Color){205,231,215,255},.18f+.07f*sinf(phase)));
+            DrawLineEx((Vector2){x+58.0f,yy+7.0f},(Vector2){x+94.0f,yy+5.0f},1.3f,Fade((Color){92,174,180,255},.2f));
         }
     }
-    free(bytes);UnloadFileText(encoded);
-    if(!TEX_ENDING_CG.id)TraceLog(LOG_WARNING,"Mist Isle: lighthouse ending CG could not be loaded.");
+    // The lighthouse beam sweeps across the bay while its lantern room brightens.
+    Vector2 lamp={923,307};
+    Vector2 beamA={lamp.x-950.0f,lamp.y-255.0f+sweep*420.0f};
+    Vector2 beamB={lamp.x-950.0f,lamp.y+255.0f+sweep*420.0f};
+    DrawTriangle(lamp,beamA,beamB,Fade((Color){255,230,165,255},.075f+.035f*pulse));
+    DrawTriangle(lamp,(Vector2){lamp.x-900,lamp.y-115+sweep*420.0f},(Vector2){lamp.x-900,lamp.y+115+sweep*420.0f},Fade((Color){255,241,196,255},.11f+.045f*pulse));
+    DrawCircleV(lamp,42,Fade((Color){255,220,137,255},.13f+.1f*pulse));
+    DrawCircleV(lamp,25,Fade((Color){255,236,178,255},.3f+.2f*pulse));
+    DrawCircleV(lamp,12,(Color){255,245,204,255});
+    for(int i=0;i<18;i++) {
+        float a=t*.45f+i*PI2/18.0f;
+        Vector2 mote={lamp.x+cosf(a)*(42.0f+7.0f*sinf(t*2+i)),lamp.y+sinf(a)*(32.0f+5.0f*cosf(t*2+i))};
+        DrawCircleV(mote,1.8f,Fade((Color){255,229,165,255},.6f));
+    }
+    // A rocky promontory anchors the tower; use the actual area art when available.
+    DrawTriangle((Vector2){690,720},(Vector2){850,475},(Vector2){1100,720},(Color){39,65,65,255});
+    DrawTriangle((Vector2){820,720},(Vector2){1015,500},(Vector2){1280,720},(Color){28,54,59,255});
+    DrawTriangle((Vector2){920,720},(Vector2){1060,585},(Vector2){1280,720},(Color){52,78,69,255});
+    if(TEX_AREA_PROPS.id) {
+        DrawAreaProp(12,(Vector2){930,680},260,150);
+        DrawAreaProp(13,(Vector2){930,560},270,310);
+    } else {
+        DrawRectangle(875,300,100,310,(Color){218,220,195,255});
+        DrawRectangle(860,282,130,28,(Color){171,91,80,255});
+        DrawRectangle(888,250,74,42,(Color){206,112,88,255});
+        DrawRectangle(899,265,52,28,Fade((Color){255,226,150,255},pulse));
+    }
+    // Lit windows and a rotating crown give the tower a readable focal point.
+    DrawRectangle(897,410,24,38,Fade((Color){255,220,143,255},.55f+.25f*pulse));
+    DrawRectangle(935,410,24,38,Fade((Color){255,220,143,255},.55f+.25f*pulse));
+    DrawCircleLines((int)lamp.x,(int)lamp.y,34,Fade(C_GOLD,.65f));
+    DrawCircleLines((int)lamp.x,(int)lamp.y,47,Fade(C_GOLD,.28f));
+    // The companions and explorer watch the lighthouse relight together.
+    DrawPlayer((Vector2){505,665},t,false,3);
+    if(g->lumi.owned)DrawLumi((Vector2){575,660},t,0);
+    if(g->splash.owned)DrawMoatail((Vector2){640,660},t);
+    if(g->spark.owned)DrawGecko((Vector2){705,660},t);
+    // Sparse fireflies make the ending feel alive without obscuring the scene.
+    for(int i=0;i<24;i++) {
+        float x=(float)((i*173)%SW);
+        float y=245.0f+(float)((i*97)%360);
+        float blink=.18f+.42f*(.5f+.5f*sinf(t*2.7f+i*1.9f));
+        DrawCircle((int)x,(int)y,1.5f+(i%3)*.45f,Fade((Color){255,226,151,255},blink));
+    }
+    DrawRectangle(0,0,SW,78,Fade((Color){9,20,35,255},.72f));
+    DrawUIText("第一章  ·  失落的灯塔",38,23,26,(Color){255,239,204,255});
+    DrawUIText("灯火越过海面，照亮整座岛屿。",800,31,17,(Color){225,226,205,255});
+    DrawRectangle(0,SH-72,SW,72,Fade((Color){8,19,33,255},.78f));
+    if(t<4.5f) {
+        DrawUIText("沉睡的灯塔正在苏醒……",470,SH-49,19,(Color){255,231,175,255});
+    } else {
+        DrawUIText("旅程仍将继续   ·   按 R 再次探索",420,SH-49,19,(Color){255,231,175,255});
+    }
 }
 void RenderInit(void) {
     LoadUIFont();
@@ -1021,13 +1018,11 @@ void RenderInit(void) {
             if(targets[i]->id)SetTextureFilter(*targets[i],TEXTURE_FILTER_POINT);
         }
     }
-    LoadEndingCG();
 }
 void RenderClose(void) {
     UnloadUIFont();
     Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
     for(int i=0;i<17;i++)if(textures[i]->id)UnloadTexture(*textures[i]);
-    if(TEX_ENDING_CG.id)UnloadTexture(TEX_ENDING_CG);
 }
 void GameRender(Game *g) {
     if(g->scene==SCENE_TITLE)RenderTitle(g);
