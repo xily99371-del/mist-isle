@@ -201,7 +201,7 @@ void GameReset(Game *g,int seed) {
     g->lumi=(Buddy){.pos={2.3f,12.4f},.owned=false,.level=1};
     g->splash=(Buddy){.pos={8,7},.owned=false,.level=1};
     g->spark=(Buddy){.pos={15,8},.owned=false,.level=1};
-    g->cam.offset=(Vector2){SW/2.0f,SH/2.0f}; g->cam.zoom=1.10f;
+    g->cam.offset=(Vector2){SW/2.0f,SH/2.0f}; g->cam.zoom=1.15f;
     g->fireflyPhase=0; g->dayClock=0.28f; g->weatherClock=0; g->weather=0; g->journalOpen=false; g->inventoryOpen=false; g->mapOpen=false;
     g->fireflyDiscovered=false; g->leaflingFed=false; g->groveMoteDefeated=false; g->enemySoaked=false; g->battleRound=0; g->defeatedGuards=0;
 }
@@ -458,8 +458,5 @@ void GameUpdate(Game *g,float dt) {
     if(g->shrineSolved&&g->enemyCount>0&&!g->enemies[g->enemyCount-1].alive)g->bossDefeated=true;
 
     g->cam.target=WorldScreen(p->pos);
-    float halfW=SW/(2.0f*g->cam.zoom),halfH=SH/(2.0f*g->cam.zoom);
-    if(WORLD_PIXEL_W>2*halfW)g->cam.target.x=Clamp(g->cam.target.x,halfW,WORLD_PIXEL_W-halfW);
-    if(WORLD_PIXEL_H>2*halfH)g->cam.target.y=Clamp(g->cam.target.y,halfH,WORLD_PIXEL_H-halfH);
     if(g->toastTimer>0)g->toastTimer-=dt;
 }
