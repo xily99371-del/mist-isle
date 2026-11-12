@@ -125,6 +125,11 @@ static void BuildAreaWorld(Game *g,Area area) {
         for(int x=2;x<20;x++)w->kind[9][x]=0;
         AddPickup(w,0,6,5);AddPickup(w,1,12,12);AddPickup(w,2,17,5);
     }
+    // Resource nodes are always placed on reachable ground, never inside a random blocker.
+    for(int i=0;i<w->pickupCount;i++) {
+        int px=(int)w->pickups[i].tile.x, py=(int)w->pickups[i].tile.y;
+        if(px>0&&py>0&&px<MAPW-1&&py<MAPH-1)w->kind[py][px]=0;
+    }
 }
 static void SwitchArea(Game *g,Area area) {
     BuildAreaWorld(g,area);
