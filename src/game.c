@@ -137,7 +137,7 @@ static void BuildAreaWorld(Game *g,Area area) {
     }
     w->pickupCount=0;
     if(area==AREA_CAMP) {
-        w->camp=(Vector2){3,12};w->groveGate=(Vector2){18,4};w->ruinGate=(Vector2){18,9};w->shrine=(Vector2){18,14};w->bossPos=(Vector2){18,14};
+        w->camp=(Vector2){4,13};w->groveGate=(Vector2){18,4};w->ruinGate=(Vector2){18,9};w->shrine=(Vector2){18,14};w->bossPos=(Vector2){18,14};
         for(int y=1;y<17;y++)for(int x=1;x<5;x++)if(y<7||y>14)w->kind[y][x]=2;
         // Collision footprints for the two Kenney Tiny Town cottages placed in the hub.
         for(int y=1;y<=4;y++)for(int x=3;x<=5;x++)w->kind[y][x]=1;
@@ -201,7 +201,19 @@ static void SwitchArea(Game *g,Area area) {
 static bool SolidPoint(Game *g,Vector2 p) {
     int x=(int)floorf(p.x+0.5f),y=(int)floorf(p.y+0.5f);
     if(x<1||y<1||x>=MAPW-1||y>=MAPH-1)return true;
-    return g->world.kind[y][x]==1;
+    if(g->world.kind[y][x]==1)return true;
+    if(g->area==AREA_CAMP) {
+        float nx=((float)x-10.5f)/11.0f, ny=((float)y-8.5f)/9.0f;
+        bool onPath=((y>=8&&y<=10&&x>=3&&x<=19)||(x>=17&&x<=19&&y>=3&&y<=15));
+        bool dockWater=(x>=1&&x<=3&&y>=11&&y<=15);
+        bool sea=(nx*nx+ny*ny)>.88f;
+        if(!onPath&&(dockWater||sea))return true;
+    } else if(g->area==AREA_GROVE||g->area==AREA_RUINS) {
+        bool stream=(x>=9&&x<=11&&y>=3&&y<=14);
+        bool bridge=(y>=8&&y<=10&&x>=2&&x<=19);
+        if(stream&&!bridge)return true;
+    }
+    return false;
 }
 static bool Solid(Game *g,Vector2 p) {
     // Match the collision footprint to the visible character width.
