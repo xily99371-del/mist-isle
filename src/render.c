@@ -337,7 +337,7 @@ static void RenderWorld(Game *g) {
     for(int i=0;i<count;i++) {
         RenderItem *it=&items[i]; Vector2 p=Iso(it->grid.x,it->grid.y,0);
         switch(it->kind) {
-            case RENDER_TREE: DrawTree(p,it->scale,g->time); break;
+            case RENDER_TREE: if(g->area==AREA_RUINS)DrawEnvProp(5,p,48*it->scale,62*it->scale); else DrawTree(p,it->scale,g->time); break;
             case RENDER_PROP:
                 if(it->index==4)DrawProp(4,p,72,68);
                 else if(it->index==5)DrawEnvProp(7,p,52,52);
@@ -345,7 +345,7 @@ static void RenderWorld(Game *g) {
                 else if(it->index==7)DrawEnvProp(9,p,84,112);
                 else if(it->index==9)DrawProp(9,p,32,36);
                 else if(it->index==10)DrawProp(10,p,46,38);
-                else if(it->index==11)DrawProp(11,p,36,30);
+                else if(it->index==11)DrawEnvProp(11,p,52,48);
                 else if(it->index==12)DrawEnvProp(3,p,48*it->scale,52*it->scale);
                 else if(it->index==13)DrawEnvProp(4,p,62*it->scale,40*it->scale);
                 else if(it->index==14)DrawEnvProp(5,p,54*it->scale,62*it->scale);
