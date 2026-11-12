@@ -28,6 +28,7 @@ assets = {
     "assets/environment/flora_props_atlas_128.png": (1024, 768),
     "assets/environment/cliffs_fences_atlas_128.png": (1024, 512),
     "assets/environment/structures_atlas_128.png": (1024, 256),
+    "assets/environment/original_props_16_v1.png": (128, 128),
     "assets/tiles/png/island_iso_tiles.png": (384, 32),
 }
 present = 0
@@ -54,6 +55,8 @@ require("DrawTopDownTile" in RENDER and "WorldToScreen" in RENDER, "orthographic
 require("topdown_terrain_atlas_v1.png" in RENDER and "56,56" in RENDER, "detailed 56px top-down terrain atlas is integrated")
 require("TEX_TOPDOWN_TILES" in RENDER and "for(int i=0;i<15;i++)" in RENDER, "top-down terrain and decor textures are loaded and released")
 require("flora_props_atlas_128.png" in RENDER and "cliffs_fences_atlas_128.png" in RENDER and "structures_atlas_128.png" in RENDER, "refined flora, cliff and structure sprite atlases are integrated")
+require("original_props_16_v1.png" in RENDER and "DrawOriginalProp" in RENDER, "curated original 16-prop atlas is integrated")
+require("TEX_ORIGINAL_PROPS" in RENDER and "for(int i=0;i<16;i++)" in RENDER, "original prop atlas texture lifecycle is complete")
 require("static Vector2 WorldScreen(Vector2 p)" in GAME and "TILE_SIZE" in HEADER, "gameplay and rendering share top-down world coordinates")
 require("grid.y+" in RENDER and "RENDER_PLAYER" in RENDER, "actor sorting uses top-down ground-contact depth")
 require("g->cam.zoom=1.15f" in GAME, "camera follows player at top-down exploration zoom")
