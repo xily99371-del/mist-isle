@@ -320,7 +320,7 @@ static void DrawForestBackdrop(float t) {
     DrawCloudPuff(250,165,.65f,(Color){235,240,204,90});
     DrawCloudPuff(990,125,.55f,(Color){235,240,204,75});
     for(int i=0;i<36;i++) {
-        float x=(float)((i*197)%WORLD_PIXEL_W), y=(float)(220+(i*83)%440);
+        float x=(float)((i*197)%(int)WORLD_PIXEL_W), y=(float)(220+(i*83)%(int)(WORLD_PIXEL_H-220));
         DrawCircle((int)x,(int)y,2.0f+(i%3),Fade((Color){238,237,156,255},.25f));
     }
 }
@@ -335,7 +335,7 @@ static void DrawRuinsBackdrop(float t) {
         DrawRectangle(x+12,base-100,w-24,22,(Color){179,189,164,120});
     }
     for(int i=0;i<30;i++) {
-        int x=(i*137)%WORLD_PIXEL_W,y=340+(i*71)%350;
+        int x=(i*137)%(int)WORLD_PIXEL_W,y=340+(i*71)%(int)(WORLD_PIXEL_H-340);
         DrawCircle(x,y,2+(i%3),Fade((Color){215,215,173,255},.2f));
     }
 }
