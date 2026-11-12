@@ -143,11 +143,19 @@ static void SwitchArea(Game *g,Area area) {
     g->cam.target=WorldScreen(g->player.pos);
 }
 
-static bool Solid(Game *g,Vector2 p) {
+static bool SolidPoint(Game *g,Vector2 p) {
     int x=(int)floorf(p.x+0.5f),y=(int)floorf(p.y+0.5f);
     if(x<1||y<1||x>=MAPW-1||y>=MAPH-1)return true;
-    if(g->world.kind[y][x]==1)return true;
-    return false;
+    return g->world.kind[y][x]==1;
+}
+static bool Solid(Game *g,Vector2 p) {
+    // A small four-corner body footprint prevents the sprite clipping through tree trunks.
+    const float r=.22f;
+    return SolidPoint(g,p) ||
+        SolidPoint(g,(Vector2){p.x-r,p.y-r}) ||
+        SolidPoint(g,(Vector2){p.x+r,p.y-r}) ||
+        SolidPoint(g,(Vector2){p.x-r,p.y+r}) ||
+        SolidPoint(g,(Vector2){p.x+r,p.y+r});
 }
 static void AddEnemy(Game *g,EnemyType t,float x,float y,float hp) {
     if(g->enemyCount>=MAX_ENEMIES)return;
@@ -173,7 +181,7 @@ bool GameLoad(Game *g) {
     if(s.magic!=0x4D495354 || s.version!=4){Toast(g,"存档版本不兼容。");return false;}
     GameReset(g,s.seed);
     SwitchArea(g,(Area)Clamp(s.area,AREA_CAMP,AREA_LIGHTHOUSE));
-    g->scene=SCENE_PLAY; g->player.pos=(Vector2){s.px,s.py};g->player.hp=fmaxf(1.0f,fminf(100.0f,s.hp));
+    g->scene=SCENE_PLAY; g->player.pos=(Vector2){s.px,s.py};g->cam.target=WorldScreen(g->player.pos);g->player.hp=fmaxf(1.0f,fminf(100.0f,s.hp));
     g->player.berries=s.berries;g->player.shells=s.shells;g->player.crystals=s.crystals;
     g->lumi.owned=s.lumi!=0;g->splash.owned=s.splash!=0;g->spark.owned=s.spark!=0;g->selectedBuddy=s.selected;
     g->shrineSolved=s.shrineSolved!=0;g->bossDefeated=s.bossDefeated!=0;
@@ -198,7 +206,7 @@ void GameReset(Game *g,int seed) {
     g->fireflyDiscovered=false; g->leaflingFed=false; g->groveMoteDefeated=false; g->enemySoaked=false; g->battleRound=0; g->defeatedGuards=0;
 }
 void GameStart(Game *g) {
-    g->scene=SCENE_PLAY; SwitchArea(g,AREA_CAMP); g->player.pos=g->world.camp;
+    g->scene=SCENE_PLAY; SwitchArea(g,AREA_CAMP); g->player.pos=g->world.camp; g->cam.target=WorldScreen(g->player.pos);
     SetDialogueAs(g,"旅人手记","你在海岸边醒来，远处的灯塔已经熄灭。",
         "一只小小的苔灯灵躲在营火旁。它似乎受了伤。",
         "靠近它，按 E 互动。WASD 移动，SHIFT 冲刺。");
