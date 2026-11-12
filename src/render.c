@@ -406,10 +406,10 @@ static void RenderHUD(Game *g) {
     } else if(g->area==AREA_CAMP && !g->lumi.owned && Dist(g->player.pos,(Vector2){4,12})<1.65f) {
         Panel((Rectangle){530,585,220,40});
         DrawUIText("E  救助苔灯灵",550,596,17,(Color){91,115,96,255});
-    } else if(Dist(g->player.pos,(Vector2){3,10})<2.0f) {
+    } else if(g->area==AREA_CAMP && Dist(g->player.pos,(Vector2){3,10})<2.0f) {
         Panel((Rectangle){530,585,220,40});
         DrawUIText("E  与守望者交谈",550,596,17,(Color){91,115,96,255});
-    } else if(g->lumi.owned && Dist(g->player.pos,(Vector2){4.1f,12.5f})<1.5f) {
+    } else if(g->area==AREA_CAMP && g->lumi.owned && Dist(g->player.pos,(Vector2){4.1f,12.5f})<1.5f) {
         Panel((Rectangle){530,585,220,40});
         DrawUIText("E  在营火旁休息",550,596,17,(Color){91,115,96,255});
     }
