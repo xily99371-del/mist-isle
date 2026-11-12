@@ -115,12 +115,14 @@ require("LogicalMousePosition" in GAME and "GetScreenWidth()" in GAME,
         "battle mouse selection remains aligned after window scaling")
 require("DrawTerrainAccent" in RENDER and "terrainKinds" in RENDER and "512" in RENDER,
         "world maps include layered ground detail, shoreline foam and a larger render queue")
-require("TEX_ENDING_CG" in RENDER and "LoadEndingCG" in RENDER and "assets/cinematics/lighthouse_lighting_6frame.jpg.b64" in RENDER,
-        "ending uses a dedicated illustrated lighthouse cinematic atlas")
+require("TEX_ENDING_CG" in RENDER and "LoadEndingCG" in RENDER and "assets/cinematics/lighthouse_final_scene.jpg.b64" in RENDER,
+        "ending uses a dedicated illustrated lighthouse scene")
+require("DrawTriangle(lamp,beamA,beamB" not in RENDER and "scene.width*.50f" in RENDER,
+        "ending scene adds a procedural moving beacon beam over the illustration")
 cg_file = ROOT / "assets/cinematics/lighthouse_lighting_6frame.jpg.b64"
 require(cg_file.exists(), "lighthouse ending CG asset is present")
 with Image.open(io.BytesIO(base64.b64decode(cg_file.read_text(encoding="ascii")))) as cg:
-    require(cg.size == (384, 256), "lighthouse CG atlas contains six 128px frames")
+    require(cg.size == (448, 448), "lighthouse finale illustration is a 448px square scene")
 require("assets/cinematics" in WORKFLOW and "Copy-Item assets/cinematics/*" in WORKFLOW,
         "Windows playtest package includes the cinematic asset")
 require("footY-66" in RENDER and "footY-56" in RENDER,
@@ -129,8 +131,14 @@ require("unsigned char solid[MAPH][MAPW]" in HEADER and "w->solid[y][x]=1" in GA
         "collision footprints are independent from visible terrain and tree tiles")
 require("h%100" not in GAME[GAME.find("static void BuildAreaWorld"):GAME.find("static void SwitchArea",GAME.find("static void BuildAreaWorld"))],
         "area maps use authored layouts instead of random blocker placement")
-require("bossDefeated && Dist(p->pos,g->world.shrine)<3.2f" in GAME and "点亮失落的灯塔" in RENDER,
-        "final lighthouse tablet has a visible E interaction")
+require("g->area==AREA_LIGHTHOUSE && g->bossDefeated && Dist(p->pos,g->world.shrine)<3.8f" in GAME and "点亮失落的灯塔" in RENDER,
+        "final lighthouse tablet has an explicit E interaction with a reachable radius")
+require("g->scene==SCENE_END" in GAME[GAME.find("void GameUpdate"):GAME.find("static void AddBuddyFriend")] if False else "SCENE_END" in GAME,
+        "chapter finale scene state is present")
+require("if(g->bossDefeated&&Dist(p->pos,g->world.shrine)<1.05f)" not in GAME,
+        "finale no longer auto-triggers from proximity")
+require(GAME.find("if(g->scene==SCENE_END)") < GAME.find("if(g->journalOpen || g->inventoryOpen || g->mapOpen)"),
+        "finale update is processed before modal UI early returns")
 
 # Critical gameplay entry points and persistence must remain present.
 for token, label in [
