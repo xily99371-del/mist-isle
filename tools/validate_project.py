@@ -91,10 +91,10 @@ require("DrawUITextWrapped" in RENDER and "UI_CODEPOINTS" in RENDER,
         "Chinese UI includes the complete source glyph set and wrapped objective text")
 require("endingTime" in GAME and "LoadEndingCG" in RENDER,
         "lighthouse ending uses a timed cinematic sequence")
-cg_b64 = ROOT / "assets/cinematics/lighthouse_lighting_6frame.jpg.b64"
-require(cg_b64.exists(), "six-frame lighthouse cinematic source is present")
-with Image.open(io.BytesIO(base64.b64decode(cg_b64.read_text(encoding="ascii")))) as cg:
-    require(cg.size == (432, 288), "lighthouse cinematic atlas is 3x2 frames at 144px each")
+require("DrawTriangle(lamp,beamA,beamB" in RENDER and "sinf(t*.78f)" in RENDER,
+        "lighthouse ending contains a sweeping animated beam")
+require("DrawAreaProp(13" in RENDER and "同行的" not in RENDER,
+        "lighthouse ending uses the authored lighthouse prop artwork")
 require("SetSolidRect" in GAME and "MovePlayerWithCollision" in GAME and "dockWater" in GAME and "stream&&!bridge" in GAME,
         "props, shore water and stream banks block movement with substep collision")
 require("GetCurrentObjective" in GAME and "DrawObjectiveMarker" in RENDER,
