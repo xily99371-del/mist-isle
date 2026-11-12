@@ -61,6 +61,11 @@ for token, label in [
     ("groveMoteDefeated", "persistent grove encounter"),
     ("fireflyDiscovered", "field journal discovery"),
     ("leaflingFed", "feeding interaction"),
+    ("BuildAreaWorld", "separate area map builder"),
+    ("SwitchArea", "hub/sub-map transitions"),
+    ("areaPickupTaken", "per-area pickup persistence"),
+    ("s.area=(int)g->area", "active area save field"),
+    ("g->area==AREA_GROVE", "area-specific interaction/render routing"),
 ]:
     require(token in GAME or token in HEADER, label + " is present")
 
