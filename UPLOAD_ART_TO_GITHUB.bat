@@ -16,24 +16,25 @@ if errorlevel 1 (
 git remote get-url origin
 if errorlevel 1 goto failed
 
-if not exist "assets\environment\area_props_96.png" (
+if not exist "assets\environment\topdown_terrain_atlas_v1.png" (
   if exist "MistIsle_ArtPack_v4_TopDown_Refined.zip" (
-    echo Extracting approved v3 art pack...
-    powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%CD%\MistIsle_ArtPack_v3_HubSubmaps.zip' -DestinationPath '%CD%' -Force"
+    echo Extracting approved v4 art pack...
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%CD%\MistIsle_ArtPack_v4_TopDown_Refined.zip' -DestinationPath '%CD%' -Force"
     if errorlevel 1 goto failed
   ) else (
     echo ERROR: Art pack not found.
-    echo Put MistIsle_ArtPack_v3_HubSubmaps.zip beside this script.
+    echo Put MistIsle_ArtPack_v4_TopDown_Refined.zip beside this script.
     pause
     exit /b 1
   )
 )
 
 echo.
-echo Checking required approved art files...
+echo Checking required art files...
 for %%F in (
   "assets\environment\environment_props_96.png"
   "assets\environment\area_props_96.png"
+  "assets\environment\topdown_terrain_atlas_v1.png"
   "assets\characters\hero\hero_walk_4dir_64.png"
   "assets\characters\companions\moss_lumi_idle_64.png"
   "assets\characters\companions\moatail_idle_64.png"
@@ -59,7 +60,7 @@ git pull --rebase origin main
 if errorlevel 1 goto failed
 
 echo.
-echo Staging only runtime art assets...
+echo Staging runtime art assets...
 git add assets/
 git diff --cached --stat
 git diff --cached --quiet
@@ -69,13 +70,14 @@ if not errorlevel 1 (
   exit /b 0
 )
 
-git commit -m "Add approved Mist Isle art pack v3"
+git commit -m "Add Mist Isle approved art pack v4"
 if errorlevel 1 goto failed
 git push origin main
 if errorlevel 1 goto failed
 
 echo.
-echo SUCCESS: Art assets are now committed to GitHub.\necho The full v4 top-down terrain atlas is included.
+echo SUCCESS: All art assets are now committed to GitHub.
+echo The full top-down terrain atlas is included.
 echo A complete Windows build will start automatically.
 pause
 exit /b 0
@@ -83,6 +85,6 @@ exit /b 0
 :failed
 echo.
 echo FAILED. No successful upload was confirmed.
-echo Check GitHub sign-in, proxy connectivity and the error above.
+echo Check GitHub authentication, proxy connectivity and the error above.
 pause
 exit /b 1
