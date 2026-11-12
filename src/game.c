@@ -321,7 +321,9 @@ void GameUpdate(Game *g,float dt) {
     float l=Vector2Length(in);if(l>0.01f)in=Vector2Scale(in,1/l);
     float speed=3.65f;
     if(IsKeyPressed(KEY_LEFT_SHIFT)&&p->dashCd<=0&&l>0.01f){speed=8.5f;p->dashCd=0.9f;p->invuln=0.18f;Burst(g,WorldScreen(p->pos),WHITE,8);}
-    p->vel=Vector2Scale(in,speed);
+    Vector2 desired=Vector2Scale(in,speed);
+    float response=(l>0.01f)?13.0f:18.0f;
+    p->vel=Vector2Lerp(p->vel,desired,fminf(1.0f,dt*response));
     if (fabsf(in.x) > fabsf(in.y) && fabsf(in.x) > 0.01f) p->facing = in.x < 0 ? 1 : 2;
     else if (fabsf(in.y) > 0.01f) p->facing = in.y < 0 ? 3 : 0;
     Vector2 n=p->pos;n.x+=p->vel.x*dt;if(!Solid(g,n))p->pos.x=n.x;
