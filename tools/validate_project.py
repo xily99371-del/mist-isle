@@ -23,6 +23,7 @@ assets = {
     "assets/characters/companions/leafling_idle_64.png": (128, 32),
     "assets/characters/companions/grove_mote_idle_64.png": (128, 32),
     "assets/environment/environment_props_96.png": (1152, 96),
+    "assets/environment/area_props_96.png": (1536, 96),
     "assets/tiles/png/island_iso_tiles.png": (384, 32),
 }
 present = 0
@@ -44,6 +45,7 @@ require("frame*32" in RENDER and "facing*32" in RENDER,
 require("frame*64" not in RENDER and "facing*64" not in RENDER,
         "no stale 64px source-frame indexing remains")
 require("index*96" in RENDER, "environment props use 96px atlas cells")
+require("DrawAreaProp" in RENDER and "area_props_96.png" in RENDER, "area-specific supplemental prop atlas is integrated")
 require("tile*64" in RENDER, "isometric ground atlas uses 64x32 diamond cells")
 require("RenderItem items[128]" in RENDER, "render queue has capacity for trees, props and pickups")
 require("world.kind[y][x]==1" in RENDER and "RENDER_TREE" in RENDER,
