@@ -37,3 +37,16 @@ Do not add assets to the repository until their license explicitly permits redis
 - Kenney Tiny Town is already committed in `third_party/kenney/tiny-town/`; its 4 curated building/fence sprites are generated into `assets/environment/kenney_buildings_atlas.png` at build time and used by the renderer.
 - The original v6 art pack (hero/companions, terrain, flora, cliffs, structures and 16 original props) is still held in ChatGPT Library and is not yet present in the GitHub tree. Use `IMPORT_ART_V6_TO_GITHUB.bat` for the one-time import.
 - Kenney RPG Base and Pixel UI Pack are license-cleared candidates only; they are not yet downloaded or integrated. Add them only after visual review and a documented import.
+
+
+## Supplemental CC0 packs prepared for import (2026-11-12)
+
+| Pack | Source | License | Planned use |
+|---|---|---|---|
+| Kenney RPG Base | https://opengameart.org/content/rpg-pack-base-set | CC0 | Orthogonal ground, path, building and prop candidates |
+| Kenney Pixel UI Pack | https://opengameart.org/content/pixel-ui-pack-750-assets | CC0 | Inventory, buttons, panels, cursors and bars |
+
+Original downloads are stored under `third_party/kenney/rpg-base/` and `third_party/kenney/pixel-ui/` after running `IMPORT_ART_V6_TO_GITHUB.bat`. The import script downloads the archives from the linked OpenGameArt file URLs, validates their ZIP integrity, generates review contact sheets, and commits the original archives plus the v6 original art to GitHub. These two packs are candidates for selective in-game use; they are not automatically drawn into the runtime until their sprites have been visually selected and mapped.
+
+## User-provided art transfer
+The v6 original art archive is provided directly in the ChatGPT conversation. Download that attachment to the Windows PC and select it in the import script's file picker. No ChatGPT Library access is required.
