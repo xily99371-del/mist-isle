@@ -44,6 +44,10 @@ jobs:
             New-Item -ItemType Directory -Force -Path dist/assets/environment | Out-Null
             Copy-Item assets/environment/* dist/assets/environment/
           }
+          if (Test-Path assets/cinematics) {
+            New-Item -ItemType Directory -Force -Path dist/assets/cinematics | Out-Null
+            Copy-Item assets/cinematics/* dist/assets/cinematics/
+          }
           Copy-Item README.md dist/
           New-Item -ItemType Directory -Force -Path dist/third_party/kenney/tiny-town | Out-Null
           Copy-Item third_party/kenney/tiny-town/kenney_tiny_town.zip dist/third_party/kenney/tiny-town/
