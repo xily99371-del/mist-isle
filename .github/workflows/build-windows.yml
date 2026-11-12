@@ -49,6 +49,18 @@ jobs:
           Copy-Item third_party/kenney/tiny-town/kenney_tiny_town.zip dist/third_party/kenney/tiny-town/
           Copy-Item third_party/kenney/tiny-town/LICENSE.md dist/third_party/kenney/tiny-town/
           if (Test-Path build/kenney_tiny_town_preview.png) { Copy-Item build/kenney_tiny_town_preview.png dist/ }
+          foreach ($pack in @('rpg-base','pixel-ui')) {
+            $source = "third_party/kenney/$pack"
+            if (Test-Path $source) {
+              New-Item -ItemType Directory -Force -Path "dist/third_party/kenney/$pack" | Out-Null
+              Copy-Item "$source/*" "dist/third_party/kenney/$pack/"
+            }
+          }
+          if (Test-Path build/art-review) {
+            New-Item -ItemType Directory -Force -Path dist/art-review | Out-Null
+            Copy-Item build/art-review/* dist/art-review/
+          }
+          if (Test-Path ASSET_SOURCES_AND_LICENSES.md) { Copy-Item ASSET_SOURCES_AND_LICENSES.md dist/ }
           if (Test-Path docs/HUB_SUBMAPS.md) { New-Item -ItemType Directory -Force -Path dist/docs | Out-Null; Copy-Item docs/HUB_SUBMAPS.md dist/docs/ }
           if (Test-Path RUN_WINDOWS.bat) { Copy-Item RUN_WINDOWS.bat dist/ }
       - name: Upload playable Windows build
