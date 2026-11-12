@@ -228,6 +228,11 @@ void GameUpdate(Game *g,float dt) {
     }
 
     Player *p=&g->player;
+    // Region identity follows the connected island's actual walkable coordinates.
+    if(p->pos.x<7.5f && p->pos.y>=9.0f)g->area=AREA_CAMP;
+    else if(p->pos.x<14.0f && p->pos.y<9.5f)g->area=AREA_GROVE;
+    else if(p->pos.x>=14.0f && p->pos.y<10.5f)g->area=AREA_RUINS;
+    else g->area=AREA_LIGHTHOUSE;
     if(IsKeyPressed(KEY_J)){g->journalOpen=true;return;}
     if(IsKeyPressed(KEY_I)){g->inventoryOpen=true;return;}
     if(IsKeyPressed(KEY_M)){g->mapOpen=true;return;}
