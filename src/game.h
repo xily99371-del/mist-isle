@@ -7,6 +7,9 @@
 #define SH 720
 #define MAPW 22
 #define MAPH 18
+#define TILE_SIZE 56.0f
+#define WORLD_PIXEL_W (MAPW*TILE_SIZE)
+#define WORLD_PIXEL_H (MAPH*TILE_SIZE)
 #define MAX_ENEMIES 8
 #define MAX_PARTICLES 300
 #define MAX_PICKUPS 32
