@@ -365,37 +365,46 @@ static void RenderWorld(Game *g) {
     DrawWorldBackdrop(g);
     BeginMode2D(g->cam);
 
-    // Orthographic square tiles: screen directions now match WASD and arrow keys.
+    // Orthographic top-down map: terrain follows screen cardinal directions.
     for(int y=0;y<MAPH;y++)for(int x=0;x<MAPW;x++) {
         int kind=0;
         if(g->world.kind[y][x]==1)kind=1;
         if(g->world.kind[y][x]==2)kind=2;
         if(g->world.kind[y][x]==3)kind=3;
         if(g->area==AREA_CAMP) {
-            if(x<5&&y>7)kind=2;
-            if(x<3&&y>11)kind=4;
-            if(x==0||y==0||x==MAPW-1||y==MAPH-1)kind=4;
+            float nx=((float)x-10.5f)/11.0f, ny=((float)y-8.5f)/9.0f;
+            float shore=nx*nx+ny*ny;
+            if(shore>.88f)kind=4;
+            else if(shore>.68f)kind=2;
+            // Broad sandy paths connect the dock, campfire and three area gates.
+            if((y>=8&&y<=10&&x>=3&&x<=19) ||
+               (x>=17&&x<=19&&y>=3&&y<=15))kind=2;
+            if(x>=1&&x<=3&&y>=11&&y<=15)kind=4;
+            if(g->world.kind[y][x]==1)kind=1;
         } else if(g->area==AREA_GROVE) {
             if(x>=9&&x<=11&&y>=3&&y<=14)kind=4;
             if((x*3+y)%13==0&&kind==0)kind=2;
+            if((y>=8&&y<=10&&x>=2&&x<=19))kind=2;
             if(x==0||y==0||x==MAPW-1||y==MAPH-1)kind=1;
         } else if(g->area==AREA_RUINS) {
             if(kind==0)kind=3;
-            if((x+y)%6==0)kind=2;
+            if((x+y)%6==0&&kind==3)kind=2;
             if(x>=9&&x<=11&&y>=3&&y<=14)kind=4;
+            if(y>=8&&y<=10&&x>=2&&x<=19)kind=3;
             if(x==0||y==0||x==MAPW-1||y==MAPH-1)kind=3;
         } else {
             if(x<5||x>17||y<4||y>14)kind=2;
             if((x+y)%9==0&&kind==0)kind=3;
+            if(y>=8&&y<=10&&x>=2&&x<=19)kind=3;
             if(x==0||y==0||x==MAPW-1||y==MAPH-1)kind=4;
         }
         DrawTopDownTile(x,y,g->area,kind,g->time);
     }
 
-    // Sort elevated objects by isometric depth (x+y): characters can pass behind trees.
-    RenderItem items[128]; int count=0;
+    // Sort objects by their ground-contact Y coordinate: walk behind trees from the top.
+    RenderItem items[192]; int count=0;
     for(int y=1;y<MAPH-1;y++)for(int x=1;x<MAPW-1;x++) {
-        if(g->world.kind[y][x]==1)
+        if(g->world.kind[y][x]==1 || (g->area==AREA_GROVE&&(x==0||y==0||x==MAPW-1||y==MAPH-1)))
             PushRenderItem(items,&count,RENDER_TREE,(x*3+y)%3,(Vector2){(float)x,(float)y},.82f+((x+y)%3)*.08f);
     }
     // Each sub-map has its own authored prop composition.
