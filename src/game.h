@@ -24,7 +24,7 @@ typedef struct {
     int lumi, splash, spark, selected;
     int shrineSolved, bossDefeated, fireflyDiscovered, leaflingFed, groveMoteDefeated;
     int lumiLevel,lumiXp,splashLevel,splashXp,sparkLevel,sparkXp;
-    unsigned char pickupTaken[MAX_PICKUPS];
+    unsigned char pickupTaken[4][MAX_PICKUPS];
 } SaveData;
 typedef struct { Vector2 tile; int kind; bool taken; float phase; } Pickup;
 typedef struct {
@@ -60,6 +60,7 @@ typedef struct {
     Player player;
     Buddy lumi, splash, spark;
     World world;
+    unsigned char areaPickupTaken[4][MAX_PICKUPS];
     Enemy enemies[MAX_ENEMIES];
     int enemyCount;
     Particle particles[MAX_PARTICLES];
