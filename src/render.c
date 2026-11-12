@@ -353,6 +353,10 @@ static void DrawLighthouseBackdrop(float t) {
     DrawCloudPuff(760,190,.55f,(Color){237,241,216,95});
 }
 static void DrawWorldBackdrop(Game *g) {
+    Color surround=g->area==AREA_CAMP?(Color){83,163,178,255}:
+        g->area==AREA_GROVE?(Color){66,112,78,255}:
+        g->area==AREA_RUINS?(Color){84,101,101,255}:(Color){76,126,145,255};
+    DrawRectangle(-SW,-SH,WORLD_PIXEL_W+2*SW,WORLD_PIXEL_H+2*SH,surround);
     switch(g->area) {
         case AREA_CAMP: DrawSeaBackdrop(g->time); break;
         case AREA_GROVE: DrawForestBackdrop(g->time); break;
