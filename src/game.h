@@ -78,6 +78,7 @@ typedef struct {
     float battleTimer;
     int battleChoice;
     float time;
+    float endingTime;
     float cameraZoom;
     Camera2D cam;
     int collectedRelics;
