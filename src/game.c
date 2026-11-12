@@ -15,6 +15,33 @@ static Vector2 Iso(float x,float y,float z) {
     return (Vector2){(x-y)*31.0f,(x+y)*15.5f-z};
 }
 static Vector2 WorldScreen(Vector2 p) { return (Vector2){(p.x+0.5f)*TILE_SIZE,(p.y+0.5f)*TILE_SIZE}; }
+static Vector2 ClampCameraTarget(Game *g,Vector2 target) {
+    float zoom=g->cam.zoom>0.01f?g->cam.zoom:1.0f;
+    float viewW=(float)SW/zoom, viewH=(float)SH/zoom;
+    if(viewW>=WORLD_PIXEL_W)target.x=WORLD_PIXEL_W*0.5f;
+    else target.x=Clamp(target.x,viewW*0.5f,WORLD_PIXEL_W-viewW*0.5f);
+    if(viewH>=WORLD_PIXEL_H)target.y=WORLD_PIXEL_H*0.5f;
+    else target.y=Clamp(target.y,viewH*0.5f,WORLD_PIXEL_H-viewH*0.5f);
+    return target;
+}
+static void SnapCameraToPlayer(Game *g) {
+    g->cam.target=ClampCameraTarget(g,WorldScreen(g->player.pos));
+}
+static void UpdateCamera(Game *g,float dt) {
+    Vector2 player=WorldScreen(g->player.pos);
+    Vector2 desired=g->cam.target;
+    float dx=player.x-g->cam.target.x, dy=player.y-g->cam.target.y;
+    float deadX=150.0f/fmaxf(g->cam.zoom,0.01f);
+    float deadY=96.0f/fmaxf(g->cam.zoom,0.01f);
+    if(dx>deadX)desired.x=player.x-deadX;
+    else if(dx<-deadX)desired.x=player.x+deadX;
+    if(dy>deadY)desired.y=player.y-deadY;
+    else if(dy<-deadY)desired.y=player.y+deadY;
+    desired=ClampCameraTarget(g,desired);
+    float blend=1.0f-expf(-2.2f*dt);
+    g->cam.target=Vector2Lerp(g->cam.target,desired,blend);
+    g->cam.target=ClampCameraTarget(g,g->cam.target);
+}
 static void Toast(Game *g,const char *s) {
     snprintf(g->toast,sizeof(g->toast),"%s",s); g->toastTimer=2.4f;
 }
@@ -46,6 +73,11 @@ static void AddPickup(World *w,int kind,float x,float y) {
     int index = w->pickupCount;
     w->pickups[index] = (Pickup){{x,y},kind,false,(float)index*0.7f};
     w->pickupCount++;
+}
+static void SetSolidRect(World *w,int x0,int y0,int x1,int y1) {
+    for(int y=y0;y<=y1;y++)for(int x=x0;x<=x1;x++) {
+        if(x>0&&y>0&&x<MAPW-1&&y<MAPH-1)w->kind[y][x]=1;
+    }
 }
 static void BuildWorld(World *w,int seed) {
     memset(w,0,sizeof(*w)); w->seed=seed;
@@ -128,6 +160,26 @@ static void BuildAreaWorld(Game *g,Area area) {
         for(int x=2;x<20;x++)w->kind[9][x]=0;
         AddPickup(w,0,6,5);AddPickup(w,1,12,12);AddPickup(w,2,17,5);
     }
+    // Authored collision footprints keep the player outside large buildings and props.
+    if(area==AREA_CAMP) {
+        SetSolidRect(w,7,5,9,6);       // campsite tent
+    } else if(area==AREA_GROVE) {
+        SetSolidRect(w,4,3,5,4);       // flowering tree
+        SetSolidRect(w,15,3,16,4);     // grove tree
+        SetSolidRect(w,9,11,10,12);    // fallen log; keep the nearby fruit node clear
+        SetSolidRect(w,14,12,15,12);   // mushroom cluster
+    } else if(area==AREA_RUINS) {
+        SetSolidRect(w,14,4,14,5);     // left arch footing
+        SetSolidRect(w,16,4,16,5);     // right arch footing
+        SetSolidRect(w,5,4,6,5);       // broken pillar
+        SetSolidRect(w,9,11,10,12);    // broken wall
+        SetSolidRect(w,15,11,16,12);   // rune fountain
+    } else {
+        SetSolidRect(w,16,3,18,4);     // lighthouse base; keep the crystal at (17,5) accessible
+        SetSolidRect(w,9,6,10,7);      // garden fountain
+        SetSolidRect(w,4,12,5,13);     // courtyard gate
+        SetSolidRect(w,14,12,15,13);   // garden shrub
+    }
     // Resource nodes are always placed on reachable ground, never inside a random blocker.
     for(int i=0;i<w->pickupCount;i++) {
         int px=(int)w->pickups[i].tile.x, py=(int)w->pickups[i].tile.y;
@@ -143,7 +195,7 @@ static void SwitchArea(Game *g,Area area) {
     g->splash.pos=Vector2Add(g->player.pos,(Vector2){-1,1});
     g->spark.pos=Vector2Add(g->player.pos,(Vector2){0,1});
     g->transition=.35f;
-    g->cam.target=WorldScreen(g->player.pos);
+    SnapCameraToPlayer(g);
 }
 
 static bool SolidPoint(Game *g,Vector2 p) {
@@ -152,13 +204,27 @@ static bool SolidPoint(Game *g,Vector2 p) {
     return g->world.kind[y][x]==1;
 }
 static bool Solid(Game *g,Vector2 p) {
-    // A small four-corner body footprint prevents the sprite clipping through tree trunks.
-    const float r=.22f;
+    // Match the collision footprint to the visible character width.
+    const float r=.30f;
     return SolidPoint(g,p) ||
         SolidPoint(g,(Vector2){p.x-r,p.y-r}) ||
         SolidPoint(g,(Vector2){p.x+r,p.y-r}) ||
         SolidPoint(g,(Vector2){p.x-r,p.y+r}) ||
         SolidPoint(g,(Vector2){p.x+r,p.y+r});
+}
+static void MovePlayerWithCollision(Game *g,Vector2 delta) {
+    float distance=Vector2Length(delta);
+    int steps=(int)ceilf(distance/0.12f);
+    if(steps<1)steps=1;
+    Vector2 step=Vector2Scale(delta,1.0f/(float)steps);
+    for(int i=0;i<steps;i++) {
+        Vector2 next=g->player.pos;
+        next.x+=step.x;
+        if(!Solid(g,next))g->player.pos.x=next.x;
+        next=g->player.pos;
+        next.y+=step.y;
+        if(!Solid(g,next))g->player.pos.y=next.y;
+    }
 }
 static void AddEnemy(Game *g,EnemyType t,float x,float y,float hp) {
     if(g->enemyCount>=MAX_ENEMIES)return;
@@ -184,7 +250,7 @@ bool GameLoad(Game *g) {
     if(s.magic!=0x4D495354 || s.version!=4){Toast(g,"存档版本不兼容。");return false;}
     GameReset(g,s.seed);
     SwitchArea(g,(Area)Clamp(s.area,AREA_CAMP,AREA_LIGHTHOUSE));
-    g->scene=SCENE_PLAY; g->player.pos=(Vector2){s.px,s.py};g->cam.target=WorldScreen(g->player.pos);g->player.hp=fmaxf(1.0f,fminf(100.0f,s.hp));
+    g->scene=SCENE_PLAY; g->player.pos=(Vector2){s.px,s.py};SnapCameraToPlayer(g);g->player.hp=fmaxf(1.0f,fminf(100.0f,s.hp));
     g->player.berries=s.berries;g->player.shells=s.shells;g->player.crystals=s.crystals;
     g->lumi.owned=s.lumi!=0;g->splash.owned=s.splash!=0;g->spark.owned=s.spark!=0;g->selectedBuddy=s.selected;
     g->shrineSolved=s.shrineSolved!=0;g->bossDefeated=s.bossDefeated!=0;
@@ -204,12 +270,12 @@ void GameReset(Game *g,int seed) {
     g->lumi=(Buddy){.pos={2.3f,12.4f},.owned=false,.level=1};
     g->splash=(Buddy){.pos={8,7},.owned=false,.level=1};
     g->spark=(Buddy){.pos={15,8},.owned=false,.level=1};
-    g->cam.offset=(Vector2){SW/2.0f,SH/2.0f}; g->cam.zoom=1.15f;
+    g->cam.offset=(Vector2){SW/2.0f,SH/2.0f}; g->cam.zoom=1.0f;
     g->fireflyPhase=0; g->dayClock=0.28f; g->weatherClock=0; g->weather=0; g->journalOpen=false; g->inventoryOpen=false; g->mapOpen=false;
     g->fireflyDiscovered=false; g->leaflingFed=false; g->groveMoteDefeated=false; g->enemySoaked=false; g->battleRound=0; g->defeatedGuards=0;
 }
 void GameStart(Game *g) {
-    g->scene=SCENE_PLAY; SwitchArea(g,AREA_CAMP); g->player.pos=g->world.camp; g->cam.target=WorldScreen(g->player.pos);
+    g->scene=SCENE_PLAY; SwitchArea(g,AREA_CAMP); g->player.pos=g->world.camp; SnapCameraToPlayer(g);
     SetDialogueAs(g,"旅人手记","你在海岸边醒来，远处的灯塔已经熄灭。",
         "一只小小的苔灯灵躲在营火旁。它似乎受了伤。",
         "靠近它，按 E 互动。WASD 移动，SHIFT 冲刺。");
@@ -220,12 +286,163 @@ static void AddBuddyFriend(Game *g,int id) {
     if(id==2){g->spark.owned=true;g->spark.pos=Vector2Add(g->player.pos,(Vector2){-0.7f,0.4f});}
 }
 Buddy *CurrentBuddy(Game *g) {
+    if(g->selectedBuddy==0 && g->lumi.owned)return &g->lumi;
     if(g->selectedBuddy==1 && g->splash.owned)return &g->splash;
     if(g->selectedBuddy==2 && g->spark.owned)return &g->spark;
+    if(g->lumi.owned)return &g->lumi;
+    if(g->splash.owned)return &g->splash;
+    if(g->spark.owned)return &g->spark;
     return &g->lumi;
+}
+static Buddy *BuddyById(Game *g,int id) {
+    if(id==0)return &g->lumi;
+    if(id==1)return &g->splash;
+    if(id==2)return &g->spark;
+    return NULL;
+}
+static int OwnedBuddyIdAt(Game *g,int slot) {
+    int count=0;
+    for(int id=0;id<3;id++) {
+        Buddy *b=BuddyById(g,id);
+        if(b&&b->owned) {
+            if(count==slot)return id;
+            count++;
+        }
+    }
+    return -1;
+}
+static int OwnedBuddyCount(Game *g) {
+    return (g->lumi.owned?1:0)+(g->splash.owned?1:0)+(g->spark.owned?1:0);
+}
+static bool FindNearestPickup(Game *g,int kindA,int kindB,Vector2 *out) {
+    float best=1.0e9f;
+    bool found=false;
+    for(int i=0;i<g->world.pickupCount;i++) {
+        Pickup *p=&g->world.pickups[i];
+        if(p->taken || (p->kind!=kindA && p->kind!=kindB))continue;
+        float d=Dist(g->player.pos,p->tile);
+        if(d<best){best=d;*out=p->tile;found=true;}
+    }
+    return found;
+}
+void GetCurrentObjective(Game *g,const char **title,const char **detail,Vector2 *target,bool *hasTarget) {
+    static const Vector2 exitPoint={2,9};
+    *hasTarget=true;
+    *title="继续探索";
+    *detail="打开旅人手记 J 查看章节记录";
+    *target=g->player.pos;
+    if(!g->lumi.owned) {
+        if(g->area==AREA_CAMP) {
+            *title="救助苔灯灵";
+            *detail="前往营火旁的绿色小精灵，靠近后按 E";
+            *target=(Vector2){4,12};
+        } else {
+            *title="返回海岸营地";
+            *detail="沿西侧石路找到出口，靠近后按 E 返回";
+            *target=exitPoint;
+        }
+        return;
+    }
+    if(!g->splash.owned) {
+        if(g->area==AREA_CAMP) {
+            *title="寻找沫尾兽";
+            *detail="前往营地东侧的辉光林地入口，靠近后按 E";
+            *target=g->world.groveGate;
+        } else if(g->area==AREA_GROVE) {
+            if(g->player.berries>0) {
+                *title="招募沫尾兽";
+                *detail="靠近浅水边的沫尾兽，交付一颗果实（E）";
+                *target=(Vector2){9,5};
+            } else {
+                *title="收集岛屿果实";
+                *detail="寻找地上的果实，靠近后按 E 采集";
+                if(!FindNearestPickup(g,0,3,target))*target=(Vector2){6,5};
+            }
+        } else {
+            *title="返回辉光林地";
+            *detail="沿西侧出口返回营地，再前往林地";
+            *target=exitPoint;
+        }
+        return;
+    }
+    if(!g->spark.owned) {
+        if(g->area==AREA_CAMP) {
+            *title="寻找鸣晶蜥";
+            *detail="前往潮汐遗迹入口，靠近后按 E";
+            *target=g->world.ruinGate;
+        } else if(g->area==AREA_RUINS) {
+            if(g->player.crystals>0) {
+                *title="招募鸣晶蜥";
+                *detail="靠近遗迹石台上的鸣晶蜥，交付一枚星晶（E）";
+                *target=(Vector2){15,7};
+            } else {
+                *title="收集星晶";
+                *detail="探索遗迹，寻找紫色星晶并按 E 采集";
+                if(!FindNearestPickup(g,2,2,target))*target=(Vector2){15,5};
+            }
+        } else {
+            *title="返回潮汐遗迹";
+            *detail="沿西侧出口返回营地，再进入潮汐遗迹";
+            *target=exitPoint;
+        }
+        return;
+    }
+    if(!g->shrineSolved) {
+        if(g->area==AREA_CAMP) {
+            *title="唤醒潮汐遗迹";
+            *detail="前往潮汐遗迹，准备一枚潮汐贝壳";
+            *target=g->world.ruinGate;
+        } else if(g->area==AREA_RUINS) {
+            if(g->player.shells<=0) {
+                *title="寻找潮汐贝壳";
+                *detail="沿遗迹水道寻找蓝色贝壳，靠近后按 E";
+                if(!FindNearestPickup(g,1,1,target))*target=(Vector2){7,6};
+            } else {
+                *title="激活遗迹机关";
+                *detail="携带潮汐贝壳，靠近中央机关后按 E";
+                *target=g->world.shrine;
+            }
+        } else {
+            *title="返回潮汐遗迹";
+            *detail="沿西侧出口返回营地，再进入潮汐遗迹";
+            *target=exitPoint;
+        }
+        return;
+    }
+    if(!g->bossDefeated) {
+        if(g->area==AREA_CAMP) {
+            *title="前往灯塔庭院";
+            *detail="封印已经解除，前往营地东南侧入口";
+            *target=g->world.shrine;
+        } else if(g->area==AREA_LIGHTHOUSE) {
+            *title="击败灯塔守卫";
+            *detail="靠近庭院中央的守卫，自动开始战斗";
+            *target=g->world.bossPos;
+        } else {
+            *title="返回灯塔庭院";
+            *detail="沿西侧出口返回营地，再前往灯塔庭院";
+            *target=exitPoint;
+        }
+        return;
+    }
+    if(g->area==AREA_LIGHTHOUSE) {
+        *title="点亮失落的灯塔";
+        *detail="返回庭院中央的遗迹，完成最后的共鸣";
+        *target=g->world.shrine;
+    } else if(g->area==AREA_CAMP) {
+        *title="返回灯塔庭院";
+        *detail="前往营地东南侧入口，完成最后的共鸣";
+        *target=g->world.shrine;
+    } else {
+        *title="返回灯塔庭院";
+        *detail="沿西侧出口返回营地，再前往灯塔庭院";
+        *target=exitPoint;
+    }
+    (void)hasTarget;
 }
 static void EnterBattle(Game *g,int idx) {
     g->battleEnemy=idx;g->battleTurn=0;g->battleChoice=0;g->battleTimer=0;g->battleRound=1;g->enemySoaked=false;
+    for(int slot=0;slot<OwnedBuddyCount(g);slot++)if(OwnedBuddyIdAt(g,slot)==g->selectedBuddy){g->battleChoice=slot;break;}
     g->scene=SCENE_BATTLE;
     g->battleMessage=0;
 }
@@ -267,30 +484,64 @@ void GameUpdate(Game *g,float dt) {
     if(g->scene==SCENE_BATTLE) {
         Enemy *e=&g->enemies[g->battleEnemy];
         if(!e->alive){g->scene=SCENE_PLAY;return;}
+        int buddyCount=OwnedBuddyCount(g);
+        int optionCount=buddyCount>0?buddyCount:1;
         if(IsKeyPressed(KEY_ONE)||IsKeyPressed(KEY_Q))g->battleChoice=0;
-        if(IsKeyPressed(KEY_TWO)||IsKeyPressed(KEY_W))g->battleChoice=1;
-        if(IsKeyPressed(KEY_THREE)||IsKeyPressed(KEY_E))g->battleChoice=2;
-        if(IsKeyPressed(KEY_ENTER)||IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        if((IsKeyPressed(KEY_TWO)||IsKeyPressed(KEY_W))&&optionCount>1)g->battleChoice=1;
+        if((IsKeyPressed(KEY_THREE)||IsKeyPressed(KEY_E))&&optionCount>2)g->battleChoice=2;
+        if(IsKeyPressed(KEY_LEFT)||IsKeyPressed(KEY_A))g->battleChoice=(g->battleChoice+optionCount-1)%optionCount;
+        if(IsKeyPressed(KEY_RIGHT)||IsKeyPressed(KEY_D))g->battleChoice=(g->battleChoice+1)%optionCount;
+        if(g->battleChoice>=optionCount)g->battleChoice=optionCount-1;
+        int selectedId=buddyCount>0?OwnedBuddyIdAt(g,g->battleChoice):-1;
+        if(selectedId>=0)g->selectedBuddy=selectedId;
+        bool mousePressed=IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
+        bool mouseSelected=false;
+        if(mousePressed) {
+            Vector2 mouse=GetMousePosition();
+            for(int slot=0;slot<optionCount;slot++) {
+                Rectangle card={(float)(50+slot*245),555,230,112};
+                if(CheckCollisionPointRec(mouse,card)) {
+                    g->battleChoice=slot;
+                    selectedId=buddyCount>0?OwnedBuddyIdAt(g,slot):-1;
+                    if(selectedId>=0)g->selectedBuddy=selectedId;
+                    mouseSelected=true;
+                    break;
+                }
+            }
+        }
+        bool confirm=IsKeyPressed(KEY_ENTER)||(mousePressed&&!mouseSelected);
+        if(confirm) {
             if(g->battleTurn==0) {
-                float damage=0;
-                if(g->battleChoice==0 && g->lumi.owned) {
-                    g->player.hp=fminf(g->player.maxHp,g->player.hp+18.0f+(g->lumi.level-1)*3.0f);
-                    damage=8.0f+(g->lumi.level-1)*2.0f; Burst(g,WorldScreen(g->player.pos),C_GOLD,16);
-                    Toast(g,"苔灯灵：星光治愈，恢复18点生命！");
-                } else if(g->battleChoice==1 && g->splash.owned) {
-                    damage=20.0f+(g->splash.level-1)*3.0f; g->enemySoaked=true; Burst(g,WorldScreen(e->pos),C_BLUE,22);
+                Buddy *active=selectedId>=0?BuddyById(g,selectedId):NULL;
+                float damage=10.0f;
+                if(selectedId==0 && active) {
+                    g->player.hp=fminf(g->player.maxHp,g->player.hp+18.0f+(active->level-1)*3.0f);
+                    damage=8.0f+(active->level-1)*2.0f;
+                    Burst(g,WorldScreen(g->player.pos),C_GOLD,16);
+                    Toast(g,"苔灯灵：星光治愈，恢复生命并造成微光伤害。");
+                } else if(selectedId==1 && active) {
+                    damage=20.0f+(active->level-1)*3.0f;
+                    g->enemySoaked=true;
+                    Burst(g,WorldScreen(e->pos),C_BLUE,22);
                     Toast(g,"沫尾兽：泡泡水流，敌人进入潮湿状态！");
-                } else if(g->battleChoice==2 && g->spark.owned) {
-                    damage=(g->enemySoaked?38.0f:26.0f)+(g->spark.level-1)*4.0f; Burst(g,WorldScreen(e->pos),C_LILAC,26);
-                    Toast(g,g->enemySoaked?"鸣晶蜥：潮湿导电！造成连锁伤害！":"鸣晶蜥：晶弧放电！");
+                } else if(selectedId==2 && active) {
+                    bool boosted=g->enemySoaked;
+                    damage=(boosted?38.0f:26.0f)+(active->level-1)*4.0f;
+                    Burst(g,WorldScreen(e->pos),C_LILAC,26);
+                    Toast(g,boosted?"鸣晶蜥：潮湿导电！造成额外伤害！":"鸣晶蜥：晶弧放电！");
                     g->enemySoaked=false;
-                } else { damage=10.0f; Toast(g,"伙伴发动了基础攻击！"); }
-                e->hp-=damage; g->battleTurn=1;
+                } else {
+                    Toast(g,"旅人发动普通攻击！");
+                }
+                e->hp-=damage;
+                g->battleTurn=1;
                 if(e->hp<=0) {
                     e->alive=false;g->battleTurn=0;g->scene=SCENE_PLAY;g->defeatedGuards++;
-                    Buddy *active=CurrentBuddy(g); active->xp+=20;
-                    if(active->xp>=50){active->xp-=50;active->level++;Toast(g,"伙伴成长了！技能效果也得到提升。");}
-                    else Toast(g,"敌人被击退！伙伴获得20点经验。");
+                    if(active) {
+                        active->xp+=20;
+                        if(active->xp>=50){active->xp-=50;active->level++;Toast(g,"伙伴成长了！技能效果也得到提升。");}
+                        else Toast(g,"敌人被击退！出战伙伴获得20点经验。");
+                    } else Toast(g,"敌人被击退！");
                     GameSave(g);
                     if(e->type==ENEMY_MOTE){g->groveMoteDefeated=true;g->player.berries+=2;GameSave(g);Toast(g,"击退林地微光兽，获得2颗果实！");}
                     if(e->type==ENEMY_BOSS){g->bossDefeated=true;g->player.crystals+=3;g->player.shells+=2;GameSave(g);}
@@ -329,8 +580,7 @@ void GameUpdate(Game *g,float dt) {
     p->vel=Vector2Lerp(p->vel,desired,fminf(1.0f,dt*response));
     if (fabsf(in.x) > fabsf(in.y) && fabsf(in.x) > 0.01f) p->facing = in.x < 0 ? 1 : 2;
     else if (fabsf(in.y) > 0.01f) p->facing = in.y < 0 ? 3 : 0;
-    Vector2 n=p->pos;n.x+=p->vel.x*dt;if(!Solid(g,n))p->pos.x=n.x;
-    n=p->pos;n.y+=p->vel.y*dt;if(!Solid(g,n))p->pos.y=n.y;
+    MovePlayerWithCollision(g,Vector2Scale(p->vel,dt));
 
     Buddy *followers[3]={&g->lumi,&g->splash,&g->spark};
     for(int bi=0;bi<3;bi++) {
@@ -338,7 +588,12 @@ void GameUpdate(Game *g,float dt) {
         if(!b->owned) continue;
         Vector2 offset = bi==0 ? (Vector2){-0.55f,0.42f} : bi==1 ? (Vector2){-0.95f,0.85f} : (Vector2){-0.15f,0.95f};
         Vector2 target=Vector2Add(p->pos,offset);
-        b->pos=Vector2Add(b->pos,Vector2Scale(Vector2Subtract(target,b->pos),fminf(1,dt*(4.2f+bi*.25f))));
+        Vector2 next=Vector2Add(b->pos,Vector2Scale(Vector2Subtract(target,b->pos),fminf(1,dt*(4.2f+bi*.25f))));
+        if(!Solid(g,next))b->pos=next;
+        else {
+            Vector2 fallback=Vector2Add(p->pos,Vector2Scale(offset,0.55f));
+            if(!Solid(g,fallback))b->pos=fallback;
+        }
         b->bob=sinf(g->time*(4.0f+bi*.5f)+bi)*0.12f;
         b->blink-=dt;if(b->blink<=0)b->blink=2.0f+(float)GetRandomValue(0,15)/10.0f;
     }
@@ -462,6 +717,6 @@ void GameUpdate(Game *g,float dt) {
     }
     if(g->shrineSolved&&g->enemyCount>0&&!g->enemies[g->enemyCount-1].alive)g->bossDefeated=true;
 
-    g->cam.target=WorldScreen(p->pos);
+    UpdateCamera(g,dt);
     if(g->toastTimer>0)g->toastTimer-=dt;
 }
