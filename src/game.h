@@ -18,7 +18,7 @@ typedef enum { SKILL_GLOW, SKILL_SPLASH, SKILL_SPARK } SkillType;
 
 typedef struct { Vector2 p, v; float life, maxLife, size; Color c; } Particle;
 typedef struct {
-    int magic, version, seed;
+    int magic, version, seed, area;
     float px, py, hp;
     int berries, shells, crystals;
     int lumi, splash, spark, selected;
