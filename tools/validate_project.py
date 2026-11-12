@@ -93,8 +93,8 @@ require("endingTime" in GAME and "LoadEndingCG" in RENDER,
         "lighthouse ending uses a timed cinematic sequence")
 require("DrawTriangle(lamp,beamA,beamB" in RENDER and "sinf(t*.78f)" in RENDER,
         "lighthouse ending contains a sweeping animated beam")
-require("DrawAreaProp(13" in RENDER and "同行的" not in RENDER,
-        "lighthouse ending uses the authored lighthouse prop artwork")
+require("DrawAreaProp(13" in RENDER and "DrawAreaProp(12" in RENDER,
+        "lighthouse ending uses the authored lighthouse and stair prop artwork")
 require("SetSolidRect" in GAME and "MovePlayerWithCollision" in GAME and "dockWater" in GAME and "stream&&!bridge" in GAME,
         "props, shore water and stream banks block movement with substep collision")
 require("GetCurrentObjective" in GAME and "DrawObjectiveMarker" in RENDER,
