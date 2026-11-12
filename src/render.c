@@ -435,46 +435,50 @@ static void RenderWorld(Game *g) {
         if(g->world.kind[y][x]==1 || (g->area==AREA_GROVE&&(x==0||y==0||x==MAPW-1||y==MAPH-1)))
             PushRenderItem(items,&count,RENDER_TREE,(x*3+y)%3,(Vector2){(float)x,(float)y},.82f+((x+y)%3)*.08f);
     }
-    // Each sub-map has its own authored prop composition.
+    // Authored top-down scene dressing uses the refined flora, cliff and structure atlases.
     if(g->area==AREA_CAMP) {
-        PushRenderItem(items,&count,RENDER_PROP,4,(Vector2){3.2f,11.4f},1.0f);
-        PushRenderItem(items,&count,RENDER_PROP,20,(Vector2){3.0f,14.0f},1.0f);
-        PushRenderItem(items,&count,RENDER_PROP,21,(Vector2){2.0f,15.0f},.9f);
-        PushRenderItem(items,&count,RENDER_PROP,22,(Vector2){5.5f,10.5f},.9f);
-        PushRenderItem(items,&count,RENDER_PROP,23,(Vector2){2.0f,12.0f},.7f);
-        PushRenderItem(items,&count,RENDER_PROP,7,(Vector2){19.0f,2.2f},1.0f);
-        PushRenderItem(items,&count,RENDER_PROP,16,(Vector2){2.1f,10.5f},1.0f);
-        PushRenderItem(items,&count,RENDER_PROP,17,(Vector2){6.6f,10.9f},.82f);
-        PushRenderItem(items,&count,RENDER_PROP,18,(Vector2){6.3f,12.2f},.72f);
-        PushRenderItem(items,&count,RENDER_FIRE,8,(Vector2){4.1f,12.5f},1.0f);
-        PushRenderItem(items,&count,RENDER_PROP,9,(Vector2){5.9f,10.3f},1.0f);
-        PushRenderItem(items,&count,RENDER_PROP,10,(Vector2){6.6f,12.5f},1.0f);
-        PushRenderItem(items,&count,RENDER_PROP,11,(Vector2){2.4f,14.0f},1.0f);
-        // Gate markers on the hub plaza.
-        PushRenderItem(items,&count,RENDER_PROP,28,g->world.groveGate,1.0f);
-        PushRenderItem(items,&count,RENDER_PROP,28,g->world.ruinGate,1.0f);
-        PushRenderItem(items,&count,RENDER_PROP,34,g->world.shrine,1.0f);
+        PushRenderItem(items,&count,RENDER_PROP,302,(Vector2){4.5f,4.2f},1.25f); // keeper cottage
+        PushRenderItem(items,&count,RENDER_PROP,303,(Vector2){8.0f,6.4f},1.10f); // canvas tent
+        PushRenderItem(items,&count,RENDER_PROP,306,(Vector2){8.0f,10.4f},.92f); // campfire
+        PushRenderItem(items,&count,RENDER_PROP,108,(Vector2){13.0f,4.0f},1.0f);
+        PushRenderItem(items,&count,RENDER_PROP,109,(Vector2){18.0f,7.0f},1.05f);
+        PushRenderItem(items,&count,RENDER_PROP,110,(Vector2){15.0f,13.0f},.9f);
+        PushRenderItem(items,&count,RENDER_PROP,116,(Vector2){5.0f,13.0f},.9f);
+        PushRenderItem(items,&count,RENDER_PROP,132,(Vector2){18.0f,4.5f},.8f); // direction sign
+        PushRenderItem(items,&count,RENDER_PROP,230,(Vector2){2.0f,13.0f},.9f); // dock
+        PushRenderItem(items,&count,RENDER_PROP,215,(Vector2){3.0f,15.0f},.85f);
+        PushRenderItem(items,&count,RENDER_PROP,220,(Vector2){6.0f,15.0f},.85f);
+        PushRenderItem(items,&count,RENDER_PROP,132,(Vector2){18.0f,9.0f},.75f);
+        PushRenderItem(items,&count,RENDER_PROP,128,(Vector2){18.0f,13.0f},.75f);
     } else if(g->area==AREA_GROVE) {
-        PushRenderItem(items,&count,RENDER_PROP,28,(Vector2){2,9},.9f);
-        for(int i=0;i<4;i++)PushRenderItem(items,&count,RENDER_PROP,24,(Vector2){6.0f+i*3.2f,3.0f+(i%2)*8.0f},.95f);
-        PushRenderItem(items,&count,RENDER_PROP,25,(Vector2){7.5f,11.0f},1.0f);
-        PushRenderItem(items,&count,RENDER_PROP,26,(Vector2){10.0f,13.0f},1.0f);
-        PushRenderItem(items,&count,RENDER_PROP,27,(Vector2){15.0f,5.0f},.9f);
-        PushRenderItem(items,&count,RENDER_PROP,12,(Vector2){6.0f,3.0f},.9f);
+        PushRenderItem(items,&count,RENDER_PROP,208,(Vector2){2,9},.85f);
+        for(int i=0;i<5;i++)PushRenderItem(items,&count,RENDER_PROP,108+(i%3),(Vector2){5.0f+i*3.0f,3.0f+(i%2)*1.2f},.95f);
+        PushRenderItem(items,&count,RENDER_PROP,111,(Vector2){6.0f,12.0f},.85f);
+        PushRenderItem(items,&count,RENDER_PROP,116,(Vector2){8.0f,13.0f},.75f);
+        PushRenderItem(items,&count,RENDER_PROP,118,(Vector2){12.0f,5.0f},.85f);
+        PushRenderItem(items,&count,RENDER_PROP,119,(Vector2){15.0f,12.0f},.85f);
+        PushRenderItem(items,&count,RENDER_PROP,138,(Vector2){17.0f,7.0f},.85f);
+        PushRenderItem(items,&count,RENDER_PROP,135,(Vector2){10.0f,14.0f},.9f);
+        PushRenderItem(items,&count,RENDER_PROP,140,(Vector2){18.0f,4.0f},.8f);
     } else if(g->area==AREA_RUINS) {
-        PushRenderItem(items,&count,RENDER_PROP,34,(Vector2){2,9},.9f);
-        PushRenderItem(items,&count,RENDER_PROP,28,(Vector2){16.0f,5.0f},1.25f);
-        for(int i=0;i<4;i++)PushRenderItem(items,&count,RENDER_PROP,29,(Vector2){6.0f+i*3.6f,4.0f+(i%2)*8.0f},.95f);
-        PushRenderItem(items,&count,RENDER_PROP,30,(Vector2){6.0f,13.0f},1.1f);
-        PushRenderItem(items,&count,RENDER_PROP,31,(Vector2){17.0f,7.0f},1.0f);
-        PushRenderItem(items,&count,RENDER_PROP,14,(Vector2){5.0f,5.0f},.8f);
+        PushRenderItem(items,&count,RENDER_PROP,208,(Vector2){2,9},.85f);
+        PushRenderItem(items,&count,RENDER_PROP,304,(Vector2){15.0f,6.0f},1.15f); // ancient shrine arch
+        PushRenderItem(items,&count,RENDER_PROP,305,(Vector2){10.0f,12.0f},.95f); // rune fountain
+        PushRenderItem(items,&count,RENDER_PROP,131,(Vector2){6.0f,5.0f},.9f);
+        PushRenderItem(items,&count,RENDER_PROP,131,(Vector2){17.0f,12.0f},.9f);
+        PushRenderItem(items,&count,RENDER_PROP,222,(Vector2){5.0f,4.0f},.95f);
+        PushRenderItem(items,&count,RENDER_PROP,223,(Vector2){18.0f,4.0f},.95f);
+        PushRenderItem(items,&count,RENDER_PROP,232,(Vector2){4.0f,14.0f},.85f);
+        PushRenderItem(items,&count,RENDER_PROP,231,(Vector2){18.0f,14.0f},.85f);
     } else {
-        PushRenderItem(items,&count,RENDER_PROP,14,(Vector2){2,9},.8f);
-        PushRenderItem(items,&count,RENDER_PROP,33,(Vector2){17.0f,4.0f},1.2f);
-        PushRenderItem(items,&count,RENDER_PROP,32,(Vector2){16.0f,12.0f},1.05f);
-        PushRenderItem(items,&count,RENDER_PROP,34,(Vector2){10.0f,6.0f},.9f);
-        PushRenderItem(items,&count,RENDER_PROP,35,(Vector2){10.0f,11.0f},1.0f);
-        for(int i=0;i<4;i++)PushRenderItem(items,&count,RENDER_PROP,15,(Vector2){4.0f+i*3.0f,13.0f},.9f);
+        PushRenderItem(items,&count,RENDER_PROP,208,(Vector2){2,9},.85f);
+        PushRenderItem(items,&count,RENDER_PROP,133,(Vector2){17.0f,4.0f},1.2f); // lighthouse
+        PushRenderItem(items,&count,RENDER_PROP,305,(Vector2){10.0f,6.0f},.9f);
+        PushRenderItem(items,&count,RENDER_PROP,114,(Vector2){5.0f,5.0f},.9f);
+        PushRenderItem(items,&count,RENDER_PROP,115,(Vector2){8.0f,13.0f},.9f);
+        PushRenderItem(items,&count,RENDER_PROP,116,(Vector2){14.0f,12.0f},.9f);
+        PushRenderItem(items,&count,RENDER_PROP,228,(Vector2){4.0f,14.0f},.8f);
+        PushRenderItem(items,&count,RENDER_PROP,229,(Vector2){18.0f,14.0f},.8f);
     }
     for(int i=0;i<g->world.pickupCount;i++) if(!g->world.pickups[i].taken)
         PushRenderItem(items,&count,RENDER_PICKUP,i,g->world.pickups[i].tile,1.0f);
