@@ -180,3 +180,9 @@ The v6 art pack adds `assets/environment/original_props_16_v1.png`, a 4x4 atlas 
 
 ## Third-party art included
 The repository now vendors the **Kenney Tiny Town** CC0 pack at `third_party/kenney/tiny-town/`, preserving the original ZIP, license and source note. It is used selectively for 3/4-view building/prop options only; the game remains on orthographic top-down movement and terrain, so its 3/4-view ground tiles are not mixed into the orthographic ground layer. CI generates a contact sheet for review and includes the original pack in the Windows distribution archive. See `ASSET_SOURCES_AND_LICENSES.md`.
+
+
+## One-time complete art import (recommended)
+Download `MistIsle_ArtPack_v6_TopDown_Polished.zip` from the ChatGPT Library project folder, then download and run `IMPORT_ART_V6_TO_GITHUB.bat` from this repository's main branch. The script automatically clones the repository to `Documents/GitHub/mist-isle`, opens a file picker for the art ZIP, extracts it, generates the Kenney Tiny Town runtime atlas, validates all expected image dimensions, commits `assets/`, and pushes to GitHub. The push triggers the complete Windows build. After the one-time import, a normal `git clone` or `git pull` contains the original character, terrain, flora, cliff, structure and prop atlases.
+
+The binary art ZIP is not stored inside this source repository until that import script is run successfully from a local machine. Do not treat a Library copy or a CI-generated fallback package as proof that the full v6 PNG set has been committed.
