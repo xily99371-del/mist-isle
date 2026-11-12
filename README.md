@@ -132,3 +132,14 @@ Save format v4 stores the active region and resource pickups separately for all 
 
 ## Supplemental area art
 A new 16-prop original generated atlas is available in ChatGPT Library as `MistIsle_AreaProps_v1.zip`. Extract it into the repository root and merge `assets/`. It supplies area-specific coastal props (dock, boat, tent, buoy), grove props (flowering tree, glow mushrooms, mossy log, luminous flowers), ruin props (arch, pillar, broken wall, rune fountain), and lighthouse props (stairs, lighthouse tower, gate, garden fountain). The renderer loads the optional atlas from `assets/environment/area_props_96.png`.
+
+
+## One-time art import into GitHub
+The v3 art pack is intended to be committed into the repository once, so future clones and ZIP downloads contain all runtime assets. For an existing local copy, use a real Git clone (a downloaded GitHub ZIP has no `.git` metadata):
+
+```powershell
+git clone https://github.com/xily99371-del/mist-isle.git
+cd mist-isle
+```
+
+Extract `MistIsle_ArtPack_v3_HubSubmaps.zip` into the cloned repository root, merge `assets/`, then run `UPLOAD_ART_TO_GITHUB.bat`. It stages only `assets/`, commits them, and pushes to the configured `origin`. After that one-time push, future source downloads will include the art pack and no separate art ZIP is needed.
