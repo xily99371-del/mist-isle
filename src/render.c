@@ -8,9 +8,13 @@ static void LoadUIFont(void) {
     for(int i=0;i<4 && UI_FONT.texture.id==0;i++) {
         if(FileExists(paths[i])) {
             UI_FONT=LoadFontEx(paths[i],32,(int*)UI_CODEPOINTS,(int)(sizeof(UI_CODEPOINTS)/sizeof(UI_CODEPOINTS[0])));
-            if(UI_FONT.texture.id)SetTextureFilter(UI_FONT.texture,TEXTURE_FILTER_BILINEAR);
+            if(UI_FONT.texture.id) {
+                SetTextureFilter(UI_FONT.texture,TEXTURE_FILTER_BILINEAR);
+                TraceLog(LOG_INFO,"Mist Isle: Chinese UI font loaded from %s",paths[i]);
+            }
         }
     }
+    if(!UI_FONT.texture.id)TraceLog(LOG_WARNING,"Mist Isle: no Chinese font found; install Microsoft YaHei or place NotoSansSC-VF.ttf in assets/fonts/");
 }
 static void UnloadUIFont(void) { if(UI_FONT.texture.id)UnloadFont(UI_FONT); }
 static void DrawUIText(const char *text,int x,int y,int size,Color tint) {
@@ -255,15 +259,30 @@ static void RenderWorld(Game *g) {
         if(x>=1&&x<=3&&y>=12&&y<=15){tile=4;c=(Color){105,177,190,255};}
         DrawIsoTile(x,y,tile,c);
     }
-    // A grove pond and a connected shoreline inlet.
+    // Water channels separate the four biomes into distinct peninsulas.
+    for(int y=2;y<=8;y++) {
+        DrawIsoTile(7,y,4,(Color){105,177,190,255});
+        DrawIsoTile(13,y,4,(Color){105,177,190,255});
+    }
+    for(int x=8;x<=12;x++)DrawIsoTile(x,9,4,(Color){105,177,190,255});
+    // Stone crossings reconnect the coast, grove, ruins and lighthouse yard.
+    DrawIsoTile(7,9,3,(Color){176,166,137,255});
+    DrawIsoTile(10,9,3,(Color){176,166,137,255});
+    DrawIsoTile(13,9,3,(Color){176,166,137,255});
+    // Small reflective pond inside the grove and a tidal inlet by camp.
     for(int y=3;y<6;y++)for(int x=2;x<6;x++)DrawIsoTile(x,y,4,(Color){119,191,199,255});
-    for(int y=12;y<16;y++)for(int x=1;x<4;x++)DrawIsoTile(x,y,4,(Color){105,177,190,255});
+    for(int y=12;y<16;y++)for(int x=1;x<3;x++)DrawIsoTile(x,y,4,(Color){105,177,190,255});
 
     // Sort elevated objects by isometric depth (x+y): characters can pass behind trees.
     RenderItem items[128]; int count=0;
     for(int y=1;y<MAPH-1;y++)for(int x=1;x<MAPW-1;x++) {
         if(g->world.kind[y][x]==1)
             PushRenderItem(items,&count,RENDER_TREE,(x*3+y)%3,(Vector2){(float)x,(float)y},.82f+((x+y)%3)*.08f);
+    }
+    // Region landmarks: grove canopy, old-ruin columns and lighthouse-yard trees.
+    for(int i=0;i<4;i++) {
+        PushRenderItem(items,&count,RENDER_TREE,30+i,(Vector2){8.0f+i*1.1f,3.0f+(i%2)*1.4f},1.05f);
+        PushRenderItem(items,&count,RENDER_TREE,40+i,(Vector2){15.0f+i*1.0f,3.0f+(i%2)*1.2f},.72f);
     }
     PushRenderItem(items,&count,RENDER_PROP,4,(Vector2){3.2f,11.4f},1.0f);
     PushRenderItem(items,&count,RENDER_PROP,5,(Vector2){4.6f,10.8f},1.0f);
