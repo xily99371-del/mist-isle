@@ -314,15 +314,19 @@ static void RenderWorld(Game *g) {
     for(int i=0;i<g->world.pickupCount;i++) if(!g->world.pickups[i].taken)
         PushRenderItem(items,&count,RENDER_PICKUP,i,g->world.pickups[i].tile,1.0f);
     if(g->area==AREA_RUINS||g->area==AREA_LIGHTHOUSE)PushRenderItem(items,&count,RENDER_SHRINE,0,g->world.shrine,1.0f);
-    if(g->area==AREA_CAMP)PushRenderItem(items,&count,RENDER_KEEPER,0,(Vector2){3.0f,10.0f},1.0f);
-    Vector2 lumiPos=g->lumi.owned?g->lumi.pos:(Vector2){4.0f,12.0f};
-    if(g->area==AREA_CAMP)PushRenderItem(items,&count,RENDER_LUMI,0,lumiPos,1.0f);
+    if(g->area==AREA_CAMP) {
+        PushRenderItem(items,&count,RENDER_KEEPER,0,(Vector2){3.0f,10.0f},1.0f);
+        if(!g->lumi.owned)PushRenderItem(items,&count,RENDER_LUMI,0,(Vector2){4.0f,12.0f},1.0f);
+    }
+    if(g->lumi.owned)PushRenderItem(items,&count,RENDER_LUMI,0,g->lumi.pos,1.0f);
     if(g->splash.owned)PushRenderItem(items,&count,RENDER_MOATAIL,0,g->splash.pos,1.0f);
     if(g->spark.owned)PushRenderItem(items,&count,RENDER_GECKO,0,g->spark.pos,1.0f);
-    Vector2 fireflyGrid={10.6f+sinf(g->fireflyPhase*0.8f)*0.22f,6.2f+cosf(g->fireflyPhase*0.65f)*0.18f};
-    PushRenderItem(items,&count,RENDER_FIREFLY,0,fireflyGrid,1.0f);
-    if(!g->leaflingFed)PushRenderItem(items,&count,RENDER_LEAFLING,0,(Vector2){12.4f,8.0f},1.0f);
-    if(!g->groveMoteDefeated)PushRenderItem(items,&count,RENDER_MOTE,0,(Vector2){13.2f,9.2f},1.0f);
+    if(g->area==AREA_GROVE) {
+        Vector2 fireflyGrid={10.6f+sinf(g->fireflyPhase*0.8f)*0.22f,6.2f+cosf(g->fireflyPhase*0.65f)*0.18f};
+        if(!g->fireflyDiscovered)PushRenderItem(items,&count,RENDER_FIREFLY,0,fireflyGrid,1.0f);
+        if(!g->leaflingFed)PushRenderItem(items,&count,RENDER_LEAFLING,0,(Vector2){12.4f,8.0f},1.0f);
+        if(!g->groveMoteDefeated)PushRenderItem(items,&count,RENDER_MOTE,0,(Vector2){13.2f,9.2f},1.0f);
+    }
     PushRenderItem(items,&count,RENDER_PLAYER,0,g->player.pos,1.0f);
 
     for(int i=1;i<count;i++) {
@@ -391,7 +395,15 @@ static void RenderHUD(Game *g) {
     DrawUIText(TextFormat("当前伙伴 Lv.%d  XP %d/50",active->level,active->xp),1040,124,13,(Color){104,119,93,255});
     Panel((Rectangle){20,652,720,48});
     DrawUIText("WASD移动 SHIFT冲刺 E互动 TAB伙伴 J手记 I背包 M地图 F5保存",38,667,13,(Color){91,115,96,255});
-    if(!g->lumi.owned && Dist(g->player.pos,(Vector2){4,12})<1.65f) {
+    if(g->area==AREA_CAMP && Dist(g->player.pos,g->world.groveGate)<1.6f) {
+        Panel((Rectangle){530,585,220,40});DrawUIText("E  前往辉光林地",550,596,17,(Color){91,115,96,255});
+    } else if(g->area==AREA_CAMP && Dist(g->player.pos,g->world.ruinGate)<1.6f) {
+        Panel((Rectangle){530,585,220,40});DrawUIText("E  前往潮汐遗迹",550,596,17,(Color){91,115,96,255});
+    } else if(g->area==AREA_CAMP && Dist(g->player.pos,g->world.shrine)<1.6f) {
+        Panel((Rectangle){530,585,220,40});DrawUIText("E  前往灯塔庭院",550,596,17,(Color){91,115,96,255});
+    } else if(g->area!=AREA_CAMP && Dist(g->player.pos,(Vector2){2,9})<1.8f) {
+        Panel((Rectangle){530,585,220,40});DrawUIText("E  返回海岸营地",550,596,17,(Color){91,115,96,255});
+    } else if(g->area==AREA_CAMP && !g->lumi.owned && Dist(g->player.pos,(Vector2){4,12})<1.65f) {
         Panel((Rectangle){530,585,220,40});
         DrawUIText("E  救助苔灯灵",550,596,17,(Color){91,115,96,255});
     } else if(Dist(g->player.pos,(Vector2){3,10})<2.0f) {
