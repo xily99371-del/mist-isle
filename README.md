@@ -128,3 +128,7 @@ The renderer source frame size is 32x32 (the `_64` filename refers to the intend
 The chapter now uses a hub-and-three-sub-map structure: Coastal Camp, Glowglade Forest, Tidal Ruins and Lighthouse Courtyard. Enter each region from the hub gates with E; use the marked west exit in a sub-map to return. The Tidal Ruins gate unlocks after recruiting Moss Lumi and Moatail; the Lighthouse Courtyard opens after solving the shrine.
 
 Save format v4 stores the active region and resource pickups separately for all four maps. See `docs/HUB_SUBMAPS.md` for the map flow, progression and remaining art gaps.
+
+
+## Supplemental area art
+A new 16-prop original generated atlas is available in ChatGPT Library as `MistIsle_AreaProps_v1.zip`. Extract it into the repository root and merge `assets/`. It supplies area-specific coastal props (dock, boat, tent, buoy), grove props (flowering tree, glow mushrooms, mossy log, luminous flowers), ruin props (arch, pillar, broken wall, rune fountain), and lighthouse props (stairs, lighthouse tower, gate, garden fountain). The renderer loads the optional atlas from `assets/environment/area_props_96.png`.
