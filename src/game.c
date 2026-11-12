@@ -93,6 +93,16 @@ static void BuildAreaWorld(Game *g,Area area) {
     for(int x=1;x<21;x++){w->kind[9][x]=0;w->kind[10][x]=0;}
     for(int y=3;y<15;y++){w->kind[y][3]=0;w->kind[y][4]=0;}
     for(int y=5;y<14;y++)for(int x=7;x<17;x++)if((x+y)%4!=0)w->kind[y][x]=0;
+    // Keep every gate and story interaction reachable on every deterministic seed.
+    for(int x=14;x<20;x++){w->kind[4][x]=0;w->kind[9][x]=0;w->kind[14][x]=0;}
+    for(int y=4;y<15;y++)w->kind[y][2]=0;
+    if(area==AREA_GROVE) {
+        for(int y=4;y<=10;y++)for(int x=8;x<=14;x++)w->kind[y][x]=0;
+    } else if(area==AREA_RUINS) {
+        for(int y=5;y<=9;y++)for(int x=13;x<=19;x++)w->kind[y][x]=0;
+    } else if(area==AREA_LIGHTHOUSE) {
+        for(int y=10;y<=14;y++)for(int x=14;x<=19;x++)w->kind[y][x]=0;
+    }
     w->pickupCount=0;
     if(area==AREA_CAMP) {
         w->camp=(Vector2){3,12};w->groveGate=(Vector2){18,4};w->ruinGate=(Vector2){18,9};w->shrine=(Vector2){18,14};w->bossPos=(Vector2){18,14};
