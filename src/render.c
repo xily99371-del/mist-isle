@@ -470,8 +470,8 @@ static void RenderWorld(Game *g) {
         PushRenderItem(items,&count,RENDER_PROP,131,(Vector2){17.0f,12.0f},.9f);
         PushRenderItem(items,&count,RENDER_PROP,222,(Vector2){5.0f,4.0f},.95f);
         PushRenderItem(items,&count,RENDER_PROP,223,(Vector2){18.0f,4.0f},.95f);
-        PushRenderItem(items,&count,RENDER_PROP,232,(Vector2){4.0f,14.0f},.85f);
-        PushRenderItem(items,&count,RENDER_PROP,231,(Vector2){18.0f,14.0f},.85f);
+        PushRenderItem(items,&count,RENDER_PROP,222,(Vector2){4.0f,14.0f},.85f);
+        PushRenderItem(items,&count,RENDER_PROP,223,(Vector2){18.0f,14.0f},.85f);
     } else {
         PushRenderItem(items,&count,RENDER_PROP,208,(Vector2){2,9},.85f);
         PushRenderItem(items,&count,RENDER_PROP,133,(Vector2){17.0f,4.0f},1.2f); // lighthouse
