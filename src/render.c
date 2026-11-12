@@ -454,15 +454,17 @@ static void RenderMap(Game *g) {
     Panel((Rectangle){250,90,780,540});
     DrawUIText("岛 屿 地 图",300,120,32,(Color){74,105,83,255});
     const char *names[4]={"海岸营地","辉光林地","潮汐遗迹","灯塔庭院"};
-    Vector2 pts[4]={{390,320},{560,250},{745,330},{900,220}};
+    Vector2 pts[4]={{390,320},{560,235},{745,320},{900,235}};
+    DrawLineEx(pts[0],pts[1],5,(Color){185,177,139,255});
+    DrawLineEx(pts[0],pts[2],5,(Color){185,177,139,255});
+    DrawLineEx(pts[0],pts[3],5,(Color){185,177,139,255});
     for(int i=0;i<4;i++) {
-        bool unlocked=(i==0)||(i==1&&g->lumi.owned)||(i==2&&g->splash.owned)||(i==3&&g->shrineSolved);
-        DrawCircleV(pts[i],28,unlocked?(Color){144,190,132,255}:(Color){181,184,164,255});
+        bool unlocked=(i==0)||(i==1)||(i==2&&g->lumi.owned&&g->splash.owned)||(i==3&&g->shrineSolved);
+        DrawCircleV(pts[i],g->area==i?36:28,g->area==i?C_GOLD:unlocked?(Color){144,190,132,255}:(Color){181,184,164,255});
         DrawCircleV(pts[i],13,(Color){255,240,196,255});
         DrawUIText(names[i],(int)pts[i].x-45,(int)pts[i].y+42,17,C_INK);
-        if(i<3)DrawLineEx(pts[i],pts[i+1],5,(Color){185,177,139,255});
     }
-    DrawCircleV((Vector2){390+(g->player.pos.x-3)*27,320+(g->player.pos.y-12)*15},7,C_RED);
+    DrawUIText("主地图为枢纽；各区域通过入口往返。",320,520,17,(Color){105,121,97,255});
     DrawUIText("红点：当前位置   灰色区域：尚未解锁",320,545,18,(Color){105,121,97,255});
     DrawUIText("按 M / ESC 关闭",800,580,16,(Color){132,137,111,255});
 }
