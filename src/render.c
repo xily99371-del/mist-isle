@@ -53,7 +53,7 @@ static void DrawTopDownTile(int x,int y,Area area,int kind,float time) {
     Vector2 p=WorldToScreen((float)x,(float)y);
     Rectangle tile={p.x-TILE_SIZE*.5f,p.y-TILE_SIZE*.5f,TILE_SIZE+1,TILE_SIZE+1};
     unsigned int hash=TileHash(x,y,(int)area);
-    int col=(int)(hash%3u),row=(int)((hash>>5)%3u),atlasIndex;
+    int col=(int)(hash%3u),row=(int)((hash>>5)%2u),atlasIndex;
     if(kind==4)atlasIndex=36+(int)(hash%12u);
     else if(kind==3)atlasIndex=24+row*4+col;
     else if(kind==2)atlasIndex=12+row*4+col;
@@ -482,6 +482,20 @@ static void RenderWorld(Game *g) {
         PushRenderItem(items,&count,RENDER_PROP,503,(Vector2){5.0f,13.0f},1.0f);
         PushRenderItem(items,&count,RENDER_PROP,415,(Vector2){15.0f,13.0f},.9f);
         PushRenderItem(items,&count,RENDER_PROP,404,(Vector2){7.0f,5.0f},.75f);
+    }
+    // Natural map rims: cliff faces meet water at the coast, stone retaining walls frame ruins.
+    if(g->area==AREA_CAMP) {
+        const int coastIdx[]={2,3,4,5,2,3};
+        for(int i=0;i<6;i++)PushRenderItem(items,&count,RENDER_PROP,200+coastIdx[i],(Vector2){4.0f+i*3.0f,16.1f},.92f);
+        PushRenderItem(items,&count,RENDER_PROP,202,(Vector2){20.0f,5.0f},.85f);
+        PushRenderItem(items,&count,RENDER_PROP,203,(Vector2){20.0f,9.0f},.85f);
+        PushRenderItem(items,&count,RENDER_PROP,204,(Vector2){20.0f,13.0f},.85f);
+    } else if(g->area==AREA_GROVE) {
+        for(int i=0;i<5;i++)PushRenderItem(items,&count,RENDER_PROP,208,(Vector2){4.0f+i*3.5f,16.0f},.88f);
+    } else if(g->area==AREA_RUINS) {
+        for(int i=0;i<5;i++)PushRenderItem(items,&count,RENDER_PROP,221+(i%2),(Vector2){4.0f+i*3.5f,16.0f},.9f);
+    } else {
+        for(int i=0;i<5;i++)PushRenderItem(items,&count,RENDER_PROP,202+(i%4),(Vector2){4.0f+i*3.5f,16.0f},.9f);
     }
     for(int i=0;i<g->world.pickupCount;i++) if(!g->world.pickups[i].taken)
         PushRenderItem(items,&count,RENDER_PICKUP,i,g->world.pickups[i].tile,1.0f);
