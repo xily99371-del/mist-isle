@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RENDER = (ROOT / "src/render.c").read_text(encoding="utf-8")
 GAME = (ROOT / "src/game.c").read_text(encoding="utf-8")
 HEADER = (ROOT / "src/game.h").read_text(encoding="utf-8")
+MAIN = (ROOT / "src/main.c").read_text(encoding="utf-8")
 
 def require(condition, message):
     if not condition:
@@ -105,6 +106,18 @@ require("!g->splash.owned" in RENDER and "!g->spark.owned" in RENDER,
         "unrecruited water and crystal companions are visible as world encounters")
 require("RenderInit(void)" in RENDER and "RenderClose(void)" in RENDER,
         "renderer owns texture load and release lifecycle")
+require("FLAG_WINDOW_RESIZABLE" in MAIN and "1600,900" in MAIN and "LoadRenderTexture(SW,SH)" in MAIN,
+        "game opens in a larger resizable window with a fixed 16:9 logical canvas")
+require("GameUpdate(&g,dt)" in MAIN and "SCENE_END must pass through GameUpdate" in MAIN,
+        "ending animation advances through the normal game update loop")
+require("LogicalMousePosition" in GAME and "GetScreenWidth()" in GAME,
+        "battle mouse selection remains aligned after window scaling")
+require("DrawTerrainAccent" in RENDER and "terrainKinds" in RENDER and "512" in RENDER,
+        "world maps include layered ground detail, shoreline foam and a larger render queue")
+require("RenderWorld(g);" in RENDER and "GetWorldToScreen2D" in RENDER,
+        "ending cinematic reuses the actual lighthouse courtyard and animated beacon")
+require("footY-54" in RENDER and "footY-50" in RENDER,
+        "player and companion sprites use enlarged world-space dimensions")
 
 # Critical gameplay entry points and persistence must remain present.
 for token, label in [
