@@ -143,3 +143,20 @@ cd mist-isle
 ```
 
 Extract `MistIsle_ArtPack_v3_HubSubmaps.zip` into the cloned repository root, merge `assets/`, then run `UPLOAD_ART_TO_GITHUB.bat`. It stages only `assets/`, commits them, and pushes to the configured `origin`. After that one-time push, future source downloads will include the art pack and no separate art ZIP is needed.
+
+
+## One-time v3 art import and full Windows playtest build
+
+The complete generated art pack is maintained as a local ZIP in ChatGPT Library. To commit the binary PNG files into this repository once:
+
+1. Clone the repository (do not use the GitHub Download ZIP, which has no `.git` folder):
+   ```powershell
+   cd D:\Games
+   git clone https://github.com/xily99371-del/mist-isle.git
+   cd mist-isle
+   ```
+2. Place `MistIsle_ArtPack_v3_HubSubmaps.zip` beside `UPLOAD_ART_TO_GITHUB.bat`.
+3. Run `UPLOAD_ART_TO_GITHUB.bat`. It extracts the pack, validates the expected images, commits only `assets/`, and pushes to `main`.
+4. The push triggers a Windows build. Download the artifact named `MistIsle-Windows-Playtest-v1` from that run.
+
+After this one-time import, all future source ZIPs and Windows build artifacts will contain the art assets. No separate art archive merge will be required.
