@@ -176,3 +176,7 @@ The v5 pack adds four runtime atlases: 56px grass/sand/stone/water terrain tiles
 
 ## Art pack v6 — polished original props
 The v6 art pack adds `assets/environment/original_props_16_v1.png`, a 4x4 atlas of 16 original project props normalized to 32x32 cells. The renderer uses it for the coastal dock, beach props, grove trees/mushrooms/log, ruin arch/pillar/rune platform/fountain, and lighthouse/courtyard structures. Use `MistIsle_ArtPack_v6_TopDown_Polished.zip` for the current full asset bundle and run `UPLOAD_ART_TO_GITHUB.bat` once to commit it into the cloned repository.
+
+
+## Third-party art included
+The repository now vendors the **Kenney Tiny Town** CC0 pack at `third_party/kenney/tiny-town/`, preserving the original ZIP, license and source note. It is used selectively for 3/4-view building/prop options only; the game remains on orthographic top-down movement and terrain, so its 3/4-view ground tiles are not mixed into the orthographic ground layer. CI generates a contact sheet for review and includes the original pack in the Windows distribution archive. See `ASSET_SOURCES_AND_LICENSES.md`.
