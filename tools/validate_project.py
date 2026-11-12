@@ -95,8 +95,8 @@ require("DrawUITextWrapped" in RENDER and "UI_CODEPOINTS" in RENDER,
         "Chinese UI includes the complete source glyph set and wrapped objective text")
 require("endingTime" in GAME and "static void RenderEnd" in RENDER,
         "lighthouse ending uses a timed cinematic sequence")
-require("RENDER_PROP,414" in RENDER and "DrawOriginalProp(it->index-400" in RENDER,
-        "lighthouse courtyard uses the authored lighthouse sprite atlas")
+require("RENDER_PROP,33" in RENDER and "DrawAreaProp(13" in RENDER,
+        "lighthouse courtyard uses the authored lighthouse sprite from the area atlas")
 require("SetSolidRect" in GAME and "MovePlayerWithCollision" in GAME and "dockWater" in GAME and "stream&&!bridge" in GAME,
         "props, shore water and stream banks block movement with substep collision")
 require("GetCurrentObjective" in GAME and "DrawObjectiveMarker" in RENDER,
@@ -123,9 +123,11 @@ require("DrawAreaProp(11,p,112,116)" in RENDER and "DrawAreaProp(13" in RENDER,
         "the shrine and lighthouse use their authored area-specific sprites")
 require("atlasIndex=36+row*4+col" in RENDER and "row=(int)((hash>>5)%3u)" in RENDER,
         "terrain selection avoids the transparent atlas column and uses all ground variants")
-cg_file = ROOT / "assets/cinematics/lighthouse_lighting_6frame.jpg.b64"
-require(cg_file.exists(), "lighthouse ending CG asset is present")
-with Image.open(io.BytesIO(base64.b64decode(cg_file.read_text(encoding="ascii")))) as cg:
+cg_file = ROOT / "assets/cinematics/lighthouse_final_scene.jpg.b64"
+require(cg_file.exists(), "lighthouse ending illustration asset is present")
+cg_data = cg_file.read_text(encoding="ascii").strip()
+require(len(cg_data) % 4 == 0, "lighthouse illustration base64 data is complete")
+with Image.open(io.BytesIO(base64.b64decode(cg_data, validate=True))) as cg:
     require(cg.size == (448, 448), "lighthouse finale illustration is a 448px square scene")
 require("assets/cinematics" in WORKFLOW and "Copy-Item assets/cinematics/*" in WORKFLOW,
         "Windows playtest package includes the cinematic asset")
@@ -137,8 +139,8 @@ require("h%100" not in GAME[GAME.find("static void BuildAreaWorld"):GAME.find("s
         "area maps use authored layouts instead of random blocker placement")
 require("g->area==AREA_LIGHTHOUSE && g->bossDefeated && Dist(p->pos,g->world.shrine)<3.8f" in GAME and "点亮失落的灯塔" in RENDER,
         "final lighthouse tablet has an explicit E interaction with a reachable radius")
-require("g->scene==SCENE_END" in GAME[GAME.find("void GameUpdate"):GAME.find("static void AddBuddyFriend")] if False else "SCENE_END" in GAME,
-        "chapter finale scene state is present")
+require("SCENE_END" in GAME and "g->endingTime+=dt" in GAME,
+        "chapter finale scene state and animation timer are present")
 require("if(g->bossDefeated&&Dist(p->pos,g->world.shrine)<1.05f)" not in GAME,
         "finale no longer auto-triggers from proximity")
 require(GAME.find("if(g->scene==SCENE_END)") < GAME.find("if(g->journalOpen || g->inventoryOpen || g->mapOpen)"),
