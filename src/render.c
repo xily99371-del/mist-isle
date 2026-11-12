@@ -365,44 +365,31 @@ static void RenderWorld(Game *g) {
     DrawWorldBackdrop(g);
     BeginMode2D(g->cam);
 
-    // Dedicated ground palette and walkable layout for each independent sub-map.
+    // Orthographic square tiles: screen directions now match WASD and arrow keys.
     for(int y=0;y<MAPH;y++)for(int x=0;x<MAPW;x++) {
-        int tile=((x+y)&1)?0:1;
-        Color tint=(Color){151,198,144,255};
+        int kind=0;
+        if(g->world.kind[y][x]==1)kind=1;
+        if(g->world.kind[y][x]==2)kind=2;
+        if(g->world.kind[y][x]==3)kind=3;
         if(g->area==AREA_CAMP) {
-            tint=(Color){156,199,143,255};
-            if(x<5&&y>7){tile=2;tint=(Color){210,190,143,255};}
-            if(x<3&&y>11){tile=4;tint=(Color){110,180,197,255};}
+            if(x<5&&y>7)kind=2;
+            if(x<3&&y>11)kind=4;
+            if(x==0||y==0||x==MAPW-1||y==MAPH-1)kind=4;
         } else if(g->area==AREA_GROVE) {
-            tint=(Color){119,171,113,255};tile=(x+y)%2;
-            if(x>=9&&x<=11&&y>=3&&y<=14){tile=4;tint=(Color){105,177,190,255};}
-            if((x*3+y)%11==0){tile=5;tint=(Color){142,188,116,255};}
+            if(x>=9&&x<=11&&y>=3&&y<=14)kind=4;
+            if((x*3+y)%13==0&&kind==0)kind=2;
+            if(x==0||y==0||x==MAPW-1||y==MAPH-1)kind=1;
         } else if(g->area==AREA_RUINS) {
-            tile=3;tint=(Color){174,169,147,255};
-            if((x+y)%5==0){tile=2;tint=(Color){187,177,143,255};}
-            if(x>=9&&x<=11&&y>=3&&y<=14){tile=4;tint=(Color){104,165,181,255};}
+            if(kind==0)kind=3;
+            if((x+y)%6==0)kind=2;
+            if(x>=9&&x<=11&&y>=3&&y<=14)kind=4;
+            if(x==0||y==0||x==MAPW-1||y==MAPH-1)kind=3;
         } else {
-            tile=3;tint=(Color){190,180,150,255};
-            if(x<5||x>17||y<4||y>14){tile=2;tint=(Color){207,190,151,255};}
-            if((x+y)%7==0){tile=5;tint=(Color){145,183,119,255};}
+            if(x<5||x>17||y<4||y>14)kind=2;
+            if((x+y)%9==0&&kind==0)kind=3;
+            if(x==0||y==0||x==MAPW-1||y==MAPH-1)kind=4;
         }
-        if(g->world.kind[y][x]==1 && g->area!=AREA_RUINS){tile=3;tint=(Color){116,144,111,255};}
-        if(g->world.kind[y][x]==2 && g->area==AREA_CAMP){tile=2;tint=(Color){207,190,151,255};}
-        if(g->world.kind[y][x]==3){tile=3;tint=(Color){145,151,133,255};}
-        DrawIsoTile(x,y,tile,tint);
-    }
-    // Area-specific water and crossing details.
-    if(g->area==AREA_CAMP) {
-        for(int y=11;y<16;y++)for(int x=1;x<4;x++)DrawIsoTile(x,y,4,(Color){105,177,190,255});
-    } else if(g->area==AREA_GROVE) {
-        for(int y=3;y<15;y++)for(int x=9;x<12;x++)DrawIsoTile(x,y,4,(Color){105,177,190,255});
-        for(int x=8;x<13;x++)DrawIsoTile(x,9,0,(Color){142,185,123,255});
-    } else if(g->area==AREA_RUINS) {
-        for(int y=3;y<15;y++)for(int x=9;x<11;x++)DrawIsoTile(x,y,4,(Color){104,165,181,255});
-        for(int x=8;x<12;x++)DrawIsoTile(x,9,3,(Color){181,174,151,255});
-    } else {
-        for(int y=2;y<6;y++)for(int x=2;x<6;x++)DrawIsoTile(x,y,4,(Color){105,177,190,255});
-        for(int x=8;x<14;x++)DrawIsoTile(x,9,3,(Color){185,174,145,255});
+        DrawTopDownTile(x,y,g->area,kind,g->time);
     }
 
     // Sort elevated objects by isometric depth (x+y): characters can pass behind trees.
@@ -476,7 +463,7 @@ static void RenderWorld(Game *g) {
         items[j+1]=key;
     }
     for(int i=0;i<count;i++) {
-        RenderItem *it=&items[i]; Vector2 p=Iso(it->grid.x,it->grid.y,0);
+        RenderItem *it=&items[i]; Vector2 p=WorldToScreen(it->grid.x,it->grid.y);
         switch(it->kind) {
             case RENDER_TREE: if(g->area==AREA_RUINS)DrawEnvProp(5,p,48*it->scale,62*it->scale); else DrawTree(p,it->scale,g->time); break;
             case RENDER_PROP:
