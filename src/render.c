@@ -503,18 +503,35 @@ static void DrawRuinsBackdrop(float t) {
         DrawCircle(x,y,2+(i%3),Fade((Color){215,215,173,255},.2f));
     }
 }
-static void DrawLighthouseBackdrop(float t) {
-    DrawRectangleGradientV(0,0,WORLD_PIXEL_W,WORLD_PIXEL_H,(Color){164,199,203,255},(Color){91,139,157,255});
-    DrawCircle(1000,125,92,Fade((Color){255,224,157,255},.45f));
-    DrawCircle(1000,125,58,Fade((Color){255,238,193,255},.38f));
-    // Distant sea bands and a warm lighthouse beam across the sky.
-    for(int i=0;i<13;i++) {
-        int y=300+i*55;
-        DrawLineEx((Vector2){0,(float)y+sinf(t*.2f+i)*4},(Vector2){(float)WORLD_PIXEL_W,(float)y+sinf(t*.2f+i)*4},2,Fade((Color){220,237,214,255},.2f));
+static void DrawLighthouseBackdrop(float t,bool beaconLit) {
+    DrawRectangleGradientV(0,0,WORLD_PIXEL_W,WORLD_PIXEL_H,(Color){48,78,111,255},(Color){24,57,81,255});
+    // A warm dusk horizon and distant headlands give the courtyard a clear sense of place.
+    DrawCircle(260,205,116,Fade((Color){255,202,142,255},.23f));
+    DrawCircle(260,205,72,Fade((Color){255,225,176,255},.22f));
+    DrawTriangle((Vector2){0,360},(Vector2){175,248},(Vector2){380,360},(Color){46,80,87,255});
+    DrawTriangle((Vector2){780,350},(Vector2){1030,235},(Vector2){WORLD_PIXEL_W,360},(Color){40,72,83,255});
+    // Distant sea bands.
+    for(int i=0;i<16;i++) {
+        float y=350.0f+i*42.0f;
+        for(int x=0;x<WORLD_PIXEL_W;x+=146) {
+            float yy=y+sinf(t*.22f+i*.65f+x*.009f)*3.5f;
+            DrawLineEx((Vector2){(float)x,yy},(Vector2){x+55.0f,yy-1.5f},1.8f,Fade((Color){194,224,220,255},.22f));
+        }
     }
-    DrawTriangle((Vector2){1000,125},(Vector2){WORLD_PIXEL_W,40},(Vector2){WORLD_PIXEL_W,230},Fade((Color){255,232,176,255},.12f));
-    DrawCloudPuff(220,130,.7f,(Color){237,241,216,130});
-    DrawCloudPuff(760,190,.55f,(Color){237,241,216,95});
+    DrawCloudPuff(220,130,.78f,(Color){237,241,216,115});
+    DrawCloudPuff(760,190,.62f,(Color){237,241,216,85});
+    if(beaconLit) {
+        Vector2 lamp={1008,179};
+        float sweep=sinf(t*.72f)*.5f;
+        Vector2 a={-220.0f,lamp.y-220.0f+sweep*320.0f};
+        Vector2 b={-220.0f,lamp.y+220.0f+sweep*320.0f};
+        DrawTriangle(lamp,a,b,Fade((Color){255,226,164,255},.10f));
+        DrawTriangle(lamp,(Vector2){-220.0f,lamp.y-92.0f+sweep*320.0f},
+            (Vector2){-220.0f,lamp.y+92.0f+sweep*320.0f},Fade((Color){255,243,198,255},.12f));
+        DrawCircleV(lamp,43,Fade((Color){255,226,155,255},.12f+.08f*sinf(t*3.0f)));
+    } else {
+        DrawCircleV((Vector2){1008,179},24,Fade((Color){100,133,158,255},.12f));
+    }
 }
 static void DrawWorldBackdrop(Game *g) {
     Color surround=g->area==AREA_CAMP?(Color){83,163,178,255}:
@@ -538,7 +555,7 @@ static void DrawWorldBackdrop(Game *g) {
         case AREA_CAMP: DrawSeaBackdrop(g->time); break;
         case AREA_GROVE: DrawForestBackdrop(g->time); break;
         case AREA_RUINS: DrawRuinsBackdrop(g->time); break;
-        default: DrawLighthouseBackdrop(g->time); break;
+        default: DrawLighthouseBackdrop(g->time,g->bossDefeated||g->scene==SCENE_END); break;
     }
 }
 
@@ -1001,7 +1018,7 @@ static void RenderEnd(Game *g) {
     float sweep=sinf(t*.72f)*.55f;
     RenderWorld(g);
     DrawRectangle(0,0,SW,SH,Fade((Color){8,18,31,255},.20f));
-    Vector2 lamp=GetWorldToScreen2D(WorldToScreen(17.5f,4.35f),g->cam);
+    Vector2 lamp=GetWorldToScreen2D(WorldToScreen(17.5f,2.7f),g->cam);
     float angle=3.1415926f+sweep;
     Vector2 beamA={lamp.x+cosf(angle-.13f)*1500.0f,lamp.y+sinf(angle-.13f)*1500.0f};
     Vector2 beamB={lamp.x+cosf(angle+.13f)*1500.0f,lamp.y+sinf(angle+.13f)*1500.0f};
