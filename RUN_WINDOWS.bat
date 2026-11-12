@@ -17,6 +17,18 @@ python tools\generate_pixel_assets.py
 if errorlevel 1 goto failed
 
 echo [3/3] Configuring and building...
+where cmake >nul 2>nul
+if errorlevel 1 (
+  echo.
+  echo CMake was not found. This is a missing Windows build dependency.
+  echo Install CMake using one of these methods:
+  echo   winget install Kitware.CMake
+  echo or download the Windows x64 installer from https://cmake.org/download/
+  echo During installation, select "Add CMake to the system PATH".
+  echo Then close this window, open a NEW terminal, and run RUN_WINDOWS.bat again.
+  echo.
+  goto failed
+)
 cmake -S . -B build
 if errorlevel 1 goto failed
 cmake --build build --config Release
