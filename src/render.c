@@ -951,7 +951,8 @@ static void RenderEnd(Game *g) {
     } else {
         DrawUIText("第一章完成   ·   按 R 再次探索",440,656,18,(Color){255,235,183,255});
     }
-}static int Base64Digit(unsigned char c) {
+}
+static int Base64Digit(unsigned char c) {
     if(c>='A'&&c<='Z')return c-'A';
     if(c>='a'&&c<='z')return c-'a'+26;
     if(c>='0'&&c<='9')return c-'0'+52;
@@ -980,7 +981,7 @@ static void LoadEndingCG(void) {
     if(bytes&&byteCount>0) {
         Image image=LoadImageFromMemory(".jpg",bytes,byteCount);
         if(image.data) {
-            if(image.width==432&&image.height==288) {
+            if(image.width==336&&image.height==224) {
                 TEX_ENDING_CG=LoadTextureFromImage(image);
                 if(TEX_ENDING_CG.id)SetTextureFilter(TEX_ENDING_CG,TEXTURE_FILTER_BILINEAR);
             } else TraceLog(LOG_WARNING,"Mist Isle: ending CG atlas has unexpected size %dx%d.",image.width,image.height);
