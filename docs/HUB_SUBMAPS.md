@@ -31,3 +31,13 @@ Each map is rebuilt from a deterministic seed plus its area ID. The active map h
 
 ## Asset status
 The map composition reuses the approved art pack's current environment atlas and isometric ground tiles. This is a first content pass, not yet a complete region-specific art expansion. Dedicated coastal dock/shore autotiles, a richer ruin arch/column set, courtyard stairs/fountain, and more varied forest flora are still needed to reach final art quality.
+
+
+## Supplemental area prop atlas v1
+A new original 16-prop atlas is provided in `MistIsle_AreaProps_v1.zip`, extracted to `assets/environment/area_props_96.png`. The 16 cells are 96x96 and grouped in order:
+- Coast: dock, boat, tent, buoy.
+- Grove: flowering tree, glow mushrooms, mossy log, lumen flower.
+- Ruins: arch, pillar, broken wall, rune fountain.
+- Lighthouse: stone stairs, lighthouse tower, iron gate, garden fountain.
+
+The renderer loads this as an optional atlas and places the matching props in each sub-map. The local game build requires the asset pack to be extracted into the repository root; a clean GitHub CI build without the optional pack falls back to the existing props.
