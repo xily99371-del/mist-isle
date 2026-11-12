@@ -297,16 +297,19 @@ static void RenderWorld(Game *g) {
         PushRenderItem(items,&count,RENDER_PROP,14,g->world.ruinGate,0.8f);
         PushRenderItem(items,&count,RENDER_PROP,14,g->world.shrine,0.8f);
     } else if(g->area==AREA_GROVE) {
+        PushRenderItem(items,&count,RENDER_PROP,14,(Vector2){2,9},.8f);
         for(int i=0;i<5;i++)PushRenderItem(items,&count,RENDER_PROP,12,(Vector2){6.0f+i*2.7f,3.0f+(i%2)*8.0f},.9f);
         PushRenderItem(items,&count,RENDER_PROP,13,(Vector2){7.5f,11.0f},1.0f);
         PushRenderItem(items,&count,RENDER_PROP,14,(Vector2){15.0f,5.0f},1.0f);
         PushRenderItem(items,&count,RENDER_PROP,15,(Vector2){16.0f,12.0f},1.0f);
     } else if(g->area==AREA_RUINS) {
+        PushRenderItem(items,&count,RENDER_PROP,14,(Vector2){2,9},.8f);
         for(int i=0;i<5;i++)PushRenderItem(items,&count,RENDER_PROP,14,(Vector2){6.0f+i*2.8f,4.0f+(i%2)*7.0f},1.0f);
         PushRenderItem(items,&count,RENDER_PROP,15,(Vector2){10.0f,5.0f},1.2f);
         PushRenderItem(items,&count,RENDER_PROP,15,(Vector2){14.0f,12.0f},1.2f);
         PushRenderItem(items,&count,RENDER_PROP,13,(Vector2){5.0f,13.0f},1.0f);
     } else {
+        PushRenderItem(items,&count,RENDER_PROP,14,(Vector2){2,9},.8f);
         PushRenderItem(items,&count,RENDER_PROP,7,(Vector2){17.0f,4.0f},1.25f);
         for(int i=0;i<7;i++)PushRenderItem(items,&count,RENDER_PROP,11,(Vector2){5.0f+i*2.0f,5.0f+(i%2)*8.0f},.72f);
         for(int i=0;i<5;i++)PushRenderItem(items,&count,RENDER_PROP,15,(Vector2){4.0f+i*3.0f,13.0f},.9f);
