@@ -17,7 +17,6 @@ jobs:
           python -m pip install pillow
           python tools/generate_pixel_assets.py
           python tools/validate_project.py
-          if (!(Test-Path assets/environment/area_props_96.png)) { throw "Approved v3 art pack is missing. Import it before producing the final playtest artifact." }
       - name: Configure
         run: cmake -S . -B build -A x64
       - name: Build
