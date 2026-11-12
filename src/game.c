@@ -164,12 +164,12 @@ static void BuildAreaWorld(Game *g,Area area) {
     }
     // Hand-authored tree clusters frame each area while keeping the main routes open.
     if(area==AREA_CAMP) {
-        const int trees[][2]={{2,2},{7,2},{10,2},{19,2},{20,6},{20,15},{12,16},{7,16}};
+        const int trees[][2]={{2,2},{7,2},{10,2},{19,2},{20,6},{20,15},{12,16},{7,16},{8,2},{12,2},{20,4},{19,16},{2,6}};
         for(int i=0;i<(int)(sizeof(trees)/sizeof(trees[0]));i++) {
             int x=trees[i][0],y=trees[i][1];w->kind[y][x]=1;w->solid[y][x]=1;
         }
     } else if(area==AREA_GROVE) {
-        const int trees[][2]={{3,2},{6,2},{8,3},{14,2},{18,2},{20,4},{4,6},{6,7},{7,13},{13,14},{17,14},{20,12}};
+        const int trees[][2]={{3,2},{6,2},{8,3},{14,2},{18,2},{20,4},{4,6},{6,7},{7,13},{13,14},{17,14},{20,12},{2,4},{2,13},{6,15},{18,15},{20,7},{3,15}};
         for(int i=0;i<(int)(sizeof(trees)/sizeof(trees[0]));i++) {
             int x=trees[i][0],y=trees[i][1];w->kind[y][x]=1;w->solid[y][x]=1;
         }
@@ -177,6 +177,10 @@ static void BuildAreaWorld(Game *g,Area area) {
         for(int y=6;y<=9;y++)for(int x=15;x<=19;x++)w->kind[y][x]=3;
         for(int y=3;y<=6;y++)for(int x=3;x<=6;x++)w->kind[y][x]=2;
         for(int y=12;y<=14;y++)for(int x=3;x<=7;x++)w->kind[y][x]=2;
+        const int trees[][2]={{5,5},{7,5},{5,13},{7,14},{12,14},{19,11}};
+        for(int i=0;i<(int)(sizeof(trees)/sizeof(trees[0]));i++) {
+            int x=trees[i][0],y=trees[i][1];w->kind[y][x]=1;w->solid[y][x]=1;
+        }
     }
     // Authored collision footprints keep the player outside large buildings and props.
     if(area==AREA_CAMP) {
