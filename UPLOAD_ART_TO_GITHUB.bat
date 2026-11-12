@@ -17,7 +17,7 @@ git remote get-url origin
 if errorlevel 1 goto failed
 
 if not exist "assets\environment\area_props_96.png" (
-  if exist "MistIsle_ArtPack_v3_HubSubmaps.zip" (
+  if exist "MistIsle_ArtPack_v4_TopDown_Refined.zip" (
     echo Extracting approved v3 art pack...
     powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%CD%\MistIsle_ArtPack_v3_HubSubmaps.zip' -DestinationPath '%CD%' -Force"
     if errorlevel 1 goto failed
@@ -75,7 +75,7 @@ git push origin main
 if errorlevel 1 goto failed
 
 echo.
-echo SUCCESS: Art assets are now committed to GitHub.
+echo SUCCESS: Art assets are now committed to GitHub.\necho The full v4 top-down terrain atlas is included.
 echo A complete Windows build will start automatically.
 pause
 exit /b 0
