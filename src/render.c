@@ -555,7 +555,7 @@ static void DrawWorldBackdrop(Game *g) {
         case AREA_CAMP: DrawSeaBackdrop(g->time); break;
         case AREA_GROVE: DrawForestBackdrop(g->time); break;
         case AREA_RUINS: DrawRuinsBackdrop(g->time); break;
-        default: DrawLighthouseBackdrop(g->time,g->bossDefeated||g->scene==SCENE_END); break;
+        default: DrawLighthouseBackdrop(g->time,g->bossDefeated&&g->scene!=SCENE_END); break;
     }
 }
 
