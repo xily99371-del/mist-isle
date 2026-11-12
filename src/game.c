@@ -106,10 +106,10 @@ static void BuildAreaWorld(Game *g,Area area) {
     w->pickupCount=0;
     if(area==AREA_CAMP) {
         w->camp=(Vector2){3,12};w->groveGate=(Vector2){18,4};w->ruinGate=(Vector2){18,9};w->shrine=(Vector2){18,14};w->bossPos=(Vector2){18,14};
+        for(int y=1;y<17;y++)for(int x=1;x<5;x++)if(y<7||y>14)w->kind[y][x]=2;
         // Collision footprints for the two Kenney Tiny Town cottages placed in the hub.
         for(int y=1;y<=4;y++)for(int x=3;x<=5;x++)w->kind[y][x]=1;
         for(int y=3;y<=6;y++)for(int x=13;x<=15;x++)w->kind[y][x]=1;
-        for(int y=1;y<17;y++)for(int x=1;x<5;x++)if(y<7||y>14)w->kind[y][x]=2;
         for(int i=0;i<5;i++)AddPickup(w,0,7+i*2,7+(i%2)*4);
         AddPickup(w,1,15,6);AddPickup(w,2,15,12);
     } else if(area==AREA_GROVE) {
