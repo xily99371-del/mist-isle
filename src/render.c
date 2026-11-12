@@ -96,13 +96,22 @@ static void DrawTopDownTile(int x,int y,Area area,int kind,float time) {
     else atlasIndex=row*4+col;
     DrawRectangleRec(tile,tileBase);
     if(TEX_TOPDOWN_TILES.id) {
-        Rectangle src={(float)((atlasIndex%4)*56),(float)((atlasIndex/4)*56),56,56};
-        Rectangle dst={tile.x-1.5f,tile.y-1.5f,TILE_SIZE+3.0f,TILE_SIZE+3.0f};
-        DrawTexturePro(TEX_TOPDOWN_TILES,src,dst,(Vector2){0,0},0,WHITE);
+        // The source atlas is a collection of framed 56px tiles. Use only their
+        // interior texture as occasional ground decals over a continuous base,
+        // instead of repeating the beveled tile borders across the whole map.
+        bool drawPatch=kind==3 ? (hash%100u)<78u : kind==4 ? false : (hash%100u)<34u;
+        if(drawPatch) {
+            int patch=kind==3?44:28;
+            int inset=(56-patch)/2;
+            Rectangle src={(float)((atlasIndex%4)*56+inset),(float)((atlasIndex/4)*56+inset),(float)patch,(float)patch};
+            float dstSize=kind==3?49.0f:34.0f;
+            Rectangle dst={p.x-dstSize*.5f,p.y-dstSize*.5f,dstSize,dstSize};
+            DrawTexturePro(TEX_TOPDOWN_TILES,src,dst,(Vector2){0,0},0,WHITE);
+        }
         return;
     }
-    Color base=kind==4?(Color){67,158,190,255}:kind==3?(Color){126,132,119,255}:kind==2?(Color){207,180,126,255}:(Color){111,166,91,255};
-    DrawRectangleRec(tile,base);
+    Color fallback=kind==4?(Color){67,158,190,255}:kind==3?(Color){126,132,119,255}:kind==2?(Color){207,180,126,255}:(Color){111,166,91,255};
+    DrawRectangleRec(tile,fallback);
     if(kind==4) {
         float wave=6.0f*sinf(time*1.7f+y*.65f+x*.35f);
         DrawLineEx((Vector2){tile.x+7,tile.y+14+wave*.15f},(Vector2){tile.x+TILE_SIZE-9,tile.y+14+wave*.15f},2.0f,Fade((Color){190,229,222,255},.32f));
