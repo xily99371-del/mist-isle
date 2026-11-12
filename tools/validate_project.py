@@ -92,10 +92,10 @@ require("DrawUITextWrapped" in RENDER and "UI_CODEPOINTS" in RENDER,
         "Chinese UI includes the complete source glyph set and wrapped objective text")
 require("endingTime" in GAME and "static void RenderEnd" in RENDER,
         "lighthouse ending uses a timed cinematic sequence")
-require("DrawTriangle(lamp,beamA,beamB" in RENDER and "sinf(t*.78f)" in RENDER,
+require("DrawTriangle(lamp,beamA,beamB" in RENDER and "sinf(t*.72f)" in RENDER,
         "lighthouse ending contains a sweeping animated beam")
-require("DrawAreaProp(13" in RENDER and "DrawAreaProp(12" in RENDER,
-        "lighthouse ending uses the authored lighthouse and stair prop artwork")
+require("RENDER_PROP,414" in RENDER and "DrawOriginalProp(it->index-400" in RENDER,
+        "lighthouse courtyard uses the authored lighthouse sprite atlas")
 require("SetSolidRect" in GAME and "MovePlayerWithCollision" in GAME and "dockWater" in GAME and "stream&&!bridge" in GAME,
         "props, shore water and stream banks block movement with substep collision")
 require("GetCurrentObjective" in GAME and "DrawObjectiveMarker" in RENDER,
