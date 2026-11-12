@@ -735,8 +735,8 @@ void RenderInit(void) {
 }
 void RenderClose(void) {
     UnloadUIFont();
-    Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
-    for(int i=0;i<11;i++)if(textures[i]->id)UnloadTexture(*textures[i]);
+    Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
+    for(int i=0;i<12;i++)if(textures[i]->id)UnloadTexture(*textures[i]);
 }
 void GameRender(Game *g) {
     if(g->scene==SCENE_TITLE)RenderTitle(g);
