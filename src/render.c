@@ -37,7 +37,7 @@ static void DrawUIText(const char *text,int x,int y,int size,Color tint) {
 
 static Texture2D TEX_HERO={0}, TEX_LUMI={0}, TEX_MOATAIL={0}, TEX_GECKO={0}, TEX_KEEPER={0};
 static Texture2D TEX_HERO_PIXEL={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, TEX_GECKO_PIXEL={0}, TEX_TILES={0}, TEX_PROPS={0};
-static Texture2D TEX_ISO_TILES={0}, TEX_HERO_WALK={0}, TEX_ENV_PROPS={0}, TEX_LEAFLING={0}, TEX_GROVE_MOTE={0}, TEX_AREA_PROPS={0}, TEX_TOPDOWN_TILES={0}, TEX_FLORA_ATLAS={0}, TEX_CLIFF_ATLAS={0}, TEX_STRUCTURE_ATLAS={0}, TEX_ORIGINAL_PROPS={0};
+static Texture2D TEX_ISO_TILES={0}, TEX_HERO_WALK={0}, TEX_ENV_PROPS={0}, TEX_LEAFLING={0}, TEX_GROVE_MOTE={0}, TEX_AREA_PROPS={0}, TEX_TOPDOWN_TILES={0}, TEX_FLORA_ATLAS={0}, TEX_CLIFF_ATLAS={0}, TEX_STRUCTURE_ATLAS={0}, TEX_ORIGINAL_PROPS={0}, TEX_KENNEY_BUILDINGS={0};
 static void DrawPortrait(Texture2D tex, Vector2 p, float w, float h, float bob) {
     if (tex.id == 0) return;
     Rectangle src={0,0,(float)tex.width,(float)tex.height};
@@ -94,6 +94,12 @@ static void DrawFloraProp(int index,Vector2 p,float w,float h) { DrawAtlasSprite
 static void DrawCliffProp(int index,Vector2 p,float w,float h) { DrawAtlasSprite(TEX_CLIFF_ATLAS,index,8,128,p,w,h); }
 static void DrawStructureProp(int index,Vector2 p,float w,float h) { DrawAtlasSprite(TEX_STRUCTURE_ATLAS,index,8,128,p,w,h); }
 static void DrawOriginalProp(int index,Vector2 p,float w,float h) { DrawAtlasSprite(TEX_ORIGINAL_PROPS,index,4,32,p,w,h); }
+static void DrawKenneyBuilding(int index,Vector2 p,float scale) {
+    if(!TEX_KENNEY_BUILDINGS.id)return;
+    Rectangle src={(float)((index%2)*192),(float)((index/2)*192),192,192};
+    Rectangle dst={p.x-84*scale,p.y-166*scale,168*scale,168*scale};
+    DrawTexturePro(TEX_KENNEY_BUILDINGS,src,dst,(Vector2){0,0},0,WHITE);
+}
 static void DrawAreaProp(int index,Vector2 p,float w,float h) {
     if(!TEX_AREA_PROPS.id)return;
     Rectangle src={(float)(index*96),0,96,96};
@@ -438,7 +444,8 @@ static void RenderWorld(Game *g) {
     }
     // Hand-authored scene dressing: curated 32px original sprite atlas plus existing refined tiles.
     if(g->area==AREA_CAMP) {
-        PushRenderItem(items,&count,RENDER_PROP,412,(Vector2){4.5f,4.2f},1.35f); // cottage
+        PushRenderItem(items,&count,RENDER_PROP,500,(Vector2){4.5f,4.2f},1.0f); // Kenney blue cottage
+        PushRenderItem(items,&count,RENDER_PROP,501,(Vector2){14.0f,5.0f},.95f); // Kenney red cottage
         PushRenderItem(items,&count,RENDER_PROP,413,(Vector2){8.0f,6.5f},1.10f); // tent
         PushRenderItem(items,&count,RENDER_PROP,400,(Vector2){2.0f,14.0f},1.15f); // dock
         PushRenderItem(items,&count,RENDER_PROP,403,(Vector2){2.2f,11.8f},.75f); // buoy
@@ -454,7 +461,7 @@ static void RenderWorld(Game *g) {
         for(int i=0;i<4;i++)PushRenderItem(items,&count,RENDER_PROP,108+(i%3),(Vector2){7.0f+i*3.0f,3.0f+(i%2)*1.0f},.8f);
         PushRenderItem(items,&count,RENDER_PROP,415,(Vector2){2.0f,9.0f},.75f);
     } else if(g->area==AREA_RUINS) {
-        PushRenderItem(items,&count,RENDER_PROP,408,(Vector2){15.0f,5.5f},1.25f);
+        PushRenderItem(items,&count,RENDER_PROP,502,(Vector2){15.0f,5.5f},1.0f);
         PushRenderItem(items,&count,RENDER_PROP,409,(Vector2){6.0f,5.0f},.9f);
         PushRenderItem(items,&count,RENDER_PROP,409,(Vector2){18.0f,12.5f},.9f);
         PushRenderItem(items,&count,RENDER_PROP,410,(Vector2){10.0f,12.0f},1.05f);
@@ -463,7 +470,7 @@ static void RenderWorld(Game *g) {
     } else {
         PushRenderItem(items,&count,RENDER_PROP,414,(Vector2){17.0f,4.5f},1.35f);
         PushRenderItem(items,&count,RENDER_PROP,411,(Vector2){10.0f,6.5f},.9f);
-        PushRenderItem(items,&count,RENDER_PROP,415,(Vector2){5.0f,13.0f},.9f);
+        PushRenderItem(items,&count,RENDER_PROP,503,(Vector2){5.0f,13.0f},1.0f);
         PushRenderItem(items,&count,RENDER_PROP,415,(Vector2){15.0f,13.0f},.9f);
         PushRenderItem(items,&count,RENDER_PROP,404,(Vector2){7.0f,5.0f},.75f);
     }
@@ -515,6 +522,7 @@ static void RenderWorld(Game *g) {
                 else if(it->index>=200&&it->index<300)DrawCliffProp(it->index-200,p,112*it->scale,112*it->scale);
                 else if(it->index>=300&&it->index<400)DrawStructureProp(it->index-300,p,150*it->scale,140*it->scale);
                 else if(it->index>=400&&it->index<416)DrawOriginalProp(it->index-400,p,92*it->scale,92*it->scale);
+                else if(it->index>=500&&it->index<504)DrawKenneyBuilding(it->index-500,p,it->scale);
                 break;
             case RENDER_FIRE: DrawCampfire(p,g->time); break;
             case RENDER_PICKUP: DrawPickup(&g->world.pickups[it->index]); break;
@@ -729,12 +737,13 @@ void RenderInit(void) {
         "assets/environment/cliffs_fences_atlas_128.png",
         "assets/environment/structures_atlas_128.png",
         "assets/environment/original_props_16_v1.png",
+        "assets/environment/kenney_buildings_atlas.png",
         "assets/characters/png/camp_keeper.png",
         "assets/tiles/png/island_iso_tiles.png",
         "assets/tiles/png/environment_props.png"
     };
-    Texture2D *targets[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
-    for(int i=0;i<16;i++) {
+    Texture2D *targets[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
+    for(int i=17;i>0;i--) {
         if(FileExists(paths[i])) {
             *targets[i]=LoadTexture(paths[i]);
             if(targets[i]->id)SetTextureFilter(*targets[i],TEXTURE_FILTER_POINT);
@@ -743,8 +752,8 @@ void RenderInit(void) {
 }
 void RenderClose(void) {
     UnloadUIFont();
-    Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
-    for(int i=0;i<16;i++)if(textures[i]->id)UnloadTexture(*textures[i]);
+    Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
+    for(int i=0;i<17;i++)if(textures[i]->id)UnloadTexture(*textures[i]);
 }
 void GameRender(Game *g) {
     if(g->scene==SCENE_TITLE)RenderTitle(g);
