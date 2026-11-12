@@ -18,6 +18,7 @@ jobs:
           python tools/generate_pixel_assets.py
           python tools/preview_kenney_pack.py
           python tools/build_kenney_runtime_atlas.py
+          if (Test-Path third_party/kenney/rpg-base/KenneyRPGpack.zip) { python tools/preview_cc0_packs.py }
           python tools/validate_project.py
       - name: Configure
         run: cmake -S . -B build -A x64
