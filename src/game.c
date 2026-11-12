@@ -339,7 +339,7 @@ void GameUpdate(Game *g,float dt) {
         if(g->area==AREA_CAMP) {
             if(Dist(p->pos,g->world.groveGate)<1.4f){SwitchArea(g,AREA_GROVE);GameSave(g);Toast(g,"进入辉光林地");return;}
             if(Dist(p->pos,g->world.ruinGate)<1.4f){
-                if(!(g->lumi.owned&&g->splash.owned&&g->spark.owned)){Toast(g,"找到三位伙伴后，遗迹道路才会开启。");return;}
+                if(!(g->lumi.owned&&g->splash.owned)){Toast(g,"先让苔灯灵和沫尾兽加入队伍，便可进入遗迹寻找鸣晶蜥。");return;}
                 SwitchArea(g,AREA_RUINS);GameSave(g);Toast(g,"进入潮汐遗迹");return;
             }
             if(Dist(p->pos,g->world.shrine)<1.4f){
