@@ -63,8 +63,27 @@ if errorlevel 1 python -m pip install pillow
 if errorlevel 1 goto failed
 
 echo.
+echo Downloading additional CC0 Kenney packs (RPG Base + Pixel UI)...
+if not exist "third_party\kenney\rpg-base" mkdir "third_party\kenney\rpg-base"
+if not exist "third_party\kenney\pixel-ui" mkdir "third_party\kenney\pixel-ui"
+if not exist "third_party\kenney\rpg-base\KenneyRPGpack.zip" (
+  powershell -NoProfile -ExecutionPolicy Bypass -Command "Invoke-WebRequest -UseBasicParsing 'https://opengameart.org/sites/default/files/KenneyRPGpack.zip' -OutFile 'third_party\kenney\rpg-base\KenneyRPGpack.zip'"
+  if errorlevel 1 goto failed
+)
+if not exist "third_party\kenney\pixel-ui\PixelUIpack.zip" (
+  powershell -NoProfile -ExecutionPolicy Bypass -Command "Invoke-WebRequest -UseBasicParsing 'https://opengameart.org/sites/default/files/PixelUIpack.zip' -OutFile 'third_party\kenney\pixel-ui\PixelUIpack.zip'"
+  if errorlevel 1 goto failed
+)
+echo Kenney RPG Base and Pixel UI packs downloaded.
+
+echo.
 echo Generating Kenney runtime building atlas...
 python tools\build_kenney_runtime_atlas.py
+if errorlevel 1 goto failed
+
+echo.
+echo Building visual review sheets for CC0 packs...
+python tools\preview_cc0_packs.py
 if errorlevel 1 goto failed
 
 echo.
@@ -81,7 +100,7 @@ if errorlevel 1 goto failed
 
 echo.
 echo Staging the complete assets folder...
-git add assets/
+git add assets/ third_party/kenney/rpg-base/ third_party/kenney/pixel-ui/
 git diff --cached --stat
 git diff --cached --quiet
 if not errorlevel 1 (
@@ -97,7 +116,7 @@ if "%GIT_AUTHOR_EMAIL%"=="" (
 )
 if "%GIT_AUTHOR_NAME%"=="" set /p GIT_AUTHOR_NAME=Enter your Git commit name:
 if "%GIT_AUTHOR_EMAIL%"=="" set /p GIT_AUTHOR_EMAIL=Enter your Git commit email:
-git -c user.name="%GIT_AUTHOR_NAME%" -c user.email="%GIT_AUTHOR_EMAIL%" commit -m "Import complete Mist Isle v6 art assets"
+git -c user.name="%GIT_AUTHOR_NAME%" -c user.email="%GIT_AUTHOR_EMAIL%" commit -m "Import Mist Isle v6 art and Kenney CC0 RPG/UI packs"
 if errorlevel 1 goto failed
 
 echo.
