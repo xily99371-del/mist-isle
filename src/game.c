@@ -76,6 +76,56 @@ static void BuildWorld(World *w,int seed) {
     AddPickup(w,3,9,3); AddPickup(w,3,11,7); AddPickup(w,0,12,5);
     AddPickup(w,0,7,6); AddPickup(w,1,13,6);
 }
+
+static void SwitchArea(Game *g,Area area);
+static void BuildAreaWorld(Game *g,Area area) {
+    BuildWorld(&g->world,g->lastSeed+(int)area*7919);
+    g->area=area;
+    World *w=&g->world;
+    for(int y=0;y<MAPH;y++)for(int x=0;x<MAPW;x++) {
+        int edge=(x==0||y==0||x==MAPW-1||y==MAPH-1);
+        unsigned h=(unsigned)(x*92837111u+y*689287499u+(unsigned)g->lastSeed*283923481u+(unsigned)area*811u);
+        h^=h>>13;h*=1274126177u;h^=h>>16;
+        w->kind[y][x]=edge?3:0;
+        if(!edge && h%100<(area==AREA_GROVE?15:area==AREA_RUINS?8:6))w->kind[y][x]=1;
+    }
+    // A broad, guaranteed walkable route and a central open area.
+    for(int x=1;x<21;x++){w->kind[9][x]=0;w->kind[10][x]=0;}
+    for(int y=3;y<15;y++){w->kind[y][3]=0;w->kind[y][4]=0;}
+    for(int y=5;y<14;y++)for(int x=7;x<17;x++)if((x+y)%4!=0)w->kind[y][x]=0;
+    w->pickupCount=0;
+    if(area==AREA_CAMP) {
+        w->camp=(Vector2){3,12};w->groveGate=(Vector2){18,4};w->ruinGate=(Vector2){18,9};w->shrine=(Vector2){18,14};w->bossPos=(Vector2){18,14};
+        for(int y=1;y<17;y++)for(int x=1;x<5;x++)if(y<7||y>14)w->kind[y][x]=2;
+        for(int i=0;i<5;i++)AddPickup(w,0,7+i*2,7+(i%2)*4);
+        AddPickup(w,1,15,6);AddPickup(w,2,15,12);
+    } else if(area==AREA_GROVE) {
+        w->camp=(Vector2){2,9};w->groveGate=(Vector2){2,9};w->ruinGate=(Vector2){19,9};w->shrine=(Vector2){17,5};w->bossPos=(Vector2){17,13};
+        for(int y=3;y<15;y++)for(int x=9;x<12;x++)w->kind[y][x]=2;
+        for(int x=8;x<14;x++)w->kind[8][x]=0;
+        AddPickup(w,0,6,5);AddPickup(w,3,8,12);AddPickup(w,0,14,5);AddPickup(w,1,16,11);AddPickup(w,2,17,13);
+    } else if(area==AREA_RUINS) {
+        w->camp=(Vector2){2,9};w->groveGate=(Vector2){2,9};w->ruinGate=(Vector2){2,9};w->shrine=(Vector2){17,7};w->bossPos=(Vector2){18,13};
+        for(int y=2;y<16;y++)for(int x=2;x<20;x++)if((x+y)%3==0)w->kind[y][x]=2;
+        for(int x=2;x<20;x++)w->kind[9][x]=0;
+        AddPickup(w,1,7,6);AddPickup(w,1,11,12);AddPickup(w,2,15,5);AddPickup(w,2,18,11);
+    } else {
+        w->camp=(Vector2){2,9};w->groveGate=(Vector2){2,9};w->ruinGate=(Vector2){2,9};w->shrine=(Vector2){17,7};w->bossPos=(Vector2){18,13};
+        for(int y=3;y<15;y++)for(int x=3;x<19;x++)if(x<6||x>15||y<5||y>13)w->kind[y][x]=2;
+        for(int x=2;x<20;x++)w->kind[9][x]=0;
+        AddPickup(w,0,6,5);AddPickup(w,1,12,12);AddPickup(w,2,17,5);
+    }
+}
+static void SwitchArea(Game *g,Area area) {
+    BuildAreaWorld(g,area);
+    g->player.pos=(area==AREA_CAMP)?(Vector2){16,9}:(Vector2){3,9};
+    g->enemyCount=0;
+    g->lumi.pos=Vector2Add(g->player.pos,(Vector2){-1,.5f});
+    g->splash.pos=Vector2Add(g->player.pos,(Vector2){-1,1});
+    g->spark.pos=Vector2Add(g->player.pos,(Vector2){0,1});
+    g->transition=.35f;
+}
+
 static bool Solid(Game *g,Vector2 p) {
     int x=(int)floorf(p.x+0.5f),y=(int)floorf(p.y+0.5f);
     if(x<1||y<1||x>=MAPW-1||y>=MAPH-1)return true;
@@ -105,6 +155,7 @@ bool GameLoad(Game *g) {
     SaveData s; memcpy(&s,raw,sizeof(s)); UnloadFileData(raw);
     if(s.magic!=0x4D495354 || s.version!=3){Toast(g,"存档版本不兼容。");return false;}
     GameReset(g,s.seed);
+    SwitchArea(g,(Area)Clamp(s.area,AREA_CAMP,AREA_LIGHTHOUSE));
     g->scene=SCENE_PLAY; g->player.pos=(Vector2){s.px,s.py};g->player.hp=fmaxf(1.0f,fminf(100.0f,s.hp));
     g->player.berries=s.berries;g->player.shells=s.shells;g->player.crystals=s.crystals;
     g->lumi.owned=s.lumi!=0;g->splash.owned=s.splash!=0;g->spark.owned=s.spark!=0;g->selectedBuddy=s.selected;
@@ -129,7 +180,7 @@ void GameReset(Game *g,int seed) {
     g->fireflyDiscovered=false; g->leaflingFed=false; g->groveMoteDefeated=false; g->enemySoaked=false; g->battleRound=0; g->defeatedGuards=0;
 }
 void GameStart(Game *g) {
-    g->scene=SCENE_PLAY; g->area=AREA_CAMP; g->player.pos=g->world.camp;
+    g->scene=SCENE_PLAY; SwitchArea(g,AREA_CAMP); g->player.pos=g->world.camp;
     SetDialogueAs(g,"旅人手记","你在海岸边醒来，远处的灯塔已经熄灭。",
         "一只小小的苔灯灵躲在营火旁。它似乎受了伤。",
         "靠近它，按 E 互动。WASD 移动，SHIFT 冲刺。");
