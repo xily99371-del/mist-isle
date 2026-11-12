@@ -247,11 +247,96 @@ static void DrawGecko(Vector2 p,float t) {
         DrawCircleV((Vector2){p.x+4,p.y-11},2,(Color){50,60,88,255});
     }
 }
+static void DrawCloudPuff(float x,float y,float s,Color color) {
+    DrawCircle((int)(x-18*s),(int)y,(int)(18*s),color);
+    DrawCircle((int)x,(int)(y-7*s),(int)(23*s),color);
+    DrawCircle((int)(x+22*s),(int)y,(int)(17*s),color);
+    DrawRectangle((int)(x-18*s),(int)(y-2*s),(int)(40*s),(int)(15*s),color);
+}
+static void DrawSeaBackdrop(float t) {
+    Color top=(Color){177,220,214,255},bottom=(Color){94,174,184,255};
+    DrawRectangleGradientV(0,0,SW,SH,top,bottom);
+    // Distant headlands create a horizon instead of a blank cyan field.
+    DrawCircle(80,185,145,(Color){104,157,145,255});
+    DrawCircle(190,205,112,(Color){123,174,153,255});
+    DrawCircle(1135,185,150,(Color){101,153,146,255});
+    DrawCircle(1040,205,105,(Color){128,177,155,255});
+    DrawRectangle(0,205,SW,65,(Color){126,184,168,255});
+    DrawCloudPuff(275,104,1.0f,(Color){236,242,216,190});
+    DrawCloudPuff(880,130,.78f,(Color){239,244,221,170});
+    for(int row=0;row<9;row++) {
+        float y=295+row*52.0f;
+        for(int x=-30;x<SW+50;x+=118) {
+            float phase=t*.22f+row*.8f+x*.012f;
+            float yy=y+sinf(phase)*5.0f;
+            DrawLineEx((Vector2){(float)x,yy},(Vector2){x+43.0f,yy-2.0f},2.0f,Fade((Color){224,242,218,255},.25f));
+            DrawLineEx((Vector2){x+49.0f,yy+5.0f},(Vector2){x+88.0f,yy+3.0f},1.5f,Fade((Color){65,139,153,255},.22f));
+        }
+    }
+    // A few distant sail silhouettes add scale to the island.
+    DrawTriangle((Vector2){1000,285},(Vector2){1000,220},(Vector2){1040,285},(Color){242,231,194,180});
+    DrawLineEx((Vector2){1000,215},(Vector2){1000,294},2,(Color){76,116,112,190});
+    DrawTriangle((Vector2){215,320},(Vector2){215,270},(Vector2){246,320},(Color){242,231,194,150});
+    DrawLineEx((Vector2){215,266},(Vector2){215,325},2,(Color){76,116,112,170});
+}
+static void DrawForestBackdrop(float t) {
+    DrawRectangleGradientV(0,0,SW,SH,(Color){196,220,174,255},(Color){104,151,111,255});
+    // Layered canopy silhouettes frame the playfield on all four sides.
+    for(int layer=0;layer<3;layer++) {
+        int y=95+layer*64;
+        Color leaf=layer==0?(Color){103,150,105,210}:layer==1?(Color){79,132,91,205}:(Color){65,116,82,190};
+        for(int x=-35;x<SW+60;x+=105) {
+            float sway=sinf(t*.35f+x*.02f+layer)*5;
+            DrawCircle((int)(x+sway),y,(int)(58-layer*7),leaf);
+            DrawCircle((int)(x+38+sway),y+22,(int)(43-layer*5),Fade(leaf,.9f));
+        }
+    }
+    DrawCloudPuff(250,165,.65f,(Color){235,240,204,90});
+    DrawCloudPuff(990,125,.55f,(Color){235,240,204,75});
+    for(int i=0;i<24;i++) {
+        float x=(float)((i*197)%SW), y=(float)(220+(i*83)%440);
+        DrawCircle((int)x,(int)y,2.0f+(i%3),Fade((Color){238,237,156,255},.25f));
+    }
+}
+static void DrawRuinsBackdrop(float t) {
+    DrawRectangleGradientV(0,0,SW,SH,(Color){179,191,180,255},(Color){91,111,112,255});
+    DrawCircle(1030,125,78,Fade((Color){246,224,168,255},.45f));
+    // Broken walls and distant pillars behind the playable island.
+    for(int i=0;i<9;i++) {
+        int x=i*165-30, base=300+(i%3)*22, w=78+(i%2)*24;
+        DrawRectangle(x,base-120-(i%3)*25,w,145,(Color){91,119,112,170});
+        DrawRectangle(x-12,base-128-(i%3)*25,w+24,12,(Color){116,139,124,180});
+        DrawRectangle(x+12,base-100,w-24,22,(Color){179,189,164,120});
+    }
+    for(int i=0;i<18;i++) {
+        int x=(i*137)%SW,y=340+(i*71)%350;
+        DrawCircle(x,y,2+(i%3),Fade((Color){215,215,173,255},.2f));
+    }
+}
+static void DrawLighthouseBackdrop(float t) {
+    DrawRectangleGradientV(0,0,SW,SH,(Color){164,199,203,255},(Color){91,139,157,255});
+    DrawCircle(1000,125,92,Fade((Color){255,224,157,255},.45f));
+    DrawCircle(1000,125,58,Fade((Color){255,238,193,255},.38f));
+    // Distant sea bands and a warm lighthouse beam across the sky.
+    for(int i=0;i<8;i++) {
+        int y=300+i*55;
+        DrawLineEx((Vector2){0,(float)y+sinf(t*.2f+i)*4},(Vector2){(float)SW,(float)y+sinf(t*.2f+i)*4},2,Fade((Color){220,237,214,255},.2f));
+    }
+    DrawTriangle((Vector2){1000,125},(Vector2){SW,40},(Vector2){SW,230},Fade((Color){255,232,176,255},.12f));
+    DrawCloudPuff(220,130,.7f,(Color){237,241,216,130});
+    DrawCloudPuff(760,190,.55f,(Color){237,241,216,95});
+}
+static void DrawWorldBackdrop(Game *g) {
+    switch(g->area) {
+        case AREA_CAMP: DrawSeaBackdrop(g->time); break;
+        case AREA_GROVE: DrawForestBackdrop(g->time); break;
+        case AREA_RUINS: DrawRuinsBackdrop(g->time); break;
+        default: DrawLighthouseBackdrop(g->time); break;
+    }
+}
+
 static void RenderWorld(Game *g) {
-    Color backdrop=g->area==AREA_CAMP?(Color){113,183,196,255}:g->area==AREA_GROVE?(Color){92,142,112,255}:g->area==AREA_RUINS?(Color){93,111,119,255}:(Color){104,143,166,255};
-    ClearBackground(backdrop);
-    // Fill the margins with a subtle area-colored atmosphere instead of a flat empty void.
-    DrawRectangleGradientV(0,0,SW,SH,Fade(WHITE,.16f),Fade(backdrop,.10f));
+    DrawWorldBackdrop(g);
     BeginMode2D(g->cam);
 
     // Dedicated ground palette and walkable layout for each independent sub-map.
