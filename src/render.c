@@ -37,7 +37,7 @@ static void DrawUIText(const char *text,int x,int y,int size,Color tint) {
 
 static Texture2D TEX_HERO={0}, TEX_LUMI={0}, TEX_MOATAIL={0}, TEX_GECKO={0}, TEX_KEEPER={0};
 static Texture2D TEX_HERO_PIXEL={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, TEX_GECKO_PIXEL={0}, TEX_TILES={0}, TEX_PROPS={0};
-static Texture2D TEX_ISO_TILES={0}, TEX_HERO_WALK={0}, TEX_ENV_PROPS={0}, TEX_LEAFLING={0}, TEX_GROVE_MOTE={0}, TEX_AREA_PROPS={0}, TEX_TOPDOWN_TILES={0};
+static Texture2D TEX_ISO_TILES={0}, TEX_HERO_WALK={0}, TEX_ENV_PROPS={0}, TEX_LEAFLING={0}, TEX_GROVE_MOTE={0}, TEX_AREA_PROPS={0}, TEX_TOPDOWN_TILES={0}, TEX_FLORA_ATLAS={0}, TEX_CLIFF_ATLAS={0}, TEX_STRUCTURE_ATLAS={0};
 static void DrawPortrait(Texture2D tex, Vector2 p, float w, float h, float bob) {
     if (tex.id == 0) return;
     Rectangle src={0,0,(float)tex.width,(float)tex.height};
@@ -84,6 +84,15 @@ static void DrawTopDownTile(int x,int y,Area area,int kind,float time) {
         if((hash%7)==0){DrawCircle((int)(tile.x+17),(int)(tile.y+18),2,(Color){247,230,173,255});DrawPixel((int)(tile.x+20),(int)(tile.y+15),WHITE);}
     }
 }
+static void DrawAtlasSprite(Texture2D tex,int index,int columns,int cell,Vector2 p,float w,float h) {
+    if(!tex.id)return;
+    Rectangle src={(float)((index%columns)*cell),(float)((index/columns)*cell),(float)cell,(float)cell};
+    Rectangle dst={p.x-w*.5f,p.y-h,w,h};
+    DrawTexturePro(tex,src,dst,(Vector2){0,0},0,WHITE);
+}
+static void DrawFloraProp(int index,Vector2 p,float w,float h) { DrawAtlasSprite(TEX_FLORA_ATLAS,index,8,128,p,w,h); }
+static void DrawCliffProp(int index,Vector2 p,float w,float h) { DrawAtlasSprite(TEX_CLIFF_ATLAS,index,8,128,p,w,h); }
+static void DrawStructureProp(int index,Vector2 p,float w,float h) { DrawAtlasSprite(TEX_STRUCTURE_ATLAS,index,8,128,p,w,h); }
 static void DrawAreaProp(int index,Vector2 p,float w,float h) {
     if(!TEX_AREA_PROPS.id)return;
     Rectangle src={(float)(index*96),0,96,96};
@@ -493,7 +502,7 @@ static void RenderWorld(Game *g) {
     for(int i=0;i<count;i++) {
         RenderItem *it=&items[i]; Vector2 p=WorldToScreen(it->grid.x,it->grid.y);
         switch(it->kind) {
-            case RENDER_TREE: p.y+=9.0f; if(g->area==AREA_RUINS)DrawEnvProp(5,p,48*it->scale,62*it->scale); else DrawTree(p,it->scale,g->time); break;
+            case RENDER_TREE: p.y+=8.0f; DrawFloraProp(8+(it->index%3),p,100*it->scale,112*it->scale); break;
             case RENDER_PROP:
                 p.y+=7.0f;
                 if(it->index==4)DrawProp(4,p,72,68);
@@ -511,6 +520,9 @@ static void RenderWorld(Game *g) {
                 else if(it->index==17)DrawEnvProp(11,p,68*it->scale,38*it->scale);
                 else if(it->index==18)DrawEnvProp(8,p,38*it->scale,46*it->scale);
                 else if(it->index>=20&&it->index<=35)DrawAreaProp(it->index-20,p,76*it->scale,82*it->scale);
+                else if(it->index>=100&&it->index<200)DrawFloraProp(it->index-100,p,100*it->scale,108*it->scale);
+                else if(it->index>=200&&it->index<300)DrawCliffProp(it->index-200,p,112*it->scale,112*it->scale);
+                else if(it->index>=300&&it->index<400)DrawStructureProp(it->index-300,p,150*it->scale,140*it->scale);
                 break;
             case RENDER_FIRE: DrawCampfire(p,g->time); break;
             case RENDER_PICKUP: DrawPickup(&g->world.pickups[it->index]); break;
@@ -721,12 +733,15 @@ void RenderInit(void) {
         "assets/environment/environment_props_96.png",
         "assets/environment/area_props_96.png",
         "assets/environment/topdown_terrain_atlas_v1.png",
+        "assets/environment/flora_props_atlas_128.png",
+        "assets/environment/cliffs_fences_atlas_128.png",
+        "assets/environment/structures_atlas_128.png",
         "assets/characters/png/camp_keeper.png",
         "assets/tiles/png/island_iso_tiles.png",
         "assets/tiles/png/environment_props.png"
     };
-    Texture2D *targets[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
-    for(int i=0;i<12;i++) {
+    Texture2D *targets[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
+    for(int i=0;i<15;i++) {
         if(FileExists(paths[i])) {
             *targets[i]=LoadTexture(paths[i]);
             if(targets[i]->id)SetTextureFilter(*targets[i],TEXTURE_FILTER_POINT);
@@ -735,8 +750,8 @@ void RenderInit(void) {
 }
 void RenderClose(void) {
     UnloadUIFont();
-    Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
-    for(int i=0;i<12;i++)if(textures[i]->id)UnloadTexture(*textures[i]);
+    Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
+    for(int i=0;i<15;i++)if(textures[i]->id)UnloadTexture(*textures[i]);
 }
 void GameRender(Game *g) {
     if(g->scene==SCENE_TITLE)RenderTitle(g);
