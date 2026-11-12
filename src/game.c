@@ -279,11 +279,7 @@ void GameUpdate(Game *g,float dt) {
     }
 
     Player *p=&g->player;
-    // Region identity follows the connected island's actual walkable coordinates.
-    if(p->pos.x<7.5f && p->pos.y>=9.0f)g->area=AREA_CAMP;
-    else if(p->pos.x<14.0f && p->pos.y<9.5f)g->area=AREA_GROVE;
-    else if(p->pos.x>=14.0f && p->pos.y<10.5f)g->area=AREA_RUINS;
-    else g->area=AREA_LIGHTHOUSE;
+    // Area identity is controlled by explicit entrance/exit gates.
     if(IsKeyPressed(KEY_J)){g->journalOpen=true;return;}
     if(IsKeyPressed(KEY_I)){g->inventoryOpen=true;return;}
     if(IsKeyPressed(KEY_M)){g->mapOpen=true;return;}
@@ -328,8 +324,23 @@ void GameUpdate(Game *g,float dt) {
         Toast(g,TextFormat("当前伙伴：%s",names[g->selectedBuddy]));
     }
     if(IsKeyPressed(KEY_E)) {
+        if(g->area==AREA_CAMP) {
+            if(Dist(p->pos,g->world.groveGate)<1.4f){SwitchArea(g,AREA_GROVE);Toast(g,"进入辉光林地");return;}
+            if(Dist(p->pos,g->world.ruinGate)<1.4f){
+                if(!(g->lumi.owned&&g->splash.owned&&g->spark.owned)){Toast(g,"找到三位伙伴后，遗迹道路才会开启。");return;}
+                SwitchArea(g,AREA_RUINS);Toast(g,"进入潮汐遗迹");return;
+            }
+            if(Dist(p->pos,g->world.shrine)<1.4f){
+                if(!g->shrineSolved){Toast(g,"灯塔庭院仍被古老封印阻挡。");return;}
+                SwitchArea(g,AREA_LIGHTHOUSE);Toast(g,"进入灯塔庭院");return;
+            }
+        } else if(Dist(p->pos,(Vector2){2,9})<1.6f) {
+            SwitchArea(g,AREA_CAMP);Toast(g,"返回海岸营地");return;
+        }
+    }
+    if(IsKeyPressed(KEY_E)) {
         // Rescue Moss Lumi at the camp.
-        if(!g->lumi.owned&&Dist(p->pos,(Vector2){4,12})<1.5f) {
+        if(g->area==AREA_CAMP&&!g->lumi.owned&&Dist(p->pos,(Vector2){4,12})<1.5f) {
             AddBuddyFriend(g,0);
             GameSave(g);
             SetDialogue(g,"苔灯灵抬起头，灯囊重新亮了起来。",
@@ -354,14 +365,14 @@ void GameUpdate(Game *g,float dt) {
         }
         // A shy forest firefly can be registered in the field journal.
         Vector2 fireflyPos={10.6f+sinf(g->fireflyPhase*0.8f)*0.22f,6.2f+cosf(g->fireflyPhase*0.65f)*0.18f};
-        if(!g->fireflyDiscovered && Dist(p->pos,fireflyPos)<1.35f) {
+        if(g->area==AREA_GROVE&&!g->fireflyDiscovered && Dist(p->pos,fireflyPos)<1.35f) {
             g->fireflyDiscovered=true;
             Burst(g,WorldScreen(fireflyPos),C_GOLD,22);
             SetDialogueAs(g,"萤芽","一只小小的萤芽停在叶片上，胸口的光一闪一闪。","它没有跟你走，只是把这片林地的秘密记在了旅人手记里。","按 J 打开手记，可以查看发现与当前目标。");
             return;
         }
         // A hungry leafling accepts a berry and reveals a hidden grove cache.
-        if(!g->leaflingFed && Dist(p->pos,(Vector2){12.4f,8.0f})<1.4f) {
+        if(g->area==AREA_GROVE&&!g->leaflingFed && Dist(p->pos,(Vector2){12.4f,8.0f})<1.4f) {
             if(p->berries>0) {
                 p->berries--; g->leaflingFed=true;
                 AddPickup(&g->world,2,13.2f,8.6f);
@@ -371,32 +382,32 @@ void GameUpdate(Game *g,float dt) {
             return;
         }
         // A small wild mote guards the old grove path. Win once to clear the route.
-        if(!g->groveMoteDefeated && Dist(p->pos,(Vector2){13.2f,9.2f})<1.45f) {
+        if(g->area==AREA_GROVE&&!g->groveMoteDefeated && Dist(p->pos,(Vector2){13.2f,9.2f})<1.45f) {
             AddEnemy(g,ENEMY_MOTE,13.2f,9.2f,34.0f);
             EnterBattle(g,g->enemyCount-1);
             return;
         }
         // Water companion encounter.
-        if(!g->splash.owned&&Dist(p->pos,(Vector2){9,5})<1.6f) {
+        if(g->area==AREA_GROVE&&!g->splash.owned&&Dist(p->pos,(Vector2){9,5})<1.6f) {
             if(p->berries>=1){p->berries--;AddBuddyFriend(g,1);GameSave(g);SetDialogue(g,"沫尾兽被果实吸引，开心地绕着你转了一圈。","它可以喷水清理蒸汽，也能让遗迹机关显形。","按 TAB 切换伙伴。");}
             else Toast(g,"沫尾兽想吃一颗岛屿果实。");
             return;
         }
         // Crystal companion encounter.
-        if(!g->spark.owned&&Dist(p->pos,(Vector2){15,7})<1.6f) {
+        if(g->area==AREA_RUINS&&!g->spark.owned&&Dist(p->pos,(Vector2){15,7})<1.6f) {
             if(p->crystals>=1){p->crystals--;AddBuddyFriend(g,2);GameSave(g);SetDialogue(g,"鸣晶蜥吸收了星晶，背上的宝石依次亮起。","它能为古代装置供能，也能在战斗中放电。","按 TAB 切换伙伴。");}
             else Toast(g,"鸣晶蜥需要一枚星晶才愿意同行。");
             return;
         }
         // Rest beside the campfire after rescuing the first companion.
-        if(g->lumi.owned && Dist(p->pos,(Vector2){4.1f,12.5f})<1.25f) {
+        if(g->area==AREA_CAMP&&g->lumi.owned && Dist(p->pos,(Vector2){4.1f,12.5f})<1.25f) {
             p->hp=fminf(p->maxHp,p->hp+22.0f);
             Toast(g,"在营火旁休息了一会儿，恢复了生命。");
             Burst(g,WorldScreen((Vector2){4.1f,12.5f}),C_GOLD,10);
             return;
         }
         // Ruin puzzle.
-        if(Dist(p->pos,g->world.shrine)<1.7f&&!g->shrineSolved) {
+        if(g->area==AREA_RUINS&&Dist(p->pos,g->world.shrine)<1.7f&&!g->shrineSolved) {
             if(g->lumi.owned&&g->splash.owned&&g->spark.owned&&p->shells>=1) {
                 g->shrineSolved=true;p->shells--;GameSave(g);
                 Burst(g,WorldScreen(g->world.shrine),C_GOLD,40);
@@ -405,11 +416,11 @@ void GameUpdate(Game *g,float dt) {
             return;
         }
         // Final encounter trigger.
-        if(g->shrineSolved&&Dist(p->pos,g->world.bossPos)<2.0f&&!g->bossDefeated) {
+        if(g->area==AREA_LIGHTHOUSE&&g->shrineSolved&&Dist(p->pos,g->world.bossPos)<2.0f&&!g->bossDefeated) {
             AddEnemy(g,ENEMY_BOSS,18,13,90);EnterBattle(g,g->enemyCount-1);return;
         }
         // NPC at camp.
-        if(Dist(p->pos,(Vector2){3,10})<1.6f) {
+        if(g->area==AREA_CAMP&&Dist(p->pos,(Vector2){3,10})<1.6f) {
             SetDialogueAs(g,"守望者","灯塔熄灭后，岛上的小生灵都变得不安。","找到三位伙伴，唤醒潮汐遗迹，灯塔就能重新点亮。","果实、贝壳和星晶散落在岛上，按 E 采集。");
             return;
         }
