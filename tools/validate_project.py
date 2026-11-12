@@ -76,8 +76,8 @@ else:
 require("build_kenney_runtime_atlas.py" in RENDER or (ROOT / "tools/build_kenney_runtime_atlas.py").exists(), "Kenney runtime atlas generator is included")
 require("static Vector2 WorldScreen(Vector2 p)" in GAME and "TILE_SIZE" in HEADER, "gameplay and rendering share top-down world coordinates")
 require("grid.y+" in RENDER and "RENDER_PLAYER" in RENDER, "actor sorting uses top-down ground-contact depth")
-require("g->cam.zoom=1.0f" in GAME and "UpdateCamera(g,dt)" in GAME and "deadY=96.0f" in GAME,
-        "camera uses map bounds, a dead zone and smoothed follow")
+require("g->cam.zoom=1.0f" in GAME and "UpdateCamera(g,dt)" in GAME and "MoveTowardsConstant" in GAME,
+        "camera uses map bounds and direct constant-speed follow")
 require("RenderItem items[192]" in RENDER and "*count>=192" in RENDER, "render queue has capacity for top-down forest canopy, props and actors")
 require("world.kind[y][x]==1" in RENDER and "RENDER_TREE" in RENDER,
         "visible forest trees are placed from the collision grid")
