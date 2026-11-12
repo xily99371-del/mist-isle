@@ -83,7 +83,7 @@ static void AddPickup(World *w,int kind,float x,float y) {
 }
 static void SetSolidRect(World *w,int x0,int y0,int x1,int y1) {
     for(int y=y0;y<=y1;y++)for(int x=x0;x<=x1;x++) {
-        if(x>0&&y>0&&x<MAPW-1&&y<MAPH-1)w->kind[y][x]=1;
+        if(x>0&&y>0&&x<MAPW-1&&y<MAPH-1)w->solid[y][x]=1;
     }
 }
 static void BuildWorld(World *w,int seed) {
@@ -123,10 +123,8 @@ static void BuildAreaWorld(Game *g,Area area) {
     World *w=&g->world;
     for(int y=0;y<MAPH;y++)for(int x=0;x<MAPW;x++) {
         int edge=(x==0||y==0||x==MAPW-1||y==MAPH-1);
-        unsigned h=(unsigned)(x*92837111u+y*689287499u+(unsigned)g->lastSeed*283923481u+(unsigned)area*811u);
-        h^=h>>13;h*=1274126177u;h^=h>>16;
         w->kind[y][x]=edge?3:0;
-        if(!edge && h%100<(area==AREA_GROVE?15:area==AREA_RUINS?8:6))w->kind[y][x]=1;
+        w->solid[y][x]=0;
     }
     // A broad, guaranteed walkable route and a central open area.
     for(int x=1;x<21;x++){w->kind[9][x]=0;w->kind[10][x]=0;}
@@ -146,9 +144,6 @@ static void BuildAreaWorld(Game *g,Area area) {
     if(area==AREA_CAMP) {
         w->camp=(Vector2){4,13};w->groveGate=(Vector2){18,4};w->ruinGate=(Vector2){18,9};w->shrine=(Vector2){18,14};w->bossPos=(Vector2){18,14};
         for(int y=1;y<17;y++)for(int x=1;x<5;x++)if(y<7||y>14)w->kind[y][x]=2;
-        // Collision footprints for the two Kenney Tiny Town cottages placed in the hub.
-        for(int y=1;y<=4;y++)for(int x=3;x<=5;x++)w->kind[y][x]=1;
-        for(int y=3;y<=6;y++)for(int x=13;x<=15;x++)w->kind[y][x]=1;
         for(int i=0;i<5;i++)AddPickup(w,0,7+i*2,7+(i%2)*4);
         AddPickup(w,1,15,6);AddPickup(w,2,15,12);
     } else if(area==AREA_GROVE) {
@@ -166,6 +161,22 @@ static void BuildAreaWorld(Game *g,Area area) {
         for(int y=3;y<15;y++)for(int x=3;x<19;x++)if(x<6||x>15||y<5||y>13)w->kind[y][x]=2;
         for(int x=2;x<20;x++)w->kind[9][x]=0;
         AddPickup(w,0,6,5);AddPickup(w,1,12,12);AddPickup(w,2,17,5);
+    }
+    // Hand-authored tree clusters frame each area while keeping the main routes open.
+    if(area==AREA_CAMP) {
+        const int trees[][2]={{2,2},{7,2},{10,2},{19,2},{20,6},{20,15},{12,16},{7,16}};
+        for(int i=0;i<(int)(sizeof(trees)/sizeof(trees[0]));i++) {
+            int x=trees[i][0],y=trees[i][1];w->kind[y][x]=1;w->solid[y][x]=1;
+        }
+    } else if(area==AREA_GROVE) {
+        const int trees[][2]={{3,2},{6,2},{8,3},{14,2},{18,2},{20,4},{4,6},{6,7},{7,13},{13,14},{17,14},{20,12}};
+        for(int i=0;i<(int)(sizeof(trees)/sizeof(trees[0]));i++) {
+            int x=trees[i][0],y=trees[i][1];w->kind[y][x]=1;w->solid[y][x]=1;
+        }
+    } else if(area==AREA_LIGHTHOUSE) {
+        for(int y=6;y<=9;y++)for(int x=15;x<=19;x++)w->kind[y][x]=3;
+        for(int y=3;y<=6;y++)for(int x=3;x<=6;x++)w->kind[y][x]=2;
+        for(int y=12;y<=14;y++)for(int x=3;x<=7;x++)w->kind[y][x]=2;
     }
     // Authored collision footprints keep the player outside large buildings and props.
     if(area==AREA_CAMP) {
@@ -211,7 +222,7 @@ static bool InRect(Vector2 p,float left,float top,float right,float bottom) {
 static bool SolidPoint(Game *g,Vector2 p) {
     int x=(int)floorf(p.x+0.5f),y=(int)floorf(p.y+0.5f);
     if(x<1||y<1||x>=MAPW-1||y>=MAPH-1)return true;
-    if(g->world.kind[y][x]==1)return true;
+    if(g->world.solid[y][x])return true;
 
     // Authored object colliders match the visible footprints, not just their anchor tile.
     if(g->area==AREA_CAMP) {
@@ -242,7 +253,7 @@ static bool SolidPoint(Game *g,Vector2 p) {
         if(InRect(p,8.45f,11.05f,10.75f,13.05f))return true;// broken wall
         if(InRect(p,14.35f,11.05f,16.35f,13.15f))return true;// rune fountain
         if(InRect(p,17.05f,11.55f,19.05f,13.55f))return true;// east broken pillar
-        if(InRect(p,16.25f,6.25f,17.75f,7.75f))return true;  // shrine plinth
+        if(InRect(p,16.68f,6.68f,17.32f,7.32f))return true;  // shrine base only
         if(!g->spark.owned && InRect(p,14.55f,6.55f,15.45f,7.45f))return true; // Crystal Gecko
         bool stream=(x>=9&&x<=11&&y>=3&&y<=14);
         bool bridge=(y>=8&&y<=10&&x>=2&&x<=19);
@@ -252,7 +263,7 @@ static bool SolidPoint(Game *g,Vector2 p) {
         if(InRect(p,8.65f,5.75f,10.85f,7.85f))return true;  // garden fountain
         if(InRect(p,3.75f,11.65f,5.65f,13.85f))return true;// courtyard gate
         if(InRect(p,13.65f,11.65f,15.85f,13.95f))return true;// garden shrub
-        if(InRect(p,16.25f,6.25f,17.75f,7.75f))return true;  // shrine plinth
+        if(InRect(p,16.68f,6.68f,17.32f,7.32f))return true;  // shrine base only
         if(!g->bossDefeated && InRect(p,17.55f,12.55f,18.45f,13.45f))return true; // lighthouse guardian
     }
     return false;
@@ -329,7 +340,7 @@ void GameReset(Game *g,int seed) {
     g->lumi=(Buddy){.pos={2.3f,12.4f},.owned=false,.level=1};
     g->splash=(Buddy){.pos={8,7},.owned=false,.level=1};
     g->spark=(Buddy){.pos={15,8},.owned=false,.level=1};
-    g->cam.offset=(Vector2){SW/2.0f,SH/2.0f}; g->cam.zoom=1.0f;
+    g->cam.offset=(Vector2){SW/2.0f,SH/2.0f}; g->cam.zoom=1.10f;
     g->fireflyPhase=0; g->dayClock=0.28f; g->weatherClock=0; g->weather=0; g->journalOpen=false; g->inventoryOpen=false; g->mapOpen=false;
     g->fireflyDiscovered=false; g->leaflingFed=false; g->groveMoteDefeated=false; g->enemySoaked=false; g->battleRound=0; g->defeatedGuards=0;
 }
@@ -486,7 +497,7 @@ void GetCurrentObjective(Game *g,const char **title,const char **detail,Vector2 
     }
     if(g->area==AREA_LIGHTHOUSE) {
         *title="点亮失落的灯塔";
-        *detail="回到中央遗迹，完成最后的共鸣";
+        *detail="靠近中央石碑，按 E 点亮灯塔";
         *target=g->world.shrine;
     } else if(g->area==AREA_CAMP) {
         *title="返回灯塔庭院";
@@ -692,6 +703,15 @@ void GameUpdate(Game *g,float dt) {
         }
     }
     if(IsKeyPressed(KEY_E)) {
+        // The final tablet is an explicit story interaction, not a fragile proximity auto-trigger.
+        if(g->area==AREA_LIGHTHOUSE && g->bossDefeated && Dist(p->pos,g->world.shrine)<3.2f) {
+            g->endingTime=0.0f;
+            g->scene=SCENE_END;
+            g->player.vel=(Vector2){0,0};
+            g->toastTimer=0.0f;
+            GameSave(g);
+            return;
+        }
         // Rescue Moss Lumi at the camp.
         if(g->area==AREA_CAMP&&!g->lumi.owned&&Dist(p->pos,(Vector2){4,12})<1.5f) {
             AddBuddyFriend(g,0);
@@ -779,9 +799,10 @@ void GameUpdate(Game *g,float dt) {
         }
     }
     // Story areas: region messages / final ending.
-    if(g->bossDefeated&&Dist(p->pos,g->world.shrine)<2.0f) {
+    if(g->bossDefeated&&Dist(p->pos,g->world.shrine)<1.05f) {
         g->endingTime=0.0f;
-        g->scene=SCENE_END;return;
+        g->scene=SCENE_END;
+        return;
     }
     if(g->shrineSolved&&g->enemyCount>0&&!g->enemies[g->enemyCount-1].alive)g->bossDefeated=true;
 
