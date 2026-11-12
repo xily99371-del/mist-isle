@@ -614,7 +614,7 @@ static void RenderWorld(Game *g) {
         if(!g->leaflingFed)PushRenderItem(items,&count,RENDER_LEAFLING,0,(Vector2){12.4f,8.0f},1.0f);
         if(!g->groveMoteDefeated)PushRenderItem(items,&count,RENDER_MOTE,0,(Vector2){13.2f,9.2f},1.0f);
     }
-    if(g->area==AREA_LIGHTHOUSE&&g->shrineSolved&&!g->bossDefeated)
+    if(g->area==AREA_LIGHTHOUSE&&!g->bossDefeated)
         PushRenderItem(items,&count,RENDER_BOSS,0,g->world.bossPos,1.0f);
     PushRenderItem(items,&count,RENDER_PLAYER,0,g->player.pos,1.0f);
 
