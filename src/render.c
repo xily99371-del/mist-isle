@@ -89,12 +89,12 @@ static void DrawTopDownTile(int x,int y,Area area,int kind,float time) {
     Rectangle tile={p.x-TILE_SIZE*.5f,p.y-TILE_SIZE*.5f,TILE_SIZE,TILE_SIZE};
     unsigned int hash=TileHash(x,y,(int)area);
     int col=(int)(hash%3u),row=(int)((hash>>5)%3u),atlasIndex;
-    Color base=kind==4?(Color){47,137,171,255}:kind==3?(Color){126,139,129,255}:kind==2?(Color){198,166,111,255}:(Color){91,145,84,255};
+    Color tileBase=kind==4?(Color){47,137,171,255}:kind==3?(Color){126,139,129,255}:kind==2?(Color){198,166,111,255}:(Color){91,145,84,255};
     if(kind==4)atlasIndex=36+row*4+col;
     else if(kind==3)atlasIndex=24+row*4+col;
     else if(kind==2)atlasIndex=12+row*4+col;
     else atlasIndex=row*4+col;
-    DrawRectangleRec(tile,base);
+    DrawRectangleRec(tile,tileBase);
     if(TEX_TOPDOWN_TILES.id) {
         Rectangle src={(float)((atlasIndex%4)*56),(float)((atlasIndex/4)*56),56,56};
         Rectangle dst={tile.x-1.5f,tile.y-1.5f,TILE_SIZE+3.0f,TILE_SIZE+3.0f};
