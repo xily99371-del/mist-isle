@@ -898,9 +898,10 @@ static void RenderBattle(Game *g) {
     }
     Panel((Rectangle){815,555,410,112});
     DrawUIText("战斗操作",838,568,16,(Color){119,145,116,255});
-    DrawUIText("1–3 / ← → 选择伙伴",838,594,15,C_INK);
+    DrawUIText(optionCount==1?"1 / 鼠标点击卡片":TextFormat("1-%d / ← → 选择伙伴",optionCount),838,594,15,C_INK);
     DrawUIText("Enter 确认   鼠标点击卡片选择",838,619,14,C_INK);
-    DrawUIText(g->enemySoaked?"敌人处于潮湿状态":"技能联动：先喷水，再使用晶弧",838,644,14,(Color){104,119,93,255});
+    const char *synergyHint=g->enemySoaked?"敌人处于潮湿状态":(g->splash.owned&&g->spark.owned?"联动：先喷水，再使用晶弧":"招募更多伙伴可解锁技能联动");
+    DrawUIText(synergyHint,838,644,14,(Color){104,119,93,255});
 }
 static void RenderTitle(Game *g) {
     ClearBackground((Color){187,222,211,255});
