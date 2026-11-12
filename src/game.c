@@ -228,6 +228,8 @@ static bool SolidPoint(Game *g,Vector2 p) {
         if(InRect(p,4.75f,4.05f,6.85f,6.25f))return true;   // broken pillar
         if(InRect(p,8.45f,11.05f,10.75f,13.05f))return true;// broken wall
         if(InRect(p,14.35f,11.05f,16.35f,13.15f))return true;// rune fountain
+        if(InRect(p,17.05f,11.55f,19.05f,13.55f))return true;// east broken pillar
+        if(InRect(p,16.25f,6.25f,17.75f,7.75f))return true;  // shrine plinth
         bool stream=(x>=9&&x<=11&&y>=3&&y<=14);
         bool bridge=(y>=8&&y<=10&&x>=2&&x<=19);
         if(stream&&!bridge)return true;
@@ -236,6 +238,8 @@ static bool SolidPoint(Game *g,Vector2 p) {
         if(InRect(p,8.65f,5.75f,10.85f,7.85f))return true;  // garden fountain
         if(InRect(p,3.75f,11.65f,5.65f,13.85f))return true;// courtyard gate
         if(InRect(p,13.65f,11.65f,15.85f,13.95f))return true;// garden shrub
+        if(InRect(p,16.25f,6.25f,17.75f,7.75f))return true;  // shrine plinth
+        if(!g->bossDefeated && InRect(p,17.55f,12.55f,18.45f,13.45f))return true; // lighthouse guardian
     }
     return false;
 }
