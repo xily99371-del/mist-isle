@@ -96,8 +96,17 @@ static void DrawStructureProp(int index,Vector2 p,float w,float h) { DrawAtlasSp
 static void DrawOriginalProp(int index,Vector2 p,float w,float h) { DrawAtlasSprite(TEX_ORIGINAL_PROPS,index,4,32,p,w,h); }
 static void DrawKenneyBuilding(int index,Vector2 p,float scale) {
     if(!TEX_KENNEY_BUILDINGS.id)return;
-    Rectangle src={(float)((index%2)*192),(float)((index/2)*192),192,192};
-    Rectangle dst={p.x-84*scale,p.y-166*scale,168*scale,168*scale};
+    Rectangle src,dst;
+    if(index==0||index==1) {
+        src={(float)(index*192+24),0,144,192};
+        dst={p.x-72*scale,p.y-192*scale,144*scale,192*scale};
+    } else if(index==2) {
+        src={0,240,192,144};
+        dst={p.x-96*scale,p.y-144*scale,192*scale,144*scale};
+    } else {
+        src={204,336,168,48};
+        dst={p.x-84*scale,p.y-48*scale,168*scale,48*scale};
+    }
     DrawTexturePro(TEX_KENNEY_BUILDINGS,src,dst,(Vector2){0,0},0,WHITE);
 }
 static void DrawAreaProp(int index,Vector2 p,float w,float h) {
