@@ -44,17 +44,43 @@ static void DrawPortrait(Texture2D tex, Vector2 p, float w, float h, float bob) 
     Rectangle dst={p.x-w*0.5f,p.y-h-bob,w,h};
     DrawTexturePro(tex,src,dst,(Vector2){0,0},0,WHITE);
 }
-static Vector2 Iso(float x,float y,float z) { return (Vector2){(x-y)*31.0f,(x+y)*15.5f-z}; }
-static void DrawIsoTile(int x,int y,int tile,Color fallback) {
-    Vector2 p=Iso((float)x,(float)y,0);
-    if (TEX_ISO_TILES.id) {
-        Rectangle src={(float)(tile*64),0,64,32};
-        Rectangle dst={p.x-32,p.y-16,64,32};
-        DrawTexturePro(TEX_ISO_TILES,src,dst,(Vector2){0,0},0,WHITE);
-        return;
+static Vector2 WorldToScreen(float x,float y) { return (Vector2){(x+0.5f)*TILE_SIZE,(y+0.5f)*TILE_SIZE}; }
+static unsigned int TileHash(int x,int y,int salt) {
+    unsigned int n=(unsigned int)(x*374761393u+y*668265263u+salt*2246822519u);
+    n=(n^(n>>13))*1274126177u; return n^(n>>16);
+}
+static void DrawTopDownTile(int x,int y,Area area,int kind,float time) {
+    Vector2 p=WorldToScreen((float)x,(float)y);
+    Rectangle tile={p.x-TILE_SIZE*.5f,p.y-TILE_SIZE*.5f,TILE_SIZE+1,TILE_SIZE+1};
+    Color base;
+    if(kind==4) base=(Color){67,158,190,255};
+    else if(kind==3) base=area==AREA_RUINS?(Color){126,132,119,255}:(Color){105,126,112,255};
+    else if(kind==2) base=(Color){207,180,126,255};
+    else if(area==AREA_GROVE) base=(Color){91,151,91,255};
+    else if(area==AREA_RUINS) base=(Color){151,151,130,255};
+    else if(area==AREA_LIGHTHOUSE) base=(Color){158,157,133,255};
+    else base=(Color){111,166,91,255};
+    if(kind==1)base=(Color){67,113,72,255};
+    DrawRectangleRec(tile,base);
+    unsigned int hash=TileHash(x,y,(int)area);
+    if(kind==4) {
+        float wave=6.0f*sinf(time*1.7f+y*.65f+x*.35f);
+        DrawLineEx((Vector2){tile.x+7,tile.y+14+wave*.15f},(Vector2){tile.x+TILE_SIZE-9,tile.y+14+wave*.15f},2.0f,Fade((Color){190,229,222,255},.32f));
+        if((hash%4)==0)DrawLineEx((Vector2){tile.x+12,tile.y+34-wave*.12f},(Vector2){tile.x+30,tile.y+34-wave*.12f},1.0f,Fade(WHITE,.25f));
+    } else if(kind==2) {
+        for(int i=0;i<4;i++){float px=tile.x+7+(float)((hash>>(i*5))%43);float py=tile.y+8+(float)((hash>>(i*4+3))%40);DrawPixel((int)px,(int)py,(Color){230,207,157,255});}
+    } else if(kind==3) {
+        DrawRectangleLinesEx((Rectangle){tile.x+2,tile.y+2,TILE_SIZE-4,TILE_SIZE-4},1.0f,Fade((Color){70,84,78,255},.2f));
+        DrawLine((int)tile.x+7,(int)(tile.y+TILE_SIZE*.5f),(int)(tile.x+TILE_SIZE-7),(int)(tile.y+TILE_SIZE*.5f),Fade(WHITE,.12f));
+    } else {
+        for(int i=0;i<5;i++){
+            float px=tile.x+5+(float)((hash>>(i*5))%47);
+            float py=tile.y+5+(float)((hash>>(i*3+7))%47);
+            Color fleck=(i%2)?(Color){158,198,119,255}:(Color){83,142,80,255};
+            DrawPixel((int)px,(int)py,Fade(fleck,.55f));
+        }
+        if((hash%7)==0){DrawCircle((int)(tile.x+17),(int)(tile.y+18),2,(Color){247,230,173,255});DrawPixel((int)(tile.x+20),(int)(tile.y+15),WHITE);}
     }
-    Vector2 a={p.x,p.y-15.5f},b={p.x+31,p.y},d={p.x-31,p.y},e={p.x,p.y+15.5f};
-    DrawTriangle(a,b,d,fallback);DrawTriangle(b,e,d,fallback);
 }
 static void DrawAreaProp(int index,Vector2 p,float w,float h) {
     if(!TEX_AREA_PROPS.id)return;
@@ -197,7 +223,7 @@ static void DrawShrine(Vector2 p,float t,bool solved) {
     }
 }
 static void DrawPickup(Pickup *p) {
-    Vector2 s=Iso(p->tile.x,p->tile.y,0);float bob=sinf(p->phase)*3;
+    Vector2 s=WorldToScreen(p->tile.x,p->tile.y);float bob=sinf(p->phase)*3;
     Color c=p->kind==1?C_BLUE:p->kind==2?C_LILAC:p->kind==3?C_PINK:C_GOLD;
     DrawEllipse((int)s.x,(int)s.y+4,8,3,(Color){70,104,79,85});
     DrawCircleV((Vector2){s.x,s.y-10-bob},7,c);
@@ -211,7 +237,7 @@ typedef enum {
 typedef struct { float depth; RenderKind kind; int index; Vector2 grid; float scale; } RenderItem;
 static void PushRenderItem(RenderItem *items,int *count,RenderKind kind,int index,Vector2 grid,float scale) {
     if(*count>=128)return;
-    items[*count]=(RenderItem){grid.x+grid.y,kind,index,grid,scale};
+    items[*count]=(RenderItem){grid.y,kind,index,grid,scale};
     (*count)++;
 }
 static void DrawMoatail(Vector2 p,float t) {
