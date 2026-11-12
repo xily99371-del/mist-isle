@@ -405,6 +405,14 @@ static void DrawWorldBackdrop(Game *g) {
     }
 }
 
+static void DrawObjectiveMarker(Vector2 grid,float time) {
+    Vector2 p=WorldToScreen(grid.x,grid.y);
+    float pulse=0.5f+0.5f*sinf(time*3.0f);
+    DrawCircleV((Vector2){p.x,p.y+2},18.0f+5.0f*pulse,Fade(C_GOLD,.12f));
+    DrawCircleLines((int)p.x,(int)p.y+2,(int)(15.0f+4.0f*pulse),Fade(C_GOLD,.9f));
+    DrawLineEx((Vector2){p.x,p.y-58.0f-5.0f*pulse},(Vector2){p.x,p.y-19.0f},3.0f,Fade(C_GOLD,.72f));
+    DrawTriangle((Vector2){p.x,p.y-66.0f-5.0f*pulse},(Vector2){p.x-8,p.y-51.0f-5.0f*pulse},(Vector2){p.x+8,p.y-51.0f-5.0f*pulse},Fade(C_GOLD,.95f));
+  }
 static void RenderWorld(Game *g) {
     BeginMode2D(g->cam);
     DrawWorldBackdrop(g);
@@ -560,6 +568,11 @@ static void RenderWorld(Game *g) {
             case RENDER_PLAYER: DrawPlayer(p,g->time,Vector2Length(g->player.vel)>.1f,g->player.facing); break;
         }
     }
+    const char *objectiveTitle,*objectiveDetail;
+    Vector2 objectiveTarget;
+    bool hasObjectiveTarget=false;
+    GetCurrentObjective(g,&objectiveTitle,&objectiveDetail,&objectiveTarget,&hasObjectiveTarget);
+    if(hasObjectiveTarget)DrawObjectiveMarker(objectiveTarget,g->time);
     for(int i=0;i<MAX_PARTICLES;i++)if(g->particles[i].life>0) {
         Particle *p=&g->particles[i];
         DrawCircleV(p->p,p->size*(p->life/p->maxLife),Fade(p->c,p->life/p->maxLife));
@@ -579,32 +592,37 @@ static void RenderHUD(Game *g) {
     DrawCircle(397,42,8,Fade(C_GOLD,.75f));
     DrawUIText("失落的灯塔",40,54,28,C_INK);
     DrawUIText(TextFormat("生命 %d    果实 %d    贝壳 %d    星晶 %d",(int)g->player.hp,g->player.berries,g->player.shells,g->player.crystals),40,96,17,(Color){104,119,93,255});
-    Panel((Rectangle){1020,18,238,92});
-    DrawUIText("伙伴图鉴",1040,32,17,(Color){119,145,116,255});
-    DrawUIText(TextFormat("苔灯灵 %s",g->lumi.owned?"已同行":"未发现"),1040,57,16,C_INK);
-    DrawUIText(TextFormat("沫尾兽 %s",g->splash.owned?"已同行":"未发现"),1040,79,16,C_INK);
-    DrawUIText(TextFormat("鸣晶蜥 %s",g->spark.owned?"已同行":"未发现"),1040,101,16,C_INK);
+
+    const char *objectiveTitle,*objectiveDetail;
+    Vector2 objectiveTarget;
+    bool hasObjectiveTarget=false;
+    GetCurrentObjective(g,&objectiveTitle,&objectiveDetail,&objectiveTarget,&hasObjectiveTarget);
+    Panel((Rectangle){850,18,410,132});
+    DrawUIText("当前目标",872,29,15,(Color){119,145,116,255});
+    DrawUIText(objectiveTitle,872,52,21,C_INK);
+    DrawUIText(objectiveDetail,872,83,14,(Color){91,115,96,255});
+    int partyCount=(g->lumi.owned?1:0)+(g->splash.owned?1:0)+(g->spark.owned?1:0);
+    const char *activeName=g->selectedBuddy==1&&g->splash.owned?"沫尾兽":g->selectedBuddy==2&&g->spark.owned?"鸣晶蜥":g->lumi.owned?"苔灯灵":partyCount>0?"伙伴":"尚无伙伴";
     Buddy *active=CurrentBuddy(g);
-    DrawUIText(TextFormat("当前伙伴 Lv.%d  XP %d/50",active->level,active->xp),1040,124,13,(Color){104,119,93,255});
-    Panel((Rectangle){20,652,720,48});
-    DrawUIText("WASD移动 SHIFT冲刺 E互动 TAB伙伴 J手记 I背包 M地图 F5保存",38,667,13,(Color){91,115,96,255});
+    DrawUIText(TextFormat("伙伴 %d/3    当前：%s  Lv.%d",partyCount,activeName,active->level),872,111,13,(Color){104,119,93,255});
+
+    Panel((Rectangle){20,652,760,48});
+    DrawUIText("WASD 移动   SHIFT 冲刺   E 互动   TAB 切换伙伴   J 手记   I 背包   M 地图   F5 保存",38,667,13,(Color){91,115,96,255});
+
     if(g->area==AREA_CAMP && Dist(g->player.pos,g->world.groveGate)<1.6f) {
         Panel((Rectangle){530,585,220,40});DrawUIText("E  前往辉光林地",550,596,17,(Color){91,115,96,255});
     } else if(g->area==AREA_CAMP && Dist(g->player.pos,g->world.ruinGate)<1.6f) {
         Panel((Rectangle){530,585,220,40});DrawUIText("E  前往潮汐遗迹",550,596,17,(Color){91,115,96,255});
-    } else if(g->area==AREA_CAMP && Dist(g->player.pos,g->world.shrine)<1.6f) {
+    } else if(g->area==AREA_CAMP && Dist(g->player.pos,g->world.shrine)<1.6f && g->shrineSolved) {
         Panel((Rectangle){530,585,220,40});DrawUIText("E  前往灯塔庭院",550,596,17,(Color){91,115,96,255});
     } else if(g->area!=AREA_CAMP && Dist(g->player.pos,(Vector2){2,9})<1.8f) {
         Panel((Rectangle){530,585,220,40});DrawUIText("E  返回海岸营地",550,596,17,(Color){91,115,96,255});
     } else if(g->area==AREA_CAMP && !g->lumi.owned && Dist(g->player.pos,(Vector2){4,12})<1.65f) {
-        Panel((Rectangle){530,585,220,40});
-        DrawUIText("E  救助苔灯灵",550,596,17,(Color){91,115,96,255});
+        Panel((Rectangle){530,585,220,40});DrawUIText("E  救助苔灯灵",550,596,17,(Color){91,115,96,255});
     } else if(g->area==AREA_CAMP && Dist(g->player.pos,(Vector2){3,10})<2.0f) {
-        Panel((Rectangle){530,585,220,40});
-        DrawUIText("E  与守望者交谈",550,596,17,(Color){91,115,96,255});
+        Panel((Rectangle){530,585,220,40});DrawUIText("E  与守望者交谈",550,596,17,(Color){91,115,96,255});
     } else if(g->area==AREA_CAMP && g->lumi.owned && Dist(g->player.pos,(Vector2){4.1f,12.5f})<1.5f) {
-        Panel((Rectangle){530,585,220,40});
-        DrawUIText("E  在营火旁休息",550,596,17,(Color){91,115,96,255});
+        Panel((Rectangle){530,585,220,40});DrawUIText("E  在营火旁休息",550,596,17,(Color){91,115,96,255});
     }
     if(g->toastTimer>0) {
         Panel((Rectangle){380,600,520,42});
@@ -617,8 +635,13 @@ static void RenderJournal(Game *g) {
     DrawUIText("旅 人 手 记",300,135,34,(Color){74,105,83,255});
     DrawUIText("CHAPTER 01  /  THE LOST LIGHTHOUSE",303,179,15,(Color){132,145,112,255});
     DrawLine(300,207,980,207,(Color){220,211,183,255});
+    const char *objectiveTitle,*objectiveDetail;
+    Vector2 objectiveTarget;
+    bool hasObjectiveTarget=false;
+    GetCurrentObjective(g,&objectiveTitle,&objectiveDetail,&objectiveTarget,&hasObjectiveTarget);
     DrawUIText("当前目标",303,230,21,(Color){104,135,94,255});
-    DrawUIText(g->shrineSolved?"遗迹已被唤醒，前往庭院寻找守卫。":"寻找三位伙伴，收集潮汐贝壳并唤醒古代遗迹。",303,265,19,C_INK);
+    DrawUIText(objectiveTitle,303,265,21,C_INK);
+    DrawUIText(objectiveDetail,303,298,17,C_INK);
     DrawUIText("岛屿发现",303,320,21,(Color){104,135,94,255});
     DrawUIText(g->fireflyDiscovered?"萤芽  —  已记录：会在林间微光处出现。":"萤芽  —  未发现：留意林地里漂浮的微光。",303,355,18,C_INK);
     DrawUIText(g->leaflingFed?"叶团  —  已帮助：它为你找到了隐藏星晶。":"叶团  —  未帮助：它似乎很喜欢岛屿果实。",303,388,18,C_INK);
@@ -672,48 +695,97 @@ static void RenderDialogue(Game *g) {
     DrawUIText("按 E / Enter / 鼠标左键继续",835,645,14,(Color){135,135,107,255});
 }
 static void RenderBattle(Game *g) {
-    DrawRectangle(0,0,SW,SH,(Color){42,57,75,255});
-    // stylized arena
-    DrawCircle(640,300,205,(Color){76,99,108,255});
-    DrawCircle(640,300,180,(Color){106,133,132,255});
-    DrawCircle(640,300,145,(Color){130,158,143,255});
-    DrawEllipse(405,440,70,22,(Color){42,54,64,120});
-    DrawEllipse(875,270,92,26,(Color){42,54,64,120});
-    DrawCircle(870,235,55,(Color){166,143,163,255});
-    DrawTriangle((Vector2){830,206},(Vector2){855,150},(Vector2){879,206},(Color){204,181,205,255});
-    DrawTriangle((Vector2){864,205},(Vector2){901,164},(Vector2){916,222},(Color){183,160,192,255});
-    DrawCircle(852,232,6,C_INK);DrawCircle(888,232,6,C_INK);
-    DrawCircle(852,230,2,WHITE);DrawCircle(888,230,2,WHITE);
-    DrawUIText("伙伴协同战斗",55,40,30,WHITE);
-    DrawUIText(TextFormat("回合 %d   %s",g->battleRound,g->enemySoaked?"敌人：潮湿（电击伤害提升）":"观察敌人状态"),55,82,18,(Color){224,232,215,255});
+    DrawRectangleGradientV(0,0,SW,SH,(Color){48,66,79,255},(Color){91,119,112,255});
+    for(int i=0;i<8;i++) {
+        int x=70+i*165;
+        DrawCircle(x,180+(i%3)*24,55,(Color){77,111,102,80});
+        DrawCircle(x+42,190+(i%2)*20,38,(Color){119,145,111,65});
+    }
+    DrawEllipse(640,435,470,118,(Color){35,55,57,100});
+    DrawEllipse(640,422,420,92,(Color){120,150,128,255});
+    DrawEllipse(640,410,350,65,(Color){148,174,142,255});
+    DrawEllipse(395,455,78,20,(Color){37,54,56,130});
+    DrawEllipse(880,455,100,25,(Color){37,54,56,130});
+
     Enemy *e=&g->enemies[g->battleEnemy];
-    DrawUIText(TextFormat("守卫 HP  %d / %d",(int)e->hp,(int)e->maxHp),760,80,22,WHITE);
-    DrawRectangle(760,112,340,17,(Color){70,75,85,255});
-    DrawRectangle(760,112,(int)(340*fmaxf(0,e->hp/e->maxHp)),17,C_PINK);
-    // Show the selected companion as a real sprite in the battle party panel.
-    if(g->selectedBuddy==0 && g->lumi.owned)DrawLumi((Vector2){380,390},g->time,0);
-    else if(g->selectedBuddy==1 && g->splash.owned)DrawMoatail((Vector2){380,390},g->time);
-    else if(g->selectedBuddy==2 && g->spark.owned)DrawGecko((Vector2){380,390},g->time);
-    else DrawPlayer((Vector2){380,390},g->time,false,0);
-    if(e->type==ENEMY_MOTE)DrawMote((Vector2){870,300},g->time);
-    else {
-        Color enemyColor=e->type==ENEMY_BOSS?(Color){103,94,145,255}:(Color){166,143,163,255};
-        DrawCircle(870,235,55,enemyColor);
-        DrawTriangle((Vector2){830,206},(Vector2){855,150},(Vector2){879,206},(Color){204,181,205,255});
-        DrawTriangle((Vector2){864,205},(Vector2){901,164},(Vector2){916,222},(Color){183,160,192,255});
-        DrawCircle(852,232,6,C_INK);DrawCircle(888,232,6,C_INK);
-        DrawCircle(852,230,2,WHITE);DrawCircle(888,230,2,WHITE);
-        if(e->type==ENEMY_BOSS)DrawCircle(870,235,78,Fade(C_LILAC,.15f));
+    const char *enemyName=e->type==ENEMY_MOTE?"林地微光兽":e->type==ENEMY_BOSS?"灯塔守卫":"遗迹守卫";
+    Panel((Rectangle){28,22,350,112});
+    DrawUIText("遭遇战",50,34,25,C_INK);
+    DrawUIText(TextFormat("第 %d 回合",g->battleRound),50,68,15,(Color){104,119,93,255});
+    DrawUIText(TextFormat("旅人生命  %d / %d",(int)g->player.hp,(int)g->player.maxHp),50,94,15,C_INK);
+    DrawRectangle(210,97,142,12,(Color){218,213,193,255});
+    DrawRectangle(210,97,(int)(142.0f*fmaxf(0.0f,g->player.hp/g->player.maxHp)),12,(Color){111,174,112,255});
+
+    Panel((Rectangle){902,22,350,112});
+    DrawUIText(enemyName,925,35,22,C_INK);
+    DrawUIText(TextFormat("生命  %d / %d",(int)fmaxf(0,e->hp),(int)e->maxHp),925,72,15,(Color){104,119,93,255});
+    DrawRectangle(925,99,295,13,(Color){218,213,193,255});
+    DrawRectangle(925,99,(int)(295.0f*fmaxf(0.0f,e->hp/e->maxHp)),13,C_PINK);
+
+    if(g->selectedBuddy==0 && g->lumi.owned)DrawLumi((Vector2){395,430},g->time,0);
+    else if(g->selectedBuddy==1 && g->splash.owned)DrawMoatail((Vector2){395,430},g->time);
+    else if(g->selectedBuddy==2 && g->spark.owned)DrawGecko((Vector2){395,430},g->time);
+    else DrawPlayer((Vector2){395,430},g->time,false,0);
+
+    if(e->type==ENEMY_MOTE) {
+        DrawMote((Vector2){880,385},g->time);
+    } else {
+        Color enemyColor=e->type==ENEMY_BOSS?(Color){100,86,142,255}:(Color){163,139,160,255};
+        DrawCircleV((Vector2){880,380},62,Fade(C_LILAC,.18f));
+        DrawEllipse(880,395,61,48,enemyColor);
+        DrawTriangle((Vector2){832,366},(Vector2){849,302},(Vector2){872,366},(Color){204,181,205,255});
+        DrawTriangle((Vector2){879,366},(Vector2){913,314},(Vector2){930,375},(Color){183,160,192,255});
+        DrawCircle(861,378,7,C_INK);DrawCircle(899,378,7,C_INK);
+        DrawCircle(861,376,2.5f,WHITE);DrawCircle(899,376,2.5f,WHITE);
+        if(e->type==ENEMY_BOSS) {
+            DrawCircleLines(880,380,82,Fade(C_GOLD,.65f));
+            DrawCircleLines(880,380,92,Fade(C_LILAC,.42f));
+        }
     }
-    DrawUIText("选择伙伴技能",70,525,23,WHITE);
-    const char *opts[3]={"1  苔灯灵：治疗 + 微光攻击","2  沫尾兽：潮湿水流","3  鸣晶蜥：晶弧放电（潮湿克制）"};
-    for(int i=0;i<3;i++) {
-        Rectangle r={70,565+i*42,440,34};
-        DrawRectangleRounded(r,.2f,8,i==g->battleChoice?(Color){255,226,158,255}:(Color){238,236,218,235});
-        DrawUIText(opts[i],88,573+i*42,18,(Color){64,82,76,255});
+
+    Panel((Rectangle){24,510,1232,185});
+    DrawUIText("选择出战伙伴",50,520,20,C_INK);
+    DrawUIText(g->battleTurn==0?"选择技能并按 Enter 确认":"敌方正在行动，按 Enter 继续",830,520,16,(Color){104,119,93,255});
+    int ids[3]={0,1,2};
+    bool owned[3]={g->lumi.owned,g->splash.owned,g->spark.owned};
+    int count=0;
+    for(int i=0;i<3;i++)if(owned[i])ids[count++]=i;
+    int optionCount=count>0?count:1;
+    if(g->battleChoice>=optionCount)g->battleChoice=optionCount-1;
+    for(int slot=0;slot<optionCount;slot++) {
+        int id=count>0?ids[slot]:-1;
+        Rectangle card={(float)(50+slot*245),555,230,112};
+        Color fill=slot==g->battleChoice?(Color){255,235,190,255}:(Color){247,245,226,245};
+        DrawRectangleRounded(card,.12f,12,fill);
+        DrawRectangleRoundedLines(card,.12f,12,slot==g->battleChoice?(Color){201,157,82,255}:(Color){220,214,188,255});
+        DrawUIText(TextFormat("%d",slot+1),(int)card.x+12,(int)card.y+10,15,(Color){127,145,111,255});
+        if(id==0) {
+            DrawLumi((Vector2){card.x+43,card.y+78},g->time,0);
+            DrawUIText("苔灯灵",(int)card.x+78,(int)card.y+22,17,C_INK);
+            DrawUIText("星光治愈",(int)card.x+78,(int)card.y+50,14,(Color){104,119,93,255});
+            DrawUIText("回复生命",(int)card.x+78,(int)card.y+73,13,(Color){104,119,93,255});
+        } else if(id==1) {
+            DrawMoatail((Vector2){card.x+43,card.y+78},g->time);
+            DrawUIText("沫尾兽",(int)card.x+78,(int)card.y+22,17,C_INK);
+            DrawUIText("泡泡水流",(int)card.x+78,(int)card.y+50,14,(Color){104,119,93,255});
+            DrawUIText("施加潮湿",(int)card.x+78,(int)card.y+73,13,(Color){104,119,93,255});
+        } else if(id==2) {
+            DrawGecko((Vector2){card.x+43,card.y+78},g->time);
+            DrawUIText("鸣晶蜥",(int)card.x+78,(int)card.y+22,17,C_INK);
+            DrawUIText("晶弧放电",(int)card.x+78,(int)card.y+50,14,(Color){104,119,93,255});
+            DrawUIText("克制潮湿",(int)card.x+78,(int)card.y+73,13,(Color){104,119,93,255});
+        } else {
+            DrawPlayer((Vector2){card.x+43,card.y+78},g->time,false,0);
+            DrawUIText("旅人",(int)card.x+78,(int)card.y+22,17,C_INK);
+            DrawUIText("基础攻击",(int)card.x+78,(int)card.y+50,14,(Color){104,119,93,255});
+            DrawUIText("造成普通伤害",(int)card.x+78,(int)card.y+73,13,(Color){104,119,93,255});
+        }
     }
-    DrawUIText(g->battleTurn==0?"选择技能并按 Enter":"敌方行动：按 Enter 继续",760,570,21,WHITE);
-    DrawUIText("技能联动：先喷水，再使用晶弧可造成额外伤害。",760,610,17,(Color){226,236,222,255});
+    Panel((Rectangle){815,555,410,112});
+    DrawUIText("战斗操作",838,568,16,(Color){119,145,116,255});
+    DrawUIText("1–3 / ← → 选择伙伴",838,594,15,C_INK);
+    DrawUIText("Enter 确认   鼠标点击卡片选择",838,619,14,C_INK);
+    DrawUIText(g->enemySoaked?"敌人处于潮湿状态":"技能联动：先喷水，再使用晶弧",838,644,14,(Color){104,119,93,255});
 }
 static void RenderTitle(Game *g) {
     ClearBackground((Color){187,222,211,255});
