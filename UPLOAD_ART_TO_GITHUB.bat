@@ -17,13 +17,13 @@ git remote get-url origin
 if errorlevel 1 goto failed
 
 if not exist "assets\environment\topdown_terrain_atlas_v1.png" (
-  if exist "MistIsle_ArtPack_v4_TopDown_Refined.zip" (
-    echo Extracting approved v4 art pack...
-    powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%CD%\MistIsle_ArtPack_v4_TopDown_Refined.zip' -DestinationPath '%CD%' -Force"
+  if exist "MistIsle_ArtPack_v5_TopDown_Refined.zip" (
+    echo Extracting approved v5 art pack...
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%CD%\MistIsle_ArtPack_v5_TopDown_Refined.zip' -DestinationPath '%CD%' -Force"
     if errorlevel 1 goto failed
   ) else (
     echo ERROR: Art pack not found.
-    echo Put MistIsle_ArtPack_v4_TopDown_Refined.zip beside this script.
+    echo Put MistIsle_ArtPack_v5_TopDown_Refined.zip beside this script.
     pause
     exit /b 1
   )
@@ -35,6 +35,9 @@ for %%F in (
   "assets\environment\environment_props_96.png"
   "assets\environment\area_props_96.png"
   "assets\environment\topdown_terrain_atlas_v1.png"
+  "assets\environment\flora_props_atlas_128.png"
+  "assets\environment\cliffs_fences_atlas_128.png"
+  "assets\environment\structures_atlas_128.png"
   "assets\characters\hero\hero_walk_4dir_64.png"
   "assets\characters\companions\moss_lumi_idle_64.png"
   "assets\characters\companions\moatail_idle_64.png"
@@ -70,7 +73,7 @@ if not errorlevel 1 (
   exit /b 0
 )
 
-git commit -m "Add Mist Isle approved art pack v4"
+git commit -m "Add Mist Isle approved art pack v5"
 if errorlevel 1 goto failed
 git push origin main
 if errorlevel 1 goto failed
