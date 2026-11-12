@@ -22,6 +22,8 @@ Only assets with a clearly documented license that permits redistribution in the
 |---|---|---|---|
 | Kenney Tiny Town | supplementary 3/4-view buildings, fences and town props; use selectively with orthographic ground | CC0; attribution not required; original ZIP and license preserved in third_party/kenney/tiny-town/ | https://kenney.nl/assets/tiny-town |
 | Kenney Pixel Pack | candidate source for supplementary props, particles and UI; not yet bundled | CC0; attribution not required | https://kenney.nl/assets/pixel-pack |
+| Kenney RPG Base | candidate source for orthographic RPG ground/props; not yet bundled | CC0; attribution not required | https://kenney.nl/assets/rpg-base |
+| Kenney Pixel UI Pack | candidate source for pixel UI panels/icons; not yet bundled | CC0; attribution not required | https://kenney.nl/assets/pixel-ui-pack |
 | OpenGameArt — Forest Tiles | supplementary forest foliage/ground variants | CC0; retain the source page and author metadata | https://opengameart.org/content/forest-tiles |
 | OpenGameArt — Pixel Art Forest Tilesets | supplementary forest terrain | CC0 | https://opengameart.org/content/pixel-art-forest-tilesets |
 
@@ -29,3 +31,9 @@ Kenney Tiny Town is already vendored at `third_party/kenney/tiny-town/kenney_tin
 
 ## Distribution rule
 Do not add assets to the repository until their license explicitly permits redistribution. A pack that permits use inside a finished game but prohibits redistribution of the source files must not be committed as a raw asset pack.
+
+
+## Current integration status (2026-11-12)
+- Kenney Tiny Town is already committed in `third_party/kenney/tiny-town/`; its 4 curated building/fence sprites are generated into `assets/environment/kenney_buildings_atlas.png` at build time and used by the renderer.
+- The original v6 art pack (hero/companions, terrain, flora, cliffs, structures and 16 original props) is still held in ChatGPT Library and is not yet present in the GitHub tree. Use `IMPORT_ART_V6_TO_GITHUB.bat` for the one-time import.
+- Kenney RPG Base and Pixel UI Pack are license-cleared candidates only; they are not yet downloaded or integrated. Add them only after visual review and a documented import.
