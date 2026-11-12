@@ -37,7 +37,7 @@ static void DrawUIText(const char *text,int x,int y,int size,Color tint) {
 
 static Texture2D TEX_HERO={0}, TEX_LUMI={0}, TEX_MOATAIL={0}, TEX_GECKO={0}, TEX_KEEPER={0};
 static Texture2D TEX_HERO_PIXEL={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, TEX_GECKO_PIXEL={0}, TEX_TILES={0}, TEX_PROPS={0};
-static Texture2D TEX_ISO_TILES={0}, TEX_HERO_WALK={0}, TEX_ENV_PROPS={0}, TEX_LEAFLING={0}, TEX_GROVE_MOTE={0}, TEX_AREA_PROPS={0};
+static Texture2D TEX_ISO_TILES={0}, TEX_HERO_WALK={0}, TEX_ENV_PROPS={0}, TEX_LEAFLING={0}, TEX_GROVE_MOTE={0}, TEX_AREA_PROPS={0}, TEX_TOPDOWN_TILES={0};
 static void DrawPortrait(Texture2D tex, Vector2 p, float w, float h, float bob) {
     if (tex.id == 0) return;
     Rectangle src={0,0,(float)tex.width,(float)tex.height};
@@ -52,17 +52,19 @@ static unsigned int TileHash(int x,int y,int salt) {
 static void DrawTopDownTile(int x,int y,Area area,int kind,float time) {
     Vector2 p=WorldToScreen((float)x,(float)y);
     Rectangle tile={p.x-TILE_SIZE*.5f,p.y-TILE_SIZE*.5f,TILE_SIZE+1,TILE_SIZE+1};
-    Color base;
-    if(kind==4) base=(Color){67,158,190,255};
-    else if(kind==3) base=area==AREA_RUINS?(Color){126,132,119,255}:(Color){105,126,112,255};
-    else if(kind==2) base=(Color){207,180,126,255};
-    else if(area==AREA_GROVE) base=(Color){91,151,91,255};
-    else if(area==AREA_RUINS) base=(Color){151,151,130,255};
-    else if(area==AREA_LIGHTHOUSE) base=(Color){158,157,133,255};
-    else base=(Color){111,166,91,255};
-    if(kind==1)base=(Color){67,113,72,255};
-    DrawRectangleRec(tile,base);
     unsigned int hash=TileHash(x,y,(int)area);
+    int col=(int)(hash%3u),row=(int)((hash>>5)%3u),atlasIndex;
+    if(kind==4)atlasIndex=36+(int)(hash%12u);
+    else if(kind==3)atlasIndex=24+row*4+col;
+    else if(kind==2)atlasIndex=12+row*4+col;
+    else atlasIndex=row*4+col;
+    if(TEX_TOPDOWN_TILES.id) {
+        Rectangle src={(float)((atlasIndex%4)*112),(float)((atlasIndex/4)*112),112,112};
+        DrawTexturePro(TEX_TOPDOWN_TILES,src,tile,(Vector2){0,0},0,WHITE);
+        return;
+    }
+    Color base=kind==4?(Color){67,158,190,255}:kind==3?(Color){126,132,119,255}:kind==2?(Color){207,180,126,255}:(Color){111,166,91,255};
+    DrawRectangleRec(tile,base);
     if(kind==4) {
         float wave=6.0f*sinf(time*1.7f+y*.65f+x*.35f);
         DrawLineEx((Vector2){tile.x+7,tile.y+14+wave*.15f},(Vector2){tile.x+TILE_SIZE-9,tile.y+14+wave*.15f},2.0f,Fade((Color){190,229,222,255},.32f));
@@ -718,12 +720,13 @@ void RenderInit(void) {
         "assets/characters/companions/grove_mote_idle_64.png",
         "assets/environment/environment_props_96.png",
         "assets/environment/area_props_96.png",
+        "assets/environment/topdown_terrain_atlas_v1.png",
         "assets/characters/png/camp_keeper.png",
         "assets/tiles/png/island_iso_tiles.png",
         "assets/tiles/png/environment_props.png"
     };
-    Texture2D *targets[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
-    for(int i=0;i<11;i++) {
+    Texture2D *targets[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
+    for(int i=0;i<12;i++) {
         if(FileExists(paths[i])) {
             *targets[i]=LoadTexture(paths[i]);
             if(targets[i]->id)SetTextureFilter(*targets[i],TEXTURE_FILTER_POINT);
