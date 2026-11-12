@@ -81,8 +81,8 @@ require("g->cam.zoom=1.0f" in GAME and "UpdateCamera(g,dt)" in GAME and "deadY=9
 require("RenderItem items[192]" in RENDER and "*count>=192" in RENDER, "render queue has capacity for top-down forest canopy, props and actors")
 require("world.kind[y][x]==1" in RENDER and "RENDER_TREE" in RENDER,
         "visible forest trees are placed from the collision grid")
-require("SetSolidRect" in GAME and "MovePlayerWithCollision" in GAME,
-        "large props have collision footprints and player motion uses substeps")
+require("SetSolidRect" in GAME and "MovePlayerWithCollision" in GAME and "dockWater" in GAME and "stream&&!bridge" in GAME,
+        "props, shore water and stream banks block movement with substep collision")
 require("GetCurrentObjective" in GAME and "DrawObjectiveMarker" in RENDER,
         "chapter objective guidance and in-world waypoint marker are active")
 require("OwnedBuddyIdAt" in GAME and "optionCount" in GAME and "选择出战伙伴" in RENDER,
