@@ -521,7 +521,20 @@ static void StartStoryBattle(Game *g) {
     EnterBattle(g,g->enemyCount-1);
 }
 void GameUpdate(Game *g,float dt) {
-    g->time+=dt; if(g->toastTimer>0)g->toastTimer-=dt;
+    g->time+=dt;
+    if(g->scene==SCENE_END) {
+        g->endingTime+=dt;
+        if(IsKeyPressed(KEY_R)) {
+            int seed=g->lastSeed+1;
+            GameReset(g,seed);
+            GameStart(g);
+        } else if(g->endingTime>=5.0f&&(IsKeyPressed(KEY_ENTER)||IsKeyPressed(KEY_ESCAPE))) {
+            g->scene=SCENE_TITLE;
+            g->endingTime=0.0f;
+        }
+        return;
+    }
+    if(g->toastTimer>0)g->toastTimer-=dt;
     g->fireflyPhase+=dt;
     g->dayClock=fmodf(g->dayClock+dt/420.0f,1.0f);
     g->weatherClock+=dt;
@@ -544,18 +557,6 @@ void GameUpdate(Game *g,float dt) {
         if(IsKeyPressed(KEY_E)||IsKeyPressed(KEY_ENTER)||IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             g->dialoguePage++;
             if(g->dialoguePage>=g->dialogueCount)g->scene=SCENE_PLAY;
-        }
-        return;
-    }
-    if(g->scene==SCENE_END) {
-        g->endingTime+=dt;
-        if(IsKeyPressed(KEY_R)) {
-            int seed=g->lastSeed+1;
-            GameReset(g,seed);
-            GameStart(g);
-        } else if(IsKeyPressed(KEY_ENTER)||IsKeyPressed(KEY_ESCAPE)) {
-            g->scene=SCENE_TITLE;
-            g->endingTime=0.0f;
         }
         return;
     }
@@ -688,6 +689,18 @@ void GameUpdate(Game *g,float dt) {
         Toast(g,TextFormat("当前伙伴：%s",names[g->selectedBuddy]));
     }
     if(IsKeyPressed(KEY_E)) {
+        // One authoritative final-story interaction. It is handled before exits, pickups and NPCs.
+        if(g->area==AREA_LIGHTHOUSE && g->bossDefeated && Dist(p->pos,g->world.shrine)<3.8f) {
+            g->journalOpen=false;
+            g->inventoryOpen=false;
+            g->mapOpen=false;
+            g->endingTime=0.0f;
+            g->player.vel=(Vector2){0,0};
+            g->toastTimer=0.0f;
+            g->scene=SCENE_END;
+            GameSave(g);
+            return;
+        }
         if(g->area==AREA_CAMP) {
             if(Dist(p->pos,g->world.groveGate)<1.4f){SwitchArea(g,AREA_GROVE);GameSave(g);Toast(g,"进入辉光林地");return;}
             if(Dist(p->pos,g->world.ruinGate)<1.4f){
@@ -703,15 +716,6 @@ void GameUpdate(Game *g,float dt) {
         }
     }
     if(IsKeyPressed(KEY_E)) {
-        // The final tablet is an explicit story interaction, not a fragile proximity auto-trigger.
-        if(g->area==AREA_LIGHTHOUSE && g->bossDefeated && Dist(p->pos,g->world.shrine)<3.2f) {
-            g->endingTime=0.0f;
-            g->scene=SCENE_END;
-            g->player.vel=(Vector2){0,0};
-            g->toastTimer=0.0f;
-            GameSave(g);
-            return;
-        }
         // Rescue Moss Lumi at the camp.
         if(g->area==AREA_CAMP&&!g->lumi.owned&&Dist(p->pos,(Vector2){4,12})<1.5f) {
             AddBuddyFriend(g,0);
@@ -798,12 +802,7 @@ void GameUpdate(Game *g,float dt) {
             return;
         }
     }
-    // Story areas: region messages / final ending.
-    if(g->bossDefeated&&Dist(p->pos,g->world.shrine)<1.05f) {
-        g->endingTime=0.0f;
-        g->scene=SCENE_END;
-        return;
-    }
+    // The final scene is entered only through the explicit E interaction above.
     if(g->shrineSolved&&g->enemyCount>0&&!g->enemies[g->enemyCount-1].alive)g->bossDefeated=true;
 
     UpdateCamera(g,dt);
