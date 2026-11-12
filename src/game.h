@@ -51,6 +51,7 @@ typedef struct {
 } Enemy;
 typedef struct {
     int kind[MAPH][MAPW];
+    unsigned char solid[MAPH][MAPW];
     int seed;
     Pickup pickups[MAX_PICKUPS];
     int pickupCount;
