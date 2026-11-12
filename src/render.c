@@ -659,17 +659,17 @@ static void RenderWorld(Game *g) {
         PushRenderItem(items,&count,RENDER_PROP,401,(Vector2){5.5f,14.5f},.8f);
         PushRenderItem(items,&count,RENDER_PROP,402,(Vector2){6.5f,15.0f},.75f);
         for(int i=0;i<5;i++) {
-            PushRenderItem(items,&count,RENDER_PROP,410,(Vector2){5.5f+i*2.2f,11.7f+(i%2)*.55f},.55f);
-            if(i%2==0)PushRenderItem(items,&count,RENDER_PROP,411,(Vector2){10.0f+i*1.8f,15.0f},.52f);
+            PushRenderItem(items,&count,RENDER_PROP,116+(i%5),(Vector2){5.5f+i*2.2f,11.7f+(i%2)*.55f},.55f);
+            if(i%2==0)PushRenderItem(items,&count,RENDER_PROP,121+(i%3),(Vector2){10.0f+i*1.8f,15.0f},.52f);
         }
     } else if(g->area==AREA_GROVE) {
         PushRenderItem(items,&count,RENDER_PROP,405,(Vector2){5.0f,4.0f},1.15f);
         PushRenderItem(items,&count,RENDER_PROP,404,(Vector2){16.0f,4.5f},1.05f);
         PushRenderItem(items,&count,RENDER_PROP,406,(Vector2){9.0f,12.0f},1.0f);
         PushRenderItem(items,&count,RENDER_PROP,407,(Vector2){14.5f,12.5f},1.05f);
-        for(int i=0;i<4;i++)PushRenderItem(items,&count,RENDER_PROP,108+(i%3),(Vector2){7.0f+i*3.0f,3.0f+(i%2)*1.0f},.8f);
+        for(int i=0;i<7;i++)PushRenderItem(items,&count,RENDER_PROP,116+(i%8),(Vector2){6.0f+i*2.0f,3.0f+(i%2)*.8f},.62f);
         PushRenderItem(items,&count,RENDER_PROP,415,(Vector2){2.0f,9.0f},.75f);
-        for(int i=0;i<6;i++)PushRenderItem(items,&count,RENDER_PROP,410,(Vector2){5.0f+i*2.5f,14.5f-(i%2)*.7f},.58f);
+        for(int i=0;i<6;i++)PushRenderItem(items,&count,RENDER_PROP,124+(i%6),(Vector2){5.0f+i*2.5f,14.5f-(i%2)*.7f},.58f);
     } else if(g->area==AREA_RUINS) {
         PushRenderItem(items,&count,RENDER_PROP,28,(Vector2){15.0f,5.5f},1.0f);  // ancient arch
         PushRenderItem(items,&count,RENDER_PROP,29,(Vector2){6.0f,5.0f},.95f);   // standing pillar
@@ -679,7 +679,7 @@ static void RenderWorld(Game *g) {
         PushRenderItem(items,&count,RENDER_PROP,119,(Vector2){18.0f,5.5f},.62f);
         PushRenderItem(items,&count,RENDER_PROP,415,(Vector2){2.0f,9.0f},.75f);
     } else {
-        PushRenderItem(items,&count,RENDER_PROP,33,(Vector2){17.0f,4.5f},1.35f); // lighthouse from area atlas
+        PushRenderItem(items,&count,RENDER_PROP,33,(Vector2){17.0f,4.5f},1.2f); // lighthouse from area atlas
         PushRenderItem(items,&count,RENDER_PROP,35,(Vector2){10.0f,6.5f},.95f);  // garden fountain
         PushRenderItem(items,&count,RENDER_PROP,34,(Vector2){5.0f,13.0f},1.0f);  // courtyard gate
         PushRenderItem(items,&count,RENDER_PROP,32,(Vector2){15.0f,13.0f},.82f); // stone bridge
@@ -748,7 +748,7 @@ static void RenderWorld(Game *g) {
                 else if(it->index==16)DrawEnvProp(10,p,76*it->scale,82*it->scale);
                 else if(it->index==17)DrawEnvProp(11,p,68*it->scale,38*it->scale);
                 else if(it->index==18)DrawEnvProp(8,p,38*it->scale,46*it->scale);
-                else if(it->index==33)DrawAreaProp(13,p,190*it->scale,250*it->scale);
+                else if(it->index==33)DrawAreaProp(13,p,150*it->scale,190*it->scale);
                 else if(it->index==28)DrawAreaProp(8,p,150*it->scale,140*it->scale);
                 else if(it->index==32)DrawAreaProp(12,p,130*it->scale,100*it->scale);
                 else if(it->index==34)DrawAreaProp(14,p,110*it->scale,118*it->scale);
@@ -819,7 +819,7 @@ static void PanelDark(Rectangle r) {
     DrawRectangleRoundedLines(r,.12f,18,(Color){197,157,91,238});
     Rectangle inner={r.x+4.0f,r.y+4.0f,r.width-8.0f,r.height-8.0f};
     DrawRectangleRoundedLines(inner,.10f,16,Fade((Color){240,221,179,255},.16f));
-    DrawRectangle(r.x+12,r.y+13,3,r.height-26,Fade(C_GOLD,.78f));
+    DrawRectangle((int)(r.x+12),(int)(r.y+13),3,(int)(r.height-26),Fade(C_GOLD,.78f));
 }
 static void RenderHUD(Game *g) {
     PanelDark((Rectangle){20,18,405,112});
@@ -1066,11 +1066,11 @@ static void RenderEnd(Game *g) {
         // The lighthouse lantern sits near the upper centre of the illustration.
         Vector2 lamp={scene.x+scene.width*.50f,scene.y+scene.height*.205f};
         float sweep=sinf(t*.72f)*74.0f;
-        Vector2 beamA={scene.x+4.0f,lamp.y-66.0f+sweep};
-        Vector2 beamB={scene.x+4.0f,lamp.y+66.0f+sweep};
+        Vector2 beamA={scene.x+scene.width-4.0f,lamp.y-66.0f+sweep};
+        Vector2 beamB={scene.x+scene.width-4.0f,lamp.y+66.0f+sweep};
         DrawTriangle(lamp,beamA,beamB,Fade((Color){255,224,151,255},.11f+.045f*pulse));
-        DrawTriangle(lamp,(Vector2){scene.x+4.0f,lamp.y-27.0f+sweep*.72f},
-            (Vector2){scene.x+4.0f,lamp.y+27.0f+sweep*.72f},Fade((Color){255,244,205,255},.16f+.06f*pulse));
+        DrawTriangle(lamp,(Vector2){scene.x+scene.width-4.0f,lamp.y-27.0f+sweep*.72f},
+            (Vector2){scene.x+scene.width-4.0f,lamp.y+27.0f+sweep*.72f},Fade((Color){255,244,205,255},.16f+.06f*pulse));
         DrawCircleV(lamp,43.0f,Fade((Color){255,222,148,255},.14f+.11f*pulse));
         DrawCircleV(lamp,23.0f,Fade((Color){255,240,190,255},.25f+.16f*pulse));
         DrawCircleV(lamp,9.0f,(Color){255,249,220,255});
@@ -1082,10 +1082,10 @@ static void RenderEnd(Game *g) {
         DrawRectangleLinesEx((Rectangle){scene.x-4,scene.y-4,scene.width+8,scene.height+8},3.0f,Fade(C_GOLD,.82f));
         DrawRectangleLinesEx((Rectangle){scene.x+2,scene.y+2,scene.width-4,scene.height-4},1.0f,Fade((Color){255,246,217,255},.32f));
         // Place the traveller and companions on the path in the illustrated scene.
-        DrawPlayer((Vector2){520,625},t,false,3);
-        if(g->lumi.owned)DrawLumi((Vector2){585,625},t,0);
-        if(g->splash.owned)DrawMoatail((Vector2){650,625},t);
-        if(g->spark.owned)DrawGecko((Vector2){715,625},t);
+        DrawPlayer((Vector2){420,650},t,false,3);
+        if(g->lumi.owned)DrawLumi((Vector2){485,650},t,0);
+        if(g->splash.owned)DrawMoatail((Vector2){550,650},t);
+        if(g->spark.owned)DrawGecko((Vector2){615,650},t);
     } else {
         DrawLighthouseBackdrop(t,true);
         DrawUIText("灯塔重新亮起",510,325,30,(Color){255,238,198,255});
