@@ -2,6 +2,8 @@
 """Static and asset-layout checks for the Mist Isle Windows playtest candidate."""
 from pathlib import Path
 from zipfile import ZipFile
+import base64
+import io
 import re
 from PIL import Image
 
@@ -10,6 +12,7 @@ RENDER = (ROOT / "src/render.c").read_text(encoding="utf-8")
 GAME = (ROOT / "src/game.c").read_text(encoding="utf-8")
 HEADER = (ROOT / "src/game.h").read_text(encoding="utf-8")
 MAIN = (ROOT / "src/main.c").read_text(encoding="utf-8")
+WORKFLOW = (ROOT / ".github/workflows/build-windows.yml").read_text(encoding="utf-8")
 
 def require(condition, message):
     if not condition:
@@ -77,7 +80,7 @@ else:
 require("build_kenney_runtime_atlas.py" in RENDER or (ROOT / "tools/build_kenney_runtime_atlas.py").exists(), "Kenney runtime atlas generator is included")
 require("static Vector2 WorldScreen(Vector2 p)" in GAME and "TILE_SIZE" in HEADER, "gameplay and rendering share top-down world coordinates")
 require("grid.y+" in RENDER and "RENDER_PLAYER" in RENDER, "actor sorting uses top-down ground-contact depth")
-require("g->cam.zoom=1.0f" in GAME and "UpdateCamera(g,dt)" in GAME and "MoveTowardsConstant" in GAME,
+require("g->cam.zoom=1.10f" in GAME and "UpdateCamera(g,dt)" in GAME and "MoveTowardsConstant" in GAME,
         "camera uses map bounds and direct constant-speed follow")
 require("RenderItem items[512]" in RENDER and "*count>=512" in RENDER, "render queue has capacity for expanded environment dressing and actors")
 require("world.kind[y][x]==1" in RENDER and "RENDER_TREE" in RENDER,
@@ -92,8 +95,6 @@ require("DrawUITextWrapped" in RENDER and "UI_CODEPOINTS" in RENDER,
         "Chinese UI includes the complete source glyph set and wrapped objective text")
 require("endingTime" in GAME and "static void RenderEnd" in RENDER,
         "lighthouse ending uses a timed cinematic sequence")
-require("DrawTriangle(lamp,beamA,beamB" in RENDER and "sinf(t*.72f)" in RENDER,
-        "lighthouse ending contains a sweeping animated beam")
 require("RENDER_PROP,414" in RENDER and "DrawOriginalProp(it->index-400" in RENDER,
         "lighthouse courtyard uses the authored lighthouse sprite atlas")
 require("SetSolidRect" in GAME and "MovePlayerWithCollision" in GAME and "dockWater" in GAME and "stream&&!bridge" in GAME,
@@ -114,10 +115,22 @@ require("LogicalMousePosition" in GAME and "GetScreenWidth()" in GAME,
         "battle mouse selection remains aligned after window scaling")
 require("DrawTerrainAccent" in RENDER and "terrainKinds" in RENDER and "512" in RENDER,
         "world maps include layered ground detail, shoreline foam and a larger render queue")
-require("RenderWorld(g);" in RENDER and "GetWorldToScreen2D" in RENDER,
-        "ending cinematic reuses the actual lighthouse courtyard and animated beacon")
-require("footY-54" in RENDER and "footY-50" in RENDER,
+require("TEX_ENDING_CG" in RENDER and "LoadEndingCG" in RENDER and "assets/cinematics/lighthouse_lighting_6frame.jpg.b64" in RENDER,
+        "ending uses a dedicated illustrated lighthouse cinematic atlas")
+cg_file = ROOT / "assets/cinematics/lighthouse_lighting_6frame.jpg.b64"
+require(cg_file.exists(), "lighthouse ending CG asset is present")
+with Image.open(io.BytesIO(base64.b64decode(cg_file.read_text(encoding="ascii")))) as cg:
+    require(cg.size == (384, 256), "lighthouse CG atlas contains six 128px frames")
+require("assets/cinematics" in WORKFLOW and "Copy-Item assets/cinematics/*" in WORKFLOW,
+        "Windows playtest package includes the cinematic asset")
+require("footY-66" in RENDER and "footY-56" in RENDER,
         "player and companion sprites use enlarged world-space dimensions")
+require("unsigned char solid[MAPH][MAPW]" in HEADER and "w->solid[y][x]=1" in GAME and "g->world.solid[y][x]" in GAME,
+        "collision footprints are independent from visible terrain and tree tiles")
+require("h%100" not in GAME[GAME.find("static void BuildAreaWorld"):GAME.find("static void SwitchArea",GAME.find("static void BuildAreaWorld"))],
+        "area maps use authored layouts instead of random blocker placement")
+require("bossDefeated && Dist(p->pos,g->world.shrine)<3.2f" in GAME and "点亮失落的灯塔" in RENDER,
+        "final lighthouse tablet has a visible E interaction")
 
 # Critical gameplay entry points and persistence must remain present.
 for token, label in [
