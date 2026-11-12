@@ -168,3 +168,7 @@ The game uses an orthographic top-down grid. WASD and arrow keys are screen-card
 
 ## Refined top-down terrain art pack v4
 The v4 art pack includes the approved v3 environment/character art plus `assets/environment/topdown_terrain_atlas_v1.png`, a native 56px orthographic terrain atlas built from the grass, sand, stone and water variant sheets. It contains 9 grass variants, 9 sand variants, 9 stone variants and 12 water/shore variants. Extract `MistIsle_ArtPack_v4_TopDown_Refined.zip` at the repository root and run `UPLOAD_ART_TO_GITHUB.bat` to commit the assets once.
+
+
+## Refined top-down art pack v5
+The v5 pack adds four runtime atlases: 56px grass/sand/stone/water terrain tiles; a 44-sprite flora and props atlas; a 30-sprite cliffs, shoreline, bridges and fences atlas; and a 10-sprite structures atlas for cottage, tent, shrine, fountain and campfire. The renderer now loads these atlases and uses the detailed square tiles and sprites for the top-down maps. Import once with `MistIsle_ArtPack_v5_TopDown_Refined.zip` and `UPLOAD_ART_TO_GITHUB.bat`.
