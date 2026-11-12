@@ -8,8 +8,10 @@ static const int UI_CODEPOINTS[]={32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,4
 static bool UIFontHasRequiredGlyphs(Font f) {
     for(int i=0;i<(int)(sizeof(UI_CODEPOINTS)/sizeof(UI_CODEPOINTS[0]));i++) {
         int cp=UI_CODEPOINTS[i];
-        if(cp>127 && GetGlyphIndex(f,cp)<=0) {
-            TraceLog(LOG_WARNING,"Mist Isle: font missing required UI glyph U+%04X",cp);
+        bool cjk=(cp>=0x3400&&cp<=0x9FFF)||(cp>=0xF900&&cp<=0xFAFF)||
+                 (cp>=0x3000&&cp<=0x303F)||(cp>=0xFF00&&cp<=0xFFEF);
+        if(cjk && GetGlyphIndex(f,cp)<=0) {
+            TraceLog(LOG_WARNING,"Mist Isle: font missing required Chinese glyph U+%04X",cp);
             return false;
         }
     }
@@ -391,7 +393,8 @@ static void DrawLighthouseGuardian(Vector2 p,float t,float scale) {
         Vector2 mote={c.x+cosf(a)*39*scale,c.y-5*scale+sinf(a)*34*scale};
         DrawCircleV(mote,2.2f*scale,Fade(gold,.65f));
     }
-}\nstatic void DrawCloudPuff(float x,float y,float s,Color color) {
+}
+static void DrawCloudPuff(float x,float y,float s,Color color) {
     DrawCircle((int)(x-18*s),(int)y,(int)(18*s),color);
     DrawCircle((int)x,(int)(y-7*s),(int)(23*s),color);
     DrawCircle((int)(x+22*s),(int)y,(int)(17*s),color);
