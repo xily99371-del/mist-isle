@@ -112,5 +112,6 @@ void GameSave(Game *g);
 bool GameLoad(Game *g);
 void GameStart(Game *g);
 Buddy *CurrentBuddy(Game *g);
+void GetCurrentObjective(Game *g,const char **title,const char **detail,Vector2 *target,bool *hasTarget);
 float Dist(Vector2 a,Vector2 b);
 #endif
