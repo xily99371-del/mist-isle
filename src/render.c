@@ -759,7 +759,7 @@ static void RenderWorld(Game *g) {
     Vector2 objectiveTarget;
     bool hasObjectiveTarget=false;
     GetCurrentObjective(g,&objectiveTitle,&objectiveDetail,&objectiveTarget,&hasObjectiveTarget);
-    if(hasObjectiveTarget)DrawObjectiveMarker(objectiveTarget,g->time);
+    if(hasObjectiveTarget && g->scene!=SCENE_END && g->scene!=SCENE_TITLE)DrawObjectiveMarker(objectiveTarget,g->time);
     for(int i=0;i<MAX_PARTICLES;i++)if(g->particles[i].life>0) {
         Particle *p=&g->particles[i];
         DrawCircleV(p->p,p->size*(p->life/p->maxLife),Fade(p->c,p->life/p->maxLife));
