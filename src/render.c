@@ -229,7 +229,10 @@ static void DrawGecko(Vector2 p,float t) {
     }
 }
 static void RenderWorld(Game *g) {
-    ClearBackground(C_BG);
+    Color backdrop=g->area==AREA_CAMP?(Color){113,183,196,255}:g->area==AREA_GROVE?(Color){92,142,112,255}:g->area==AREA_RUINS?(Color){93,111,119,255}:(Color){104,143,166,255};
+    ClearBackground(backdrop);
+    // Fill the margins with a subtle area-colored atmosphere instead of a flat empty void.
+    DrawRectangleGradientV(0,0,SW,SH,Fade(WHITE,.16f),Fade(backdrop,.10f));
     BeginMode2D(g->cam);
 
     // Ground first: every tile is drawn before any elevated object.
@@ -279,38 +282,42 @@ static void RenderWorld(Game *g) {
         if(g->world.kind[y][x]==1)
             PushRenderItem(items,&count,RENDER_TREE,(x*3+y)%3,(Vector2){(float)x,(float)y},.82f+((x+y)%3)*.08f);
     }
-    // Region landmarks: grove canopy, old-ruin columns and lighthouse-yard trees.
-    for(int i=0;i<4;i++) {
-        PushRenderItem(items,&count,RENDER_TREE,30+i,(Vector2){8.0f+i*1.1f,3.0f+(i%2)*1.4f},1.05f);
-        PushRenderItem(items,&count,RENDER_TREE,40+i,(Vector2){15.0f+i*1.0f,3.0f+(i%2)*1.2f},.72f);
-    }
-    PushRenderItem(items,&count,RENDER_PROP,4,(Vector2){3.2f,11.4f},1.0f);
-    PushRenderItem(items,&count,RENDER_PROP,5,(Vector2){4.6f,10.8f},1.0f);
-    PushRenderItem(items,&count,RENDER_PROP,6,(Vector2){5.5f,11.7f},1.0f);
-    PushRenderItem(items,&count,RENDER_PROP,7,(Vector2){19.0f,2.2f},1.0f);
-    PushRenderItem(items,&count,RENDER_PROP,16,(Vector2){2.1f,10.5f},1.0f);
-    PushRenderItem(items,&count,RENDER_PROP,17,(Vector2){6.6f,10.9f},.82f);
-    PushRenderItem(items,&count,RENDER_PROP,18,(Vector2){6.3f,12.2f},.72f);
-    PushRenderItem(items,&count,RENDER_FIRE,8,(Vector2){4.1f,12.5f},1.0f);
-    PushRenderItem(items,&count,RENDER_PROP,9,(Vector2){5.9f,10.3f},1.0f);
-    PushRenderItem(items,&count,RENDER_PROP,10,(Vector2){6.6f,12.5f},1.0f);
-    PushRenderItem(items,&count,RENDER_PROP,11,(Vector2){2.4f,14.0f},1.0f);
-    // Dense grove dressing gives the forest its own visual identity.
-    PushRenderItem(items,&count,RENDER_PROP,12,(Vector2){9.0f,4.0f},1.0f);
-    PushRenderItem(items,&count,RENDER_PROP,12,(Vector2){12.8f,6.8f},0.85f);
-    PushRenderItem(items,&count,RENDER_PROP,13,(Vector2){10.0f,8.0f},1.0f);
-    PushRenderItem(items,&count,RENDER_PROP,14,(Vector2){13.0f,5.0f},0.9f);
-    PushRenderItem(items,&count,RENDER_PROP,15,(Vector2){8.4f,7.4f},1.0f);
-    for(int i=0;i<7;i++) {
-        int gx=8+(i*3)%6, gy=3+(i*5)%6;
-        PushRenderItem(items,&count,RENDER_TREE,20+i,(Vector2){(float)gx,(float)gy},0.68f+(i%3)*0.08f);
+    // Each sub-map has its own authored prop composition.
+    if(g->area==AREA_CAMP) {
+        PushRenderItem(items,&count,RENDER_PROP,4,(Vector2){3.2f,11.4f},1.0f);
+        PushRenderItem(items,&count,RENDER_PROP,7,(Vector2){19.0f,2.2f},1.0f);
+        PushRenderItem(items,&count,RENDER_PROP,16,(Vector2){2.1f,10.5f},1.0f);
+        PushRenderItem(items,&count,RENDER_PROP,17,(Vector2){6.6f,10.9f},.82f);
+        PushRenderItem(items,&count,RENDER_PROP,18,(Vector2){6.3f,12.2f},.72f);
+        PushRenderItem(items,&count,RENDER_FIRE,8,(Vector2){4.1f,12.5f},1.0f);
+        PushRenderItem(items,&count,RENDER_PROP,9,(Vector2){5.9f,10.3f},1.0f);
+        PushRenderItem(items,&count,RENDER_PROP,10,(Vector2){6.6f,12.5f},1.0f);
+        PushRenderItem(items,&count,RENDER_PROP,11,(Vector2){2.4f,14.0f},1.0f);
+        // Gate markers on the hub plaza.
+        PushRenderItem(items,&count,RENDER_PROP,14,g->world.groveGate,0.8f);
+        PushRenderItem(items,&count,RENDER_PROP,14,g->world.ruinGate,0.8f);
+        PushRenderItem(items,&count,RENDER_PROP,14,g->world.shrine,0.8f);
+    } else if(g->area==AREA_GROVE) {
+        for(int i=0;i<5;i++)PushRenderItem(items,&count,RENDER_PROP,12,(Vector2){6.0f+i*2.7f,3.0f+(i%2)*8.0f},.9f);
+        PushRenderItem(items,&count,RENDER_PROP,13,(Vector2){7.5f,11.0f},1.0f);
+        PushRenderItem(items,&count,RENDER_PROP,14,(Vector2){15.0f,5.0f},1.0f);
+        PushRenderItem(items,&count,RENDER_PROP,15,(Vector2){16.0f,12.0f},1.0f);
+    } else if(g->area==AREA_RUINS) {
+        for(int i=0;i<5;i++)PushRenderItem(items,&count,RENDER_PROP,14,(Vector2){6.0f+i*2.8f,4.0f+(i%2)*7.0f},1.0f);
+        PushRenderItem(items,&count,RENDER_PROP,15,(Vector2){10.0f,5.0f},1.2f);
+        PushRenderItem(items,&count,RENDER_PROP,15,(Vector2){14.0f,12.0f},1.2f);
+        PushRenderItem(items,&count,RENDER_PROP,13,(Vector2){5.0f,13.0f},1.0f);
+    } else {
+        PushRenderItem(items,&count,RENDER_PROP,7,(Vector2){17.0f,4.0f},1.25f);
+        for(int i=0;i<7;i++)PushRenderItem(items,&count,RENDER_PROP,11,(Vector2){5.0f+i*2.0f,5.0f+(i%2)*8.0f},.72f);
+        for(int i=0;i<5;i++)PushRenderItem(items,&count,RENDER_PROP,15,(Vector2){4.0f+i*3.0f,13.0f},.9f);
     }
     for(int i=0;i<g->world.pickupCount;i++) if(!g->world.pickups[i].taken)
         PushRenderItem(items,&count,RENDER_PICKUP,i,g->world.pickups[i].tile,1.0f);
-    PushRenderItem(items,&count,RENDER_SHRINE,0,g->world.shrine,1.0f);
-    PushRenderItem(items,&count,RENDER_KEEPER,0,(Vector2){3.0f,10.0f},1.0f);
+    if(g->area==AREA_RUINS||g->area==AREA_LIGHTHOUSE)PushRenderItem(items,&count,RENDER_SHRINE,0,g->world.shrine,1.0f);
+    if(g->area==AREA_CAMP)PushRenderItem(items,&count,RENDER_KEEPER,0,(Vector2){3.0f,10.0f},1.0f);
     Vector2 lumiPos=g->lumi.owned?g->lumi.pos:(Vector2){4.0f,12.0f};
-    PushRenderItem(items,&count,RENDER_LUMI,0,lumiPos,1.0f);
+    if(g->area==AREA_CAMP)PushRenderItem(items,&count,RENDER_LUMI,0,lumiPos,1.0f);
     if(g->splash.owned)PushRenderItem(items,&count,RENDER_MOATAIL,0,g->splash.pos,1.0f);
     if(g->spark.owned)PushRenderItem(items,&count,RENDER_GECKO,0,g->spark.pos,1.0f);
     Vector2 fireflyGrid={10.6f+sinf(g->fireflyPhase*0.8f)*0.22f,6.2f+cosf(g->fireflyPhase*0.65f)*0.18f};
