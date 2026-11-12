@@ -513,8 +513,10 @@ static void RenderWorld(Game *g) {
         if(!g->lumi.owned)PushRenderItem(items,&count,RENDER_LUMI,0,(Vector2){4.0f,12.0f},1.0f);
     }
     if(g->lumi.owned)PushRenderItem(items,&count,RENDER_LUMI,0,g->lumi.pos,1.0f);
-    if(g->splash.owned)PushRenderItem(items,&count,RENDER_MOATAIL,0,g->splash.pos,1.0f);
-    if(g->spark.owned)PushRenderItem(items,&count,RENDER_GECKO,0,g->spark.pos,1.0f);
+    if(g->area==AREA_GROVE&&!g->splash.owned)PushRenderItem(items,&count,RENDER_MOATAIL,0,(Vector2){9,5},1.0f);
+    else if(g->splash.owned)PushRenderItem(items,&count,RENDER_MOATAIL,0,g->splash.pos,1.0f);
+    if(g->area==AREA_RUINS&&!g->spark.owned)PushRenderItem(items,&count,RENDER_GECKO,0,(Vector2){15,7},1.0f);
+    else if(g->spark.owned)PushRenderItem(items,&count,RENDER_GECKO,0,g->spark.pos,1.0f);
     if(g->area==AREA_GROVE) {
         Vector2 fireflyGrid={10.6f+sinf(g->fireflyPhase*0.8f)*0.22f,6.2f+cosf(g->fireflyPhase*0.65f)*0.18f};
         if(!g->fireflyDiscovered)PushRenderItem(items,&count,RENDER_FIREFLY,0,fireflyGrid,1.0f);
@@ -560,8 +562,20 @@ static void RenderWorld(Game *g) {
             case RENDER_SHRINE: DrawShrine(p,g->time,g->shrineSolved); break;
             case RENDER_KEEPER: DrawKeeper(p,g->time); break;
             case RENDER_LUMI: DrawLumi(p,g->time,g->lumi.bob); break;
-            case RENDER_MOATAIL: DrawMoatail(p,g->time); break;
-            case RENDER_GECKO: DrawGecko(p,g->time); break;
+            case RENDER_MOATAIL:
+                DrawMoatail(p,g->time);
+                if(g->area==AREA_GROVE&&!g->splash.owned) {
+                    DrawCircle((int)p.x,(int)p.y-58,11,C_GOLD);
+                    DrawUIText("!",(int)p.x-4,(int)p.y-67,17,WHITE);
+                }
+                break;
+            case RENDER_GECKO:
+                DrawGecko(p,g->time);
+                if(g->area==AREA_RUINS&&!g->spark.owned) {
+                    DrawCircle((int)p.x,(int)p.y-58,11,C_GOLD);
+                    DrawUIText("!",(int)p.x-4,(int)p.y-67,17,WHITE);
+                }
+                break;
             case RENDER_FIREFLY: DrawFirefly(p,g->time); break;
             case RENDER_LEAFLING: DrawLeafling(p,g->time); break;
             case RENDER_MOTE: DrawMote(p,g->time); break;
