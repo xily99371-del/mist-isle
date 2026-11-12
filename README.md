@@ -164,3 +164,7 @@ After this one-time import, all future source ZIPs and Windows build artifacts w
 
 ## Controls and movement coordinate convention
 The game uses an orthographic top-down grid. WASD and arrow keys are screen-cardinal: W/up decreases world Y, S/down increases world Y, A/left decreases world X, D/right increases world X. World tiles are 56x56 pixels. Camera tracking is clamped to the active sub-map bounds.
+
+
+## Refined top-down terrain art pack v4
+The v4 art pack includes the approved v3 environment/character art plus `assets/environment/topdown_terrain_atlas_v1.png`, a native 56px orthographic terrain atlas built from the grass, sand, stone and water variant sheets. It contains 9 grass variants, 9 sand variants, 9 stone variants and 12 water/shore variants. Extract `MistIsle_ArtPack_v4_TopDown_Refined.zip` at the repository root and run `UPLOAD_ART_TO_GITHUB.bat` to commit the assets once.
