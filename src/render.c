@@ -236,7 +236,7 @@ typedef enum {
 } RenderKind;
 typedef struct { float depth; RenderKind kind; int index; Vector2 grid; float scale; } RenderItem;
 static void PushRenderItem(RenderItem *items,int *count,RenderKind kind,int index,Vector2 grid,float scale) {
-    if(*count>=128)return;
+    if(*count>=192)return;
     items[*count]=(RenderItem){grid.y,kind,index,grid,scale};
     (*count)++;
 }
