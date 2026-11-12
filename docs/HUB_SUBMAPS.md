@@ -41,3 +41,7 @@ A new original 16-prop atlas is provided in `MistIsle_AreaProps_v1.zip`, extract
 - Lighthouse: stone stairs, lighthouse tower, iron gate, garden fountain.
 
 The renderer loads this as an optional atlas and places the matching props in each sub-map. The local game build requires the asset pack to be extracted into the repository root; a clean GitHub CI build without the optional pack falls back to the existing props.
+
+
+## Orthographic top-down control update
+The world renderer now uses an orthographic 2D grid with 56px square cells. WASD and arrow keys map directly to screen directions: W/up moves toward the top of the screen, S/down toward the bottom, A/left and D/right horizontally. The camera follows the player and clamps to each sub-map's world bounds. Ground and object projection use the same tile-center transform; trees and props are sorted by ground-contact Y for correct foreground overlap. The coastal hub uses an irregular oval shoreline with sand transition, while forest, ruins and lighthouse maps use distinct border treatments.
