@@ -237,7 +237,7 @@ typedef enum {
 typedef struct { float depth; RenderKind kind; int index; Vector2 grid; float scale; } RenderItem;
 static void PushRenderItem(RenderItem *items,int *count,RenderKind kind,int index,Vector2 grid,float scale) {
     if(*count>=192)return;
-    items[*count]=(RenderItem){grid.y,kind,index,grid,scale};
+    items[*count]=(RenderItem){grid.y+((kind==RENDER_PLAYER||kind==RENDER_TREE||kind==RENDER_PROP)?0.16f:0.0f),kind,index,grid,scale};
     (*count)++;
 }
 static void DrawMoatail(Vector2 p,float t) {
@@ -474,8 +474,9 @@ static void RenderWorld(Game *g) {
     for(int i=0;i<count;i++) {
         RenderItem *it=&items[i]; Vector2 p=WorldToScreen(it->grid.x,it->grid.y);
         switch(it->kind) {
-            case RENDER_TREE: if(g->area==AREA_RUINS)DrawEnvProp(5,p,48*it->scale,62*it->scale); else DrawTree(p,it->scale,g->time); break;
+            case RENDER_TREE: p.y+=9.0f; if(g->area==AREA_RUINS)DrawEnvProp(5,p,48*it->scale,62*it->scale); else DrawTree(p,it->scale,g->time); break;
             case RENDER_PROP:
+                p.y+=7.0f;
                 if(it->index==4)DrawProp(4,p,72,68);
                 else if(it->index==5)DrawEnvProp(7,p,52,52);
                 else if(it->index==6)DrawEnvProp(5,p,44,46);
