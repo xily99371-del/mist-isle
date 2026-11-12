@@ -122,3 +122,9 @@ Extract `MistIsle_ArtIntegration_v2.zip` into the repository root (merge the `as
 The updated art archive is available in ChatGPT Library as `MistIsle_ArtIntegration_v2_1.zip`. Extract it into the repository root and merge `assets/`. This release includes the hand-projected grass, flower-grass, sand, stone and water isometric tiles. The asset generator now preserves an imported ground atlas instead of overwriting it with procedural placeholders.
 
 The renderer source frame size is 32x32 (the `_64` filename refers to the intended display scale, not the source-cell dimensions). The environment prop atlas uses 96x96 cells.
+
+
+## Hub + sub-map world
+The chapter now uses a hub-and-three-sub-map structure: Coastal Camp, Glowglade Forest, Tidal Ruins and Lighthouse Courtyard. Enter each region from the hub gates with E; use the marked west exit in a sub-map to return. The Tidal Ruins gate unlocks after recruiting Moss Lumi and Moatail; the Lighthouse Courtyard opens after solving the shrine.
+
+Save format v4 stores the active region and resource pickups separately for all four maps. See `docs/HUB_SUBMAPS.md` for the map flow, progression and remaining art gaps.
