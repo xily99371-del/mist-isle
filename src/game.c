@@ -27,19 +27,16 @@ static Vector2 ClampCameraTarget(Game *g,Vector2 target) {
 static void SnapCameraToPlayer(Game *g) {
     g->cam.target=ClampCameraTarget(g,WorldScreen(g->player.pos));
 }
+static Vector2 MoveTowardsConstant(Vector2 current,Vector2 target,float maxDistance) {
+    Vector2 delta=Vector2Subtract(target,current);
+    float distance=Vector2Length(delta);
+    if(distance<=maxDistance || distance<0.0001f)return target;
+    return Vector2Add(current,Vector2Scale(delta,maxDistance/distance));
+}
 static void UpdateCamera(Game *g,float dt) {
-    Vector2 player=WorldScreen(g->player.pos);
-    Vector2 desired=g->cam.target;
-    float dx=player.x-g->cam.target.x, dy=player.y-g->cam.target.y;
-    float deadX=150.0f/fmaxf(g->cam.zoom,0.01f);
-    float deadY=96.0f/fmaxf(g->cam.zoom,0.01f);
-    if(dx>deadX)desired.x=player.x-deadX;
-    else if(dx<-deadX)desired.x=player.x+deadX;
-    if(dy>deadY)desired.y=player.y-deadY;
-    else if(dy<-deadY)desired.y=player.y+deadY;
-    desired=ClampCameraTarget(g,desired);
-    float blend=1.0f-expf(-2.2f*dt);
-    g->cam.target=Vector2Lerp(g->cam.target,desired,blend);
+    Vector2 desired=ClampCameraTarget(g,WorldScreen(g->player.pos));
+    // Constant-speed lock-on: no dead zone and no exponential ease-in/out.
+    g->cam.target=MoveTowardsConstant(g->cam.target,desired,680.0f*dt);
     g->cam.target=ClampCameraTarget(g,g->cam.target);
 }
 static void Toast(Game *g,const char *s) {
@@ -198,35 +195,67 @@ static void SwitchArea(Game *g,Area area) {
     SnapCameraToPlayer(g);
 }
 
+static bool InRect(Vector2 p,float left,float top,float right,float bottom) {
+    return p.x>=left && p.x<=right && p.y>=top && p.y<=bottom;
+}
 static bool SolidPoint(Game *g,Vector2 p) {
     int x=(int)floorf(p.x+0.5f),y=(int)floorf(p.y+0.5f);
     if(x<1||y<1||x>=MAPW-1||y>=MAPH-1)return true;
     if(g->world.kind[y][x]==1)return true;
+
+    // Authored object colliders match the visible footprints, not just their anchor tile.
     if(g->area==AREA_CAMP) {
-        float nx=((float)x-10.5f)/11.0f, ny=((float)y-8.5f)/9.0f;
+        if(InRect(p,3.05f,1.55f,5.95f,4.75f))return true;   // blue cottage
+        if(InRect(p,12.55f,2.75f,15.45f,6.15f))return true; // red cottage
+        if(InRect(p,7.15f,5.15f,9.05f,7.15f))return true;   // main tent
+        if(InRect(p,12.55f,3.25f,13.65f,4.75f))return true; // supply tent
+        float nx=(p.x-10.5f)/11.0f, ny=(p.y-8.5f)/9.0f;
         bool onPath=((y>=8&&y<=10&&x>=3&&x<=19)||(x>=17&&x<=19&&y>=3&&y<=15));
         bool dockWater=(x>=1&&x<=3&&y>=11&&y<=15);
         bool sea=(nx*nx+ny*ny)>.88f;
         if(!onPath&&(dockWater||sea))return true;
-    } else if(g->area==AREA_GROVE||g->area==AREA_RUINS) {
+    } else if(g->area==AREA_GROVE) {
+        if(InRect(p,3.95f,2.95f,6.05f,4.85f))return true;   // flowering tree
+        if(InRect(p,14.95f,3.05f,17.05f,4.95f))return true;  // grove tree
+        if(InRect(p,8.35f,11.15f,10.75f,12.95f))return true;// fallen log
+        if(InRect(p,13.75f,11.45f,15.85f,13.15f))return true;// mushroom cluster
         bool stream=(x>=9&&x<=11&&y>=3&&y<=14);
         bool bridge=(y>=8&&y<=10&&x>=2&&x<=19);
         if(stream&&!bridge)return true;
+    } else if(g->area==AREA_RUINS) {
+        if(InRect(p,13.65f,3.95f,14.75f,6.45f))return true; // left arch footing
+        if(InRect(p,15.25f,3.95f,16.35f,6.45f))return true; // right arch footing
+        if(InRect(p,4.75f,4.05f,6.85f,6.25f))return true;   // broken pillar
+        if(InRect(p,8.45f,11.05f,10.75f,13.05f))return true;// broken wall
+        if(InRect(p,14.35f,11.05f,16.35f,13.15f))return true;// rune fountain
+        bool stream=(x>=9&&x<=11&&y>=3&&y<=14);
+        bool bridge=(y>=8&&y<=10&&x>=2&&x<=19);
+        if(stream&&!bridge)return true;
+    } else {
+        if(InRect(p,15.45f,2.65f,18.65f,5.15f))return true; // lighthouse tower
+        if(InRect(p,8.65f,5.75f,10.85f,7.85f))return true;  // garden fountain
+        if(InRect(p,3.75f,11.65f,5.65f,13.85f))return true;// courtyard gate
+        if(InRect(p,13.65f,11.65f,15.85f,13.95f))return true;// garden shrub
     }
     return false;
 }
 static bool Solid(Game *g,Vector2 p) {
-    // Match the collision footprint to the visible character width.
-    const float r=.30f;
+    // Eight perimeter samples approximate the full body footprint and prevent diagonal corner clipping.
+    const float r=.37f;
+    const float d=.262f;
     return SolidPoint(g,p) ||
-        SolidPoint(g,(Vector2){p.x-r,p.y-r}) ||
-        SolidPoint(g,(Vector2){p.x+r,p.y-r}) ||
-        SolidPoint(g,(Vector2){p.x-r,p.y+r}) ||
-        SolidPoint(g,(Vector2){p.x+r,p.y+r});
+        SolidPoint(g,(Vector2){p.x-r,p.y}) ||
+        SolidPoint(g,(Vector2){p.x+r,p.y}) ||
+        SolidPoint(g,(Vector2){p.x,p.y-r}) ||
+        SolidPoint(g,(Vector2){p.x,p.y+r}) ||
+        SolidPoint(g,(Vector2){p.x-d,p.y-d}) ||
+        SolidPoint(g,(Vector2){p.x+d,p.y-d}) ||
+        SolidPoint(g,(Vector2){p.x-d,p.y+d}) ||
+        SolidPoint(g,(Vector2){p.x+d,p.y+d});
 }
 static void MovePlayerWithCollision(Game *g,Vector2 delta) {
     float distance=Vector2Length(delta);
-    int steps=(int)ceilf(distance/0.12f);
+    int steps=(int)ceilf(distance/0.08f);
     if(steps<1)steps=1;
     Vector2 step=Vector2Scale(delta,1.0f/(float)steps);
     for(int i=0;i<steps;i++) {
@@ -346,11 +375,11 @@ void GetCurrentObjective(Game *g,const char **title,const char **detail,Vector2 
     if(!g->lumi.owned) {
         if(g->area==AREA_CAMP) {
             *title="救助苔灯灵";
-            *detail="前往营火旁的绿色小精灵，靠近后按 E";
+            *detail="到营火旁找苔灯灵，按 E 救助";
             *target=(Vector2){4,12};
         } else {
             *title="返回海岸营地";
-            *detail="沿西侧石路找到出口，靠近后按 E 返回";
+            *detail="沿西侧石路返回海岸营地，按 E";
             *target=exitPoint;
         }
         return;
@@ -358,21 +387,21 @@ void GetCurrentObjective(Game *g,const char **title,const char **detail,Vector2 
     if(!g->splash.owned) {
         if(g->area==AREA_CAMP) {
             *title="寻找沫尾兽";
-            *detail="前往营地东侧的辉光林地入口，靠近后按 E";
+            *detail="从营地东侧入口进入辉光林地";
             *target=g->world.groveGate;
         } else if(g->area==AREA_GROVE) {
             if(g->player.berries>0) {
                 *title="招募沫尾兽";
-                *detail="靠近浅水边的沫尾兽，交付一颗果实（E）";
+                *detail="带一颗果实，到浅水边喂沫尾兽";
                 *target=(Vector2){9,5};
             } else {
                 *title="收集岛屿果实";
-                *detail="寻找地上的果实，靠近后按 E 采集";
+                *detail="在林地采集一颗果实";
                 if(!FindNearestPickup(g,0,3,target))*target=(Vector2){6,5};
             }
         } else {
             *title="返回辉光林地";
-            *detail="沿西侧出口返回营地，再前往林地";
+            *detail="从西侧出口回营地，再进辉光林地";
             *target=exitPoint;
         }
         return;
@@ -380,21 +409,21 @@ void GetCurrentObjective(Game *g,const char **title,const char **detail,Vector2 
     if(!g->spark.owned) {
         if(g->area==AREA_CAMP) {
             *title="寻找鸣晶蜥";
-            *detail="前往潮汐遗迹入口，靠近后按 E";
+            *detail="从营地东侧入口进入潮汐遗迹";
             *target=g->world.ruinGate;
         } else if(g->area==AREA_RUINS) {
             if(g->player.crystals>0) {
                 *title="招募鸣晶蜥";
-                *detail="靠近遗迹石台上的鸣晶蜥，交付一枚星晶（E）";
+                *detail="带一枚星晶，到石台招募鸣晶蜥";
                 *target=(Vector2){15,7};
             } else {
                 *title="收集星晶";
-                *detail="探索遗迹，寻找紫色星晶并按 E 采集";
+                *detail="在遗迹寻找并采集星晶";
                 if(!FindNearestPickup(g,2,2,target))*target=(Vector2){15,5};
             }
         } else {
             *title="返回潮汐遗迹";
-            *detail="沿西侧出口返回营地，再进入潮汐遗迹";
+            *detail="从西侧出口回营地，再进潮汐遗迹";
             *target=exitPoint;
         }
         return;
@@ -402,16 +431,16 @@ void GetCurrentObjective(Game *g,const char **title,const char **detail,Vector2 
     if(!g->shrineSolved) {
         if(g->area==AREA_CAMP) {
             *title="唤醒潮汐遗迹";
-            *detail="前往潮汐遗迹，准备一枚潮汐贝壳";
+            *detail="进入潮汐遗迹，收集一枚潮汐贝壳";
             *target=g->world.ruinGate;
         } else if(g->area==AREA_RUINS) {
             if(g->player.shells<=0) {
                 *title="寻找潮汐贝壳";
-                *detail="沿遗迹水道寻找蓝色贝壳，靠近后按 E";
+                *detail="沿水道寻找潮汐贝壳，按 E 采集";
                 if(!FindNearestPickup(g,1,1,target))*target=(Vector2){7,6};
             } else {
                 *title="激活遗迹机关";
-                *detail="携带潮汐贝壳，靠近中央机关后按 E";
+                *detail="带着潮汐贝壳，靠近中央机关按 E";
                 *target=g->world.shrine;
             }
         } else {
@@ -424,30 +453,30 @@ void GetCurrentObjective(Game *g,const char **title,const char **detail,Vector2 
     if(!g->bossDefeated) {
         if(g->area==AREA_CAMP) {
             *title="前往灯塔庭院";
-            *detail="封印已经解除，前往营地东南侧入口";
+            *detail="封印已解除，从营地东南入口进入庭院";
             *target=g->world.shrine;
         } else if(g->area==AREA_LIGHTHOUSE) {
             *title="击败灯塔守卫";
-            *detail="靠近庭院中央的守卫，自动开始战斗";
+            *detail="找到庭院中央的守卫，靠近后按 E 挑战";
             *target=g->world.bossPos;
         } else {
             *title="返回灯塔庭院";
-            *detail="沿西侧出口返回营地，再前往灯塔庭院";
+            *detail="从西侧出口回营地，再进灯塔庭院";
             *target=exitPoint;
         }
         return;
     }
     if(g->area==AREA_LIGHTHOUSE) {
         *title="点亮失落的灯塔";
-        *detail="返回庭院中央的遗迹，完成最后的共鸣";
+        *detail="回到中央遗迹，完成最后的共鸣";
         *target=g->world.shrine;
     } else if(g->area==AREA_CAMP) {
         *title="返回灯塔庭院";
-        *detail="前往营地东南侧入口，完成最后的共鸣";
+        *detail="从营地东南入口回到灯塔庭院";
         *target=g->world.shrine;
     } else {
         *title="返回灯塔庭院";
-        *detail="沿西侧出口返回营地，再前往灯塔庭院";
+        *detail="从西侧出口回营地，再进灯塔庭院";
         *target=exitPoint;
     }
     (void)hasTarget;
@@ -490,6 +519,7 @@ void GameUpdate(Game *g,float dt) {
         return;
     }
     if(g->scene==SCENE_END) {
+        g->endingTime+=dt;
         if(IsKeyPressed(KEY_R)) GameReset(g,g->lastSeed+1);
         return;
     }
@@ -715,7 +745,7 @@ void GameUpdate(Game *g,float dt) {
         }
         // Final encounter trigger.
         if(g->area==AREA_LIGHTHOUSE&&g->shrineSolved&&Dist(p->pos,g->world.bossPos)<2.0f&&!g->bossDefeated) {
-            AddEnemy(g,ENEMY_BOSS,18,13,90);EnterBattle(g,g->enemyCount-1);return;
+            AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,150);EnterBattle(g,g->enemyCount-1);return;
         }
         // NPC at camp.
         if(g->area==AREA_CAMP&&Dist(p->pos,(Vector2){3,10})<1.6f) {
@@ -725,6 +755,7 @@ void GameUpdate(Game *g,float dt) {
     }
     // Story areas: region messages / final ending.
     if(g->bossDefeated&&Dist(p->pos,g->world.shrine)<2.0f) {
+        g->endingTime=0.0f;
         g->scene=SCENE_END;return;
     }
     if(g->shrineSolved&&g->enemyCount>0&&!g->enemies[g->enemyCount-1].alive)g->bossDefeated=true;
