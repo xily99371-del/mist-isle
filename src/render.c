@@ -24,7 +24,7 @@ static void DrawUIText(const char *text,int x,int y,int size,Color tint) {
 
 static Texture2D TEX_HERO={0}, TEX_LUMI={0}, TEX_MOATAIL={0}, TEX_GECKO={0}, TEX_KEEPER={0};
 static Texture2D TEX_HERO_PIXEL={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, TEX_GECKO_PIXEL={0}, TEX_TILES={0}, TEX_PROPS={0};
-static Texture2D TEX_ISO_TILES={0}, TEX_HERO_WALK={0}, TEX_ENV_PROPS={0}, TEX_LEAFLING={0}, TEX_GROVE_MOTE={0};
+static Texture2D TEX_ISO_TILES={0}, TEX_HERO_WALK={0}, TEX_ENV_PROPS={0}, TEX_LEAFLING={0}, TEX_GROVE_MOTE={0}, TEX_AREA_PROPS={0};
 static void DrawPortrait(Texture2D tex, Vector2 p, float w, float h, float bob) {
     if (tex.id == 0) return;
     Rectangle src={0,0,(float)tex.width,(float)tex.height};
@@ -42,6 +42,12 @@ static void DrawIsoTile(int x,int y,int tile,Color fallback) {
     }
     Vector2 a={p.x,p.y-15.5f},b={p.x+31,p.y},d={p.x-31,p.y},e={p.x,p.y+15.5f};
     DrawTriangle(a,b,d,fallback);DrawTriangle(b,e,d,fallback);
+}
+static void DrawAreaProp(int index,Vector2 p,float w,float h) {
+    if(!TEX_AREA_PROPS.id)return;
+    Rectangle src={(float)(index*96),0,96,96};
+    Rectangle dst={p.x-w*.5f,p.y-h,w,h};
+    DrawTexturePro(TEX_AREA_PROPS,src,dst,(Vector2){0,0},0,WHITE);
 }
 static void DrawEnvProp(int index,Vector2 p,float w,float h) {
     if(!TEX_ENV_PROPS.id)return;
@@ -284,6 +290,10 @@ static void RenderWorld(Game *g) {
     // Each sub-map has its own authored prop composition.
     if(g->area==AREA_CAMP) {
         PushRenderItem(items,&count,RENDER_PROP,4,(Vector2){3.2f,11.4f},1.0f);
+        PushRenderItem(items,&count,RENDER_PROP,20,(Vector2){3.0f,14.0f},1.0f);
+        PushRenderItem(items,&count,RENDER_PROP,21,(Vector2){2.0f,15.0f},.9f);
+        PushRenderItem(items,&count,RENDER_PROP,22,(Vector2){5.5f,10.5f},.9f);
+        PushRenderItem(items,&count,RENDER_PROP,23,(Vector2){2.0f,12.0f},.7f);
         PushRenderItem(items,&count,RENDER_PROP,7,(Vector2){19.0f,2.2f},1.0f);
         PushRenderItem(items,&count,RENDER_PROP,16,(Vector2){2.1f,10.5f},1.0f);
         PushRenderItem(items,&count,RENDER_PROP,17,(Vector2){6.6f,10.9f},.82f);
@@ -298,21 +308,25 @@ static void RenderWorld(Game *g) {
         PushRenderItem(items,&count,RENDER_PROP,14,g->world.shrine,0.8f);
     } else if(g->area==AREA_GROVE) {
         PushRenderItem(items,&count,RENDER_PROP,14,(Vector2){2,9},.8f);
-        for(int i=0;i<5;i++)PushRenderItem(items,&count,RENDER_PROP,12,(Vector2){6.0f+i*2.7f,3.0f+(i%2)*8.0f},.9f);
-        PushRenderItem(items,&count,RENDER_PROP,13,(Vector2){7.5f,11.0f},1.0f);
-        PushRenderItem(items,&count,RENDER_PROP,14,(Vector2){15.0f,5.0f},1.0f);
-        PushRenderItem(items,&count,RENDER_PROP,15,(Vector2){16.0f,12.0f},1.0f);
+        for(int i=0;i<4;i++)PushRenderItem(items,&count,RENDER_PROP,24,(Vector2){6.0f+i*3.2f,3.0f+(i%2)*8.0f},.95f);
+        PushRenderItem(items,&count,RENDER_PROP,25,(Vector2){7.5f,11.0f},1.0f);
+        PushRenderItem(items,&count,RENDER_PROP,26,(Vector2){10.0f,13.0f},1.0f);
+        PushRenderItem(items,&count,RENDER_PROP,27,(Vector2){15.0f,5.0f},.9f);
+        PushRenderItem(items,&count,RENDER_PROP,12,(Vector2){6.0f,3.0f},.9f);
     } else if(g->area==AREA_RUINS) {
         PushRenderItem(items,&count,RENDER_PROP,14,(Vector2){2,9},.8f);
-        for(int i=0;i<5;i++)PushRenderItem(items,&count,RENDER_PROP,14,(Vector2){6.0f+i*2.8f,4.0f+(i%2)*7.0f},1.0f);
-        PushRenderItem(items,&count,RENDER_PROP,15,(Vector2){10.0f,5.0f},1.2f);
-        PushRenderItem(items,&count,RENDER_PROP,15,(Vector2){14.0f,12.0f},1.2f);
-        PushRenderItem(items,&count,RENDER_PROP,13,(Vector2){5.0f,13.0f},1.0f);
+        PushRenderItem(items,&count,RENDER_PROP,28,(Vector2){16.0f,5.0f},1.25f);
+        for(int i=0;i<4;i++)PushRenderItem(items,&count,RENDER_PROP,29,(Vector2){6.0f+i*3.6f,4.0f+(i%2)*8.0f},.95f);
+        PushRenderItem(items,&count,RENDER_PROP,30,(Vector2){6.0f,13.0f},1.1f);
+        PushRenderItem(items,&count,RENDER_PROP,31,(Vector2){17.0f,7.0f},1.0f);
+        PushRenderItem(items,&count,RENDER_PROP,14,(Vector2){5.0f,5.0f},.8f);
     } else {
         PushRenderItem(items,&count,RENDER_PROP,14,(Vector2){2,9},.8f);
-        PushRenderItem(items,&count,RENDER_PROP,7,(Vector2){17.0f,4.0f},1.25f);
-        for(int i=0;i<7;i++)PushRenderItem(items,&count,RENDER_PROP,11,(Vector2){5.0f+i*2.0f,5.0f+(i%2)*8.0f},.72f);
-        for(int i=0;i<5;i++)PushRenderItem(items,&count,RENDER_PROP,15,(Vector2){4.0f+i*3.0f,13.0f},.9f);
+        PushRenderItem(items,&count,RENDER_PROP,33,(Vector2){17.0f,4.0f},1.2f);
+        PushRenderItem(items,&count,RENDER_PROP,32,(Vector2){16.0f,12.0f},1.05f);
+        PushRenderItem(items,&count,RENDER_PROP,34,(Vector2){10.0f,6.0f},.9f);
+        PushRenderItem(items,&count,RENDER_PROP,35,(Vector2){10.0f,11.0f},1.0f);
+        for(int i=0;i<4;i++)PushRenderItem(items,&count,RENDER_PROP,15,(Vector2){4.0f+i*3.0f,13.0f},.9f);
     }
     for(int i=0;i<g->world.pickupCount;i++) if(!g->world.pickups[i].taken)
         PushRenderItem(items,&count,RENDER_PICKUP,i,g->world.pickups[i].tile,1.0f);
@@ -356,6 +370,7 @@ static void RenderWorld(Game *g) {
                 else if(it->index==16)DrawEnvProp(10,p,76*it->scale,82*it->scale);
                 else if(it->index==17)DrawEnvProp(11,p,68*it->scale,38*it->scale);
                 else if(it->index==18)DrawEnvProp(8,p,38*it->scale,46*it->scale);
+                else if(it->index>=20&&it->index<=35)DrawAreaProp(it->index-20,p,76*it->scale,82*it->scale);
                 break;
             case RENDER_FIRE: DrawCampfire(p,g->time); break;
             case RENDER_PICKUP: DrawPickup(&g->world.pickups[it->index]); break;
@@ -564,12 +579,13 @@ void RenderInit(void) {
         "assets/characters/companions/leafling_idle_64.png",
         "assets/characters/companions/grove_mote_idle_64.png",
         "assets/environment/environment_props_96.png",
+        "assets/environment/area_props_96.png",
         "assets/characters/png/camp_keeper.png",
         "assets/tiles/png/island_iso_tiles.png",
         "assets/tiles/png/environment_props.png"
     };
-    Texture2D *targets[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
-    for(int i=0;i<10;i++) {
+    Texture2D *targets[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
+    for(int i=0;i<11;i++) {
         if(FileExists(paths[i])) {
             *targets[i]=LoadTexture(paths[i]);
             if(targets[i]->id)SetTextureFilter(*targets[i],TEXTURE_FILTER_POINT);
@@ -578,8 +594,8 @@ void RenderInit(void) {
 }
 void RenderClose(void) {
     UnloadUIFont();
-    Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
-    for(int i=0;i<10;i++)if(textures[i]->id)UnloadTexture(*textures[i]);
+    Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
+    for(int i=0;i<11;i++)if(textures[i]->id)UnloadTexture(*textures[i]);
 }
 void GameRender(Game *g) {
     if(g->scene==SCENE_TITLE)RenderTitle(g);
