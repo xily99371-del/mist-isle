@@ -33,7 +33,7 @@ static Vector2 MoveTowardsConstant(Vector2 current,Vector2 target,float maxDista
     if(distance<=maxDistance || distance<0.0001f)return target;
     return Vector2Add(current,Vector2Scale(delta,maxDistance/distance));
 }
-static void UpdateCamera(Game *g,float dt) {
+static void UpdatePlayerCamera(Game *g,float dt) {
     Vector2 desired=ClampCameraTarget(g,WorldScreen(g->player.pos));
     // Constant-speed lock-on: no dead zone and no exponential ease-in/out.
     g->cam.target=MoveTowardsConstant(g->cam.target,desired,680.0f*dt);
@@ -809,6 +809,6 @@ void GameUpdate(Game *g,float dt) {
     // The final scene is entered only through the explicit E interaction above.
     if(g->shrineSolved&&g->enemyCount>0&&!g->enemies[g->enemyCount-1].alive)g->bossDefeated=true;
 
-    UpdateCamera(g,dt);
+    UpdatePlayerCamera(g,dt);
     if(g->toastTimer>0)g->toastTimer-=dt;
 }
