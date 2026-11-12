@@ -39,6 +39,16 @@ static void UpdateCamera(Game *g,float dt) {
     g->cam.target=MoveTowardsConstant(g->cam.target,desired,680.0f*dt);
     g->cam.target=ClampCameraTarget(g,g->cam.target);
 }
+static Vector2 LogicalMousePosition(void) {
+    Vector2 mouse=GetMousePosition();
+    float sx=(float)GetScreenWidth()/(float)SW;
+    float sy=(float)GetScreenHeight()/(float)SH;
+    float scale=sx<sy?sx:sy;
+    if(scale<0.001f)scale=1.0f;
+    float ox=((float)GetScreenWidth()-(float)SW*scale)*.5f;
+    float oy=((float)GetScreenHeight()-(float)SH*scale)*.5f;
+    return (Vector2){(mouse.x-ox)/scale,(mouse.y-oy)/scale};
+}
 static void Toast(Game *g,const char *s) {
     snprintf(g->toast,sizeof(g->toast),"%s",s); g->toastTimer=2.4f;
 }
@@ -528,7 +538,14 @@ void GameUpdate(Game *g,float dt) {
     }
     if(g->scene==SCENE_END) {
         g->endingTime+=dt;
-        if(IsKeyPressed(KEY_R)) GameReset(g,g->lastSeed+1);
+        if(IsKeyPressed(KEY_R)) {
+            int seed=g->lastSeed+1;
+            GameReset(g,seed);
+            GameStart(g);
+        } else if(IsKeyPressed(KEY_ENTER)||IsKeyPressed(KEY_ESCAPE)) {
+            g->scene=SCENE_TITLE;
+            g->endingTime=0.0f;
+        }
         return;
     }
     if(g->scene==SCENE_BATTLE) {
@@ -547,7 +564,7 @@ void GameUpdate(Game *g,float dt) {
         bool mousePressed=IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
         bool mouseSelected=false;
         if(mousePressed) {
-            Vector2 mouse=GetMousePosition();
+            Vector2 mouse=LogicalMousePosition();
             for(int slot=0;slot<optionCount;slot++) {
                 Rectangle card={(float)(50+slot*245),555,230,112};
                 if(CheckCollisionPointRec(mouse,card)) {
