@@ -76,10 +76,19 @@ else:
 require("build_kenney_runtime_atlas.py" in RENDER or (ROOT / "tools/build_kenney_runtime_atlas.py").exists(), "Kenney runtime atlas generator is included")
 require("static Vector2 WorldScreen(Vector2 p)" in GAME and "TILE_SIZE" in HEADER, "gameplay and rendering share top-down world coordinates")
 require("grid.y+" in RENDER and "RENDER_PLAYER" in RENDER, "actor sorting uses top-down ground-contact depth")
-require("g->cam.zoom=1.15f" in GAME, "camera follows player at top-down exploration zoom")
+require("g->cam.zoom=1.0f" in GAME and "UpdateCamera(g,dt)" in GAME and "deadY=96.0f" in GAME,
+        "camera uses map bounds, a dead zone and smoothed follow")
 require("RenderItem items[192]" in RENDER and "*count>=192" in RENDER, "render queue has capacity for top-down forest canopy, props and actors")
 require("world.kind[y][x]==1" in RENDER and "RENDER_TREE" in RENDER,
         "visible forest trees are placed from the collision grid")
+require("SetSolidRect" in GAME and "MovePlayerWithCollision" in GAME,
+        "large props have collision footprints and player motion uses substeps")
+require("GetCurrentObjective" in GAME and "DrawObjectiveMarker" in RENDER,
+        "chapter objective guidance and in-world waypoint marker are active")
+require("OwnedBuddyIdAt" in GAME and "optionCount" in GAME and "选择出战伙伴" in RENDER,
+        "battle options are restricted to companions currently owned")
+require("!g->splash.owned" in RENDER and "!g->spark.owned" in RENDER,
+        "unrecruited water and crystal companions are visible as world encounters")
 require("RenderInit(void)" in RENDER and "RenderClose(void)" in RENDER,
         "renderer owns texture load and release lifecycle")
 
