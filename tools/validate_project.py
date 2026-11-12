@@ -123,6 +123,8 @@ require("DrawAreaProp(11,p,112,116)" in RENDER and "DrawAreaProp(13" in RENDER,
         "the shrine and lighthouse use their authored area-specific sprites")
 require("atlasIndex=36+row*4+col" in RENDER and "row=(int)((hash>>5)%3u)" in RENDER,
         "terrain selection avoids the transparent atlas column and uses all ground variants")
+require("drawPatch=kind==3" in RENDER and "dstSize=kind==3?49.0f:34.0f" in RENDER,
+        "grass, sand and water render as continuous ground with sparse texture decals")
 cg_file = ROOT / "assets/cinematics/lighthouse_final_scene.jpg.b64"
 require(cg_file.exists(), "lighthouse ending illustration asset is present")
 cg_data = cg_file.read_text(encoding="ascii").strip()
