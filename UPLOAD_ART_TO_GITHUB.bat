@@ -52,6 +52,8 @@ for %%F in (
 
 python -m pip install --quiet pillow
 if errorlevel 1 goto failed
+python tools\build_kenney_runtime_atlas.py
+if errorlevel 1 goto failed
 python tools\validate_project.py
 if errorlevel 1 goto failed
 
