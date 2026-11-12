@@ -81,6 +81,20 @@ require("g->cam.zoom=1.0f" in GAME and "UpdateCamera(g,dt)" in GAME and "deadY=9
 require("RenderItem items[192]" in RENDER and "*count>=192" in RENDER, "render queue has capacity for top-down forest canopy, props and actors")
 require("world.kind[y][x]==1" in RENDER and "RENDER_TREE" in RENDER,
         "visible forest trees are placed from the collision grid")
+require("MoveTowardsConstant" in GAME and "680.0f*dt" in GAME,
+        "camera uses direct constant-speed follow without an easing dead zone")
+require("InRect" in GAME and "const float r=.37f" in GAME and "distance/0.08f" in GAME,
+        "player collision checks authored prop footprints with dense substeps")
+require("RENDER_BOSS" in RENDER and "DrawLighthouseGuardian" in RENDER,
+        "lighthouse guardian is visible in the world and battle scene")
+require("DrawUITextWrapped" in RENDER and "UI_CODEPOINTS" in RENDER,
+        "Chinese UI includes the complete source glyph set and wrapped objective text")
+require("endingTime" in GAME and "LoadEndingCG" in RENDER,
+        "lighthouse ending uses a timed cinematic sequence")
+cg_b64 = ROOT / "assets/cinematics/lighthouse_lighting_6frame.jpg.b64"
+require(cg_b64.exists(), "six-frame lighthouse cinematic source is present")
+with Image.open(io.BytesIO(base64.b64decode(cg_b64.read_text(encoding="ascii")))) as cg:
+    require(cg.size == (432, 288), "lighthouse cinematic atlas is 3x2 frames at 144px each")
 require("SetSolidRect" in GAME and "MovePlayerWithCollision" in GAME and "dockWater" in GAME and "stream&&!bridge" in GAME,
         "props, shore water and stream banks block movement with substep collision")
 require("GetCurrentObjective" in GAME and "DrawObjectiveMarker" in RENDER,
