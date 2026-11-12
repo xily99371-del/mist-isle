@@ -46,8 +46,11 @@ require("frame*64" not in RENDER and "facing*64" not in RENDER,
         "no stale 64px source-frame indexing remains")
 require("index*96" in RENDER, "environment props use 96px atlas cells")
 require("DrawAreaProp" in RENDER and "area_props_96.png" in RENDER, "area-specific supplemental prop atlas is integrated")
-require("tile*64" in RENDER, "isometric ground atlas uses 64x32 diamond cells")
-require("RenderItem items[128]" in RENDER, "render queue has capacity for trees, props and pickups")
+require("DrawTopDownTile" in RENDER and "WorldToScreen" in RENDER, "orthographic top-down square-tile renderer is active")
+require("static Vector2 WorldScreen(Vector2 p)" in GAME and "TILE_SIZE" in HEADER, "gameplay and rendering share top-down world coordinates")
+require("grid.y,kind,index" in RENDER, "actor sorting uses top-down ground-contact depth")
+require("g->cam.zoom=1.10f" in GAME, "camera follows player at top-down exploration zoom")
+require("RenderItem items[192]" in RENDER and "*count>=192" in RENDER, "render queue has capacity for top-down forest canopy, props and actors")
 require("world.kind[y][x]==1" in RENDER and "RENDER_TREE" in RENDER,
         "visible forest trees are placed from the collision grid")
 require("RenderInit(void)" in RENDER and "RenderClose(void)" in RENDER,
