@@ -1,6 +1,23 @@
 #include "game.h"
 #include <math.h>
 #include <stdio.h>
+static Font UI_FONT={0};
+static const int UI_CODEPOINTS[]={12289,12290,19968,19977,19978,19981,19982,19990,20013,20026,20027,20046,20063,20102,20110,20113,20114,20132,20142,20154,20195,20197,20204,20214,20241,20249,20250,20260,20276,20284,20301,20307,20320,20351,20379,20381,20445,20572,20799,20808,20809,20811,20837,20840,20851,20860,20861,20877,20889,20914,20915,20986,20987,20999,21040,21046,21050,21069,21147,21160,21161,21191,21253,21306,21319,21327,21355,21360,21457,21462,21463,21464,21475,21476,21482,21487,21494,21507,21512,21516,21518,21543,21560,21561,21629,21644,21709,21796,21916,21943,22218,22238,22242,22270,22280,22312,22320,22495,22522,22612,22771,22788,22797,22806,22810,22830,22833,22836,22987,23384,23427,23432,23433,23436,23450,23453,23454,23475,23481,23494,23519,23547,23548,23553,23567,23578,23601,23614,23618,23679,23707,23736,24038,24050,24102,24110,24182,24212,24231,24237,24320,24341,24359,24403,24405,24418,24448,24452,24456,24471,24494,24515,24577,24674,24687,24819,24840,24847,24895,25104,25110,25112,25163,25165,25171,25214,25216,25226,25260,25320,25321,25353,25442,25506,25509,25552,25910,25915,25918,25928,25932,25937,25955,25972,25991,26007,26032,26041,26049,26053,26080,26087,26102,26143,26159,26174,26230,26263,26377,26395,26410,26412,26426,26469,26519,26522,26524,26597,26631,26723,27425,27426,27573,27668,27700,27719,27728,27773,27809,27819,27835,27861,27873,27922,27963,27969,28014,28023,28165,28287,28304,28418,28526,28779,28781,28783,28784,28789,28857,29031,29060,29255,29256,29289,29366,29616,29702,29983,29992,30005,30028,30041,30103,30333,30340,30446,30475,30528,30707,30784,31181,31192,31227,31243,31456,31526,31532,32034,32418,32441,32447,32454,32463,32469,32473,32487,32493,32622,32773,32852,32972,33016,33021,33394,33426,33469,33492,33719,33828,33829,33853,33976,34067,34255,34276,34411,34597,34892,34987,35013,35201,35266,35299,35753,35760,35835,35848,36125,36133,36164,36208,36215,36291,36319,36335,36454,36530,36716,36731,36745,36793,36807,36817,36825,36827,36828,36830,36857,36864,36873,36890,36896,36951,37117,37266,37319,37324,37325,37327,37492,38145,38190,38271,38378,38381,38388,38395,38451,38498,38500,38505,38544,38598,38632,38654,38656,38706,38752,39063,39069,39118,39128,39295,39321,39564,40483,40736};
+static void LoadUIFont(void) {
+    const char *paths[]={"assets/fonts/NotoSansSC-VF.ttf","C:/Windows/Fonts/msyh.ttc","C:/Windows/Fonts/simhei.ttf","C:/Windows/Fonts/simsun.ttc"};
+    for(int i=0;i<4 && UI_FONT.texture.id==0;i++) {
+        if(FileExists(paths[i])) {
+            UI_FONT=LoadFontEx(paths[i],32,(int*)UI_CODEPOINTS,(int)(sizeof(UI_CODEPOINTS)/sizeof(UI_CODEPOINTS[0])));
+            if(UI_FONT.texture.id)SetTextureFilter(UI_FONT.texture,TEXTURE_FILTER_BILINEAR);
+        }
+    }
+}
+static void UnloadUIFont(void) { if(UI_FONT.texture.id)UnloadFont(UI_FONT); }
+static void DrawUIText(const char *text,int x,int y,int size,Color tint) {
+    if(UI_FONT.texture.id)DrawTextEx(UI_FONT,text,(Vector2){(float)x,(float)y},(float)size,1.0f,tint);
+    else DrawUIText(text,x,y,size,tint);
+}
+
 static Texture2D TEX_HERO={0}, TEX_LUMI={0}, TEX_MOATAIL={0}, TEX_GECKO={0}, TEX_KEEPER={0};
 static Texture2D TEX_HERO_PIXEL={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, TEX_GECKO_PIXEL={0}, TEX_TILES={0}, TEX_PROPS={0};
 static Texture2D TEX_ISO_TILES={0}, TEX_HERO_WALK={0}, TEX_ENV_PROPS={0}, TEX_LEAFLING={0}, TEX_GROVE_MOTE={0};
@@ -314,81 +331,81 @@ static void RenderWorld(Game *g) {
 static void Panel(Rectangle r) { DrawRectangleRounded(r,.13f,18,C_PAPER);DrawRectangleRoundedLines(r,.13f,18,(Color){221,215,188,255});}
 static void RenderHUD(Game *g) {
     Panel((Rectangle){20,18,405,112});
-    DrawText("MIST ISLE  /  CHAPTER 01",40,32,15,(Color){119,145,116,255});
+    DrawUIText("MIST ISLE  /  CHAPTER 01",40,32,15,(Color){119,145,116,255});
     DrawCircle(397,42,8,Fade(C_GOLD,.75f));
-    DrawText("失落的灯塔",40,54,28,C_INK);
-    DrawText(TextFormat("生命 %d    果实 %d    贝壳 %d    星晶 %d",(int)g->player.hp,g->player.berries,g->player.shells,g->player.crystals),40,96,17,(Color){104,119,93,255});
+    DrawUIText("失落的灯塔",40,54,28,C_INK);
+    DrawUIText(TextFormat("生命 %d    果实 %d    贝壳 %d    星晶 %d",(int)g->player.hp,g->player.berries,g->player.shells,g->player.crystals),40,96,17,(Color){104,119,93,255});
     Panel((Rectangle){1020,18,238,92});
-    DrawText("伙伴图鉴",1040,32,17,(Color){119,145,116,255});
-    DrawText(TextFormat("苔灯灵 %s",g->lumi.owned?"已同行":"未发现"),1040,57,16,C_INK);
-    DrawText(TextFormat("沫尾兽 %s",g->splash.owned?"已同行":"未发现"),1040,79,16,C_INK);
-    DrawText(TextFormat("鸣晶蜥 %s",g->spark.owned?"已同行":"未发现"),1040,101,16,C_INK);
+    DrawUIText("伙伴图鉴",1040,32,17,(Color){119,145,116,255});
+    DrawUIText(TextFormat("苔灯灵 %s",g->lumi.owned?"已同行":"未发现"),1040,57,16,C_INK);
+    DrawUIText(TextFormat("沫尾兽 %s",g->splash.owned?"已同行":"未发现"),1040,79,16,C_INK);
+    DrawUIText(TextFormat("鸣晶蜥 %s",g->spark.owned?"已同行":"未发现"),1040,101,16,C_INK);
     Buddy *active=CurrentBuddy(g);
-    DrawText(TextFormat("当前伙伴 Lv.%d  XP %d/50",active->level,active->xp),1040,124,13,(Color){104,119,93,255});
+    DrawUIText(TextFormat("当前伙伴 Lv.%d  XP %d/50",active->level,active->xp),1040,124,13,(Color){104,119,93,255});
     Panel((Rectangle){20,652,720,48});
-    DrawText("WASD移动 SHIFT冲刺 E互动 TAB伙伴 J手记 I背包 M地图 F5保存",38,667,13,(Color){91,115,96,255});
+    DrawUIText("WASD移动 SHIFT冲刺 E互动 TAB伙伴 J手记 I背包 M地图 F5保存",38,667,13,(Color){91,115,96,255});
     if(!g->lumi.owned && Dist(g->player.pos,(Vector2){4,12})<1.65f) {
         Panel((Rectangle){530,585,220,40});
-        DrawText("E  救助苔灯灵",550,596,17,(Color){91,115,96,255});
+        DrawUIText("E  救助苔灯灵",550,596,17,(Color){91,115,96,255});
     } else if(Dist(g->player.pos,(Vector2){3,10})<2.0f) {
         Panel((Rectangle){530,585,220,40});
-        DrawText("E  与守望者交谈",550,596,17,(Color){91,115,96,255});
+        DrawUIText("E  与守望者交谈",550,596,17,(Color){91,115,96,255});
     } else if(g->lumi.owned && Dist(g->player.pos,(Vector2){4.1f,12.5f})<1.5f) {
         Panel((Rectangle){530,585,220,40});
-        DrawText("E  在营火旁休息",550,596,17,(Color){91,115,96,255});
+        DrawUIText("E  在营火旁休息",550,596,17,(Color){91,115,96,255});
     }
     if(g->toastTimer>0) {
         Panel((Rectangle){380,600,520,42});
-        DrawText(g->toast,400,612,18,(Color){78,112,91,255});
+        DrawUIText(g->toast,400,612,18,(Color){78,112,91,255});
     }
 }
 static void RenderJournal(Game *g) {
     DrawRectangle(0,0,SW,SH,Fade((Color){35,55,48,255},.48f));
     Panel((Rectangle){250,105,780,510});
-    DrawText("旅 人 手 记",300,135,34,(Color){74,105,83,255});
-    DrawText("CHAPTER 01  /  THE LOST LIGHTHOUSE",303,179,15,(Color){132,145,112,255});
+    DrawUIText("旅 人 手 记",300,135,34,(Color){74,105,83,255});
+    DrawUIText("CHAPTER 01  /  THE LOST LIGHTHOUSE",303,179,15,(Color){132,145,112,255});
     DrawLine(300,207,980,207,(Color){220,211,183,255});
-    DrawText("当前目标",303,230,21,(Color){104,135,94,255});
-    DrawText(g->shrineSolved?"遗迹已被唤醒，前往庭院寻找守卫。":"寻找三位伙伴，收集潮汐贝壳并唤醒古代遗迹。",303,265,19,C_INK);
-    DrawText("岛屿发现",303,320,21,(Color){104,135,94,255});
-    DrawText(g->fireflyDiscovered?"萤芽  —  已记录：会在林间微光处出现。":"萤芽  —  未发现：留意林地里漂浮的微光。",303,355,18,C_INK);
-    DrawText(g->leaflingFed?"叶团  —  已帮助：它为你找到了隐藏星晶。":"叶团  —  未帮助：它似乎很喜欢岛屿果实。",303,388,18,C_INK);
-    DrawText(g->groveMoteDefeated?"微光兽 — 已击退：林间小径恢复安全。":"微光兽 — 尚未击退：它守在林地旧路旁。",303,416,18,C_INK);
-    DrawText("伙伴同行",303,445,21,(Color){104,135,94,255});
-    DrawText(TextFormat("苔灯灵  %s       沫尾兽  %s       鸣晶蜥  %s",g->lumi.owned?"同行中":"未发现",g->splash.owned?"同行中":"未发现",g->spark.owned?"同行中":"未发现"),303,480,18,C_INK);
-    DrawText("资源",303,525,21,(Color){104,135,94,255});
-    DrawText(TextFormat("果实 %d     潮汐贝壳 %d     星晶 %d",g->player.berries,g->player.shells,g->player.crystals),303,560,18,C_INK);
-    DrawText("F5 保存   F9 读取   按 J 或 ESC 关闭",760,570,16,(Color){132,137,111,255});
+    DrawUIText("当前目标",303,230,21,(Color){104,135,94,255});
+    DrawUIText(g->shrineSolved?"遗迹已被唤醒，前往庭院寻找守卫。":"寻找三位伙伴，收集潮汐贝壳并唤醒古代遗迹。",303,265,19,C_INK);
+    DrawUIText("岛屿发现",303,320,21,(Color){104,135,94,255});
+    DrawUIText(g->fireflyDiscovered?"萤芽  —  已记录：会在林间微光处出现。":"萤芽  —  未发现：留意林地里漂浮的微光。",303,355,18,C_INK);
+    DrawUIText(g->leaflingFed?"叶团  —  已帮助：它为你找到了隐藏星晶。":"叶团  —  未帮助：它似乎很喜欢岛屿果实。",303,388,18,C_INK);
+    DrawUIText(g->groveMoteDefeated?"微光兽 — 已击退：林间小径恢复安全。":"微光兽 — 尚未击退：它守在林地旧路旁。",303,416,18,C_INK);
+    DrawUIText("伙伴同行",303,445,21,(Color){104,135,94,255});
+    DrawUIText(TextFormat("苔灯灵  %s       沫尾兽  %s       鸣晶蜥  %s",g->lumi.owned?"同行中":"未发现",g->splash.owned?"同行中":"未发现",g->spark.owned?"同行中":"未发现"),303,480,18,C_INK);
+    DrawUIText("资源",303,525,21,(Color){104,135,94,255});
+    DrawUIText(TextFormat("果实 %d     潮汐贝壳 %d     星晶 %d",g->player.berries,g->player.shells,g->player.crystals),303,560,18,C_INK);
+    DrawUIText("F5 保存   F9 读取   按 J 或 ESC 关闭",760,570,16,(Color){132,137,111,255});
 }
 static void RenderInventory(Game *g) {
     DrawRectangle(0,0,SW,SH,Fade((Color){35,55,48,255},.48f));
     Panel((Rectangle){300,120,680,470});
-    DrawText("探 险 背 包",350,150,32,(Color){74,105,83,255});
+    DrawUIText("探 险 背 包",350,150,32,(Color){74,105,83,255});
     DrawLine(350,200,930,200,(Color){220,211,183,255});
-    DrawText(TextFormat("岛屿果实       x %d",g->player.berries),360,238,22,C_INK);
-    DrawText(TextFormat("潮汐贝壳       x %d",g->player.shells),360,285,22,C_INK);
-    DrawText(TextFormat("星晶           x %d",g->player.crystals),360,332,22,C_INK);
-    DrawText(TextFormat("生命           %d / %d",(int)g->player.hp,(int)g->player.maxHp),360,379,22,C_INK);
-    DrawText("伙伴成长",360,432,22,(Color){104,135,94,255});
-    DrawText(TextFormat("苔灯灵 Lv.%d   沫尾兽 Lv.%d   鸣晶蜥 Lv.%d",g->lumi.level,g->splash.level,g->spark.level),360,470,19,C_INK);
-    DrawText("按 I / ESC 关闭",760,550,16,(Color){132,137,111,255});
+    DrawUIText(TextFormat("岛屿果实       x %d",g->player.berries),360,238,22,C_INK);
+    DrawUIText(TextFormat("潮汐贝壳       x %d",g->player.shells),360,285,22,C_INK);
+    DrawUIText(TextFormat("星晶           x %d",g->player.crystals),360,332,22,C_INK);
+    DrawUIText(TextFormat("生命           %d / %d",(int)g->player.hp,(int)g->player.maxHp),360,379,22,C_INK);
+    DrawUIText("伙伴成长",360,432,22,(Color){104,135,94,255});
+    DrawUIText(TextFormat("苔灯灵 Lv.%d   沫尾兽 Lv.%d   鸣晶蜥 Lv.%d",g->lumi.level,g->splash.level,g->spark.level),360,470,19,C_INK);
+    DrawUIText("按 I / ESC 关闭",760,550,16,(Color){132,137,111,255});
 }
 static void RenderMap(Game *g) {
     DrawRectangle(0,0,SW,SH,Fade((Color){35,55,48,255},.48f));
     Panel((Rectangle){250,90,780,540});
-    DrawText("岛 屿 地 图",300,120,32,(Color){74,105,83,255});
+    DrawUIText("岛 屿 地 图",300,120,32,(Color){74,105,83,255});
     const char *names[4]={"海岸营地","辉光林地","潮汐遗迹","灯塔庭院"};
     Vector2 pts[4]={{390,320},{560,250},{745,330},{900,220}};
     for(int i=0;i<4;i++) {
         bool unlocked=(i==0)||(i==1&&g->lumi.owned)||(i==2&&g->splash.owned)||(i==3&&g->shrineSolved);
         DrawCircleV(pts[i],28,unlocked?(Color){144,190,132,255}:(Color){181,184,164,255});
         DrawCircleV(pts[i],13,(Color){255,240,196,255});
-        DrawText(names[i],(int)pts[i].x-45,(int)pts[i].y+42,17,C_INK);
+        DrawUIText(names[i],(int)pts[i].x-45,(int)pts[i].y+42,17,C_INK);
         if(i<3)DrawLineEx(pts[i],pts[i+1],5,(Color){185,177,139,255});
     }
     DrawCircleV((Vector2){390+(g->player.pos.x-3)*27,320+(g->player.pos.y-12)*15},7,C_RED);
-    DrawText("红点：当前位置   灰色区域：尚未解锁",320,545,18,(Color){105,121,97,255});
-    DrawText("按 M / ESC 关闭",800,580,16,(Color){132,137,111,255});
+    DrawUIText("红点：当前位置   灰色区域：尚未解锁",320,545,18,(Color){105,121,97,255});
+    DrawUIText("按 M / ESC 关闭",800,580,16,(Color){132,137,111,255});
 }
 static void RenderDialogue(Game *g) {
     DrawRectangle(0,0,SW,SH,Fade((Color){35,55,48,255},.26f));
@@ -396,9 +413,9 @@ static void RenderDialogue(Game *g) {
     DrawCircle(190,510,43,(Color){157,201,143,255});
     DrawCircle(190,510,29,(Color){220,233,183,255});
     DrawCircle(180,506,3,C_INK);DrawCircle(200,506,3,C_INK);
-    DrawText(g->dialogueSpeaker,245,535,18,(Color){125,149,112,255});
-    DrawText(g->dialogue[g->dialoguePage],245,568,23,C_INK);
-    DrawText("按 E / Enter / 鼠标左键继续",820,635,16,(Color){135,135,107,255});
+    DrawUIText(g->dialogueSpeaker,245,535,18,(Color){125,149,112,255});
+    DrawUIText(g->dialogue[g->dialoguePage],245,568,23,C_INK);
+    DrawUIText("按 E / Enter / 鼠标左键继续",820,635,16,(Color){135,135,107,255});
 }
 static void RenderBattle(Game *g) {
     DrawRectangle(0,0,SW,SH,(Color){42,57,75,255});
@@ -413,10 +430,10 @@ static void RenderBattle(Game *g) {
     DrawTriangle((Vector2){864,205},(Vector2){901,164},(Vector2){916,222},(Color){183,160,192,255});
     DrawCircle(852,232,6,C_INK);DrawCircle(888,232,6,C_INK);
     DrawCircle(852,230,2,WHITE);DrawCircle(888,230,2,WHITE);
-    DrawText("伙伴协同战斗",55,40,30,WHITE);
-    DrawText(TextFormat("回合 %d   %s",g->battleRound,g->enemySoaked?"敌人：潮湿（电击伤害提升）":"观察敌人状态"),55,82,18,(Color){224,232,215,255});
+    DrawUIText("伙伴协同战斗",55,40,30,WHITE);
+    DrawUIText(TextFormat("回合 %d   %s",g->battleRound,g->enemySoaked?"敌人：潮湿（电击伤害提升）":"观察敌人状态"),55,82,18,(Color){224,232,215,255});
     Enemy *e=&g->enemies[g->battleEnemy];
-    DrawText(TextFormat("守卫 HP  %d / %d",(int)e->hp,(int)e->maxHp),760,80,22,WHITE);
+    DrawUIText(TextFormat("守卫 HP  %d / %d",(int)e->hp,(int)e->maxHp),760,80,22,WHITE);
     DrawRectangle(760,112,340,17,(Color){70,75,85,255});
     DrawRectangle(760,112,(int)(340*fmaxf(0,e->hp/e->maxHp)),17,C_PINK);
     // Show the selected companion as a real sprite in the battle party panel.
@@ -434,27 +451,27 @@ static void RenderBattle(Game *g) {
         DrawCircle(852,230,2,WHITE);DrawCircle(888,230,2,WHITE);
         if(e->type==ENEMY_BOSS)DrawCircle(870,235,78,Fade(C_LILAC,.15f));
     }
-    DrawText("选择伙伴技能",70,525,23,WHITE);
+    DrawUIText("选择伙伴技能",70,525,23,WHITE);
     const char *opts[3]={"1  苔灯灵：治疗 + 微光攻击","2  沫尾兽：潮湿水流","3  鸣晶蜥：晶弧放电（潮湿克制）"};
     for(int i=0;i<3;i++) {
         Rectangle r={70,565+i*42,440,34};
         DrawRectangleRounded(r,.2f,8,i==g->battleChoice?(Color){255,226,158,255}:(Color){238,236,218,235});
-        DrawText(opts[i],88,573+i*42,18,(Color){64,82,76,255});
+        DrawUIText(opts[i],88,573+i*42,18,(Color){64,82,76,255});
     }
-    DrawText(g->battleTurn==0?"选择技能并按 Enter":"敌方行动：按 Enter 继续",760,570,21,WHITE);
-    DrawText("技能联动：先喷水，再使用晶弧可造成额外伤害。",760,610,17,(Color){226,236,222,255});
+    DrawUIText(g->battleTurn==0?"选择技能并按 Enter":"敌方行动：按 Enter 继续",760,570,21,WHITE);
+    DrawUIText("技能联动：先喷水，再使用晶弧可造成额外伤害。",760,610,17,(Color){226,236,222,255});
 }
 static void RenderTitle(Game *g) {
     ClearBackground((Color){187,222,211,255});
     for(int i=0;i<10;i++)DrawTree((Vector2){90+i*130,410+(i%3)*20},1.0f+(i%2)*.2f,g->time);
     DrawRectangle(0,0,SW,SH,Fade((Color){239,242,221,255},.25f));
-    DrawText("雾 屿 回 响",390,155,64,(Color){69,104,83,255});
-    DrawText("第一章  ·  失落的灯塔",445,235,28,(Color){107,141,115,255});
-    DrawText("一段关于伙伴、勇气与重新点亮世界的旅程",350,315,23,(Color){89,119,103,255});
+    DrawUIText("雾 屿 回 响",390,155,64,(Color){69,104,83,255});
+    DrawUIText("第一章  ·  失落的灯塔",445,235,28,(Color){107,141,115,255});
+    DrawUIText("一段关于伙伴、勇气与重新点亮世界的旅程",350,315,23,(Color){89,119,103,255});
     DrawRectangleRounded((Rectangle){500,425,280,62},.2f,16,(Color){255,249,224,245});
-    DrawText("按 Enter 开始旅程",535,444,23,(Color){70,115,87,255});
-    DrawText(FileExists("mist_isle_save.dat")?"F9 继续上次旅程":"F9 读取存档",565,500,18,(Color){94,127,101,255});
-    DrawText("CARTOON PIXEL ADVENTURE",470,650,17,(Color){110,143,119,255});
+    DrawUIText("按 Enter 开始旅程",535,444,23,(Color){70,115,87,255});
+    DrawUIText(FileExists("mist_isle_save.dat")?"F9 继续上次旅程":"F9 读取存档",565,500,18,(Color){94,127,101,255});
+    DrawUIText("CARTOON PIXEL ADVENTURE",470,650,17,(Color){110,143,119,255});
 }
 static void RenderEnd(Game *g) {
     ClearBackground((Color){35,59,72,255});
@@ -469,11 +486,12 @@ static void RenderEnd(Game *g) {
         DrawCircleV(q,3.0f,Fade(i%2?C_GOLD:C_BLUE,.65f));
     }
     DrawCircle(640,160,62,Fade(C_GOLD,.10f+.06f*sinf(g->time*2)));
-    DrawText("灯塔重新亮起了",435,475,38,(Color){255,246,218,255});
-    DrawText("伙伴们的光芒，照亮了整座岛屿。",405,535,23,(Color){218,231,211,255});
-    DrawText("第一章 完成   ·   按 R 再次探索",430,620,20,(Color){255,222,154,255});
+    DrawUIText("灯塔重新亮起了",435,475,38,(Color){255,246,218,255});
+    DrawUIText("伙伴们的光芒，照亮了整座岛屿。",405,535,23,(Color){218,231,211,255});
+    DrawUIText("第一章 完成   ·   按 R 再次探索",430,620,20,(Color){255,222,154,255});
 }
 void RenderInit(void) {
+    LoadUIFont();
     const char *paths[]={
         "assets/characters/hero/hero_walk_4dir_64.png",
         "assets/characters/companions/moss_lumi_idle_64.png",
@@ -495,6 +513,7 @@ void RenderInit(void) {
     }
 }
 void RenderClose(void) {
+    UnloadUIFont();
     Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
     for(int i=0;i<10;i++)if(textures[i]->id)UnloadTexture(*textures[i]);
 }
