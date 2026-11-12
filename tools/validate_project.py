@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Static and asset-layout checks for the Mist Isle Windows playtest candidate."""
 from pathlib import Path
+from zipfile import ZipFile
 import re
 from PIL import Image
 
@@ -59,6 +60,18 @@ require("flora_props_atlas_128.png" in RENDER and "cliffs_fences_atlas_128.png" 
 require("original_props_16_v1.png" in RENDER and "DrawOriginalProp" in RENDER, "curated original 16-prop atlas is integrated")
 require("TEX_ORIGINAL_PROPS" in RENDER and "for(int i=0;i<17;i++)" in RENDER, "original prop atlas texture lifecycle is complete")
 require("kenney_buildings_atlas.png" in RENDER and "DrawKenneyBuilding" in RENDER, "Kenney Tiny Town building atlas is integrated")
+for rel, label in [
+    ("third_party/kenney/rpg-base/KenneyRPGpack.zip", "Kenney RPG Base CC0 archive"),
+    ("third_party/kenney/pixel-ui/PixelUIpack.zip", "Kenney Pixel UI CC0 archive"),
+]:
+    pack = ROOT / rel
+    require(pack.exists(), label + " is present")
+    with ZipFile(pack) as z:
+        require(z.testzip() is None, label + " passes ZIP integrity check")
+require((ROOT / "build/art-review/kenney-rpg-base-01.jpg").exists(),
+        "Kenney RPG Base visual review sheet is generated")
+require((ROOT / "build/art-review/kenney-pixel-ui-01.jpg").exists(),
+        "Kenney Pixel UI visual review sheet is generated")
 require("build_kenney_runtime_atlas.py" in RENDER or (ROOT / "tools/build_kenney_runtime_atlas.py").exists(), "Kenney runtime atlas generator is included")
 require("static Vector2 WorldScreen(Vector2 p)" in GAME and "TILE_SIZE" in HEADER, "gameplay and rendering share top-down world coordinates")
 require("grid.y+" in RENDER and "RENDER_PLAYER" in RENDER, "actor sorting uses top-down ground-contact depth")
