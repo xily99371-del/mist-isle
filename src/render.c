@@ -235,16 +235,29 @@ static void RenderWorld(Game *g) {
         if(g->world.kind[y][x]==2)c=(Color){192,181,143,255};
         if(x>=8&&x<=13&&y>=3&&y<=8)c=(Color){130,181,123,255};
         if(x>=14&&x<=19&&y>=4&&y<=10)c=(Color){184,181,151,255};
-        int tile=((x+y)&1)?0:1;                 // grass variants
-        if(g->world.kind[y][x]==1)tile=3;        // solid rocks/tree roots
-        if(g->world.kind[y][x]==2)tile=2;        // sandy footpaths
-        if(g->world.kind[y][x]==3)tile=3;        // island boundary stone
-        if(x>=8&&x<=13&&y>=3&&y<=8)tile=(x+y)%2; // flower grove grass
-        if(x>=14&&x<=19&&y>=4&&y<=10)tile=3;    // old stone ruins
+        int tile=((x+y)&1)?0:1;
+        // Four connected biomes with distinct ground palettes.
+        if(x<=7 && y>=9) {
+            tile=((x+y)%4==0)?2:((x+y)&1); c=(Color){190,188,145,255};
+            if(y==9 || x==6)tile=2;
+        } else if(x>=7 && x<=13 && y<=9) {
+            tile=(x+y)&1; c=(Color){133,185,122,255};
+        } else if(x>=14 && y<=10) {
+            tile=3; c=(Color){173,169,145,255};
+        } else if(x>=14 && y>=11) {
+            tile=((x+y)%3==0)?2:3; c=(Color){190,180,145,255};
+        }
+        if(g->world.kind[y][x]==1 && !(x>=14&&y<=10))tile=3;
+        if(g->world.kind[y][x]==2 && tile!=3)tile=2;
+        if(g->world.kind[y][x]==3)tile=3;
+        if(x>=8&&x<=13&&y>=3&&y<=8){tile=(x+y)%2;c=(Color){128,180,117,255};}
+        if(x>=14&&x<=19&&y>=4&&y<=10){tile=3;c=(Color){174,168,145,255};}
+        if(x>=1&&x<=3&&y>=12&&y<=15){tile=4;c=(Color){105,177,190,255};}
         DrawIsoTile(x,y,tile,c);
     }
-    // A small tidal pool and stepping-stone edge.
+    // A grove pond and a connected shoreline inlet.
     for(int y=3;y<6;y++)for(int x=2;x<6;x++)DrawIsoTile(x,y,4,(Color){119,191,199,255});
+    for(int y=12;y<16;y++)for(int x=1;x<4;x++)DrawIsoTile(x,y,4,(Color){105,177,190,255});
 
     // Sort elevated objects by isometric depth (x+y): characters can pass behind trees.
     RenderItem items[128]; int count=0;
@@ -339,6 +352,8 @@ static void Panel(Rectangle r) { DrawRectangleRounded(r,.13f,18,C_PAPER);DrawRec
 static void RenderHUD(Game *g) {
     Panel((Rectangle){20,18,405,112});
     DrawUIText("MIST ISLE  /  CHAPTER 01",40,32,15,(Color){119,145,116,255});
+    const char *areaName=g->area==AREA_CAMP?"海岸营地":g->area==AREA_GROVE?"辉光林地":g->area==AREA_RUINS?"潮汐遗迹":"灯塔庭院";
+    DrawUIText(areaName,560,32,18,(Color){83,119,88,255});
     DrawCircle(397,42,8,Fade(C_GOLD,.75f));
     DrawUIText("失落的灯塔",40,54,28,C_INK);
     DrawUIText(TextFormat("生命 %d    果实 %d    贝壳 %d    星晶 %d",(int)g->player.hp,g->player.berries,g->player.shells,g->player.crystals),40,96,17,(Color){104,119,93,255});
@@ -416,13 +431,13 @@ static void RenderMap(Game *g) {
 }
 static void RenderDialogue(Game *g) {
     DrawRectangle(0,0,SW,SH,Fade((Color){35,55,48,255},.26f));
-    Panel((Rectangle){125,510,1030,165});
-    DrawCircle(190,510,43,(Color){157,201,143,255});
-    DrawCircle(190,510,29,(Color){220,233,183,255});
-    DrawCircle(180,506,3,C_INK);DrawCircle(200,506,3,C_INK);
-    DrawUIText(g->dialogueSpeaker,245,535,18,(Color){125,149,112,255});
-    DrawUIText(g->dialogue[g->dialoguePage],245,568,23,C_INK);
-    DrawUIText("按 E / Enter / 鼠标左键继续",820,635,16,(Color){135,135,107,255});
+    Panel((Rectangle){145,552,990,125});
+    DrawCircle(195,552,37,(Color){157,201,143,255});
+    DrawCircle(195,552,25,(Color){220,233,183,255});
+    DrawCircle(187,548,2.8f,C_INK);DrawCircle(203,548,2.8f,C_INK);
+    DrawUIText(g->dialogueSpeaker,250,566,17,(Color){125,149,112,255});
+    DrawUIText(g->dialogue[g->dialoguePage],250,595,20,C_INK);
+    DrawUIText("按 E / Enter / 鼠标左键继续",835,645,14,(Color){135,135,107,255});
 }
 static void RenderBattle(Game *g) {
     DrawRectangle(0,0,SW,SH,(Color){42,57,75,255});
