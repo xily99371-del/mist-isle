@@ -59,7 +59,7 @@ static void DrawTopDownTile(int x,int y,Area area,int kind,float time) {
     else if(kind==2)atlasIndex=12+row*4+col;
     else atlasIndex=row*4+col;
     if(TEX_TOPDOWN_TILES.id) {
-        Rectangle src={(float)((atlasIndex%4)*112),(float)((atlasIndex/4)*112),112,112};
+        Rectangle src={(float)((atlasIndex%4)*56),(float)((atlasIndex/4)*56),56,56};
         DrawTexturePro(TEX_TOPDOWN_TILES,src,tile,(Vector2){0,0},0,WHITE);
         return;
     }
