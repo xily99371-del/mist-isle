@@ -445,8 +445,10 @@ static void RenderWorld(Game *g) {
         PushRenderItem(items,&count,RENDER_PROP,110,(Vector2){15.0f,13.0f},.9f);
         PushRenderItem(items,&count,RENDER_PROP,116,(Vector2){5.0f,13.0f},.9f);
         PushRenderItem(items,&count,RENDER_PROP,132,(Vector2){18.0f,4.5f},.8f); // direction sign
-        PushRenderItem(items,&count,RENDER_PROP,230,(Vector2){2.0f,13.0f},.9f); // dock
-        PushRenderItem(items,&count,RENDER_PROP,215,(Vector2){3.0f,15.0f},.85f);
+        PushRenderItem(items,&count,RENDER_PROP,202,(Vector2){1.5f,12.0f},.9f);
+        PushRenderItem(items,&count,RENDER_PROP,203,(Vector2){1.5f,14.0f},.9f);
+        PushRenderItem(items,&count,RENDER_PROP,204,(Vector2){4.0f,16.0f},.9f);
+        PushRenderItem(items,&count,RENDER_PROP,215,(Vector2){3.0f,15.0f},.9f); // dock
         PushRenderItem(items,&count,RENDER_PROP,220,(Vector2){6.0f,15.0f},.85f);
         PushRenderItem(items,&count,RENDER_PROP,132,(Vector2){18.0f,9.0f},.75f);
         PushRenderItem(items,&count,RENDER_PROP,128,(Vector2){18.0f,13.0f},.75f);
