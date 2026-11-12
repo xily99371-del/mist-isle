@@ -89,7 +89,7 @@ require("RENDER_BOSS" in RENDER and "DrawLighthouseGuardian" in RENDER,
         "lighthouse guardian is visible in the world and battle scene")
 require("DrawUITextWrapped" in RENDER and "UI_CODEPOINTS" in RENDER,
         "Chinese UI includes the complete source glyph set and wrapped objective text")
-require("endingTime" in GAME and "LoadEndingCG" in RENDER,
+require("endingTime" in GAME and "static void RenderEnd" in RENDER,
         "lighthouse ending uses a timed cinematic sequence")
 require("DrawTriangle(lamp,beamA,beamB" in RENDER and "sinf(t*.78f)" in RENDER,
         "lighthouse ending contains a sweeping animated beam")
