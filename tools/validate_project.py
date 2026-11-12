@@ -117,8 +117,12 @@ require("DrawTerrainAccent" in RENDER and "terrainKinds" in RENDER and "512" in 
         "world maps include layered ground detail, shoreline foam and a larger render queue")
 require("TEX_ENDING_CG" in RENDER and "LoadEndingCG" in RENDER and "assets/cinematics/lighthouse_final_scene.jpg.b64" in RENDER,
         "ending uses a dedicated illustrated lighthouse scene")
-require("DrawTriangle(lamp,beamA,beamB" not in RENDER and "scene.width*.50f" in RENDER,
+require("scene.width*.50f" in RENDER and "scene.width-4.0f" in RENDER,
         "ending scene adds a procedural moving beacon beam over the illustration")
+require("DrawAreaProp(11,p,112,116)" in RENDER and "DrawAreaProp(13" in RENDER,
+        "the shrine and lighthouse use their authored area-specific sprites")
+require("atlasIndex=36+row*4+col" in RENDER and "row=(int)((hash>>5)%3u)" in RENDER,
+        "terrain selection avoids the transparent atlas column and uses all ground variants")
 cg_file = ROOT / "assets/cinematics/lighthouse_lighting_6frame.jpg.b64"
 require(cg_file.exists(), "lighthouse ending CG asset is present")
 with Image.open(io.BytesIO(base64.b64decode(cg_file.read_text(encoding="ascii")))) as cg:
