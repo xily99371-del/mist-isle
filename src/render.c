@@ -357,6 +357,19 @@ static void DrawWorldBackdrop(Game *g) {
         g->area==AREA_GROVE?(Color){66,112,78,255}:
         g->area==AREA_RUINS?(Color){84,101,101,255}:(Color){76,126,145,255};
     DrawRectangle(-SW,-SH,WORLD_PIXEL_W+2*SW,WORLD_PIXEL_H+2*SH,surround);
+    // Decorative exterior texture remains visible when the camera looks beyond the island edge.
+    for(int y=-SH;y<WORLD_PIXEL_H+SH;y+=54)for(int x=-SW;x<WORLD_PIXEL_W+SW;x+=112) {
+        unsigned int h=TileHash(x/112,y/54,(int)g->area);
+        if(g->area==AREA_CAMP || g->area==AREA_LIGHTHOUSE) {
+            float yy=(float)y+fmodf((float)(h%31),31.0f);
+            DrawLineEx((Vector2){(float)x,yy},(Vector2){(float)x+42+(h%26),yy-2},1.5f,Fade((Color){221,241,226,255},.22f));
+        } else if(g->area==AREA_GROVE) {
+            DrawCircle((int)(x+(h%35)),(int)(y+(h%29)),2+(h%3),Fade((Color){205,222,145,255},.24f));
+        } else {
+            DrawLine((int)x,(int)y,(int)x+12+(h%17),(int)y+4,Fade((Color){205,210,184,255},.18f));
+            DrawCircle((int)(x+38),(int)(y+22),1+(h%2),Fade((Color){219,219,189,255},.18f));
+        }
+    }
     switch(g->area) {
         case AREA_CAMP: DrawSeaBackdrop(g->time); break;
         case AREA_GROVE: DrawForestBackdrop(g->time); break;
