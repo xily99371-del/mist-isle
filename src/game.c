@@ -119,11 +119,13 @@ static void BuildAreaWorld(Game *g,Area area) {
 static void SwitchArea(Game *g,Area area) {
     BuildAreaWorld(g,area);
     g->player.pos=(area==AREA_CAMP)?(Vector2){16,9}:(Vector2){3,9};
+    for(int i=0;i<g->world.pickupCount && i<MAX_PICKUPS;i++)g->world.pickups[i].taken=g->areaPickupTaken[(int)area][i]!=0;
     g->enemyCount=0;
     g->lumi.pos=Vector2Add(g->player.pos,(Vector2){-1,.5f});
     g->splash.pos=Vector2Add(g->player.pos,(Vector2){-1,1});
     g->spark.pos=Vector2Add(g->player.pos,(Vector2){0,1});
     g->transition=.35f;
+    GameSave(g);
 }
 
 static bool Solid(Game *g,Vector2 p) {
@@ -139,21 +141,21 @@ static void AddEnemy(Game *g,EnemyType t,float x,float y,float hp) {
 void GameReset(Game *g,int seed);
 void GameSave(Game *g) {
     SaveData s={0};
-    s.magic=0x4D495354; s.version=3; s.seed=g->lastSeed; s.area=(int)g->area;
+    s.magic=0x4D495354; s.version=4; s.seed=g->lastSeed; s.area=(int)g->area;
     s.px=g->player.pos.x; s.py=g->player.pos.y; s.hp=g->player.hp;
     s.berries=g->player.berries; s.shells=g->player.shells; s.crystals=g->player.crystals;
     s.lumi=g->lumi.owned; s.splash=g->splash.owned; s.spark=g->spark.owned; s.selected=g->selectedBuddy;
     s.shrineSolved=g->shrineSolved; s.bossDefeated=g->bossDefeated;
     s.fireflyDiscovered=g->fireflyDiscovered; s.leaflingFed=g->leaflingFed; s.groveMoteDefeated=g->groveMoteDefeated;
     s.lumiLevel=g->lumi.level;s.lumiXp=g->lumi.xp;s.splashLevel=g->splash.level;s.splashXp=g->splash.xp;s.sparkLevel=g->spark.level;s.sparkXp=g->spark.xp;
-    for(int i=0;i<g->world.pickupCount && i<MAX_PICKUPS;i++)s.pickupTaken[i]=(unsigned char)g->world.pickups[i].taken;
+    for(int a=0;a<4;a++)for(int i=0;i<MAX_PICKUPS;i++)s.pickupTaken[a][i]=g->areaPickupTaken[a][i];
     if(!SaveFileData("mist_isle_save.dat",&s,(int)sizeof(s)))Toast(g,"保存失败：无法写入存档文件。");
 }
 bool GameLoad(Game *g) {
     int size=0; unsigned char *raw=LoadFileData("mist_isle_save.dat",&size);
     if(!raw || size!=(int)sizeof(SaveData)){if(raw)UnloadFileData(raw);Toast(g,"没有找到有效存档。");return false;}
     SaveData s; memcpy(&s,raw,sizeof(s)); UnloadFileData(raw);
-    if(s.magic!=0x4D495354 || s.version!=3){Toast(g,"存档版本不兼容。");return false;}
+    if(s.magic!=0x4D495354 || s.version!=4){Toast(g,"存档版本不兼容。");return false;}
     GameReset(g,s.seed);
     SwitchArea(g,(Area)Clamp(s.area,AREA_CAMP,AREA_LIGHTHOUSE));
     g->scene=SCENE_PLAY; g->player.pos=(Vector2){s.px,s.py};g->player.hp=fmaxf(1.0f,fminf(100.0f,s.hp));
@@ -162,7 +164,8 @@ bool GameLoad(Game *g) {
     g->shrineSolved=s.shrineSolved!=0;g->bossDefeated=s.bossDefeated!=0;
     g->fireflyDiscovered=s.fireflyDiscovered!=0;g->leaflingFed=s.leaflingFed!=0;g->groveMoteDefeated=s.groveMoteDefeated!=0;
     g->lumi.level=s.lumiLevel;g->lumi.xp=s.lumiXp;g->splash.level=s.splashLevel;g->splash.xp=s.splashXp;g->spark.level=s.sparkLevel;g->spark.xp=s.sparkXp;
-    for(int i=0;i<g->world.pickupCount && i<MAX_PICKUPS;i++)g->world.pickups[i].taken=s.pickupTaken[i]!=0;
+    for(int a=0;a<4;a++)for(int i=0;i<MAX_PICKUPS;i++)g->areaPickupTaken[a][i]=s.pickupTaken[a][i];
+    for(int i=0;i<g->world.pickupCount && i<MAX_PICKUPS;i++)g->world.pickups[i].taken=g->areaPickupTaken[(int)g->area][i]!=0;
     if(g->lumi.owned)g->lumi.pos=Vector2Add(g->player.pos,(Vector2){-.55f,.42f});
     if(g->splash.owned)g->splash.pos=Vector2Add(g->player.pos,(Vector2){-.95f,.85f});
     if(g->spark.owned)g->spark.pos=Vector2Add(g->player.pos,(Vector2){-.15f,.95f});
@@ -352,7 +355,7 @@ void GameUpdate(Game *g,float dt) {
         for(int i=0;i<g->world.pickupCount;i++) {
             Pickup *q=&g->world.pickups[i];
             if(!q->taken&&Dist(p->pos,q->tile)<1.0f) {
-                q->taken=true;
+                q->taken=true; g->areaPickupTaken[(int)g->area][i]=1;
                 if(q->kind==0)p->berries++;
                 if(q->kind==1)p->shells++;
                 if(q->kind==2)p->crystals++;
