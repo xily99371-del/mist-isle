@@ -86,16 +86,19 @@ static unsigned int TileHash(int x,int y,int salt) {
 }
 static void DrawTopDownTile(int x,int y,Area area,int kind,float time) {
     Vector2 p=WorldToScreen((float)x,(float)y);
-    Rectangle tile={p.x-TILE_SIZE*.5f,p.y-TILE_SIZE*.5f,TILE_SIZE+1,TILE_SIZE+1};
+    Rectangle tile={p.x-TILE_SIZE*.5f,p.y-TILE_SIZE*.5f,TILE_SIZE,TILE_SIZE};
     unsigned int hash=TileHash(x,y,(int)area);
-    int col=(int)(hash%3u),row=(int)((hash>>5)%2u),atlasIndex;
-    if(kind==4)atlasIndex=36+(int)(hash%12u);
+    int col=(int)(hash%3u),row=(int)((hash>>5)%3u),atlasIndex;
+    Color base=kind==4?(Color){47,137,171,255}:kind==3?(Color){126,139,129,255}:kind==2?(Color){198,166,111,255}:(Color){91,145,84,255};
+    if(kind==4)atlasIndex=36+row*4+col;
     else if(kind==3)atlasIndex=24+row*4+col;
     else if(kind==2)atlasIndex=12+row*4+col;
     else atlasIndex=row*4+col;
+    DrawRectangleRec(tile,base);
     if(TEX_TOPDOWN_TILES.id) {
         Rectangle src={(float)((atlasIndex%4)*56),(float)((atlasIndex/4)*56),56,56};
-        DrawTexturePro(TEX_TOPDOWN_TILES,src,tile,(Vector2){0,0},0,WHITE);
+        Rectangle dst={tile.x-1.5f,tile.y-1.5f,TILE_SIZE+3.0f,TILE_SIZE+3.0f};
+        DrawTexturePro(TEX_TOPDOWN_TILES,src,dst,(Vector2){0,0},0,WHITE);
         return;
     }
     Color base=kind==4?(Color){67,158,190,255}:kind==3?(Color){126,132,119,255}:kind==2?(Color){207,180,126,255}:(Color){111,166,91,255};
@@ -315,7 +318,8 @@ static void DrawPlayer(Vector2 p,float t,bool moving,int facing) {
 static void DrawShrine(Vector2 p,float t,bool solved) {
     Color c=solved?C_GOLD:(Color){158,185,166,255};
     DrawEllipse((int)p.x,(int)p.y+8,34,10,(Color){66,95,85,95});
-    if(TEX_ENV_PROPS.id) DrawEnvProp(4,p,82,82);
+    if(TEX_AREA_PROPS.id) DrawAreaProp(11,p,112,116);
+    else if(TEX_ENV_PROPS.id) DrawEnvProp(4,p,82,82);
     else {
         DrawRectangle((int)p.x-14,(int)p.y-25,28,31,(Color){156,174,149,255});
         DrawRectangle((int)p.x-8,(int)p.y-45,16,22,(Color){198,209,171,255});
@@ -594,15 +598,22 @@ static void RenderWorld(Game *g) {
             if((y>=8&&y<=10&&x>=2&&x<=19))kind=2;
             if(x==0||y==0||x==MAPW-1||y==MAPH-1)kind=1;
         } else if(g->area==AREA_RUINS) {
-            if(kind==0)kind=3;
-            if((x+y)%6==0&&kind==3)kind=2;
+            // One continuous ancient-stone floor, with deliberate moss gardens and a readable bridge.
+            kind=3;
+            if((x>=2&&x<=6&&y>=3&&y<=6)||(x>=15&&x<=19&&y>=11&&y<=14)||
+               (x>=3&&x<=6&&y>=12&&y<=14))kind=0;
             if(x>=9&&x<=11&&y>=3&&y<=14)kind=4;
             if(y>=8&&y<=10&&x>=2&&x<=19)kind=3;
             if(x==0||y==0||x==MAPW-1||y==MAPH-1)kind=3;
         } else {
-            if(x<5||x>17||y<4||y>14)kind=2;
-            if((x+y)%9==0&&kind==0)kind=3;
-            if(y>=8&&y<=10&&x>=2&&x<=19)kind=3;
+            // Lighthouse courtyard: stone plaza, grass gardens, sandy shore and a clear approach.
+            kind=0;
+            if(x<3||x>19||y<2||y>15)kind=4;
+            if((x>=3&&x<=5)||(x>=18&&x<=19)||(y>=14&&y<=15))kind=2;
+            if(x>=7&&x<=18&&y>=5&&y<=14)kind=3;
+            if(y>=8&&y<=10&&x>=3&&x<=19)kind=3;
+            if(x>=16&&x<=18&&y>=6&&y<=14)kind=3;
+            if((x>=5&&x<=7&&y>=5&&y<=7)||(x>=5&&x<=8&&y>=12&&y<=14))kind=0;
             if(x==0||y==0||x==MAPW-1||y==MAPH-1)kind=4;
         }
         terrainKinds[y][x]=kind;
@@ -660,20 +671,21 @@ static void RenderWorld(Game *g) {
         PushRenderItem(items,&count,RENDER_PROP,415,(Vector2){2.0f,9.0f},.75f);
         for(int i=0;i<6;i++)PushRenderItem(items,&count,RENDER_PROP,410,(Vector2){5.0f+i*2.5f,14.5f-(i%2)*.7f},.58f);
     } else if(g->area==AREA_RUINS) {
-        PushRenderItem(items,&count,RENDER_PROP,502,(Vector2){15.0f,5.5f},1.0f);
-        PushRenderItem(items,&count,RENDER_PROP,409,(Vector2){6.0f,5.0f},.9f);
-        PushRenderItem(items,&count,RENDER_PROP,409,(Vector2){18.0f,12.5f},.9f);
-        PushRenderItem(items,&count,RENDER_PROP,410,(Vector2){10.0f,12.0f},1.05f);
-        PushRenderItem(items,&count,RENDER_PROP,411,(Vector2){15.0f,12.0f},.9f);
+        PushRenderItem(items,&count,RENDER_PROP,28,(Vector2){15.0f,5.5f},1.0f);  // ancient arch
+        PushRenderItem(items,&count,RENDER_PROP,29,(Vector2){6.0f,5.0f},.95f);   // standing pillar
+        PushRenderItem(items,&count,RENDER_PROP,30,(Vector2){18.0f,12.5f},.95f); // broken wall
+        PushRenderItem(items,&count,RENDER_PROP,32,(Vector2){10.0f,12.0f},1.0f); // stone bridge
+        PushRenderItem(items,&count,RENDER_PROP,116,(Vector2){5.5f,13.2f},.65f);
+        PushRenderItem(items,&count,RENDER_PROP,119,(Vector2){18.0f,5.5f},.62f);
         PushRenderItem(items,&count,RENDER_PROP,415,(Vector2){2.0f,9.0f},.75f);
-        for(int i=0;i<5;i++)PushRenderItem(items,&count,RENDER_PROP,411,(Vector2){4.5f+i*3.2f,14.7f},.58f);
     } else {
-        PushRenderItem(items,&count,RENDER_PROP,414,(Vector2){17.0f,4.5f},1.35f);
-        PushRenderItem(items,&count,RENDER_PROP,411,(Vector2){10.0f,6.5f},.9f);
-        PushRenderItem(items,&count,RENDER_PROP,503,(Vector2){5.0f,13.0f},1.0f);
-        PushRenderItem(items,&count,RENDER_PROP,415,(Vector2){15.0f,13.0f},.9f);
-        PushRenderItem(items,&count,RENDER_PROP,404,(Vector2){7.0f,5.0f},.75f);
-        for(int i=0;i<6;i++)PushRenderItem(items,&count,RENDER_PROP,410,(Vector2){4.5f+i*2.4f,14.5f},.55f);
+        PushRenderItem(items,&count,RENDER_PROP,33,(Vector2){17.0f,4.5f},1.35f); // lighthouse from area atlas
+        PushRenderItem(items,&count,RENDER_PROP,35,(Vector2){10.0f,6.5f},.95f);  // garden fountain
+        PushRenderItem(items,&count,RENDER_PROP,34,(Vector2){5.0f,13.0f},1.0f);  // courtyard gate
+        PushRenderItem(items,&count,RENDER_PROP,32,(Vector2){15.0f,13.0f},.82f); // stone bridge
+        PushRenderItem(items,&count,RENDER_PROP,116,(Vector2){6.2f,6.5f},.62f);
+        PushRenderItem(items,&count,RENDER_PROP,118,(Vector2){12.0f,13.6f},.62f);
+        PushRenderItem(items,&count,RENDER_PROP,120,(Vector2){19.0f,10.5f},.58f);
     }
     // Natural map rims: cliff faces meet water at the coast, stone retaining walls frame ruins.
     if(g->area==AREA_CAMP) {
@@ -736,6 +748,11 @@ static void RenderWorld(Game *g) {
                 else if(it->index==16)DrawEnvProp(10,p,76*it->scale,82*it->scale);
                 else if(it->index==17)DrawEnvProp(11,p,68*it->scale,38*it->scale);
                 else if(it->index==18)DrawEnvProp(8,p,38*it->scale,46*it->scale);
+                else if(it->index==33)DrawAreaProp(13,p,190*it->scale,250*it->scale);
+                else if(it->index==28)DrawAreaProp(8,p,150*it->scale,140*it->scale);
+                else if(it->index==32)DrawAreaProp(12,p,130*it->scale,100*it->scale);
+                else if(it->index==34)DrawAreaProp(14,p,110*it->scale,118*it->scale);
+                else if(it->index==35)DrawAreaProp(15,p,112*it->scale,116*it->scale);
                 else if(it->index>=20&&it->index<=35)DrawAreaProp(it->index-20,p,76*it->scale,82*it->scale);
                 else if(it->index>=100&&it->index<200)DrawFloraProp(it->index-100,p,100*it->scale,108*it->scale);
                 else if(it->index>=200&&it->index<300)DrawCliffProp(it->index-200,p,112*it->scale,112*it->scale);
@@ -795,20 +812,29 @@ static void Panel(Rectangle r) {
     Rectangle inner={r.x+4.0f,r.y+4.0f,r.width-8.0f,r.height-8.0f};
     DrawRectangleRoundedLines(inner,.10f,16,Fade((Color){255,255,255,255},.38f));
 }
+static void PanelDark(Rectangle r) {
+    Rectangle shadow={r.x+2.0f,r.y+4.0f,r.width,r.height};
+    DrawRectangleRounded(shadow,.12f,18,Fade((Color){4,13,25,255},.48f));
+    DrawRectangleRounded(r,.12f,18,(Color){12,29,47,238});
+    DrawRectangleRoundedLines(r,.12f,18,(Color){197,157,91,238});
+    Rectangle inner={r.x+4.0f,r.y+4.0f,r.width-8.0f,r.height-8.0f};
+    DrawRectangleRoundedLines(inner,.10f,16,Fade((Color){240,221,179,255},.16f));
+    DrawRectangle(r.x+12,r.y+13,3,r.height-26,Fade(C_GOLD,.78f));
+}
 static void RenderHUD(Game *g) {
-    Panel((Rectangle){20,18,405,112});
+    PanelDark((Rectangle){20,18,405,112});
     DrawUIText("MIST ISLE  /  CHAPTER 01",40,32,15,(Color){119,145,116,255});
     const char *areaName=g->area==AREA_CAMP?"海岸营地":g->area==AREA_GROVE?"辉光林地":g->area==AREA_RUINS?"潮汐遗迹":"灯塔庭院";
     DrawUIText(areaName,560,32,18,(Color){83,119,88,255});
     DrawCircle(397,42,8,Fade(C_GOLD,.75f));
-    DrawUIText("失落的灯塔",40,54,28,C_INK);
+    DrawUIText("失落的灯塔",40,54,28,(Color){246,239,217,255});
     DrawUIText(TextFormat("生命 %d    果实 %d    贝壳 %d    星晶 %d",(int)g->player.hp,g->player.berries,g->player.shells,g->player.crystals),40,96,17,(Color){104,119,93,255});
 
     const char *objectiveTitle,*objectiveDetail;
     Vector2 objectiveTarget;
     bool hasObjectiveTarget=false;
     GetCurrentObjective(g,&objectiveTitle,&objectiveDetail,&objectiveTarget,&hasObjectiveTarget);
-    Panel((Rectangle){850,18,410,154});
+    PanelDark((Rectangle){850,18,410,154});
     DrawUIText("当前目标",872,29,15,(Color){119,145,116,255});
     DrawUIText(objectiveTitle,872,52,21,C_INK);
     DrawUITextWrapped(objectiveDetail,872,81,365,14,2,(Color){91,115,96,255});
@@ -817,30 +843,30 @@ static void RenderHUD(Game *g) {
     Buddy *active=CurrentBuddy(g);
     DrawUIText(TextFormat("伙伴 %d/3    当前：%s  Lv.%d",partyCount,activeName,active->level),872,137,13,(Color){104,119,93,255});
 
-    Panel((Rectangle){20,652,760,48});
+    PanelDark((Rectangle){20,652,760,48});
     DrawUIText("WASD 移动   SHIFT 冲刺   E 互动   TAB 切换伙伴   J 手记   I 背包   M 地图   F5 保存",38,667,13,(Color){91,115,96,255});
 
     if(g->area==AREA_CAMP && Dist(g->player.pos,g->world.groveGate)<1.6f) {
-        Panel((Rectangle){530,585,220,40});DrawUIText("E  前往辉光林地",550,596,17,(Color){91,115,96,255});
+        PanelDark((Rectangle){530,585,220,40});DrawUIText("E  前往辉光林地",550,596,17,(Color){91,115,96,255});
     } else if(g->area==AREA_CAMP && Dist(g->player.pos,g->world.ruinGate)<1.6f) {
-        Panel((Rectangle){530,585,220,40});DrawUIText("E  前往潮汐遗迹",550,596,17,(Color){91,115,96,255});
+        PanelDark((Rectangle){530,585,220,40});DrawUIText("E  前往潮汐遗迹",550,596,17,(Color){91,115,96,255});
     } else if(g->area==AREA_CAMP && Dist(g->player.pos,g->world.shrine)<1.6f && g->shrineSolved) {
-        Panel((Rectangle){530,585,220,40});DrawUIText("E  前往灯塔庭院",550,596,17,(Color){91,115,96,255});
+        PanelDark((Rectangle){530,585,220,40});DrawUIText("E  前往灯塔庭院",550,596,17,(Color){91,115,96,255});
     } else if(g->area!=AREA_CAMP && Dist(g->player.pos,(Vector2){2,9})<1.8f) {
-        Panel((Rectangle){530,585,220,40});DrawUIText("E  返回海岸营地",550,596,17,(Color){91,115,96,255});
+        PanelDark((Rectangle){530,585,220,40});DrawUIText("E  返回海岸营地",550,596,17,(Color){91,115,96,255});
     } else if(g->area==AREA_CAMP && !g->lumi.owned && Dist(g->player.pos,(Vector2){4,12})<1.65f) {
-        Panel((Rectangle){530,585,220,40});DrawUIText("E  救助苔灯灵",550,596,17,(Color){91,115,96,255});
+        PanelDark((Rectangle){530,585,220,40});DrawUIText("E  救助苔灯灵",550,596,17,(Color){91,115,96,255});
     } else if(g->area==AREA_CAMP && Dist(g->player.pos,(Vector2){3,10})<2.0f) {
-        Panel((Rectangle){530,585,220,40});DrawUIText("E  与守望者交谈",550,596,17,(Color){91,115,96,255});
+        PanelDark((Rectangle){530,585,220,40});DrawUIText("E  与守望者交谈",550,596,17,(Color){91,115,96,255});
     } else if(g->area==AREA_CAMP && g->lumi.owned && Dist(g->player.pos,(Vector2){4.1f,12.5f})<1.5f) {
-        Panel((Rectangle){530,585,220,40});DrawUIText("E  在营火旁休息",550,596,17,(Color){91,115,96,255});
+        PanelDark((Rectangle){530,585,220,40});DrawUIText("E  在营火旁休息",550,596,17,(Color){91,115,96,255});
     } else if(g->area==AREA_LIGHTHOUSE && !g->bossDefeated && Dist(g->player.pos,g->world.bossPos)<2.2f) {
-        Panel((Rectangle){530,585,250,40});DrawUIText("E  挑战灯塔守卫",550,596,17,(Color){91,115,96,255});
-    } else if(g->area==AREA_LIGHTHOUSE && g->bossDefeated && Dist(g->player.pos,g->world.shrine)<3.2f) {
-        Panel((Rectangle){500,585,280,40});DrawUIText("E  点亮失落的灯塔",525,596,17,(Color){91,115,96,255});
+        PanelDark((Rectangle){530,585,250,40});DrawUIText("E  挑战灯塔守卫",550,596,17,(Color){91,115,96,255});
+    } else if(g->area==AREA_LIGHTHOUSE && g->bossDefeated && Dist(g->player.pos,g->world.shrine)<3.8f) {
+        PanelDark((Rectangle){500,585,280,40});DrawUIText("E  点亮失落的灯塔",525,596,17,(Color){91,115,96,255});
     }
     if(g->toastTimer>0) {
-        Panel((Rectangle){380,600,520,42});
+        PanelDark((Rectangle){380,600,520,42});
         DrawUIText(g->toast,400,612,18,(Color){78,112,91,255});
     }
 }
@@ -1023,47 +1049,68 @@ static void RenderTitle(Game *g) {
 }
 static void RenderEnd(Game *g) {
     float t=g->endingTime;
-    int frame=(int)(t/0.82f);
-    if(frame>5)frame=5;
-    float fadeIn=fminf(1.0f,t/.65f);
-    ClearBackground((Color){8,17,30,255});
-    DrawRectangleGradientV(0,0,SW,SH,(Color){13,28,48,255},(Color){25,48,63,255});
-    for(int i=0;i<42;i++) {
+    float fadeIn=fminf(1.0f,t/.7f);
+    float pulse=.62f+.38f*sinf(t*3.1f);
+    ClearBackground((Color){7,17,31,255});
+    DrawRectangleGradientV(0,0,SW,SH,(Color){9,22,39,255},(Color){17,38,54,255});
+    for(int i=0;i<58;i++) {
         float x=(float)((i*197+31)%SW);
-        float y=(float)((i*83+17)%(SH-110));
-        float alpha=.16f+.22f*(.5f+.5f*sinf(t*1.7f+i*1.4f));
-        DrawCircle((int)x,(int)y,1.0f+(i%3)*.35f,Fade((Color){229,222,190,255},alpha));
+        float y=(float)((i*83+17)%(SH-92));
+        float a=.14f+.24f*(.5f+.5f*sinf(t*1.6f+i*1.37f));
+        DrawCircle((int)x,(int)y,1.0f+(i%3)*.4f,Fade((Color){229,222,190,255},a));
     }
-    DrawRectangle(0,0,300,SH,(Color){10,23,40,238});
-    DrawRectangle(SW-300,0,300,SH,(Color){10,23,40,238});
-    DrawLineEx((Vector2){300,34},(Vector2){300,SH-34},2.0f,Fade(C_GOLD,.45f));
-    DrawLineEx((Vector2){SW-300,34},(Vector2){SW-300,SH-34},2.0f,Fade(C_GOLD,.45f));
+    Rectangle scene={306,18,668,668};
     if(TEX_ENDING_CG.id) {
-        Rectangle src={(float)((frame%3)*128),(float)((frame/3)*128),128,128};
-        Rectangle dst={332,42,616,616};
-        DrawTexturePro(TEX_ENDING_CG,src,dst,(Vector2){0,0},0,WHITE);
-        DrawRectangleLinesEx((Rectangle){328,38,624,624},3.0f,Fade(C_GOLD,.78f));
-        DrawRectangleLinesEx((Rectangle){334,44,612,612},1.0f,Fade((Color){255,246,217,255},.45f));
+        Rectangle src={0,0,(float)TEX_ENDING_CG.width,(float)TEX_ENDING_CG.height};
+        DrawTexturePro(TEX_ENDING_CG,src,scene,(Vector2){0,0},0,WHITE);
+        // The lighthouse lantern sits near the upper centre of the illustration.
+        Vector2 lamp={scene.x+scene.width*.50f,scene.y+scene.height*.205f};
+        float sweep=sinf(t*.72f)*74.0f;
+        Vector2 beamA={scene.x+4.0f,lamp.y-66.0f+sweep};
+        Vector2 beamB={scene.x+4.0f,lamp.y+66.0f+sweep};
+        DrawTriangle(lamp,beamA,beamB,Fade((Color){255,224,151,255},.11f+.045f*pulse));
+        DrawTriangle(lamp,(Vector2){scene.x+4.0f,lamp.y-27.0f+sweep*.72f},
+            (Vector2){scene.x+4.0f,lamp.y+27.0f+sweep*.72f},Fade((Color){255,244,205,255},.16f+.06f*pulse));
+        DrawCircleV(lamp,43.0f,Fade((Color){255,222,148,255},.14f+.11f*pulse));
+        DrawCircleV(lamp,23.0f,Fade((Color){255,240,190,255},.25f+.16f*pulse));
+        DrawCircleV(lamp,9.0f,(Color){255,249,220,255});
+        for(int i=0;i<12;i++) {
+            float a=t*.8f+i*PI2/12.0f;
+            Vector2 mote={lamp.x+cosf(a)*(34.0f+5.0f*sinf(t*2.0f+i)),lamp.y+sinf(a)*(28.0f+4.0f*cosf(t*2.0f+i))};
+            DrawCircleV(mote,1.6f,Fade((Color){255,232,173,255},.55f));
+        }
+        DrawRectangleLinesEx((Rectangle){scene.x-4,scene.y-4,scene.width+8,scene.height+8},3.0f,Fade(C_GOLD,.82f));
+        DrawRectangleLinesEx((Rectangle){scene.x+2,scene.y+2,scene.width-4,scene.height-4},1.0f,Fade((Color){255,246,217,255},.32f));
+        // Place the traveller and companions on the path in the illustrated scene.
+        DrawPlayer((Vector2){520,625},t,false,3);
+        if(g->lumi.owned)DrawLumi((Vector2){585,625},t,0);
+        if(g->splash.owned)DrawMoatail((Vector2){650,625},t);
+        if(g->spark.owned)DrawGecko((Vector2){715,625},t);
     } else {
-        DrawCircle(640,300,180,Fade(C_GOLD,.12f));
-        DrawUIText("灯塔重新亮起",520,330,32,(Color){255,238,198,255});
+        DrawLighthouseBackdrop(t,true);
+        DrawUIText("灯塔重新亮起",510,325,30,(Color){255,238,198,255});
     }
-    DrawUIText("第一章",38,78,17,(Color){224,183,105,255});
-    DrawUIText("失落的灯塔",38,112,29,(Color){255,242,213,255});
-    DrawLineEx((Vector2){38,164},(Vector2){260,164},1.5f,Fade(C_GOLD,.55f));
-    DrawUITextWrapped("沉睡的灯火终于苏醒。",38,204,224,18,2,(Color){239,232,209,255});
-    DrawUITextWrapped("伙伴们的光，照亮了回家的路。",38,272,224,16,3,(Color){195,211,210,255});
-    DrawUIText("同行伙伴",SW-266,78,17,(Color){224,183,105,255});
+    // Side panels keep the CG unobstructed and give the ending a deliberate editorial layout.
+    DrawRectangle(0,0,286,SH,(Color){8,20,36,242});
+    DrawRectangle(SW-286,0,286,SH,(Color){8,20,36,242});
+    DrawLineEx((Vector2){286,28},(Vector2){286,SH-28},2.0f,Fade(C_GOLD,.48f));
+    DrawLineEx((Vector2){SW-286,28},(Vector2){SW-286,SH-28},2.0f,Fade(C_GOLD,.48f));
+    DrawUIText("第一章",34,76,17,(Color){224,183,105,255});
+    DrawUIText("失落的灯塔",34,112,29,(Color){255,242,213,255});
+    DrawLineEx((Vector2){34,160},(Vector2){246,160},1.5f,Fade(C_GOLD,.55f));
+    DrawUITextWrapped("沉睡的灯火终于苏醒。",34,198,214,18,2,(Color){239,232,209,255});
+    DrawUITextWrapped("伙伴们的光，照亮了回家的路。",34,265,214,16,3,(Color){195,211,210,255});
+    DrawUIText("同行伙伴",SW-250,76,17,(Color){224,183,105,255});
     int row=0;
-    if(g->lumi.owned){DrawLumi((Vector2){SW-250,174},t,0);DrawUIText("苔灯灵",SW-208,160,17,(Color){244,239,217,255});row++;}
-    if(g->splash.owned){DrawMoatail((Vector2){SW-250,174+row*76},t);DrawUIText("沫尾兽",SW-208,160+row*76,17,(Color){244,239,217,255});row++;}
-    if(g->spark.owned){DrawGecko((Vector2){SW-250,174+row*76},t);DrawUIText("鸣晶蜥",SW-208,160+row*76,17,(Color){244,239,217,255});row++;}
-    DrawLineEx((Vector2){SW-266,440},(Vector2){SW-38,440},1.5f,Fade(C_GOLD,.42f));
-    DrawUITextWrapped("一座灯塔，一段旅程。",SW-266,472,224,16,2,(Color){220,226,207,255});
-    DrawUITextWrapped("新的故事还在岛屿深处等待。",SW-266,528,224,15,3,(Color){188,207,203,255});
-    DrawRectangle(0,SH-76,SW,76,Fade((Color){6,16,29,255},.88f));
-    if(t<5.0f)DrawUIText("灯塔的光正在越过海面……",480,SH-49,18,(Color){255,232,181,255});
-    else DrawUIText("第一章完成   ·   Enter 返回标题   ·   R 再次探索",390,SH-49,18,(Color){255,232,181,255});
+    if(g->lumi.owned){DrawLumi((Vector2){SW-226,166},t,0);DrawUIText("苔灯灵",SW-184,152,17,(Color){244,239,217,255});row++;}
+    if(g->splash.owned){DrawMoatail((Vector2){SW-226,166+row*76},t);DrawUIText("沫尾兽",SW-184,152+row*76,17,(Color){244,239,217,255});row++;}
+    if(g->spark.owned){DrawGecko((Vector2){SW-226,166+row*76},t);DrawUIText("鸣晶蜥",SW-184,152+row*76,17,(Color){244,239,217,255});row++;}
+    DrawLineEx((Vector2){SW-250,420},(Vector2){SW-34,420},1.5f,Fade(C_GOLD,.42f));
+    DrawUITextWrapped("一座灯塔，一段旅程。",SW-250,450,216,16,2,(Color){220,226,207,255});
+    DrawUITextWrapped("新的故事还在岛屿深处等待。",SW-250,506,216,15,3,(Color){188,207,203,255});
+    DrawRectangle(0,SH-72,SW,72,Fade((Color){5,15,27,255},.94f));
+    if(t<5.0f)DrawUIText("灯塔的光正在越过海面……",478,SH-47,18,(Color){255,232,181,255});
+    else DrawUIText("第一章完成   ·   Enter 返回标题   ·   R 再次探索",390,SH-47,18,(Color){255,232,181,255});
     if(fadeIn<1.0f)DrawRectangle(0,0,SW,SH,Fade(BLACK,1.0f-fadeIn));
 }
 static int Base64Value(unsigned char c) {
@@ -1089,16 +1136,16 @@ static unsigned char *DecodeBase64(const char *encoded,int *outSize) {
     *outSize=count;return out;
 }
 static void LoadEndingCG(void) {
-    char *encoded=LoadFileText("assets/cinematics/lighthouse_lighting_6frame.jpg.b64");
+    char *encoded=LoadFileText("assets/cinematics/lighthouse_final_scene.jpg.b64");
     if(!encoded){TraceLog(LOG_WARNING,"Mist Isle: lighthouse CG asset missing; using fallback ending.");return;}
     int byteCount=0;unsigned char *bytes=DecodeBase64(encoded,&byteCount);
     if(bytes&&byteCount>0) {
         Image image=LoadImageFromMemory(".jpg",bytes,byteCount);
         if(image.data) {
-            if(image.width==384&&image.height==256) {
+            if(image.width==448&&image.height==448) {
                 TEX_ENDING_CG=LoadTextureFromImage(image);
                 if(TEX_ENDING_CG.id)SetTextureFilter(TEX_ENDING_CG,TEXTURE_FILTER_POINT);
-            } else TraceLog(LOG_WARNING,"Mist Isle: lighthouse CG atlas size mismatch (%dx%d).",image.width,image.height);
+            } else TraceLog(LOG_WARNING,"Mist Isle: lighthouse CG illustration size mismatch (%dx%d).",image.width,image.height);
             UnloadImage(image);
         }
     }
