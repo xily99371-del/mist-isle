@@ -14,7 +14,7 @@ static Texture2D TEX_HERO_WALK={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, T
 static Vector2 Iso(float x,float y,float z) {
     return (Vector2){(x-y)*31.0f,(x+y)*15.5f-z};
 }
-static Vector2 WorldScreen(Vector2 p) { return Iso(p.x,p.y,0); }
+static Vector2 WorldScreen(Vector2 p) { return (Vector2){(p.x+0.5f)*TILE_SIZE,(p.y+0.5f)*TILE_SIZE}; }
 static void Toast(Game *g,const char *s) {
     snprintf(g->toast,sizeof(g->toast),"%s",s); g->toastTimer=2.4f;
 }
@@ -192,7 +192,7 @@ void GameReset(Game *g,int seed) {
     g->lumi=(Buddy){.pos={2.3f,12.4f},.owned=false,.level=1};
     g->splash=(Buddy){.pos={8,7},.owned=false,.level=1};
     g->spark=(Buddy){.pos={15,8},.owned=false,.level=1};
-    g->cam.offset=(Vector2){SW/2.0f,SH/2.0f+20}; g->cam.zoom=1;
+    g->cam.offset=(Vector2){SW/2.0f,SH/2.0f}; g->cam.zoom=1.10f;
     g->fireflyPhase=0; g->dayClock=0.28f; g->weatherClock=0; g->weather=0; g->journalOpen=false; g->inventoryOpen=false; g->mapOpen=false;
     g->fireflyDiscovered=false; g->leaflingFed=false; g->groveMoteDefeated=false; g->enemySoaked=false; g->battleRound=0; g->defeatedGuards=0;
 }
@@ -310,7 +310,7 @@ void GameUpdate(Game *g,float dt) {
     if(IsKeyDown(KEY_A)||IsKeyDown(KEY_LEFT))in.x-=1;
     if(IsKeyDown(KEY_D)||IsKeyDown(KEY_RIGHT))in.x+=1;
     float l=Vector2Length(in);if(l>0.01f)in=Vector2Scale(in,1/l);
-    float speed=3.3f;
+    float speed=3.65f;
     if(IsKeyPressed(KEY_LEFT_SHIFT)&&p->dashCd<=0&&l>0.01f){speed=8.5f;p->dashCd=0.9f;p->invuln=0.18f;Burst(g,WorldScreen(p->pos),WHITE,8);}
     p->vel=Vector2Scale(in,speed);
     if (fabsf(in.x) > fabsf(in.y) && fabsf(in.x) > 0.01f) p->facing = in.x < 0 ? 1 : 2;
@@ -448,6 +448,9 @@ void GameUpdate(Game *g,float dt) {
     }
     if(g->shrineSolved&&g->enemyCount>0&&!g->enemies[g->enemyCount-1].alive)g->bossDefeated=true;
 
-    g->cam.target=Iso(p->pos.x,p->pos.y,0);
+    g->cam.target=WorldScreen(p->pos);
+    float halfW=SW/(2.0f*g->cam.zoom),halfH=SH/(2.0f*g->cam.zoom);
+    if(WORLD_PIXEL_W>2*halfW)g->cam.target.x=Clamp(g->cam.target.x,halfW,WORLD_PIXEL_W-halfW);
+    if(WORLD_PIXEL_H>2*halfH)g->cam.target.y=Clamp(g->cam.target.y,halfH,WORLD_PIXEL_H-halfH);
     if(g->toastTimer>0)g->toastTimer-=dt;
 }
