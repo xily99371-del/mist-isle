@@ -16,17 +16,22 @@ def render_map(name,out_dir):
     layer=root.find("./layer[@name='Ground']/data")
     gids=[int(v.strip()) for v in (layer.text or "").replace("\n","").split(",") if v.strip()]
     image=Image.new("RGBA",(W*T,H*T),(20,34,39,255))
+    draw=ImageDraw.Draw(image,"RGBA")
     for i,gid in enumerate(gids):
         index=gid-1
+        row=index//4
+        base=(47,137,171,255) if row>=9 else (126,139,129,255) if row>=6 else (198,166,111,255) if row>=3 else (91,145,84,255)
+        x,y=(i%W)*T,(i//W)*T
+        draw.rectangle((x,y,x+T-1,y+T-1),fill=base)
         tile=atlas.crop(((index%4)*T,(index//4)*T,(index%4+1)*T,(index//4+1)*T))
-        image.alpha_composite(tile,((i%W)*T,(i//W)*T))
+        image.alpha_composite(tile,(x,y))
     draw=ImageDraw.Draw(image,"RGBA")
     collision=root.find("./objectgroup[@name='Collision']")
     if collision is not None:
         for obj in collision.findall("object"):
             x,y=float(obj.get("x","0")),float(obj.get("y","0"))
             w,h=float(obj.get("width","0")),float(obj.get("height","0"))
-            draw.rectangle((x,y,x+w,y+h),fill=(215,55,48,48),outline=(235,87,75,190),width=2)
+            draw.rectangle((x,y,x+w,y+h),fill=(215,55,48,22),outline=(235,87,75,155),width=2)
     markers=root.find("./objectgroup[@name='Markers']")
     if markers is not None:
         font=ImageFont.load_default()
