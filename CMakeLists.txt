@@ -32,6 +32,7 @@ add_custom_command(
   COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/tools/build_maps.py" --output "${MISTISLE_MAP_HEADER}"
   DEPENDS
     "${CMAKE_SOURCE_DIR}/tools/build_maps.py"
+    "${CMAKE_SOURCE_DIR}/tools/map_autotile.py"
     "${CMAKE_SOURCE_DIR}/maps/terrain.tsx"
     "${CMAKE_SOURCE_DIR}/maps/coastal_camp.tmx"
     "${CMAKE_SOURCE_DIR}/maps/glowglade_grove.tmx"
