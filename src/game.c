@@ -175,12 +175,12 @@ static void BuildAreaWorld(Game *g,Area area) {
         AddPickup(w,0,5,9);AddPickup(w,1,3,10);AddPickup(w,2,14,9);
     } else if(area==AREA_GROVE) {
         AddPickup(w,0,6,7);AddPickup(w,0,10,5);AddPickup(w,0,12,7);
-        AddPickup(w,1,4,10);AddPickup(w,2,12,9);
+        AddPickup(w,1,4,10);AddPickup(w,2,10,9);
     } else if(area==AREA_RUINS) {
         AddPickup(w,1,6,7);AddPickup(w,1,12,7);
         AddPickup(w,2,7,8);AddPickup(w,2,12,9);
     } else {
-        AddPickup(w,0,4,6);AddPickup(w,1,14,6);AddPickup(w,2,12,8);
+        AddPickup(w,0,5,7);AddPickup(w,1,13,7);AddPickup(w,2,10,9);
     }
     for(int i=0;i<w->pickupCount;i++) {
         int px=(int)w->pickups[i].tile.x, py=(int)w->pickups[i].tile.y;
@@ -405,7 +405,7 @@ void GetCurrentObjective(Game *g,const char **title,const char **detail,Vector2 
             } else {
                 *title="收集星晶";
                 *detail="在遗迹寻找并采集星晶";
-                if(!FindNearestPickup(g,2,2,target))*target=(Vector2){12,8};
+                if(!FindNearestPickup(g,2,2,target))*target=(Vector2){10,9};
             }
         } else {
             *title="返回潮汐遗迹";
