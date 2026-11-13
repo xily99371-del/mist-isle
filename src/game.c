@@ -82,18 +82,12 @@ static void AddPickup(World *w,int kind,float x,float y) {
     w->pickups[index] = (Pickup){{x,y},kind,false,(float)index*0.7f};
     w->pickupCount++;
 }
-static void SetSolidRect(World *w,int x0,int y0,int x1,int y1) {
-    for(int y=y0;y<=y1;y++)for(int x=x0;x<=x1;x++) {
-        if(x>0&&y>0&&x<MAPW-1&&y<MAPH-1)w->solid[y][x]=1;
-    }
-
 static int TerrainKindFromAtlasIndex(unsigned char index) {
     int row=(int)index/4;
     if(row>=9)return 4; // water
     if(row>=6)return 3; // stone
     if(row>=3)return 2; // sand
     return 0;           // grass
-}
 }
 static void BuildWorld(World *w,int seed) {
     memset(w,0,sizeof(*w)); w->seed=seed;
@@ -363,7 +357,7 @@ void GetCurrentObjective(Game *g,const char **title,const char **detail,Vector2 
         } else {
             *title="返回辉光林地";
             *detail="从西侧出口回营地，再进辉光林地";
-            *target=exitPoint;
+            *target=g->world.returnPoint;
         }
         return;
     }
@@ -385,7 +379,7 @@ void GetCurrentObjective(Game *g,const char **title,const char **detail,Vector2 
         } else {
             *title="返回潮汐遗迹";
             *detail="从西侧出口回营地，再进潮汐遗迹";
-            *target=exitPoint;
+            *target=g->world.returnPoint;
         }
         return;
     }
@@ -407,7 +401,7 @@ void GetCurrentObjective(Game *g,const char **title,const char **detail,Vector2 
         } else {
             *title="返回潮汐遗迹";
             *detail="沿西侧出口返回营地，再进入潮汐遗迹";
-            *target=exitPoint;
+            *target=g->world.returnPoint;
         }
         return;
     }
@@ -423,7 +417,7 @@ void GetCurrentObjective(Game *g,const char **title,const char **detail,Vector2 
         } else {
             *title="返回灯塔庭院";
             *detail="从西侧出口回营地，再进灯塔庭院";
-            *target=exitPoint;
+            *target=g->world.returnPoint;
         }
         return;
     }
@@ -438,7 +432,7 @@ void GetCurrentObjective(Game *g,const char **title,const char **detail,Vector2 
     } else {
         *title="返回灯塔庭院";
         *detail="从西侧出口回营地，再进灯塔庭院";
-        *target=exitPoint;
+        *target=g->world.returnPoint;
     }
     (void)hasTarget;
 }
