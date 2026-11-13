@@ -237,9 +237,11 @@ static bool SolidPoint(Game *g,Vector2 p) {
         if(InRect(p,2.55f,9.55f,3.45f,10.45f))return true;  // camp keeper
         if(!g->lumi.owned && InRect(p,3.55f,11.55f,4.45f,12.45f))return true; // Moss Lumi
         float nx=(p.x-10.5f)/11.0f, ny=(p.y-8.5f)/9.0f;
-        bool onPath=((y>=8&&y<=10&&x>=3&&x<=19)||(x>=17&&x<=19&&y>=3&&y<=15));
+        float coastNoise=.045f*sinf((float)x*.73f+(float)y*.29f)+.026f*cosf((float)y*.91f-(float)x*.24f);
+        float shore=nx*nx+ny*ny+coastNoise;
+        bool onPath=((y==9&&x>=3&&x<=19)||(x==4&&y>=9&&y<=13)||(x==18&&y>=3&&y<=15));
         bool dockWater=(x>=1&&x<=3&&y>=11&&y<=15);
-        bool sea=(nx*nx+ny*ny)>.88f;
+        bool sea=shore>.90f;
         if(!onPath&&(dockWater||sea))return true;
     } else if(g->area==AREA_GROVE) {
         if(InRect(p,3.95f,2.95f,6.05f,4.85f))return true;   // flowering tree
@@ -269,6 +271,9 @@ static bool SolidPoint(Game *g,Vector2 p) {
         if(InRect(p,13.65f,11.65f,15.85f,13.95f))return true;// garden shrub
         if(InRect(p,16.68f,6.68f,17.32f,7.32f))return true;  // shrine base only
         if(!g->bossDefeated && InRect(p,17.55f,12.55f,18.45f,13.45f))return true; // lighthouse guardian
+        float nx=(p.x-10.8f)/10.6f, ny=(p.y-8.5f)/8.7f;
+        float coastNoise=.038f*sinf((float)x*.68f+(float)y*.34f)+.024f*cosf((float)y*.86f-(float)x*.27f);
+        if(nx*nx+ny*ny+coastNoise>.94f)return true;
     }
     return false;
 }
