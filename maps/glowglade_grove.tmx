@@ -62,7 +62,7 @@
   <object id="332" name="tree2" type="tree2" x="924.00" y="588.00"><properties><property name="scale" type="float" value="1.20"/></properties><point/></object>
   <object id="333" name="tree0" type="tree0" x="980.00" y="700.00"><properties><property name="scale" type="float" value="1.12"/></properties><point/></object>
   <object id="334" name="tree1" type="tree1" x="812.00" y="868.00"><properties><property name="scale" type="float" value="1.16"/></properties><point/></object>
-  <object id="335" name="prop_27" type="prop_27" x="980.00" y="140.00"><properties><property name="scale" type="float" value="1.18"/></properties><point/></object>
+  <object id="335" name="prop_27" type="prop_27" x="644.00" y="812.00"><properties><property name="scale" type="float" value="1.18"/></properties><point/></object>
   <object id="336" name="prop_25" type="prop_25" x="364.00" y="364.00"><properties><property name="scale" type="float" value="0.95"/></properties><point/></object>
   <object id="337" name="prop_116" type="prop_116" x="308.00" y="308.00"><properties><property name="scale" type="float" value="0.96"/></properties><point/></object>
   <object id="338" name="prop_117" type="prop_117" x="364.00" y="644.00"><properties><property name="scale" type="float" value="0.88"/></properties><point/></object>
