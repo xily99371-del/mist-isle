@@ -72,7 +72,7 @@ require("frame*64" not in RENDER and "facing*64" not in RENDER,
 require("index*96" in RENDER, "environment props use 96px atlas cells")
 require("DrawAreaProp" in RENDER and "area_props_96.png" in RENDER, "area-specific supplemental prop atlas is integrated")
 require("DrawTopDownTile" in RENDER and "WorldToScreen" in RENDER, "orthographic top-down square-tile renderer is active")
-require("topdown_terrain_atlas_v1.png" in RENDER and "56,56" in RENDER, "detailed 56px top-down terrain atlas is integrated")
+require("topdown_terrain_atlas_v1.png" in RENDER and "TILE_SIZE" in RENDER and "56.0f,56.0f" in RENDER, "detailed 56px top-down terrain atlas is integrated")
 require("TEX_TOPDOWN_TILES" in RENDER and "for(int i=0;i<20;i++)" in RENDER, "top-down terrain and decor textures are loaded and released")
 require('type="prop_22"' in GROVE_MAP and 'type="prop_302"' not in GROVE_MAP,
         "Glowglade uses its own woodland shelter and never reuses the coastal lighthouse cottage")
