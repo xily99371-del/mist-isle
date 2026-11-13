@@ -3,7 +3,7 @@
  <properties>
   <property name="level_id" value="lighthouse_courtyard"/>
   <property name="layout_style" value="one_screen_handcrafted_topdown"/>
-  <property name="map_review_revision" type="int" value="6"/>
+  <property name="map_review_revision" type="int" value="7"/>
   <property name="scene_description" value="Final lighthouse forecourt; axial approach, formal stone court, open guardian arena."/>
  </properties>
  <tileset firstgid="1" source="terrain.tsx"/>
