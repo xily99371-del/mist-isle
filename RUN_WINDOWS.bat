@@ -24,6 +24,8 @@ if errorlevel 1 goto failed
 echo [2/3] Generating pixel-art assets...
 python tools\generate_pixel_assets.py
 if errorlevel 1 goto failed
+python tools\generate_ground_atlas.py
+if errorlevel 1 goto failed
 python tools\build_kenney_runtime_atlas.py
 if errorlevel 1 goto failed
 
