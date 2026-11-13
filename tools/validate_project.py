@@ -15,6 +15,7 @@ MAIN = (ROOT / "src/main.c").read_text(encoding="utf-8")
 WORKFLOW = (ROOT / ".github/workflows/build-windows.yml").read_text(encoding="utf-8")
 CMAKE = (ROOT / "CMakeLists.txt").read_text(encoding="utf-8")
 MAP_BUILD = (ROOT / "tools/build_maps.py").read_text(encoding="utf-8")
+MAP_PREVIEW = (ROOT / "tools/preview_tiled_maps.py").read_text(encoding="utf-8")
 MAP_FILES = [ROOT / "maps" / name for name in (
     "terrain.tsx", "coastal_camp.tmx", "glowglade_grove.tmx",
     "tidal_ruins.tmx", "lighthouse_courtyard.tmx"
@@ -117,13 +118,17 @@ require("FLAG_WINDOW_RESIZABLE" in MAIN and "1600,900" in MAIN and "LoadRenderTe
         "Windows game opens in a larger resizable window with a fixed 16:9 logical canvas")
 require("MISTISLE_PI_PROFILE" in MAIN and "SetWindowMinSize(960,540)" in MAIN and "showPerfOverlay" in MAIN,
         "Pi profile uses a non-maximized 720p window and optional FPS diagnostics")
-require("MISTISLE_PI_PROFILE" in CMAKE and 'set(OPENGL_VERSION "2.1"' in CMAKE and "generate_area_maps" in CMAKE,
+require("MISTISLE_PI_PROFILE" in CMAKE and 'set(OPENGL_VERSION "2.1"' in CMAKE and "GLFW_BUILD_WAYLAND ON" in CMAKE and "generate_area_maps" in CMAKE,
         "CMake exposes a Raspberry Pi desktop OpenGL 2.1 profile and builds map data")
 require("find_package(Python3 REQUIRED COMPONENTS Interpreter)" in CMAKE and "tools/build_maps.py" in CMAKE,
         "Python is required only at build time to compile Tiled maps")
 require(all(path.exists() for path in MAP_FILES), "all four Tiled maps and the terrain tileset are present")
 require("AREA_GROUND" in MAP_BUILD and "AREA_COLLISION" in MAP_BUILD and "AREA_MARKERS" in MAP_BUILD and "AREA_OBJECTS" in MAP_BUILD,
         "Tiled compiler exports ground, collision, story markers and object placements")
+require("chapter1_map_review.png" in MAP_PREVIEW and "Collision" in MAP_PREVIEW and "Markers" in MAP_PREVIEW,
+        "map preview generator creates a visual QA sheet with collision and story markers")
+require("python tools/preview_tiled_maps.py" in WORKFLOW,
+        "Windows and Raspberry Pi CI generate map review images")
 require('objectgroup[@name=\'Markers\']' in MAP_BUILD and 'objectgroup[@name=\'Collision\']' in MAP_BUILD,
         "map compiler reads named marker and collision layers")
 require("GameUpdate(&g,dt)" in MAIN and "SCENE_END must pass through GameUpdate" in MAIN,
