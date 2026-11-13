@@ -3,8 +3,8 @@
  <properties>
   <property name="level_id" value="tidal_ruins"/>
   <property name="layout_style" value="one_screen_handcrafted_topdown"/>
-  <property name="map_review_revision" type="int" value="11"/>
-  <property name="scene_description" value="Ancient stone processional; flanking shrines, broken arches, central keystone."/>
+  <property name="map_review_revision" type="int" value="12"/>
+  <property name="scene_description" value="Ancient stone processional framed by two irregular tidal pools; broken arches, flanking altars and a central keystone."/>
  </properties>
  <tileset firstgid="1" source="terrain.tsx"/>
  <layer id="1" name="Ground" width="18" height="12">
@@ -12,10 +12,10 @@
    2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1,
    1, 1, 26, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 26, 25, 25, 1, 1,
    1, 1, 25, 25, 26, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 26, 1, 1,
-   1, 1, 25, 25, 25, 25, 26, 25, 25, 25, 25, 25, 25, 25, 25, 25, 1, 2,
-   37, 37, 25, 25, 25, 25, 25, 25, 26, 25, 25, 25, 25, 25, 25, 25, 1, 1,
-   37, 37, 25, 25, 25, 25, 25, 25, 25, 25, 26, 25, 25, 25, 25, 25, 1, 1,
-   37, 38, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 26, 25, 25, 25, 1, 1,
+   1, 1, 25, 25, 25, 25, 26, 25, 25, 25, 25, 25, 25, 25, 25, 25, 1, 37,
+   37, 37, 25, 25, 25, 25, 25, 25, 26, 25, 25, 25, 25, 25, 25, 25, 37, 37,
+   37, 37, 25, 25, 25, 25, 25, 25, 25, 25, 26, 25, 25, 25, 25, 25, 38, 37,
+   37, 38, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 26, 25, 25, 25, 37, 38,
    1, 1, 25, 26, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 26, 25, 1, 1,
    1, 1, 25, 25, 25, 26, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 2, 1,
    1, 1, 13, 13, 13, 13, 13, 14, 13, 13, 13, 13, 13, 13, 1, 1, 1, 1,
