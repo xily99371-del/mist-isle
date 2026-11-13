@@ -134,7 +134,8 @@ require("AREA_GROUND" in MAP_BUILD and "AREA_COLLISION" in MAP_BUILD and "AREA_M
 require("build_overlay(ground)" in MAP_BUILD and "AREA_OVERLAY[4][4][MAPH][MAPW]" in MAP_BUILD,
         "Tiled compiler emits four directional autotile planes consumed by the renderer")
 require("def build_overlay" in MAP_AUTOTILE and "DIRECTIONS" in MAP_AUTOTILE and "PRIORITY" in MAP_AUTOTILE,
-        "the four-direction shoreline autotile helper is present for clean Windows and ARM64 builds")\nrequire("if type_id==32:" in MAP_BUILD and "collision[by][xx]=0" in MAP_BUILD,
+        "the four-direction shoreline autotile helper is present for clean Windows and ARM64 builds")
+require("if type_id==32:" in MAP_BUILD and "collision[by][xx]=0" in MAP_BUILD,
         "Tiled bridge objects open a real walkable span through the water collision grid")
 require('#include "area_maps.h"' in RENDER and "AREA_OVERLAY[(int)g->area][direction][y][x]" in RENDER and "direction*90" in RENDER,
         "renderer draws every directional shoreline mask from the generated Tiled map header")
