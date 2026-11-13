@@ -75,8 +75,12 @@ def parse(path):
                 block_rect(cx+1,cy,cx+1,cy)            # arch posts; keep doorway open
             elif type_id==305:
                 block_rect(cx-1,cy-1,cx+1,cy)          # fountain plinth
-            elif type_id in (25,27,29,31,33):
-                block_rect(cx,cy,cx,cy)                 # crystal, tree, pillar, altar, lighthouse base
+            elif type_id in (24,25,26,27,29,31,33):
+                block_rect(cx,cy,cx,cy)                 # flowering trees, crystal, pillar, altar, lighthouse base
+            elif type_id==21:
+                block_rect(cx-1,cy,cx+1,cy)              # boat hull
+            elif type_id==22:
+                block_rect(cx-1,cy-1,cx+1,cy)            # tent footprint
             elif type_id==28:
                 block_rect(cx-1,cy,cx-1,cy)
                 block_rect(cx+1,cy,cx+1,cy)            # ruin arch supports
