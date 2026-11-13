@@ -1,4 +1,5 @@
 #include "game.h"
+#include "area_maps.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -85,6 +86,14 @@ static void SetSolidRect(World *w,int x0,int y0,int x1,int y1) {
     for(int y=y0;y<=y1;y++)for(int x=x0;x<=x1;x++) {
         if(x>0&&y>0&&x<MAPW-1&&y<MAPH-1)w->solid[y][x]=1;
     }
+
+static int TerrainKindFromAtlasIndex(unsigned char index) {
+    int row=(int)index/4;
+    if(row>=9)return 4; // water
+    if(row>=6)return 3; // stone
+    if(row>=3)return 2; // sand
+    return 0;           // grass
+}
 }
 static void BuildWorld(World *w,int seed) {
     memset(w,0,sizeof(*w)); w->seed=seed;
@@ -121,96 +130,45 @@ static void BuildAreaWorld(Game *g,Area area) {
     BuildWorld(&g->world,g->lastSeed+(int)area*7919);
     g->area=area;
     World *w=&g->world;
-    for(int y=0;y<MAPH;y++)for(int x=0;x<MAPW;x++) {
-        int edge=(x==0||y==0||x==MAPW-1||y==MAPH-1);
-        w->kind[y][x]=edge?3:0;
-        w->solid[y][x]=0;
-    }
-    // A broad, guaranteed walkable route and a central open area.
-    for(int x=1;x<21;x++){w->kind[9][x]=0;w->kind[10][x]=0;}
-    for(int y=3;y<15;y++){w->kind[y][3]=0;w->kind[y][4]=0;}
-    for(int y=5;y<14;y++)for(int x=7;x<17;x++)if((x+y)%4!=0)w->kind[y][x]=0;
-    // Keep every gate and story interaction reachable on every deterministic seed.
-    for(int x=14;x<20;x++){w->kind[4][x]=0;w->kind[9][x]=0;w->kind[14][x]=0;}
-    for(int y=4;y<15;y++)w->kind[y][2]=0;
-    if(area==AREA_GROVE) {
-        for(int y=4;y<=10;y++)for(int x=8;x<=14;x++)w->kind[y][x]=0;
-    } else if(area==AREA_RUINS) {
-        for(int y=5;y<=9;y++)for(int x=13;x<=19;x++)w->kind[y][x]=0;
-    } else if(area==AREA_LIGHTHOUSE) {
-        for(int y=10;y<=14;y++)for(int x=14;x<=19;x++)w->kind[y][x]=0;
-    }
     w->pickupCount=0;
+    w->objectCount=0;
+    for(int y=0;y<MAPH;y++)for(int x=0;x<MAPW;x++) {
+        w->kind[y][x]=0;
+        w->terrain[y][x]=AREA_GROUND[(int)area][y][x];
+        w->solid[y][x]=AREA_COLLISION[(int)area][y][x];
+    }
+    w->camp=AREA_MARKERS[(int)area][0];
+    w->returnPoint=AREA_MARKERS[(int)area][1];
+    w->groveGate=AREA_MARKERS[(int)area][2];
+    w->ruinGate=AREA_MARKERS[(int)area][3];
+    w->shrine=AREA_MARKERS[(int)area][4];
+    w->bossPos=AREA_MARKERS[(int)area][5];
+    w->objectCount=AREA_OBJECT_COUNTS[(int)area];
+    for(int i=0;i<w->objectCount;i++)w->objects[i]=AREA_OBJECTS[(int)area][i];
+
+    // Resource placement remains progression-driven; terrain, static objects,
+    // collision and all major story markers are authored in Tiled.
     if(area==AREA_CAMP) {
-        w->camp=(Vector2){4,13};w->groveGate=(Vector2){18,4};w->ruinGate=(Vector2){18,9};w->shrine=(Vector2){18,14};w->bossPos=(Vector2){18,14};
-        for(int y=1;y<17;y++)for(int x=1;x<5;x++)if(y<7||y>14)w->kind[y][x]=2;
-        for(int i=0;i<5;i++)AddPickup(w,0,7+i*2,7+(i%2)*4);
+        AddPickup(w,0,7,7);AddPickup(w,0,9,11);AddPickup(w,0,13,10);
+        AddPickup(w,0,15,6);AddPickup(w,0,15,12);
         AddPickup(w,1,15,6);AddPickup(w,2,15,12);
     } else if(area==AREA_GROVE) {
-        w->camp=(Vector2){2,9};w->groveGate=(Vector2){2,9};w->ruinGate=(Vector2){19,9};w->shrine=(Vector2){17,5};w->bossPos=(Vector2){17,13};
-        for(int y=3;y<15;y++)for(int x=9;x<12;x++)w->kind[y][x]=2;
-        for(int x=8;x<14;x++)w->kind[8][x]=0;
-        AddPickup(w,0,6,5);AddPickup(w,3,8,12);AddPickup(w,0,14,5);AddPickup(w,1,16,11);AddPickup(w,2,17,13);
+        AddPickup(w,0,6,5);AddPickup(w,3,8,12);AddPickup(w,0,14,5);
+        AddPickup(w,1,16,11);AddPickup(w,2,17,13);
     } else if(area==AREA_RUINS) {
-        w->camp=(Vector2){2,9};w->groveGate=(Vector2){2,9};w->ruinGate=(Vector2){2,9};w->shrine=(Vector2){17,7};w->bossPos=(Vector2){18,13};
-        for(int y=2;y<16;y++)for(int x=2;x<20;x++)if((x+y)%3==0)w->kind[y][x]=2;
-        for(int x=2;x<20;x++)w->kind[9][x]=0;
-        AddPickup(w,1,7,6);AddPickup(w,1,11,12);AddPickup(w,2,15,5);AddPickup(w,2,18,11);
+        AddPickup(w,1,7,6);AddPickup(w,1,11,12);
+        AddPickup(w,2,15,5);AddPickup(w,2,18,11);
     } else {
-        w->camp=(Vector2){2,9};w->groveGate=(Vector2){2,9};w->ruinGate=(Vector2){2,9};w->shrine=(Vector2){17,7};w->bossPos=(Vector2){18,13};
-        for(int y=3;y<15;y++)for(int x=3;x<19;x++)if(x<6||x>15||y<5||y>13)w->kind[y][x]=2;
-        for(int x=2;x<20;x++)w->kind[9][x]=0;
         AddPickup(w,0,6,5);AddPickup(w,1,12,12);AddPickup(w,2,17,5);
     }
-    // Hand-authored tree clusters frame each area while keeping the main routes open.
-    if(area==AREA_CAMP) {
-        const int trees[][2]={{2,2},{7,2},{10,2},{19,2},{20,6},{20,15},{12,16},{7,16},{8,2},{12,2},{20,4},{19,16},{2,6}};
-        for(int i=0;i<(int)(sizeof(trees)/sizeof(trees[0]));i++) {
-            int x=trees[i][0],y=trees[i][1];w->kind[y][x]=1;w->solid[y][x]=1;
-        }
-    } else if(area==AREA_GROVE) {
-        const int trees[][2]={{3,2},{6,2},{8,3},{14,2},{18,2},{20,4},{4,6},{6,7},{7,13},{13,14},{17,14},{20,12},{2,4},{2,13},{6,15},{18,15},{20,7},{3,15}};
-        for(int i=0;i<(int)(sizeof(trees)/sizeof(trees[0]));i++) {
-            int x=trees[i][0],y=trees[i][1];w->kind[y][x]=1;w->solid[y][x]=1;
-        }
-    } else if(area==AREA_LIGHTHOUSE) {
-        for(int y=6;y<=9;y++)for(int x=15;x<=19;x++)w->kind[y][x]=3;
-        for(int y=3;y<=6;y++)for(int x=3;x<=6;x++)w->kind[y][x]=2;
-        for(int y=12;y<=14;y++)for(int x=3;x<=7;x++)w->kind[y][x]=2;
-        const int trees[][2]={{5,5},{7,5},{5,13},{7,14},{12,14},{19,11}};
-        for(int i=0;i<(int)(sizeof(trees)/sizeof(trees[0]));i++) {
-            int x=trees[i][0],y=trees[i][1];w->kind[y][x]=1;w->solid[y][x]=1;
-        }
-    }
-    // Authored collision footprints keep the player outside large buildings and props.
-    if(area==AREA_CAMP) {
-        SetSolidRect(w,7,5,9,6);       // campsite tent
-    } else if(area==AREA_GROVE) {
-        SetSolidRect(w,4,3,5,4);       // flowering tree
-        SetSolidRect(w,15,3,16,4);     // grove tree
-        SetSolidRect(w,9,11,10,12);    // fallen log; keep the nearby fruit node clear
-        SetSolidRect(w,14,12,15,12);   // mushroom cluster
-    } else if(area==AREA_RUINS) {
-        SetSolidRect(w,14,4,14,5);     // left arch footing
-        SetSolidRect(w,16,4,16,5);     // right arch footing
-        SetSolidRect(w,5,4,6,5);       // broken pillar
-        SetSolidRect(w,9,11,10,12);    // broken wall
-        SetSolidRect(w,15,11,16,12);   // rune fountain
-    } else {
-        SetSolidRect(w,16,3,18,4);     // lighthouse base; keep the crystal at (17,5) accessible
-        SetSolidRect(w,9,6,10,7);      // garden fountain
-        SetSolidRect(w,4,12,5,13);     // courtyard gate
-        SetSolidRect(w,14,12,15,13);   // garden shrub
-    }
-    // Resource nodes are always placed on reachable ground, never inside a random blocker.
     for(int i=0;i<w->pickupCount;i++) {
         int px=(int)w->pickups[i].tile.x, py=(int)w->pickups[i].tile.y;
-        if(px>0&&py>0&&px<MAPW-1&&py<MAPH-1)w->kind[py][px]=0;
+        if(px>0&&py>0&&px<MAPW-1&&py<MAPH-1)w->solid[py][px]=0;
     }
 }
 static void SwitchArea(Game *g,Area area) {
     BuildAreaWorld(g,area);
-    g->player.pos=(area==AREA_CAMP)?(Vector2){16,9}:(Vector2){3,9};
+    g->player.pos=(area==AREA_CAMP)?g->world.returnPoint:g->world.camp;
     for(int i=0;i<g->world.pickupCount && i<MAX_PICKUPS;i++)g->world.pickups[i].taken=g->areaPickupTaken[(int)area][i]!=0;
     g->enemyCount=0;
     g->lumi.pos=Vector2Add(g->player.pos,(Vector2){-1,.5f});
@@ -227,53 +185,19 @@ static bool SolidPoint(Game *g,Vector2 p) {
     int x=(int)floorf(p.x+0.5f),y=(int)floorf(p.y+0.5f);
     if(x<1||y<1||x>=MAPW-1||y>=MAPH-1)return true;
     if(g->world.solid[y][x])return true;
+    if(TerrainKindFromAtlasIndex(g->world.terrain[y][x])==4)return true;
 
-    // Authored object colliders match the visible footprints, not just their anchor tile.
+    // Dynamic actors remain solid; static scenery collision is authored in Tiled.
     if(g->area==AREA_CAMP) {
-        if(InRect(p,3.05f,1.55f,5.95f,4.75f))return true;   // blue cottage
-        if(InRect(p,12.55f,2.75f,15.45f,6.15f))return true; // red cottage
-        if(InRect(p,7.15f,5.15f,9.05f,7.15f))return true;   // main tent
-        if(InRect(p,12.55f,3.25f,13.65f,4.75f))return true; // supply tent
-        if(InRect(p,2.55f,9.55f,3.45f,10.45f))return true;  // camp keeper
-        if(!g->lumi.owned && InRect(p,3.55f,11.55f,4.45f,12.45f))return true; // Moss Lumi
-        float nx=(p.x-10.5f)/11.0f, ny=(p.y-8.5f)/9.0f;
-        float coastNoise=.045f*sinf((float)x*.73f+(float)y*.29f)+.026f*cosf((float)y*.91f-(float)x*.24f);
-        float shore=nx*nx+ny*ny+coastNoise;
-        bool onPath=((y==9&&x>=3&&x<=19)||(x==4&&y>=9&&y<=13)||(x==18&&y>=3&&y<=15));
-        bool dockWater=(x>=1&&x<=3&&y>=11&&y<=15);
-        bool sea=shore>.90f;
-        if(!onPath&&(dockWater||sea))return true;
+        if(InRect(p,2.55f,9.55f,3.45f,10.45f))return true;
+        if(!g->lumi.owned&&InRect(p,3.55f,11.55f,4.45f,12.45f))return true;
     } else if(g->area==AREA_GROVE) {
-        if(InRect(p,3.95f,2.95f,6.05f,4.85f))return true;   // flowering tree
-        if(InRect(p,14.95f,3.05f,17.05f,4.95f))return true;  // grove tree
-        if(InRect(p,8.35f,11.15f,10.75f,12.95f))return true;// fallen log
-        if(InRect(p,13.75f,11.45f,15.85f,13.15f))return true;// mushroom cluster
-        if(!g->splash.owned && InRect(p,8.55f,4.55f,9.45f,5.45f))return true; // Moatail
-        bool stream=(x>=9&&x<=11&&y>=3&&y<=14);
-        bool bridge=(y==9&&x>=2&&x<=19);
-        if(stream&&!bridge)return true;
+        if(!g->splash.owned&&InRect(p,8.55f,4.55f,9.45f,5.45f))return true;
     } else if(g->area==AREA_RUINS) {
-        if(InRect(p,13.65f,3.95f,14.75f,6.45f))return true; // left arch footing
-        if(InRect(p,15.25f,3.95f,16.35f,6.45f))return true; // right arch footing
-        if(InRect(p,4.75f,4.05f,6.85f,6.25f))return true;   // broken pillar
-        if(InRect(p,8.45f,11.05f,10.75f,13.05f))return true;// broken wall
-        if(InRect(p,14.35f,11.05f,16.35f,13.15f))return true;// rune fountain
-        if(InRect(p,17.05f,11.55f,19.05f,13.55f))return true;// east broken pillar
-        if(InRect(p,16.68f,6.68f,17.32f,7.32f))return true;  // shrine base only
-        if(!g->spark.owned && InRect(p,14.55f,6.55f,15.45f,7.45f))return true; // Crystal Gecko
-        bool stream=(x>=9&&x<=11&&y>=3&&y<=14);
-        bool bridge=(y==9&&x>=2&&x<=19);
-        if(stream&&!bridge)return true;
+        if(!g->spark.owned&&InRect(p,14.55f,6.55f,15.45f,7.45f))return true;
     } else {
-        if(InRect(p,15.45f,2.65f,18.65f,5.15f))return true; // lighthouse tower
-        if(InRect(p,8.65f,5.75f,10.85f,7.85f))return true;  // garden fountain
-        if(InRect(p,3.75f,11.65f,5.65f,13.85f))return true;// courtyard gate
-        if(InRect(p,13.65f,11.65f,15.85f,13.95f))return true;// garden shrub
-        if(InRect(p,16.68f,6.68f,17.32f,7.32f))return true;  // shrine base only
-        if(!g->bossDefeated && InRect(p,17.55f,12.55f,18.45f,13.45f))return true; // lighthouse guardian
-        float nx=(p.x-10.8f)/10.6f, ny=(p.y-8.5f)/8.7f;
-        float coastNoise=.038f*sinf((float)x*.68f+(float)y*.34f)+.024f*cosf((float)y*.86f-(float)x*.27f);
-        if(nx*nx+ny*ny+coastNoise>.94f)return true;
+        if(InRect(p,16.68f,6.68f,17.32f,7.32f))return true;
+        if(!g->bossDefeated&&InRect(p,17.55f,12.55f,18.45f,13.45f))return true;
     }
     return false;
 }
@@ -405,7 +329,6 @@ static bool FindNearestPickup(Game *g,int kindA,int kindB,Vector2 *out) {
     return found;
 }
 void GetCurrentObjective(Game *g,const char **title,const char **detail,Vector2 *target,bool *hasTarget) {
-    static const Vector2 exitPoint={2,9};
     *hasTarget=true;
     *title="继续探索";
     *detail="打开旅人手记 J 查看章节记录";
@@ -418,7 +341,7 @@ void GetCurrentObjective(Game *g,const char **title,const char **detail,Vector2 
         } else {
             *title="返回海岸营地";
             *detail="沿西侧石路返回海岸营地，按 E";
-            *target=exitPoint;
+            *target=g->world.returnPoint;
         }
         return;
     }
@@ -734,7 +657,7 @@ void GameUpdate(Game *g,float dt) {
                 if(!g->shrineSolved){Toast(g,"灯塔庭院仍被古老封印阻挡。");return;}
                 SwitchArea(g,AREA_LIGHTHOUSE);GameSave(g);Toast(g,"进入灯塔庭院");return;
             }
-        } else if(Dist(p->pos,(Vector2){2,9})<1.6f) {
+        } else if(Dist(p->pos,g->world.returnPoint)<1.6f) {
             SwitchArea(g,AREA_CAMP);GameSave(g);Toast(g,"返回海岸营地");return;
         }
     }
