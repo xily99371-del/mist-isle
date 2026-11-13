@@ -32,15 +32,15 @@
   <object id="312" name="微光花树" type="prop_24" x="308.00" y="252.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
   <object id="313" name="蓝晶簇" type="prop_25" x="252.00" y="308.00"><properties><property name="scale" type="float" value="0.86"/></properties><point/></object>
   <object id="314" name="发光蘑菇" type="prop_26" x="756.00" y="252.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
-  <object id="315" name="prop_116" type="prop_116" x="420.00" y="252.00"><properties><property name="scale" type="float" value="0.86"/></properties><point/></object>
-  <object id="316" name="prop_117" type="prop_117" x="644.00" y="252.00"><properties><property name="scale" type="float" value="0.86"/></properties><point/></object>
+  <object id="315" name="prop_116" type="prop_116" x="364.00" y="364.00"><properties><property name="scale" type="float" value="0.86"/></properties><point/></object>
+  <object id="316" name="prop_117" type="prop_117" x="700.00" y="308.00"><properties><property name="scale" type="float" value="0.86"/></properties><point/></object>
   <object id="317" name="prop_118" type="prop_118" x="364.00" y="476.00"><properties><property name="scale" type="float" value="0.86"/></properties><point/></object>
   <object id="318" name="prop_119" type="prop_119" x="644.00" y="420.00"><properties><property name="scale" type="float" value="0.86"/></properties><point/></object>
   <object id="319" name="prop_120" type="prop_120" x="252.00" y="532.00"><properties><property name="scale" type="float" value="0.84"/></properties><point/></object>
   <object id="320" name="prop_124" type="prop_124" x="476.00" y="532.00"><properties><property name="scale" type="float" value="0.84"/></properties><point/></object>
   <object id="321" name="prop_126" type="prop_126" x="700.00" y="532.00"><properties><property name="scale" type="float" value="0.84"/></properties><point/></object>
   <object id="322" name="prop_128" type="prop_128" x="812.00" y="308.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
-  <object id="323" name="prop_129" type="prop_129" x="364.00" y="196.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
+  <object id="323" name="prop_129" type="prop_129" x="252.00" y="420.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
  </objectgroup>
 <object id="328" name="tree2" type="tree2" x="308.00" y="140.00"><properties><property name="scale" type="float" value="1.08"/></properties><point/></object>
 <object id="329" name="tree0" type="tree0" x="756.00" y="140.00"><properties><property name="scale" type="float" value="1.08"/></properties><point/></object>
