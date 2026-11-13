@@ -9,7 +9,7 @@ from map_autotile import build_overlay, DIRECTIONS
 
 ROOT=Path(__file__).resolve().parents[1]
 MAPS=["coastal_camp","glowglade_grove","tidal_ruins","lighthouse_courtyard"]
-W,H,T=22,18,56
+W,H,T=18,12,56
 ATLAS=ROOT/"assets/environment/topdown_terrain_atlas_v1.png"
 FLORA=ROOT/"assets/environment/flora_props_atlas_128.png"
 AREA=ROOT/"assets/environment/area_props_96.png"
