@@ -175,7 +175,7 @@ require("Collision follows the visible object's ground footprint" in MAP_BUILD a
         "Tiled buildings, tree trunks, walls, pillars and altar bases compile into gameplay collision")
 require("nearest free, reachable tile" in GAME and "occupied" in GAME,
         "blocked or duplicate pickups are relocated to a distinct reachable ground tile")
-require("living stone arch" in RENDER and "beacon tower" in RENDER and "Return gate" in RENDER,
+require("living stone arch" in RENDER and "beacon tower" in RENDER and "Return route keeps" in RENDER,
         "grove, ruins, lighthouse and return portals have distinct grounded visual identities")
 require("finalCore" in RENDER and "DrawAreaProp(11,p,190,194)" in RENDER,
         "the Tidal Ruins keystone is a larger multi-ring final altar, distinct from ordinary shrines")
