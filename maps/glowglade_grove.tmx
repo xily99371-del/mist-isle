@@ -30,7 +30,7 @@
  <objectgroup id="3" name="Objects" draworder="topdown">
    <object id="357" name="tree2" type="tree2" x="364.00" y="140.00"><properties><property name="scale" type="float" value="1.16"/></properties><point/></object>
   <object id="358" name="tree0" type="tree0" x="924.00" y="140.00"><properties><property name="scale" type="float" value="1.16"/></properties><point/></object>
-<object id="354" name="prop_302" type="prop_302" x="644.00" y="196.00"><properties><property name="scale" type="float" value="1.18"/></properties><point/></object>
+<object id="354" name="prop_302" type="prop_302" x="644.00" y="308.00"><properties><property name="scale" type="float" value="1.18"/></properties><point/></object>
   <object id="300" name="tree0" type="tree0" x="28.00" y="28.00"><properties><property name="scale" type="float" value="1.12"/></properties><point/></object>
   <object id="301" name="tree1" type="tree1" x="140.00" y="28.00"><properties><property name="scale" type="float" value="1.16"/></properties><point/></object>
   <object id="302" name="tree2" type="tree2" x="308.00" y="28.00"><properties><property name="scale" type="float" value="1.20"/></properties><point/></object>
