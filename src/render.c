@@ -1172,7 +1172,7 @@ static void DrawDialoguePortrait(Game *g,int portrait) {
     if(portrait==0) {
         if(TEX_HERO_WALK.id) {
             Rectangle src={0,0,32,32};
-            Rectangle dst={78,420,132,210};
+            Rectangle dst={55,390,180,250};
             DrawTexturePro(TEX_HERO_WALK,src,dst,(Vector2){0,0},0,WHITE);
         } else DrawPlayer((Vector2){144,640},g->time,false,0);
     } else if(portrait==1) {
@@ -1193,6 +1193,7 @@ static void RenderDialogue(Game *g) {
     if(page>=g->dialogueCount)page=g->dialogueCount-1;
     int portrait=page>=0?g->dialoguePortrait[page]:0;
     const char *speaker=page>=0?g->dialogueLineSpeaker[page]:g->dialogueSpeaker;
+    if(strncmp(speaker,"旅人",strlen("旅人"))==0)speaker="旅人";
     DrawDialoguePortrait(g,portrait);
     DrawRectangleRounded((Rectangle){258,541,190,31},.16f,6,(Color){37,64,61,255});
     DrawUIText(speaker,274,547,17,(Color){255,224,165,255});
