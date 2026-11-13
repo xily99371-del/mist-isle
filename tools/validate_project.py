@@ -101,7 +101,7 @@ require("DrawUITextWrapped" in RENDER and "UI_CODEPOINTS" in RENDER,
         "Chinese UI includes the complete source glyph set and wrapped objective text")
 require("endingTime" in GAME and "static void RenderEnd" in RENDER,
         "lighthouse ending uses a timed cinematic sequence")
-require("RENDER_PROP,33" in RENDER and "DrawAreaPropTint(13,p" in RENDER,
+require("AREA_OBJECTS" in GAME and "DrawAreaPropTint(13,p" in RENDER,
         "lighthouse courtyard uses the authored lighthouse sprite from the area atlas")
 require("AREA_COLLISION" in GAME and "TerrainKindFromAtlasIndex(g->world.terrain[y][x])==4" in GAME and "MovePlayerWithCollision" in GAME,
         "Tiled collision rectangles and water tiles drive substep movement collision")
