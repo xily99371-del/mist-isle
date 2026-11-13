@@ -16,6 +16,7 @@ WORKFLOW = (ROOT / ".github/workflows/build-windows.yml").read_text(encoding="ut
 CMAKE = (ROOT / "CMakeLists.txt").read_text(encoding="utf-8")
 MAP_BUILD = (ROOT / "tools/build_maps.py").read_text(encoding="utf-8")
 MAP_AUTOTILE = (ROOT / "tools/map_autotile.py").read_text(encoding="utf-8")
+MAP_HEADER_VALIDATOR = (ROOT / "tools/validate_generated_maps.py").read_text(encoding="utf-8")
 MAP_PREVIEW = (ROOT / "tools/preview_tiled_maps.py").read_text(encoding="utf-8")
 MAP_FILES = [ROOT / "maps" / name for name in (
     "terrain.tsx", "coastal_camp.tmx", "glowglade_grove.tmx",
@@ -132,6 +133,8 @@ require("build_overlay(ground)" in MAP_BUILD and "AREA_OVERLAY[4][MAPH][MAPW]" i
         "Tiled compiler emits autotile overlays and rotations consumed by the renderer")
 require("def build_overlay" in MAP_AUTOTILE and "MASK_ROW" in MAP_AUTOTILE,
         "the deterministic autotile helper is present for clean Windows and ARM64 builds")
+require("AREA_OVERLAY[4][MAPH][MAPW]" in MAP_HEADER_VALIDATOR and "validate_generated_maps.py" in CMAKE,
+        "CMake validates the generated Tiled header before compiling renderer references")
 require("chapter1_map_review.png" in MAP_PREVIEW and "Collision" in MAP_PREVIEW and "Markers" in MAP_PREVIEW,
         "map preview generator creates a visual QA sheet with collision and story markers")
 require("python tools/preview_tiled_maps.py" in WORKFLOW,
