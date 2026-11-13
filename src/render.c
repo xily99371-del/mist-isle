@@ -678,11 +678,15 @@ static void DrawGateMarker(Game *g,int gateId,Vector2 grid) {
     Vector2 p=WorldToScreen(grid.x,grid.y);
     float pulse=.5f+.5f*sinf(g->time*2.8f+gateId);
     // A grounded masonry plinth connects each portal to the path and removes the floating-object look.
-    DrawEllipse((int)p.x,(int)p.y+13,61,18,(Color){24,43,42,135});
-    Rectangle plinth={p.x-54,p.y-8,108,22};
-    DrawRectangleRounded(plinth,.18f,5,(Color){91,100,82,255});
-    DrawRectangleRoundedLinesEx(plinth,.18f,5,2.0f,(Color){169,158,119,255});
-    DrawLineEx((Vector2){p.x-42,p.y+4},(Vector2){p.x+42,p.y+4},2.0f,Fade(WHITE,.20f));
+    // Irregular embedded stone threshold: no floating rectangular slab.
+    DrawEllipse((int)p.x,(int)p.y+12,66,17,(Color){24,43,42,135});
+    DrawEllipse((int)p.x,(int)p.y+7,57,12,(Color){91,100,82,255});
+    DrawEllipseLines((int)p.x,(int)p.y+7,57,12,(Color){169,158,119,230});
+    for(int i=0;i<7;i++) {
+        float a=(float)i*PI2/7.0f+.18f;
+        Vector2 shard={p.x+cosf(a)*47.0f,p.y+7.0f+sinf(a)*10.0f};
+        DrawCircleV(shard,2.2f,(Color){183,169,129,210});
+    }
     if(gateId==0) {
         // Grove entrance: living stone arch, flowered feet and a soft green threshold.
         DrawAreaProp(8,(Vector2){p.x,p.y+2},160,168);
@@ -942,7 +946,7 @@ static void RenderWorld(Game *g) {
                 else if(it->index>=20&&it->index<=35)DrawAreaProp(it->index-20,p,100*it->scale,108*it->scale);
                 else if(it->index>=100&&it->index<200)DrawFloraProp(it->index-100,p,100*it->scale,108*it->scale);
                 else if(it->index>=200&&it->index<300)DrawCliffProp(it->index-200,p,112*it->scale,112*it->scale);
-                else if(it->index==302)DrawStructureProp(2,p,232*it->scale,210*it->scale);
+                else if(it->index==302)DrawStructureProp(2,p,330*it->scale,300*it->scale);
                 else if(it->index==303)DrawStructureProp(3,p,176*it->scale,154*it->scale);
                 else if(it->index==304)DrawStructureProp(4,p,166*it->scale,180*it->scale);
                 else if(it->index==305)DrawStructureProp(5,p,168*it->scale,152*it->scale);
@@ -1168,15 +1172,42 @@ static void RenderMap(Game *g) {
     DrawUIText("红点：当前位置   灰色区域：尚未解锁",320,545,18,(Color){105,121,97,255});
     DrawUIText("按 M / ESC 关闭",800,580,16,(Color){132,137,111,255});
 }
+static void DrawDialoguePortrait(Game *g,int portrait) {
+    Rectangle card={34,372,220,314};
+    DrawRectangleRounded(card,.10f,10,(Color){11,31,43,245});
+    DrawRectangleRoundedLinesEx(card,.10f,10,2.0f,(Color){208,177,111,255});
+    DrawRectangleGradientV(48,386,192,286,(Color){91,128,116,255},(Color){28,57,65,255});
+    DrawCircle(144,476,76,Fade((Color){212,190,133,255},.10f));
+    if(portrait==0) {
+        if(TEX_HERO_WALK.id) {
+            Rectangle src={0,0,32,32};
+            Rectangle dst={78,420,132,210};
+            DrawTexturePro(TEX_HERO_WALK,src,dst,(Vector2){0,0},0,WHITE);
+        } else DrawPlayer((Vector2){144,640},g->time,false,0);
+    } else if(portrait==1) {
+        DrawKeeper((Vector2){144,650},g->time,1.85f);
+    } else if(portrait==2) {
+        DrawLighthouseGuardian((Vector2){144,666},g->time,1.55f);
+    } else {
+        DrawLumi((Vector2){144,625},g->time,0);
+    }
+    DrawRectangleRounded((Rectangle){52,647,184,27},.2f,5,(Color){8,25,36,210});
+    DrawUIText(portrait==0?"旅人":portrait==1?"守望者":portrait==2?"灯塔守卫":"岛屿精灵",88,651,14,(Color){255,231,178,255});
+}
 static void RenderDialogue(Game *g) {
-    DrawRectangle(0,0,SW,SH,Fade((Color){35,55,48,255},.26f));
-    Panel((Rectangle){145,552,990,125});
-    DrawCircle(195,552,37,(Color){157,201,143,255});
-    DrawCircle(195,552,25,(Color){220,233,183,255});
-    DrawCircle(187,548,2.8f,C_INK);DrawCircle(203,548,2.8f,C_INK);
-    DrawUIText(g->dialogueSpeaker,250,566,17,(Color){125,149,112,255});
-    DrawUIText(g->dialogue[g->dialoguePage],250,595,20,C_INK);
-    DrawUIText("按 E / Enter / 鼠标左键继续",835,645,14,(Color){135,135,107,255});
+    DrawRectangle(0,0,SW,SH,Fade((Color){22,39,48,255},.46f));
+    Panel((Rectangle){220,520,1032,160});
+    int page=g->dialoguePage;
+    if(page<0)page=0;
+    if(page>=g->dialogueCount)page=g->dialogueCount-1;
+    int portrait=page>=0?g->dialoguePortrait[page]:0;
+    const char *speaker=page>=0?g->dialogueLineSpeaker[page]:g->dialogueSpeaker;
+    DrawDialoguePortrait(g,portrait);
+    DrawRectangleRounded((Rectangle){258,541,190,31},.16f,6,(Color){37,64,61,255});
+    DrawUIText(speaker,274,547,17,(Color){255,224,165,255});
+    DrawTextWrapped(g->dialogue[page],270,592,930,23,2,(Color){44,61,55,255});
+    DrawLineEx((Vector2){260,638},(Vector2){1210,638},1.0f,(Color){177,158,119,150});
+    DrawUIText("按 E / Enter / 鼠标左键继续",886,650,14,(Color){112,124,103,255});
 }
 static void RenderBattle(Game *g) {
     DrawRectangleGradientV(0,0,SW,SH,(Color){48,66,79,255},(Color){91,119,112,255});
