@@ -184,7 +184,7 @@ require("DrawCoastalCliffs(g,terrainKinds,minX,minY,maxX,maxY)" in RENDER and "A
         "shoreline and all four ground layouts are sourced from Tiled maps")
 require("GetVisibleTileBounds" in RENDER and "screen.x<-180.0f" in RENDER,
         "terrain and scene objects outside the camera view are culled")
-require("MISTISLE_RAIN_DROPS 84" in RENDER and "MISTISLE_RAIN_RIPPLES 10" in RENDER,
+require("MISTISLE_RAIN_DROPS 56" in RENDER and "MISTISLE_RAIN_RIPPLES 6" in RENDER,
         "Raspberry Pi profile reduces weather draw calls")
 require("DrawPlayer((Vector2){420,620}" in RENDER,
         "finale character lineup stays clear of the bottom caption")
