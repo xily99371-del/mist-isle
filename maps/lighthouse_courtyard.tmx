@@ -27,7 +27,6 @@
  </objectgroup>
  <objectgroup id="3" name="Objects" draworder="topdown">
   <object id="300" name="prop_33" type="prop_33" x="980.00" y="196.00"><properties><property name="scale" type="float" value="1.12"/></properties><point/></object>
-  <object id="301" name="prop_34" type="prop_34" x="252.00" y="532.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
   <object id="302" name="prop_35" type="prop_35" x="420.00" y="308.00"><properties><property name="scale" type="float" value="0.95"/></properties><point/></object>
   <object id="303" name="prop_29" type="prop_29" x="364.00" y="476.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
   <object id="304" name="prop_29" type="prop_29" x="980.00" y="588.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
