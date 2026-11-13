@@ -3,7 +3,6 @@
 from __future__ import annotations
 import argparse, math, xml.etree.ElementTree as ET
 from pathlib import Path
-from map_autotile import build_overlay
 
 ROOT=Path(__file__).resolve().parents[1]
 MAPS=["coastal_camp","glowglade_grove","tidal_ruins","lighthouse_courtyard"]
@@ -70,14 +69,13 @@ def parse(path):
     if missing: fail(f"{path.name}: missing markers {missing}")
     for i,index in enumerate(ground):
         if index//4>=9: collision[i//W][i%W]=1
-    overlay, rotations = build_overlay(ground)
-    return ground,[v for row in collision for v in row],objects,markers,overlay,rotations
+    return ground,[v for row in collision for v in row],objects,markers
 
 def generate(out):
-    grounds=[]; solids=[]; objects=[]; markers=[]; overlays=[]; rotations=[]
+    grounds=[]; solids=[]; objects=[]; markers=[]
     for name in MAPS:
-        g,c,o,m,edge,angle=parse(ROOT/"maps"/(name+".tmx"))
-        grounds.append(g); solids.append(c); objects.append(o); markers.append(m); overlays.append(edge); rotations.append(angle)
+        g,c,o,m=parse(ROOT/"maps"/(name+".tmx"))
+        grounds.append(g); solids.append(c); objects.append(o); markers.append(m)
         print(f"MAP OK: {name}: {len(o)} objects, {sum(c)} solid cells")
     lines=["/* Generated from maps/*.tmx by tools/build_maps.py. Do not edit. */",
            "#ifndef MIST_ISLE_AREA_MAPS_H","#define MIST_ISLE_AREA_MAPS_H",
@@ -90,16 +88,6 @@ def generate(out):
     for row in solids:
         lines.append("    {")
         for y in range(H): lines.append("        {"+", ".join(map(str,row[y*W:(y+1)*W]))+"},")
-        lines.append("    },")
-    lines += ["};", "static const signed char AREA_OVERLAY[4][MAPH][MAPW] = {"]
-    for row in overlays:
-        lines.append("    {")
-        for y in range(H): lines.append("        {" + ", ".join(str(v) for v in row[y*W:(y+1)*W]) + "},")
-        lines.append("    },")
-    lines += ["};", "static const unsigned short AREA_OVERLAY_ROTATION[4][MAPH][MAPW] = {"]
-    for row in rotations:
-        lines.append("    {")
-        for y in range(H): lines.append("        {" + ", ".join(str(v) for v in row[y*W:(y+1)*W]) + "},")
         lines.append("    },")
     lines += ["};", "/* Marker order: spawn, return, grove_gate, ruin_gate, shrine, boss. */",
               "static const Vector2 AREA_MARKERS[4][6] = {"]
