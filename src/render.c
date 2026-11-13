@@ -72,6 +72,7 @@ static void DrawUITextWrapped(const char *text,int x,int y,int maxWidth,int size
 }
 
 static Texture2D TEX_HERO={0}, TEX_LUMI={0}, TEX_MOATAIL={0}, TEX_GECKO={0}, TEX_KEEPER={0};
+static Texture2D TEX_HERO_PORTRAIT={0}, TEX_WATCHER_PORTRAIT={0}, TEX_GUARDIAN_PORTRAIT={0};
 static Texture2D TEX_HERO_PIXEL={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, TEX_GECKO_PIXEL={0}, TEX_TILES={0}, TEX_PROPS={0};
 static Texture2D TEX_ISO_TILES={0}, TEX_HERO_WALK={0}, TEX_ENV_PROPS={0}, TEX_LEAFLING={0}, TEX_GROVE_MOTE={0}, TEX_AREA_PROPS={0}, TEX_TOPDOWN_TILES={0}, TEX_FLORA_ATLAS={0}, TEX_CLIFF_ATLAS={0}, TEX_STRUCTURE_ATLAS={0}, TEX_ORIGINAL_PROPS={0}, TEX_KENNEY_BUILDINGS={0}, TEX_ENDING_CG={0};
 static RenderTexture2D TEX_GROUND_CACHE={0};
@@ -1167,23 +1168,18 @@ static void DrawDialoguePortrait(Game *g,int portrait) {
     Rectangle card={34,372,220,314};
     DrawRectangleRounded(card,.10f,10,(Color){11,31,43,245});
     DrawRectangleRoundedLinesEx(card,.10f,10,2.0f,(Color){208,177,111,255});
-    DrawRectangleGradientV(48,386,192,286,(Color){91,128,116,255},(Color){28,57,65,255});
-    DrawCircle(144,476,76,Fade((Color){212,190,133,255},.10f));
-    if(portrait==0) {
-        if(TEX_HERO_WALK.id) {
-            Rectangle src={0,0,32,32};
-            Rectangle dst={55,390,180,250};
-            DrawTexturePro(TEX_HERO_WALK,src,dst,(Vector2){0,0},0,WHITE);
-        } else DrawPlayer((Vector2){144,640},g->time,false,0);
-    } else if(portrait==1) {
-        DrawKeeper((Vector2){144,650},g->time,1.85f);
-    } else if(portrait==2) {
-        DrawLighthouseGuardian((Vector2){144,635},g->time,1.45f);
-    } else {
-        DrawLumi((Vector2){144,625},g->time,0);
+    DrawRectangleGradientV(48,386,192,286,(Color){62,83,86,255},(Color){22,43,54,255});
+    Texture2D *art=portrait==0?&TEX_HERO_PORTRAIT:(portrait==1?&TEX_WATCHER_PORTRAIT:&TEX_GUARDIAN_PORTRAIT);
+    if(art->id) {
+        Rectangle src={0,0,(float)art->width,(float)art->height};
+        Rectangle dst={48,386,192,260};
+        DrawTexturePro(*art,src,dst,(Vector2){0,0},0,WHITE);
+    } else if(portrait==0&&TEX_HERO_WALK.id) {
+        Rectangle src={0,0,32,32},dst={55,390,180,250};
+        DrawTexturePro(TEX_HERO_WALK,src,dst,(Vector2){0,0},0,WHITE);
     }
-    DrawRectangleRounded((Rectangle){52,647,184,27},.2f,5,(Color){8,25,36,210});
-    DrawUIText(portrait==0?"旅人":portrait==1?"守望者":portrait==2?"灯塔守卫":"岛屿精灵",88,651,14,(Color){255,231,178,255});
+    DrawRectangleRounded((Rectangle){52,647,184,27},.2f,5,(Color){8,25,36,225});
+    DrawUIText(portrait==0?"旅人":portrait==1?"守望者":"灯塔守卫",88,651,14,(Color){255,231,178,255});
 }
 static void RenderDialogue(Game *g) {
     DrawRectangle(0,0,SW,SH,Fade((Color){22,39,48,255},.46f));
@@ -1437,13 +1433,16 @@ void RenderInit(void) {
         "assets/environment/kenney_buildings_atlas.png",
         "assets/characters/png/camp_keeper.png",
         "assets/tiles/png/island_iso_tiles.png",
-        "assets/tiles/png/environment_props.png"
+        "assets/tiles/png/environment_props.png",
+        "assets/characters/png/heroine_portrait.png",
+        "assets/characters/png/watcher_portrait.png",
+        "assets/characters/png/lighthouse_guardian_portrait.png"
     };
-    Texture2D *targets[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
-    for(int i=0;i<17;i++) {
+    Texture2D *targets[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS,&TEX_HERO_PORTRAIT,&TEX_WATCHER_PORTRAIT,&TEX_GUARDIAN_PORTRAIT};
+    for(int i=0;i<20;i++) {
         if(FileExists(paths[i])) {
             *targets[i]=LoadTexture(paths[i]);
-            if(targets[i]->id)SetTextureFilter(*targets[i],TEXTURE_FILTER_POINT);
+            if(targets[i]->id)SetTextureFilter(*targets[i],i>=17?TEXTURE_FILTER_BILINEAR:TEXTURE_FILTER_POINT);
         }
     }
     TEX_GROUND_CACHE=LoadRenderTexture((int)WORLD_PIXEL_W,(int)WORLD_PIXEL_H);
@@ -1456,8 +1455,8 @@ void RenderClose(void) {
     TEX_GROUND_CACHE=(RenderTexture2D){0};
     CACHED_GROUND_AREA=-1;
     UnloadUIFont();
-    Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
-    for(int i=0;i<17;i++)if(textures[i]->id)UnloadTexture(*textures[i]);
+    Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS,&TEX_HERO_PORTRAIT,&TEX_WATCHER_PORTRAIT,&TEX_GUARDIAN_PORTRAIT};
+    for(int i=0;i<20;i++)if(textures[i]->id)UnloadTexture(*textures[i]);
     if(TEX_ENDING_CG.id)UnloadTexture(TEX_ENDING_CG);
 }
 void GameRender(Game *g) {
