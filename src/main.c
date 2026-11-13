@@ -2,18 +2,27 @@
 #include <math.h>
 #include <time.h>
 int main(void) {
+#if defined(MISTISLE_PI_PROFILE)
+    // Raspberry Pi 5: 720p logical canvas, no MSAA, no forced maximization.
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE|FLAG_VSYNC_HINT);
+    InitWindow(1280,720,"雾屿回响 - 第一章：失落的灯塔");
+    SetWindowMinSize(960,540);
+#else
     SetConfigFlags(FLAG_WINDOW_RESIZABLE|FLAG_VSYNC_HINT|FLAG_MSAA_4X_HINT);
     InitWindow(1600,900,"雾屿回响 - 第一章：失落的灯塔");
     SetWindowMinSize(1280,720);
     SetWindowState(FLAG_WINDOW_MAXIMIZED);
+#endif
     RenderTexture2D canvas=LoadRenderTexture(SW,SH);
     SetTextureFilter(canvas.texture,TEXTURE_FILTER_POINT);
     RenderInit();
     SetTargetFPS(60);
+    bool showPerfOverlay=false;
     SetExitKey(KEY_NULL);
     Game g;
     GameReset(&g,(int)time(NULL));
     while(!WindowShouldClose()) {
+        if(IsKeyPressed(KEY_F3))showPerfOverlay=!showPerfOverlay;
         float dt=GetFrameTime();
         if(dt>.05f)dt=.05f;
         if(g.scene==SCENE_TITLE) {
@@ -46,6 +55,10 @@ int main(void) {
             drawW,drawH
         };
         DrawTexturePro(canvas.texture,source,destination,(Vector2){0,0},0,WHITE);
+        if(showPerfOverlay) {
+            DrawRectangle(10,10,190,30,(Color){7,18,29,210});
+            DrawText(TextFormat("FPS %d  %.1f ms",GetFPS(),GetFrameTime()*1000.0f),18,17,14,(Color){225,238,224,255});
+        }
         EndDrawing();
     }
     RenderClose();
