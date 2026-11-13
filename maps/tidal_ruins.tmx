@@ -20,28 +20,21 @@
  <objectgroup id="2" name="Collision" draworder="topdown"/>
  <objectgroup id="3" name="Objects" draworder="topdown">
   <object id="300" name="tree1" type="tree1" x="84.00" y="84.00"><properties><property name="scale" type="float" value="0.86"/></properties><point/></object>
-  <object id="301" name="tree0" type="tree0" x="924.00" y="84.00"><properties><property name="scale" type="float" value="0.86"/></properties><point/></object>
   <object id="302" name="tree2" type="tree2" x="84.00" y="588.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
-  <object id="303" name="tree1" type="tree1" x="924.00" y="588.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
-  <object id="304" name="西侧残缺拱门" type="prop_28" x="252.00" y="196.00"><properties><property name="scale" type="float" value="1.00"/></properties><point/></object>
-  <object id="305" name="东侧残缺拱门" type="prop_28" x="812.00" y="196.00"><properties><property name="scale" type="float" value="1.00"/></properties><point/></object>
+  <object id="304" name="西侧残缺拱门" type="prop_28" x="196.00" y="196.00"><properties><property name="scale" type="float" value="1.00"/></properties><point/></object>
+  <object id="305" name="东侧残缺拱门" type="prop_28" x="868.00" y="196.00"><properties><property name="scale" type="float" value="1.00"/></properties><point/></object>
   <object id="306" name="prop_29" type="prop_29" x="364.00" y="140.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
   <object id="307" name="prop_29" type="prop_29" x="700.00" y="140.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
-  <object id="308" name="prop_29" type="prop_29" x="308.00" y="420.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
-  <object id="309" name="prop_29" type="prop_29" x="756.00" y="420.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
-  <object id="310" name="断裂石墙" type="prop_30" x="196.00" y="308.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
-  <object id="311" name="断裂石墙" type="prop_30" x="868.00" y="308.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
-  <object id="312" name="断裂石墙" type="prop_30" x="196.00" y="420.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
-  <object id="313" name="断裂石墙" type="prop_30" x="868.00" y="420.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
+  <object id="308" name="prop_29" type="prop_29" x="308.00" y="476.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
+  <object id="309" name="prop_29" type="prop_29" x="700.00" y="476.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
+  <object id="310" name="断裂石墙" type="prop_30" x="140.00" y="420.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
+  <object id="311" name="断裂石墙" type="prop_30" x="924.00" y="420.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
   <object id="314" name="西侧潮汐祭坛" type="prop_31" x="364.00" y="308.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
   <object id="315" name="东侧潮汐祭坛" type="prop_31" x="700.00" y="308.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
-  <object id="316" name="蓝晶簇" type="prop_25" x="252.00" y="252.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
-  <object id="317" name="蓝晶簇" type="prop_25" x="812.00" y="252.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
+  <object id="316" name="蓝晶簇" type="prop_25" x="308.00" y="252.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
+  <object id="317" name="蓝晶簇" type="prop_25" x="756.00" y="252.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
   <object id="318" name="遗迹苔木" type="prop_26" x="252.00" y="476.00"><properties><property name="scale" type="float" value="0.80"/></properties><point/></object>
-  <object id="319" name="石缝植被" type="prop_27" x="812.00" y="476.00"><properties><property name="scale" type="float" value="0.80"/></properties><point/></object>
-  <object id="320" name="西侧水蚀崖壁" type="prop_200" x="84.00" y="252.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
-  <object id="321" name="西侧水蚀崖壁" type="prop_201" x="84.00" y="364.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
-  <object id="322" name="东侧水蚀崖壁" type="prop_202" x="924.00" y="308.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
+  <object id="319" name="石缝植被" type="prop_27" x="868.00" y="532.00"><properties><property name="scale" type="float" value="0.80"/></properties><point/></object>
   <object id="323" name="prop_116" type="prop_116" x="308.00" y="532.00"><properties><property name="scale" type="float" value="0.76"/></properties><point/></object>
   <object id="324" name="prop_117" type="prop_117" x="420.00" y="532.00"><properties><property name="scale" type="float" value="0.76"/></properties><point/></object>
   <object id="325" name="prop_118" type="prop_118" x="644.00" y="532.00"><properties><property name="scale" type="float" value="0.76"/></properties><point/></object>
