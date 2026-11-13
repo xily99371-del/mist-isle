@@ -120,27 +120,52 @@ static void DrawTerrainAccent(int x,int y,Area area,int kind,float time) {
     Vector2 p=WorldToScreen((float)x,(float)y);
     unsigned int h=TileHash(x+41,y-19,(int)area+17);
     if(kind==4) {
+        Color deep=(Color){86,164,181,255};
+        Color crest=(Color){211,239,230,255};
+        if(area==AREA_GROVE) {
+            deep=(Color){104,184,174,255};
+            crest=(Color){222,244,209,255};
+        } else if(area==AREA_RUINS) {
+            deep=(Color){79,143,171,255};
+            crest=(Color){194,225,224,255};
+        } else if(area==AREA_LIGHTHOUSE) {
+            deep=(Color){102,165,194,255};
+            crest=(Color){235,239,221,255};
+        }
+        float phase=time*1.22f+(float)(h%113u)*.055f;
+        float ox=(float)((h>>4)%25u)-12.0f;
+        float drift=sinf(phase)*2.2f;
 #if defined(MISTISLE_PI_PROFILE)
         if((h%3u)==0u) {
-            float phase=time*1.25f+(float)(h%97u)*.08f;
-            float ox=(float)((h>>4)%22u)-11.0f;
-            float yy=p.y-10.0f+sinf(phase)*2.0f;
-            DrawLineEx((Vector2){p.x+ox,yy},(Vector2){p.x+ox+17.0f,yy-1.0f},1.2f,
-                       Fade((Color){211,239,230,255},.28f));
+            float yy=p.y-9.0f+drift;
+            DrawLineEx((Vector2){p.x+ox,yy},
+                       (Vector2){p.x+ox+13.0f,yy-1.0f},1.25f,Fade(crest,.34f));
+            DrawCircleV((Vector2){p.x+ox+17.0f,yy-1.0f},.9f,Fade(WHITE,.48f));
         }
 #else
-        float phase=time*1.35f+(float)(h%97u)*.08f;
-        for(int i=0;i<3;i++) {
-            float ox=(float)((h>>(i*4))%22u)-11.0f;
-            float yy=p.y-13.0f+i*17.0f+sinf(phase+i*.9f)*2.8f;
-            float length=15.0f+(float)((h>>(i*5+3))%17u);
-            Color wave=i==1?(Color){91,178,190,255}:(Color){211,239,230,255};
-            DrawLineEx((Vector2){p.x+ox,yy},(Vector2){p.x+ox+length,yy-1.2f},i==1?1.1f:1.6f,Fade(wave,i==1?.28f:.34f));
+        // Two offset wave crests give each water tile a moving surface instead
+        // of a flat blue fill. Their phase is stable per tile, so motion reads
+        // as a continuous current rather than flickering random noise.
+        for(int band=0;band<2;band++) {
+            float bx=(float)((h>>(band*5+3))%23u)-11.0f;
+            float by=p.y-17.0f+(float)band*19.0f+sinf(phase+band*1.1f)*2.8f;
+            float length=12.0f+(float)((h>>(band*7+9))%15u);
+            DrawLineEx((Vector2){p.x+bx,by},
+                       (Vector2){p.x+bx+length*.48f,by-1.8f},1.55f,Fade(crest,.40f));
+            DrawLineEx((Vector2){p.x+bx+length*.48f,by-1.8f},
+                       (Vector2){p.x+bx+length,by-.3f},1.15f,Fade(deep,.34f));
         }
-        if((h%4u)==0u) {
-            float rx=p.x-16.0f+(float)((h>>7)%32u);
-            float ry=p.y-18.0f+(float)((h>>11)%34u);
-            DrawCircleLines((int)rx,(int)ry,3.0f,Fade((Color){202,237,226,255},.34f));
+        if((h%3u)==0u) {
+            float gx=p.x-19.0f+(float)((h>>8)%38u);
+            float gy=p.y-21.0f+(float)((h>>13)%39u)+sinf(phase*1.35f)*2.0f;
+            DrawCircleV((Vector2){gx,gy},1.35f,Fade(crest,.54f));
+            DrawCircleV((Vector2){gx+2.0f,gy+1.0f},.7f,Fade(WHITE,.58f));
+        }
+        if((h%7u)==0u) {
+            float rx=p.x-13.0f+(float)((h>>10)%26u);
+            float ry=p.y-13.0f+(float)((h>>15)%26u);
+            float pulse=.5f+.5f*sinf(phase*.72f);
+            DrawCircleLines((int)rx,(int)ry,2.0f+2.0f*pulse,Fade(crest,.22f));
         }
 #endif
         return;
