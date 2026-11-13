@@ -124,9 +124,12 @@ static void AddPickup(World *w,int kind,float x,float y) {
                 if(o->type==302||o->type==500||o->type==501){rx=3.1f;ry=2.8f;}
                 else if(o->type==303||o->type==22){rx=2.1f;ry=1.8f;}
                 else if(o->type>=1000&&o->type<1003){rx=1.45f;ry=1.55f;}
-                else if(o->type==27||o->type==33){rx=1.9f;ry=1.8f;}
-                else if(o->type==28||o->type==31){rx=1.35f;ry=1.25f;}
-                else if(o->type==29||o->type==30){rx=1.0f;ry=1.0f;}
+                else if(o->type==24||o->type==33||o->type==35){rx=1.8f;ry=1.8f;}
+                else if(o->type==25||o->type==27||o->type==28||o->type==31){rx=1.5f;ry=1.5f;}
+                else if(o->type==26||o->type==29||o->type==30||o->type==34){rx=1.1f;ry=1.1f;}
+                else if(o->type==20||o->type==21||o->type==32){rx=1.5f;ry=1.1f;}
+                else if(o->type>=200&&o->type<300){rx=1.4f;ry=1.4f;}
+                else if(o->type==2000){rx=.9f;ry=.9f;}
                 if(rx>0.0f&&dx<rx&&dy<ry)occupied=true;
             }
             if(occupied)continue;
@@ -171,16 +174,16 @@ static void BuildAreaWorld(Game *g,Area area) {
     // Resource placement remains progression-driven; terrain, static objects,
     // collision and all major story markers are authored in Tiled.
     if(area==AREA_CAMP) {
-        AddPickup(w,0,6,5);AddPickup(w,0,12,8);AddPickup(w,0,14,7);
-        AddPickup(w,0,5,9);AddPickup(w,1,3,10);AddPickup(w,2,14,9);
+        AddPickup(w,0,8,8);AddPickup(w,0,12,8);AddPickup(w,0,14,6);
+        AddPickup(w,0,5,9);AddPickup(w,1,5,10);AddPickup(w,2,12,9);
     } else if(area==AREA_GROVE) {
-        AddPickup(w,0,6,7);AddPickup(w,0,10,5);AddPickup(w,0,12,7);
-        AddPickup(w,1,4,10);AddPickup(w,2,10,9);
+        AddPickup(w,0,6,7);AddPickup(w,0,12,6);AddPickup(w,0,12,7);
+        AddPickup(w,1,4,10);AddPickup(w,2,10,10);
     } else if(area==AREA_RUINS) {
-        AddPickup(w,1,6,7);AddPickup(w,1,12,7);
-        AddPickup(w,2,7,8);AddPickup(w,2,12,9);
+        AddPickup(w,1,7,7);AddPickup(w,1,14,6);
+        AddPickup(w,2,7,8);AddPickup(w,2,12,10);
     } else {
-        AddPickup(w,0,5,7);AddPickup(w,1,13,7);AddPickup(w,2,10,9);
+        AddPickup(w,0,7,7);AddPickup(w,1,11,7);AddPickup(w,2,10,10);
     }
     for(int i=0;i<w->pickupCount;i++) {
         int px=(int)w->pickups[i].tile.x, py=(int)w->pickups[i].tile.y;
