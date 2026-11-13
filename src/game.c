@@ -76,10 +76,33 @@ static void SetDialogueAs(Game *g,const char *speaker,const char *a,const char *
 static void SetDialogue(Game *g,const char *a,const char *b,const char *c) {
     SetDialogueAs(g,"苔灯灵",a,b,c);
 }
+static int TerrainKindFromAtlasIndex(unsigned char index);
 static void AddPickup(World *w,int kind,float x,float y) {
     if(w->pickupCount>=MAX_PICKUPS)return;
-    int index = w->pickupCount;
-    w->pickups[index] = (Pickup){{x,y},kind,false,(float)index*0.7f};
+    // Place every pickup on a free, reachable tile; relocate it when a prop,
+    // tree trunk or water cell occupies its authored position.
+    int ox=(int)roundf(x),oy=(int)roundf(y),bestX=-1,bestY=-1;
+    float best=1.0e9f;
+    for(int radius=0;radius<=4;radius++) {
+        for(int dy=-radius;dy<=radius;dy++)for(int dx=-radius;dx<=radius;dx++) {
+            if(abs(dx)+abs(dy)!=radius)continue;
+            int tx=ox+dx,ty=oy+dy;
+            if(tx<1||ty<1||tx>=MAPW-1||ty>=MAPH-1)continue;
+            if(w->solid[ty][tx]||TerrainKindFromAtlasIndex(w->terrain[ty][tx])==4)continue;
+            bool occupied=false;
+            for(int i=0;i<w->pickupCount;i++)
+                if((int)roundf(w->pickups[i].tile.x)==tx&&(int)roundf(w->pickups[i].tile.y)==ty) {
+                    occupied=true;break;
+                }
+            if(occupied)continue;
+            float score=(float)(dx*dx+dy*dy)+(float)ty*0.0001f;
+            if(score<best){best=score;bestX=tx;bestY=ty;}
+        }
+        if(bestX>=0)break;
+    }
+    if(bestX<0)return;
+    int index=w->pickupCount;
+    w->pickups[index]=(Pickup){{(float)bestX,(float)bestY},kind,false,(float)index*0.7f};
     w->pickupCount++;
 }
 static int TerrainKindFromAtlasIndex(unsigned char index) {
