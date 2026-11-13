@@ -3,7 +3,7 @@
  <properties>
   <property name="level_id" value="coastal_camp"/>
   <property name="layout_style" value="one_screen_handcrafted_topdown"/>
-  <property name="map_review_revision" type="int" value="9"/>
+  <property name="map_review_revision" type="int" value="10"/>
   <property name="scene_description" value="Coastal hub; dock, keeper house, supply camp, three clear exits."/>
  </properties>
  <tileset firstgid="1" source="terrain.tsx"/>
