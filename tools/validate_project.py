@@ -123,6 +123,8 @@ require("MISTISLE_PI_PROFILE" in CMAKE and 'set(OPENGL_VERSION "2.1"' in CMAKE a
 require("find_package(Python3 REQUIRED COMPONENTS Interpreter)" in CMAKE and "tools/build_maps.py" in CMAKE,
         "Python is required only at build time to compile Tiled maps")
 require(all(path.exists() for path in MAP_FILES), "all four Tiled maps and the terrain tileset are present")
+require('name=="campfire": type_id=2000' in MAP_BUILD and "obj->type==2000" in RENDER,
+        "the campfire remains an animated Tiled-authored scene object")
 require("AREA_GROUND" in MAP_BUILD and "AREA_COLLISION" in MAP_BUILD and "AREA_MARKERS" in MAP_BUILD and "AREA_OBJECTS" in MAP_BUILD,
         "Tiled compiler exports ground, collision, story markers and object placements")
 require("chapter1_map_review.png" in MAP_PREVIEW and "Collision" in MAP_PREVIEW and "Markers" in MAP_PREVIEW,
