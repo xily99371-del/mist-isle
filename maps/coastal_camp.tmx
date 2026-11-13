@@ -8,7 +8,7 @@
  </properties>
  <tileset firstgid="1" source="terrain.tsx"/>
  <layer id="1" name="Ground" width="18" height="12">
-  <data encoding="csv"
+  <data encoding="csv">
    2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1,
    1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1,
    1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1,
