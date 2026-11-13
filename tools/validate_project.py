@@ -139,6 +139,18 @@ require("LogicalMousePosition" in GAME and "GetScreenWidth()" in GAME,
         "battle mouse selection remains aligned after window scaling")
 require("DrawTerrainAccent" in RENDER and "terrainKinds" in RENDER and "512" in RENDER,
         "world maps include layered ground detail, shoreline foam and a larger render queue")
+require("static RenderTexture2D TEX_GROUND_CACHE" in RENDER and "BuildGroundCache(g)" in RENDER,
+        "static Tiled ground, autotile overlays and coast details are cached in one active-area render target")
+require("CACHED_GROUND_AREA==(int)g->area" in RENDER and "CACHED_GROUND_AREA=(int)g->area" in RENDER,
+        "ground cache is rebuilt only when the player changes area")
+require("DrawTexturePro(TEX_GROUND_CACHE.texture" in RENDER and "UnloadRenderTexture(TEX_GROUND_CACHE)" in RENDER,
+        "cached map is drawn as one texture and released cleanly")
+require("Safe fallback if the target GPU cannot allocate the single-area ground cache" in RENDER,
+        "terrain still renders if a Raspberry Pi GPU cannot allocate the cache")
+require("#define MISTISLE_RAIN_DROPS 56" in RENDER and "#define MISTISLE_RAIN_RIPPLES 6" in RENDER,
+        "Raspberry Pi profile reduces weather overdraw")
+require("Static grass, sand and stone detail is baked into the ground cache" in RENDER,
+        "Raspberry Pi avoids redrawing static terrain accents every frame")
 require("RENDER_GATE" in RENDER and "DrawGateMarker" in RENDER and "DrawStructureProp(4" in RENDER,
         "all area transitions use a visible authored stone-arch portal with destination signage")
 require("辉光林地" in RENDER and "潮汐遗迹" in RENDER and "灯塔庭院" in RENDER and "返回海岸营地" in RENDER,
