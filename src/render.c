@@ -258,17 +258,26 @@ static void DrawProp(int index,Vector2 p,float w,float h) {
 }
 static void DrawKeeper(Vector2 p,float t) {
     const float footY=p.y+8.0f;
-    DrawEllipse((int)p.x,(int)footY,16,5,(Color){48,66,57,105});
+    float sway=sinf(t*1.7f)*1.4f;
+    DrawEllipse((int)p.x,(int)footY,23,7,(Color){35,49,45,125});
+    // The Watcher reads as a story NPC: layered mantle, staff and a warm signal lantern.
+    DrawTriangle((Vector2){p.x-23,footY-7},(Vector2){p.x+22,footY-7},(Vector2){p.x+15,footY-62},
+                 (Color){65,105,91,255});
+    DrawTriangle((Vector2){p.x-23,footY-7},(Vector2){p.x-15,footY-62},(Vector2){p.x+1,footY-14},
+                 (Color){91,139,112,255});
+    DrawLineEx((Vector2){p.x+25,footY-4},(Vector2){p.x+29+sway,footY-82},4.0f,(Color){93,73,54,255});
+    DrawCircleV((Vector2){p.x+29+sway,footY-85},8,(Color){127,91,54,255});
+    DrawCircleV((Vector2){p.x+29+sway,footY-85},5,Fade(C_GOLD,.82f));
     if(TEX_KEEPER.id) {
         Rectangle src={0,0,32,32};
-        Rectangle dst={p.x-28,footY-56+sinf(t*2.0f)*0.5f,56,56};
+        Rectangle dst={p.x-36,footY-82+sinf(t*2.0f)*0.5f,72,82};
         DrawTexturePro(TEX_KEEPER,src,dst,(Vector2){0,0},0,WHITE);
         return;
     }
-    DrawCircleV((Vector2){p.x,p.y-29},10,(Color){229,222,198,255});
-    DrawCircleV((Vector2){p.x-3,p.y-30},1.5f,C_INK);
-    DrawCircleV((Vector2){p.x+3,p.y-30},1.5f,C_INK);
-    DrawRectangle((int)p.x-9,(int)p.y-19,18,18,(Color){111,151,116,255});
+    DrawCircleV((Vector2){p.x,p.y-40},13,(Color){229,222,198,255});
+    DrawCircleV((Vector2){p.x-4,p.y-41},1.8f,C_INK);
+    DrawCircleV((Vector2){p.x+4,p.y-41},1.8f,C_INK);
+    DrawRectangle((int)p.x-12,(int)p.y-29,24,25,(Color){75,116,91,255});
 }
 static void DrawFirefly(Vector2 p,float t) {
     float bob=sinf(t*3.8f)*4.0f;
@@ -350,20 +359,52 @@ static void DrawPlayer(Vector2 p,float t,bool moving,int facing) {
     DrawCircleV((Vector2){p.x-8,p.y-41-bob},3,(Color){228,166,111,255});
     DrawCircleV((Vector2){p.x+8,p.y-41-bob},3,(Color){228,166,111,255});
 }
-static void DrawShrine(Vector2 p,float t,bool solved) {
+static void DrawShrine(Vector2 p,float t,bool solved,bool finalCore) {
     Color c=solved?C_GOLD:(Color){158,185,166,255};
+    if(finalCore) {
+        // The Tidal Ruins keystone is the chapter's central mechanism, not another small shrine.
+        DrawEllipse((int)p.x,(int)p.y+13,104,25,(Color){35,57,61,145});
+        DrawCircleLines((int)p.x,(int)p.y+7,91,Fade((Color){93,169,174,255},.38f));
+        DrawCircleLines((int)p.x,(int)p.y+7,74,Fade((Color){218,192,128,255},.55f));
+        DrawCircleLines((int)p.x,(int)p.y+7,58,Fade((Color){93,169,174,255},.32f));
+        DrawAreaProp(11,p,190,194);
+        // Four inset rune stones anchor the mechanism to the floor.
+        for(int i=0;i<4;i++) {
+            float a=(float)i*PI2/4.0f+.785f;
+            Vector2 q={p.x+cosf(a)*79.0f,p.y+7.0f+sinf(a)*25.0f};
+            DrawAreaProp(9,(Vector2){q.x,q.y+4},42,48);
+            DrawCircleV((Vector2){q.x,q.y-13},3.5f,Fade(C_BLUE,.65f+.25f*sinf(t*2+i)));
+        }
+        float pulse=.5f+.5f*sinf(t*2.4f);
+        DrawCircleV((Vector2){p.x,p.y-92-sinf(t*2)*4},30,Fade(C_BLUE,.10f+.10f*pulse));
+        DrawCircleV((Vector2){p.x,p.y-92-sinf(t*2)*4},13,Fade((Color){117,225,235,255},.85f));
+        DrawCircleV((Vector2){p.x,p.y-92-sinf(t*2)*4},5,WHITE);
+        for(int i=0;i<8;i++) {
+            float a=t*.42f+(float)i*PI2/8.0f;
+            Vector2 q={p.x+cosf(a)*54.0f,p.y-38+sinf(a)*20.0f};
+            DrawCircleV(q,3.0f,Fade(i%2?C_GOLD:C_BLUE,.55f+.35f*pulse));
+        }
+        if(solved) {
+            DrawCircleV((Vector2){p.x,p.y-76},66,Fade(C_GOLD,.12f));
+            for(int i=0;i<6;i++) {
+                float a=t*.7f+(float)i*PI2/6.0f;
+                DrawCircleV((Vector2){p.x+cosf(a)*88,p.y-40+sinf(a)*30},3.2f,Fade(C_GOLD,.85f));
+            }
+        }
+        return;
+    }
     DrawEllipse((int)p.x,(int)p.y+8,34,10,(Color){66,95,85,95});
-    if(TEX_AREA_PROPS.id) DrawAreaProp(11,p,112,116);
+    if(TEX_AREA_PROPS.id) DrawAreaProp(11,p,104,108);
     else if(TEX_ENV_PROPS.id) DrawEnvProp(4,p,82,82);
     else {
         DrawRectangle((int)p.x-14,(int)p.y-25,28,31,(Color){156,174,149,255});
         DrawRectangle((int)p.x-8,(int)p.y-45,16,22,(Color){198,209,171,255});
     }
-    DrawCircleV((Vector2){p.x,p.y-56-sinf(t*2)*3},solved?11:7,c);
-    DrawCircleV((Vector2){p.x,p.y-56-sinf(t*2)*3},3,WHITE);
+    DrawCircleV((Vector2){p.x,p.y-52-sinf(t*2)*2},solved?9:6,c);
+    DrawCircleV((Vector2){p.x,p.y-52-sinf(t*2)*2},2.5f,WHITE);
     if(solved) {
-        DrawCircleV((Vector2){p.x,p.y-55},38,Fade(c,.15f));
-        for(int i=0;i<4;i++){float a=t*.7f+i*PI2/4;DrawCircleV((Vector2){p.x+cosf(a)*35,p.y-42+sinf(a)*22},2.5f,Fade(C_GOLD,.8f));}
+        DrawCircleV((Vector2){p.x,p.y-52},30,Fade(c,.12f));
+        for(int i=0;i<4;i++){float a=t*.7f+i*PI2/4;DrawCircleV((Vector2){p.x+cosf(a)*28,p.y-40+sinf(a)*18},2.0f,Fade(C_GOLD,.8f));}
     }
 }
 static void DrawPickup(Pickup *p) {
@@ -623,12 +664,42 @@ static void DrawGateMarker(Game *g,int gateId,Vector2 grid) {
     bool nearby=Dist(g->player.pos,grid)<2.35f;
     Vector2 p=WorldToScreen(grid.x,grid.y);
     float pulse=.5f+.5f*sinf(g->time*2.8f+gateId);
-    DrawEllipse((int)p.x,(int)p.y+5,34,9,(Color){27,48,48,105});
-    DrawCircleV((Vector2){p.x,p.y-63},42.0f,Fade(accent,locked?.07f:.12f+.08f*pulse));
-    DrawCircleLines((int)p.x,(int)p.y-63,31.0f,Fade(accent,locked?.30f:.72f));
-    DrawStructureProp(4,(Vector2){p.x,p.y+4},118.0f,132.0f);
-    DrawCircleV((Vector2){p.x,p.y-69},4.0f,locked?(Color){138,144,137,255}:Fade(accent,.75f+.25f*pulse));
-    Rectangle sign={p.x-84.0f,p.y-176.0f,168.0f,42.0f};
+    // A grounded masonry plinth connects each portal to the path and removes the floating-object look.
+    DrawEllipse((int)p.x,(int)p.y+13,61,18,(Color){24,43,42,135});
+    Rectangle plinth={p.x-54,p.y-8,108,22};
+    DrawRectangleRounded(plinth,.18f,5,(Color){91,100,82,255});
+    DrawRectangleRoundedLinesEx(plinth,.18f,5,2.0f,(Color){169,158,119,255});
+    DrawLineEx((Vector2){p.x-42,p.y+4},(Vector2){p.x+42,p.y+4},2.0f,Fade(WHITE,.20f));
+    if(gateId==0) {
+        // Grove entrance: living stone arch, flowered feet and a soft green threshold.
+        DrawAreaProp(8,(Vector2){p.x,p.y+2},160,168);
+        DrawFloraProp(12,(Vector2){p.x-49,p.y+9},45,46);
+        DrawFloraProp(13,(Vector2){p.x+48,p.y+10},44,45);
+        DrawCircleV((Vector2){p.x,p.y-63},48,Fade((Color){150,220,132,255},.08f+.07f*pulse));
+        DrawCircleLines((int)p.x,(int)p.y-63,37,Fade((Color){169,231,147,255},.55f));
+    } else if(gateId==1) {
+        // Ruins entrance: heavy carved portal with a clearly readable blue rune.
+        DrawStructureProp(4,(Vector2){p.x,p.y+2},160,178);
+        DrawCircleLines((int)p.x,(int)p.y-65,43,Fade((Color){104,194,214,255},.72f));
+        for(int i=0;i<4;i++) {
+            float a=(float)i*PI2/4.0f+g->time*.12f;
+            DrawCircleV((Vector2){p.x+cosf(a)*43,p.y-65+sinf(a)*43},3.2f,Fade(C_BLUE,.8f));
+        }
+    } else if(gateId==2) {
+        // Lighthouse route: the entrance is a beacon tower, not a generic arch.
+        DrawAreaProp(13,(Vector2){p.x,p.y+1},142,178);
+        DrawCircleV((Vector2){p.x,p.y-119},31,Fade(C_GOLD,.10f+.08f*pulse));
+        DrawCircleV((Vector2){p.x,p.y-119},8,Fade((Color){255,229,157,255},.85f));
+        DrawCircleLines((int)p.x,(int)p.y-119,23,Fade(C_GOLD,.75f));
+    } else {
+        // Return gate: familiar arch, but blue-lit and visibly set into a stone landing.
+        DrawAreaProp(8,(Vector2){p.x,p.y+2},146,154);
+        DrawCircleLines((int)p.x,(int)p.y-58,34,Fade((Color){127,204,224,255},.75f));
+        DrawCircleV((Vector2){p.x,p.y-62},5,Fade((Color){147,224,239,255},.9f));
+    }
+    if(locked)DrawCircleV((Vector2){p.x,p.y-69},5,(Color){138,144,137,255});
+    else DrawCircleV((Vector2){p.x,p.y-69},5,Fade(accent,.75f+.25f*pulse));
+    Rectangle sign={p.x-84.0f,p.y-188.0f,168.0f,42.0f};
     DrawRectangleRounded(sign,.16f,6,(Color){8,27,43,242});
     DrawRectangleRoundedLinesEx(sign,.16f,6,1.6f,Fade(accent,locked?.42f:.88f));
     float nameWidth=UI_FONT.texture.id?MeasureTextEx(UI_FONT,name,15.0f,1.0f).x:(float)MeasureText(name,15);
@@ -636,10 +707,10 @@ static void DrawGateMarker(Game *g,int gateId,Vector2 grid) {
     float statusWidth=UI_FONT.texture.id?MeasureTextEx(UI_FONT,status,11.0f,1.0f).x:(float)MeasureText(status,11);
     DrawUIText(status,(int)(p.x-statusWidth*.5f),(int)sign.y+23,11,locked?(Color){201,190,161,255}:(nearby?(Color){255,226,154,255}:(Color){177,202,194,255}));
     if(nearby&&!locked) {
-        DrawCircleV((Vector2){p.x,p.y-191.0f-sinf(g->time*4.0f)*3.0f},4.0f,C_GOLD);
-        DrawTriangle((Vector2){p.x,p.y-185.0f-sinf(g->time*4.0f)*3.0f},
-                     (Vector2){p.x-6,p.y-196.0f-sinf(g->time*4.0f)*3.0f},
-                     (Vector2){p.x+6,p.y-196.0f-sinf(g->time*4.0f)*3.0f},C_GOLD);
+        DrawCircleV((Vector2){p.x,p.y-201.0f-sinf(g->time*4.0f)*3.0f},4.0f,C_GOLD);
+        DrawTriangle((Vector2){p.x,p.y-195.0f-sinf(g->time*4.0f)*3.0f},
+                     (Vector2){p.x-6,p.y-206.0f-sinf(g->time*4.0f)*3.0f},
+                     (Vector2){p.x+6,p.y-206.0f-sinf(g->time*4.0f)*3.0f},C_GOLD);
     }
 }
 static void GetVisibleTileBounds(Game *g,int *minX,int *minY,int *maxX,int *maxY) {
@@ -858,13 +929,17 @@ static void RenderWorld(Game *g) {
                 else if(it->index>=20&&it->index<=35)DrawAreaProp(it->index-20,p,100*it->scale,108*it->scale);
                 else if(it->index>=100&&it->index<200)DrawFloraProp(it->index-100,p,100*it->scale,108*it->scale);
                 else if(it->index>=200&&it->index<300)DrawCliffProp(it->index-200,p,112*it->scale,112*it->scale);
+                else if(it->index==302)DrawStructureProp(2,p,232*it->scale,210*it->scale);
+                else if(it->index==303)DrawStructureProp(3,p,176*it->scale,154*it->scale);
+                else if(it->index==304)DrawStructureProp(4,p,166*it->scale,180*it->scale);
+                else if(it->index==305)DrawStructureProp(5,p,168*it->scale,152*it->scale);
                 else if(it->index>=300&&it->index<400)DrawStructureProp(it->index-300,p,150*it->scale,140*it->scale);
                 else if(it->index>=400&&it->index<416)DrawOriginalProp(it->index-400,p,92*it->scale,92*it->scale);
                 else if(it->index>=500&&it->index<504)DrawKenneyBuilding(it->index-500,p,it->scale);
                 break;
             case RENDER_FIRE: DrawCampfire(p,g->time); break;
             case RENDER_PICKUP: DrawPickup(&g->world.pickups[it->index]); break;
-            case RENDER_SHRINE: DrawShrine(p,g->time,g->shrineSolved); break;
+            case RENDER_SHRINE: DrawShrine(p,g->time,g->shrineSolved,g->area==AREA_RUINS); break;
             case RENDER_KEEPER: DrawKeeper(p,g->time); break;
             case RENDER_LUMI: DrawLumi(p,g->time,g->lumi.bob); break;
             case RENDER_MOATAIL:
@@ -885,8 +960,13 @@ static void RenderWorld(Game *g) {
             case RENDER_LEAFLING: DrawLeafling(p,g->time); break;
             case RENDER_MOTE: DrawMote(p,g->time); break;
             case RENDER_BOSS:
-                DrawLighthouseGuardian(p,g->time,1.12f);
-                DrawUIText("灯塔守卫",(int)p.x-28,(int)p.y-112,13,(Color){255,232,170,255});
+                DrawEllipse((int)p.x,(int)p.y+5,72,18,(Color){24,38,46,145});
+                DrawCircleLines((int)p.x,(int)p.y+3,61,Fade((Color){117,203,220,255},.42f));
+                DrawCircleLines((int)p.x,(int)p.y+3,48,Fade((Color){255,205,115,255},.28f));
+                DrawLighthouseGuardian(p,g->time,1.48f);
+                DrawRectangleRounded((Rectangle){p.x-52,p.y-154,104,22},.25f,5,(Color){8,24,38,230});
+                DrawRectangleRoundedLinesEx((Rectangle){p.x-52,p.y-154,104,22},.25f,5,1.5f,(Color){255,205,115,220});
+                DrawUIText("灯塔守卫",(int)p.x-28,(int)p.y-150,13,(Color){255,232,170,255});
                 break;
             case RENDER_GATE: DrawGateMarker(g,it->index,it->grid); break;
             case RENDER_PLAYER: DrawPlayer(p,g->time,Vector2Length(g->player.vel)>.1f,g->player.facing); break;
