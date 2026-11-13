@@ -20,19 +20,17 @@
  <objectgroup id="2" name="Collision" draworder="topdown"/>
  <objectgroup id="3" name="Objects" draworder="topdown">
   <object id="300" name="tree0" type="tree0" x="84.00" y="84.00"><properties><property name="scale" type="float" value="1.08"/></properties><point/></object>
-  <object id="301" name="tree1" type="tree1" x="252.00" y="84.00"><properties><property name="scale" type="float" value="1.02"/></properties><point/></object>
+  <object id="301" name="tree1" type="tree1" x="140.00" y="84.00"><properties><property name="scale" type="float" value="1.02"/></properties><point/></object>
   <object id="302" name="tree2" type="tree2" x="812.00" y="84.00"><properties><property name="scale" type="float" value="1.04"/></properties><point/></object>
   <object id="303" name="tree0" type="tree0" x="980.00" y="140.00"><properties><property name="scale" type="float" value="1.02"/></properties><point/></object>
   <object id="304" name="tree1" type="tree1" x="84.00" y="308.00"><properties><property name="scale" type="float" value="1.00"/></properties><point/></object>
   <object id="305" name="tree2" type="tree2" x="980.00" y="588.00"><properties><property name="scale" type="float" value="1.00"/></properties><point/></object>
-  <object id="306" name="tree0" type="tree0" x="252.00" y="644.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
-  <object id="307" name="tree1" type="tree1" x="700.00" y="644.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
-  <object id="308" name="海岸守望宅邸" type="prop_302" x="532.00" y="308.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
-  <object id="309" name="补给营帐" type="prop_303" x="756.00" y="252.00"><properties><property name="scale" type="float" value="0.96"/></properties><point/></object>
+  <object id="308" name="海岸守望宅邸" type="prop_302" x="588.00" y="308.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
+  <object id="309" name="补给营帐" type="prop_303" x="252.00" y="252.00"><properties><property name="scale" type="float" value="0.96"/></properties><point/></object>
   <object id="310" name="旧木码头" type="prop_20" x="196.00" y="532.00"><properties><property name="scale" type="float" value="1.00"/></properties><point/></object>
   <object id="311" name="停泊的小船" type="prop_21" x="140.00" y="588.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
   <object id="312" name="营火" type="campfire" x="364.00" y="420.00"><properties><property name="scale" type="float" value="1.00"/></properties><point/></object>
-  <object id="313" name="海风花树" type="prop_24" x="252.00" y="252.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
+  <object id="313" name="海风花树" type="prop_24" x="84.00" y="476.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="314" name="庭院灌木" type="prop_27" x="700.00" y="420.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="315" name="海岸灌木" type="prop_27" x="812.00" y="532.00"><properties><property name="scale" type="float" value="0.72"/></properties><point/></object>
   <object id="316" name="prop_116" type="prop_116" x="308.00" y="308.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
@@ -44,9 +42,8 @@
   <object id="322" name="prop_126" type="prop_126" x="700.00" y="532.00"><properties><property name="scale" type="float" value="0.76"/></properties><point/></object>
   <object id="323" name="prop_128" type="prop_128" x="140.00" y="364.00"><properties><property name="scale" type="float" value="0.76"/></properties><point/></object>
   <object id="324" name="prop_129" type="prop_129" x="868.00" y="196.00"><properties><property name="scale" type="float" value="0.76"/></properties><point/></object>
-  <object id="325" name="prop_132" type="prop_132" x="364.00" y="196.00"><properties><property name="scale" type="float" value="0.74"/></properties><point/></object>
-  <object id="326" name="prop_133" type="prop_133" x="700.00" y="196.00"><properties><property name="scale" type="float" value="0.74"/></properties><point/></object>
-  <object id="327" name="prop_134" type="prop_134" x="868.00" y="588.00"><properties><property name="scale" type="float" value="0.72"/></properties><point/></object>
+  <object id="325" name="prop_132" type="prop_132" x="420.00" y="140.00"><properties><property name="scale" type="float" value="0.74"/></properties><point/></object>
+  <object id="326" name="prop_133" type="prop_133" x="868.00" y="140.00"><properties><property name="scale" type="float" value="0.74"/></properties><point/></object>
   <object id="328" name="海岸岩壁" type="prop_200" x="84.00" y="476.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
   <object id="329" name="海岸岩壁" type="prop_201" x="84.00" y="588.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
  </objectgroup>
