@@ -3,7 +3,7 @@
  <properties>
   <property name="level_id" value="tidal_ruins"/>
   <property name="layout_style" value="one_screen_handcrafted_topdown"/>
-  <property name="map_review_revision" type="int" value="2"/>
+  <property name="map_review_revision" type="int" value="3"/>
   <property name="scene_description" value="Ancient stone processional; flanking shrines, broken arches, central keystone."/>
  </properties>
  <tileset firstgid="1" source="terrain.tsx"/>
