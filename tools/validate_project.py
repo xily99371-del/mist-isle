@@ -211,7 +211,7 @@ require(GAME.find("if(g->scene==SCENE_END)") < GAME.find("if(g->journalOpen || g
 
 # Critical gameplay entry points and persistence must remain present.
 for token, label in [
-    ("BuildWorld", "world construction"),
+    ("BuildAreaWorld", "Tiled world construction"),
     ("GameSave", "save system"),
     ("GameLoad", "load system"),
     ("SCENE_BATTLE", "battle state"),
