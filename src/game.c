@@ -800,6 +800,16 @@ void GameUpdate(Game *g,float dt) {
         if(g->area==AREA_LIGHTHOUSE&&g->shrineSolved&&Dist(p->pos,g->world.bossPos)<2.0f&&!g->bossDefeated) {
             AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,150);EnterBattle(g,g->enemyCount-1);return;
         }
+        // Chapter finale: the player must explicitly activate the central beacon stone.
+        // The stone's collision footprint prevents standing on its centre, so use a generous
+        // interaction radius and keep this check ahead of generic NPC/area interactions.
+        if(g->area==AREA_LIGHTHOUSE&&g->bossDefeated&&Dist(p->pos,g->world.shrine)<3.0f) {
+            g->endingTime=0.0f;
+            g->scene=SCENE_END;
+            GameSave(g);
+            Burst(g,WorldScreen(g->world.shrine),C_GOLD,64);
+            return;
+        }
         // NPC at camp.
         if(g->area==AREA_CAMP&&Dist(p->pos,(Vector2){3,10})<1.6f) {
             SetDialogueAs(g,"守望者","灯塔熄灭后，岛上的小生灵都变得不安。","找到三位伙伴，唤醒潮汐遗迹，灯塔就能重新点亮。","果实、贝壳和星晶散落在岛上，按 E 采集。");
