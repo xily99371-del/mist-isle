@@ -137,6 +137,15 @@ require("MISTISLE_PI_PROFILE" in CMAKE and 'set(OPENGL_VERSION "2.1"' in CMAKE a
 require("find_package(Python3 REQUIRED COMPONENTS Interpreter)" in CMAKE and "tools/build_maps.py" in CMAKE,
         "Python is required only at build time to compile Tiled maps")
 require(all(path.exists() for path in MAP_FILES), "all four Tiled maps and the terrain tileset are present")
+require("#define MAPW 18" in HEADER and "#define MAPH 12" in HEADER and "W,H,T,MAX_OBJECTS=18,12,56,64" in MAP_BUILD and "WIDTH, HEIGHT = 18, 12" in MAP_AUTOTILE and "W,H,T=18,12,56" in MAP_PREVIEW,
+        "all four maps, runtime arrays, autotile masks and Tiled previews use compact 18×12 one-screen dimensions")
+require(all(f'width="18" height="12"' in path.read_text(encoding="utf-8") for path in MAP_FILES if path.suffix==".tmx"),
+        "every Chapter 1 Tiled map is authored at 18×12 cells")
+require('type="prop_22"' in GROVE_MAP and 'type="prop_302"' not in GROVE_MAP and 'type="prop_133"' not in GROVE_MAP and 'type="prop_132"' not in GROVE_MAP,
+        "Glowglade Grove uses its own woodland shelter and excludes the coastal cottage, lighthouse and bridge props")
+require("PushRenderItem(items,&count,RENDER_KEEPER,0,(Vector2){7.0f,7.0f}" in RENDER and "PushRenderItem(items,&count,RENDER_MOATAIL,0,(Vector2){14,7}" in RENDER and "PushRenderItem(items,&count,RENDER_GECKO,0,(Vector2){13,8}" in RENDER,
+        "Watcher and companion actors are positioned for the compact Tiled scene layouts")
+
 require('name=="campfire": type_id=2000' in MAP_BUILD and "obj->type==2000" in RENDER,
         "the campfire remains an animated Tiled-authored scene object")
 require("generate_ground_atlas.py" in CMAKE and "topdown_terrain_atlas_v1.png" in CMAKE,
