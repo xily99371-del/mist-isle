@@ -224,11 +224,14 @@ static void DrawKenneyBuilding(int index,Vector2 p,float scale) {
     }
     DrawTexturePro(TEX_KENNEY_BUILDINGS,src,dst,(Vector2){0,0},0,WHITE);
 }
-static void DrawAreaProp(int index,Vector2 p,float w,float h) {
+static void DrawAreaPropTint(int index,Vector2 p,float w,float h,Color tint) {
     if(!TEX_AREA_PROPS.id)return;
     Rectangle src={(float)(index*96),0,96,96};
     Rectangle dst={p.x-w*.5f,p.y-h,w,h};
-    DrawTexturePro(TEX_AREA_PROPS,src,dst,(Vector2){0,0},0,WHITE);
+    DrawTexturePro(TEX_AREA_PROPS,src,dst,(Vector2){0,0},0,tint);
+}
+static void DrawAreaProp(int index,Vector2 p,float w,float h) {
+    DrawAreaPropTint(index,p,w,h,WHITE);
 }
 static void DrawEnvProp(int index,Vector2 p,float w,float h) {
     if(!TEX_ENV_PROPS.id)return;
@@ -782,7 +785,7 @@ static void RenderWorld(Game *g) {
                 else if(it->index==16)DrawEnvProp(10,p,76*it->scale,82*it->scale);
                 else if(it->index==17)DrawEnvProp(11,p,68*it->scale,38*it->scale);
                 else if(it->index==18)DrawEnvProp(8,p,38*it->scale,46*it->scale);
-                else if(it->index==33)DrawAreaProp(13,p,150*it->scale,190*it->scale);
+                else if(it->index==33)DrawAreaPropTint(13,p,150*it->scale,190*it->scale,(Color){145,160,176,255});
                 else if(it->index==28)DrawAreaProp(8,p,150*it->scale,140*it->scale);
                 else if(it->index==32)DrawAreaProp(12,p,130*it->scale,100*it->scale);
                 else if(it->index==34)DrawAreaProp(14,p,110*it->scale,118*it->scale);
@@ -1098,7 +1101,7 @@ static void RenderEnd(Game *g) {
         Rectangle src={0,0,(float)TEX_ENDING_CG.width,(float)TEX_ENDING_CG.height};
         DrawTexturePro(TEX_ENDING_CG,src,scene,(Vector2){0,0},0,WHITE);
         // The lighthouse lantern sits near the upper centre of the illustration.
-        Vector2 lamp={scene.x+scene.width*.50f,scene.y+scene.height*.205f};
+        Vector2 lamp={scene.x+scene.width*.535f,scene.y+scene.height*.205f};
         float sweep=sinf(t*.72f)*74.0f;
         Vector2 beamA={scene.x+scene.width-4.0f,lamp.y-66.0f+sweep};
         Vector2 beamB={scene.x+scene.width-4.0f,lamp.y+66.0f+sweep};
