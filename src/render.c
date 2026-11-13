@@ -859,7 +859,7 @@ static void RenderHUD(Game *g) {
     PanelDark((Rectangle){20,18,405,112});
     DrawUIText("MIST ISLE  /  CHAPTER 01",40,32,15,(Color){205,214,198,255});
     const char *areaName=g->area==AREA_CAMP?"海岸营地":g->area==AREA_GROVE?"辉光林地":g->area==AREA_RUINS?"潮汐遗迹":"灯塔庭院";
-    DrawUIText(areaName,560,32,18,(Color){255,221,158,255});
+    DrawUIText(areaName,276,32,18,(Color){255,221,158,255});
     DrawCircle(397,42,8,Fade(C_GOLD,.75f));
     DrawUIText("失落的灯塔",40,54,28,(Color){246,239,217,255});
     DrawUIText(TextFormat("生命 %d    果实 %d    贝壳 %d    星晶 %d",(int)g->player.hp,g->player.berries,g->player.shells,g->player.crystals),40,96,17,(Color){211,220,205,255});
@@ -870,7 +870,7 @@ static void RenderHUD(Game *g) {
     GetCurrentObjective(g,&objectiveTitle,&objectiveDetail,&objectiveTarget,&hasObjectiveTarget);
     PanelDark((Rectangle){850,18,410,154});
     DrawUIText("当前目标",872,29,15,(Color){205,214,198,255});
-    DrawUIText(objectiveTitle,872,52,21,C_INK);
+    DrawUIText(objectiveTitle,872,52,21,(Color){246,239,217,255});
     DrawUITextWrapped(objectiveDetail,872,81,365,14,2,(Color){211,220,205,255});
     int partyCount=(g->lumi.owned?1:0)+(g->splash.owned?1:0)+(g->spark.owned?1:0);
     const char *activeName=g->selectedBuddy==1&&g->splash.owned?"沫尾兽":g->selectedBuddy==2&&g->spark.owned?"鸣晶蜥":g->lumi.owned?"苔灯灵":partyCount>0?"伙伴":"尚无伙伴";
@@ -1116,10 +1116,10 @@ static void RenderEnd(Game *g) {
         DrawRectangleLinesEx((Rectangle){scene.x-4,scene.y-4,scene.width+8,scene.height+8},3.0f,Fade(C_GOLD,.82f));
         DrawRectangleLinesEx((Rectangle){scene.x+2,scene.y+2,scene.width-4,scene.height-4},1.0f,Fade((Color){255,246,217,255},.32f));
         // Place the traveller and companions on the path in the illustrated scene.
-        DrawPlayer((Vector2){420,650},t,false,3);
-        if(g->lumi.owned)DrawLumi((Vector2){485,650},t,0);
-        if(g->splash.owned)DrawMoatail((Vector2){550,650},t);
-        if(g->spark.owned)DrawGecko((Vector2){615,650},t);
+        DrawPlayer((Vector2){420,620},t,false,3);
+        if(g->lumi.owned)DrawLumi((Vector2){485,620},t,0);
+        if(g->splash.owned)DrawMoatail((Vector2){550,620},t);
+        if(g->spark.owned)DrawGecko((Vector2){615,620},t);
     } else {
         DrawLighthouseBackdrop(t,true);
         DrawUIText("灯塔重新亮起",510,325,30,(Color){255,238,198,255});
