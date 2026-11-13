@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="640" viewBox="0 0 512 640">
+<defs>
+ <linearGradient id="hair" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#8b5a43"/><stop offset=".48" stop-color="#573a35"/><stop offset="1" stop-color="#332a30"/></linearGradient>
+ <linearGradient id="hairHi" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d49a72"/><stop offset="1" stop-color="#8c5b49"/></linearGradient>
+ <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffe4ce"/><stop offset="1" stop-color="#e8b69e"/></linearGradient>
+ <linearGradient id="scarf" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f06c5e"/><stop offset="1" stop-color="#a9363c"/></linearGradient>
+ <linearGradient id="leather" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#9b7457"/><stop offset="1" stop-color="#59463e"/></linearGradient>
+ <linearGradient id="cloth" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff0db"/><stop offset="1" stop-color="#cbbca9"/></linearGradient>
+ <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f5df9c"/><stop offset=".5" stop-color="#9e8060"/><stop offset="1" stop-color="#4c4a4d"/></linearGradient>
+ <filter id="soft"><feGaussianBlur stdDeviation="7"/></filter>
+</defs>
+<!-- ponytail and back hair -->
+<path d="M324 115Q421 82 449 170Q467 252 423 314Q397 359 438 408Q461 444 427 488Q383 528 350 471Q326 429 351 371L325 276Z" fill="url(#hair)" stroke="#392d31" stroke-width="10" stroke-linejoin="round"/>
+<path d="M392 156Q438 207 414 293Q393 341 414 393Q427 428 400 462" fill="none" stroke="#c88969" stroke-width="9" stroke-linecap="round" opacity=".75"/>
+<path d="M362 186Q405 249 377 322Q357 368 377 418" fill="none" stroke="#e0a17a" stroke-width="5" stroke-linecap="round" opacity=".55"/>
+<!-- shoulders and backpack -->
+<path d="M108 470Q134 410 211 397L312 398Q395 420 427 492L459 640H55Z" fill="url(#cloth)" stroke="#4b3935" stroke-width="10" stroke-linejoin="round"/>
+<path d="M82 464Q42 484 39 563L45 640H142L155 492Z" fill="url(#leather)" stroke="#4b3935" stroke-width="10"/>
+<path d="M375 450Q442 443 475 510L493 620L430 640L387 552Z" fill="#785a48" stroke="#4b3935" stroke-width="10"/>
+<path d="M403 485Q449 492 465 546L472 602L424 611L400 548Z" fill="#a98261" stroke="#4b3935" stroke-width="7"/>
+<path d="M425 522L467 529M419 551L473 559M425 580L480 587" stroke="#e0c08b" stroke-width="6" stroke-linecap="round"/>
+<!-- torso vest -->
+<path d="M146 418Q195 389 254 410Q313 389 365 423L395 640H112Z" fill="url(#leather)" stroke="#443431" stroke-width="10" stroke-linejoin="round"/>
+<path d="M194 414L253 470L312 412L336 640H170Z" fill="#6c5145" stroke="#443431" stroke-width="7"/>
+<path d="M218 426L255 466L291 426L282 640H229Z" fill="url(#cloth)" stroke="#5a4740" stroke-width="6"/>
+<!-- shirt collar -->
+<path d="M204 397L252 449L300 396L284 467L255 489L222 465Z" fill="#f8eee0" stroke="#51403a" stroke-width="7"/>
+<path d="M222 402L253 443L284 402" fill="none" stroke="#b7a493" stroke-width="5"/>
+<!-- shoulder straps and utility harness -->
+<path d="M153 420Q179 445 198 505L227 640" fill="none" stroke="#493a34" stroke-width="22" stroke-linecap="round"/>
+<path d="M153 420Q179 445 198 505L227 640" fill="none" stroke="#bd966e" stroke-width="10" stroke-linecap="round"/>
+<path d="M355 422Q329 456 311 505L287 640" fill="none" stroke="#493a34" stroke-width="22" stroke-linecap="round"/>
+<path d="M355 422Q329 456 311 505L287 640" fill="none" stroke="#bd966e" stroke-width="10" stroke-linecap="round"/>
+<g fill="#e5c68d" stroke="#493a34" stroke-width="5"><rect x="187" y="500" width="25" height="29" rx="5"/><rect x="300" y="500" width="25" height="29" rx="5"/><rect x="244" y="545" width="25" height="31" rx="5"/></g>
+<path d="M130 554Q252 588 377 548" fill="none" stroke="#3d302d" stroke-width="18"/>
+<path d="M130 554Q252 588 377 548" fill="none" stroke="#c59a6d" stroke-width="8"/>
+<path d="M244 548L264 548L264 581L244 581Z" fill="url(#metal)" stroke="#493a34" stroke-width="5"/>
+<!-- scarf -->
+<path d="M178 356Q249 384 326 351L359 405Q305 445 245 424Q206 412 174 386Z" fill="url(#scarf)" stroke="#5b3436" stroke-width="9" stroke-linejoin="round"/>
+<path d="M307 386Q357 395 392 438Q377 477 354 512Q338 470 317 444L279 416Z" fill="#c64848" stroke="#5b3436" stroke-width="8" stroke-linejoin="round"/>
+<path d="M192 376Q244 402 310 379" fill="none" stroke="#ffb09a" stroke-width="7" stroke-linecap="round" opacity=".75"/>
+<path d="M354 432Q365 461 356 485" fill="none" stroke="#f58a78" stroke-width="5" stroke-linecap="round"/>
+<!-- neck -->
+<path d="M215 324L213 383Q253 415 293 380L286 316Z" fill="url(#skin)" stroke="#4b3935" stroke-width="8"/>
+<!-- hair mass and face -->
+<path d="M125 165Q126 63 246 53Q360 53 389 166L371 291Q352 370 255 390Q160 370 133 294Z" fill="url(#hair)" stroke="#392d31" stroke-width="11"/>
+<path d="M146 191Q157 112 246 98Q338 95 366 190L351 298Q333 355 254 365Q176 354 151 295Z" fill="url(#skin)" stroke="#4b3935" stroke-width="8"/>
+<!-- ears -->
+<path d="M146 242Q107 211 105 260Q110 300 153 292M361 242Q402 214 402 262Q396 300 357 292" fill="url(#skin)" stroke="#4b3935" stroke-width="8"/>
+<!-- hair fringe -->
+<path d="M128 211Q101 153 143 101Q186 43 270 61Q357 67 384 135Q354 123 335 142Q306 167 282 139Q249 177 207 151Q184 199 149 221L146 270Q129 248 128 211Z" fill="url(#hair)" stroke="#392d31" stroke-width="9" stroke-linejoin="round"/>
+<path d="M165 124Q199 81 244 83Q218 114 222 160Q188 171 158 210" fill="none" stroke="url(#hairHi)" stroke-width="10" stroke-linecap="round"/>
+<path d="M255 72Q284 96 279 143Q274 168 254 188" fill="none" stroke="#d69b77" stroke-width="8" stroke-linecap="round"/>
+<path d="M335 108Q359 133 350 180" fill="none" stroke="#c88969" stroke-width="7" stroke-linecap="round"/>
+<!-- brows and eyes -->
+<path d="M177 228Q203 210 226 226M282 226Q307 209 333 227" fill="none" stroke="#62423a" stroke-width="8" stroke-linecap="round"/>
+<path d="M172 248Q198 222 230 248Q216 280 190 276Q176 269 172 248Z" fill="#fff8ed" stroke="#513b37" stroke-width="6"/>
+<path d="M280 248Q309 221 338 248Q328 278 301 276Q284 269 280 248Z" fill="#fff8ed" stroke="#513b37" stroke-width="6"/>
+<ellipse cx="202" cy="253" rx="13" ry="19" fill="#8f574c"/><ellipse cx="310" cy="253" rx="13" ry="19" fill="#8f574c"/>
+<ellipse cx="202" cy="254" rx="7" ry="12" fill="#2f303b"/><ellipse cx="310" cy="254" rx="7" ry="12" fill="#2f303b"/>
+<circle cx="207" cy="246" r="5" fill="#fff"/><circle cx="315" cy="246" r="5" fill="#fff"/>
+<path d="M250 265Q241 285 256 289" fill="none" stroke="#bf8a78" stroke-width="5" stroke-linecap="round"/>
+<path d="M232 313Q254 327 278 312" fill="none" stroke="#a85f5c" stroke-width="6" stroke-linecap="round"/>
+<path d="M232 311Q254 319 278 310" fill="none" stroke="#ffe4d4" stroke-width="3" stroke-linecap="round"/>
+<ellipse cx="165" cy="291" rx="20" ry="9" fill="#ee9a94" opacity=".35"/><ellipse cx="345" cy="291" rx="20" ry="9" fill="#ee9a94" opacity=".35"/>
+<!-- goggles resting on hair -->
+<path d="M160 132Q218 103 276 126L288 157Q229 142 173 166Z" fill="#5d4a40" stroke="#392d31" stroke-width="8"/>
+<ellipse cx="202" cy="140" rx="29" ry="20" fill="#b5c8c7" stroke="#493c38" stroke-width="8"/>
+<ellipse cx="272" cy="139" rx="29" ry="20" fill="#b5c8c7" stroke="#493c38" stroke-width="8"/>
+<ellipse cx="202" cy="140" rx="20" ry="12" fill="#e7f3e9" opacity=".72"/><ellipse cx="272" cy="139" rx="20" ry="12" fill="#e7f3e9" opacity=".72"/>
+<path d="M182 135Q197 125 213 132M252 134Q269 123 284 132" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+<!-- ponytail tie and loose locks -->
+<path d="M365 122Q420 88 427 157Q407 190 374 177L354 151Z" fill="#7b4a3d" stroke="#392d31" stroke-width="8"/>
+<path d="M383 141Q406 122 414 151" fill="none" stroke="#d69b77" stroke-width="7" stroke-linecap="round"/>
+<path d="M136 250Q106 300 131 344Q149 367 171 353" fill="none" stroke="#7d5143" stroke-width="13" stroke-linecap="round"/>
+<!-- collar pins and compass emblem -->
+<circle cx="185" cy="425" r="13" fill="#e4c57e" stroke="#4d3a35" stroke-width="5"/>
+<path d="M185 412L190 425L185 438L180 425Z" fill="#8ab6b5"/>
+<path d="M334 432L350 445L334 458L318 445Z" fill="#d9bd82" stroke="#4d3a35" stroke-width="5"/>
+<circle cx="334" cy="445" r="5" fill="#83b7b5"/>
+<!-- linework and stitching -->
+<path d="M125 495Q145 480 160 490M350 493Q367 483 382 500M155 608L191 615M322 613L358 604" fill="none" stroke="#e2c39b" stroke-width="4" stroke-linecap="round" opacity=".75"/>
+<path d="M108 578Q128 584 143 572M371 574Q387 586 405 576" fill="none" stroke="#3f322f" stroke-width="4" stroke-linecap="round"/>
+</svg>
