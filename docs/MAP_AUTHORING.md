@@ -14,7 +14,7 @@ All maps are orthogonal, 22 x 18 cells, with 56 x 56 pixel tiles. The terrain ti
 ## Layers
 - Ground: CSV tile layer. Use complete grass, sand, stone and water tiles only. The compiler rejects transparent edge-mask tiles used as full ground.
 - Collision: rectangle objects. These are rasterized into the runtime collision grid. Water tiles are also automatically solid.
-- Objects: point objects. Use tree0, tree1, tree2, or prop_116 etc. Add a float property named scale when required.
+- Objects: point objects. Use tree0, tree1, tree2, prop_116 etc., or campfire for the animated campsite fire. Add a float property named scale when required.
 - Markers: point objects. Each map requires spawn, return, grove_gate, ruin_gate, shrine and boss.
 
 Object and marker points are placed at the centre of their tile. Moving a marker in Tiled updates the corresponding gameplay position without editing C.
