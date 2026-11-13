@@ -3,50 +3,106 @@
  <tileset firstgid="1" source="terrain.tsx"/>
  <layer id="1" name="Ground" width="22" height="18">
   <data encoding="csv">
-27,26,25,32,31,30,29,28,27,26,25,32,31,30,29,28,27,26,25,32,31,30,
-30,30,30,30,30,25,25,25,25,25,28,28,28,28,28,31,31,31,31,31,26,26,
-25,26,27,31,32,28,29,30,26,27,31,32,25,29,30,26,27,28,32,25,29,30,
-28,30,3,5,2,31,1,30,32,29,38,40,37,27,32,29,31,4,6,3,32,26,
-31,26,32,6,4,26,5,27,25,31,41,44,42,28,26,32,27,1,7,5,27,30,
-26,25,8,7,6,5,4,27,26,25,44,43,42,29,28,27,2,1,8,7,30,29,
-29,29,5,29,29,8,8,32,32,32,39,39,39,27,27,30,30,30,30,6,25,25,
-32,25,26,30,31,27,28,29,25,26,42,43,44,28,29,25,26,27,31,32,28,29,
-27,29,26,28,25,30,32,29,31,40,37,39,32,26,31,28,30,27,29,26,31,25,
-30,25,31,29,27,25,28,26,32,30,28,31,29,27,25,31,26,32,30,28,26,29,
-25,32,31,30,29,28,27,26,25,44,43,42,29,28,27,26,25,32,31,30,29,28,
-28,28,28,28,28,31,31,31,43,43,38,26,26,26,26,29,29,29,29,29,32,32,
-31,32,25,5,6,2,3,28,44,37,41,30,31,27,28,32,1,2,6,7,27,28,
-26,28,25,3,8,29,7,28,42,39,44,26,31,25,30,27,29,2,4,1,30,32,
-29,32,30,4,2,8,3,25,43,41,39,30,28,26,32,30,1,7,5,3,25,28,
-32,31,30,5,4,3,2,25,32,31,30,29,28,27,26,25,8,7,30,5,28,27,
-27,27,27,27,27,30,30,30,30,30,25,25,25,25,25,28,28,28,28,28,31,31,
-30,31,32,28,29,25,26,27,31,32,28,29,30,26,27,31,32,25,29,30,26,27
+   1, 8, 7, 6, 5, 4, 3, 2, 1, 8, 7, 6, 20, 19, 40, 17, 1, 8, 7, 6, 5, 4,
+   4, 3, 2, 1, 8, 7, 6, 5, 4, 3, 2, 1, 15, 44, 13, 20, 4, 3, 2, 1, 8, 7,
+   7, 6, 5, 4, 3, 32, 31, 30, 29, 28, 27, 19, 18, 39, 16, 30, 29, 28, 27, 4, 3, 2,
+   2, 1, 8, 7, 6, 27, 26, 25, 32, 31, 30, 14, 43, 20, 19, 25, 32, 31, 30, 7, 6, 5,
+   5, 4, 3, 32, 1, 8, 7, 28, 27, 26, 18, 17, 38, 15, 29, 28, 5, 4, 3, 2, 1, 8,
+   8, 7, 6, 27, 4, 3, 2, 31, 30, 29, 28, 42, 19, 18, 32, 31, 8, 7, 6, 5, 4, 3,
+   3, 2, 1, 30, 7, 6, 5, 26, 25, 32, 31, 37, 14, 28, 27, 26, 3, 2, 1, 8, 7, 6,
+   6, 5, 4, 25, 32, 31, 30, 29, 28, 27, 26, 40, 17, 31, 30, 29, 28, 27, 26, 3, 2, 1,
+   1, 8, 7, 28, 27, 26, 25, 32, 31, 30, 29, 43, 20, 19, 25, 32, 31, 30, 29, 6, 5, 4,
+   4, 3, 32, 31, 30, 29, 28, 27, 26, 25, 32, 31, 37, 29, 28, 27, 26, 25, 32, 31, 8, 7,
+   7, 6, 5, 26, 25, 32, 31, 30, 29, 28, 27, 19, 18, 39, 16, 15, 29, 28, 27, 4, 3, 2,
+   2, 1, 8, 29, 28, 27, 26, 25, 32, 31, 30, 29, 13, 42, 41, 18, 32, 31, 30, 7, 6, 5,
+   5, 4, 3, 32, 1, 8, 7, 28, 27, 26, 25, 32, 16, 15, 44, 13, 5, 4, 3, 2, 1, 8,
+   8, 7, 6, 27, 4, 3, 2, 31, 30, 29, 28, 27, 19, 18, 39, 16, 8, 7, 6, 5, 4, 3,
+   3, 2, 1, 30, 7, 6, 5, 26, 25, 32, 31, 30, 14, 43, 20, 19, 3, 2, 1, 8, 7, 6,
+   6, 5, 4, 25, 32, 31, 30, 29, 28, 27, 26, 18, 17, 38, 15, 29, 28, 5, 4, 3, 2, 1,
+   1, 8, 7, 6, 5, 4, 3, 2, 1, 8, 14, 13, 42, 19, 18, 2, 1, 8, 7, 6, 5, 4,
+   4, 3, 2, 1, 8, 7, 6, 5, 4, 3, 17, 38, 37, 14, 6, 5, 4, 3, 2, 1, 8, 7
   </data>
  </layer>
- <objectgroup id="2" name="Collision" color="#d65c55">
-  <object id="100" name="solid_1" x="784" y="224" width="56" height="112"/>
-  <object id="101" name="solid_2" x="896" y="224" width="56" height="112"/>
-  <object id="102" name="solid_3" x="280" y="224" width="112" height="112"/>
-  <object id="103" name="solid_4" x="504" y="616" width="112" height="112"/>
-  <object id="104" name="solid_5" x="840" y="616" width="112" height="112"/>
+ <objectgroup id="2" name="Collision" draworder="topdown">
+  <object id="117" name="solid" x="392.00" y="392.00" width="56.00" height="56.00"/>
+  <object id="118" name="solid" x="504.00" y="280.00" width="56.00" height="56.00"/>
+  <object id="119" name="solid" x="896.00" y="224.00" width="56.00" height="56.00"/>
+  <object id="120" name="solid" x="896.00" y="560.00" width="56.00" height="56.00"/>
+  <object id="121" name="solid" x="224.00" y="672.00" width="112.00" height="56.00"/>
+  <object id="122" name="solid" x="952.00" y="784.00" width="112.00" height="56.00"/>
  </objectgroup>
- <objectgroup id="3" name="Objects">
-  <object id="1" name="prop_28" type="prop_28" x="868.00" y="336.00"><properties><property name="scale" type="float" value="1"/></properties><point/></object>
-  <object id="2" name="prop_29" type="prop_29" x="364.00" y="308.00"><properties><property name="scale" type="float" value="0.95"/></properties><point/></object>
-  <object id="3" name="prop_30" type="prop_30" x="1036.00" y="728.00"><properties><property name="scale" type="float" value="0.95"/></properties><point/></object>
-  <object id="4" name="prop_32" type="prop_32" x="588.00" y="700.00"><properties><property name="scale" type="float" value="1"/></properties><point/></object>
-  <object id="5" name="prop_116" type="prop_116" x="336.00" y="767.20"><properties><property name="scale" type="float" value="0.65"/></properties><point/></object>
-  <object id="6" name="prop_119" type="prop_119" x="1036.00" y="336.00"><properties><property name="scale" type="float" value="0.62"/></properties><point/></object>
-  <object id="7" name="prop_117" type="prop_117" x="252.00" y="476.00"><properties><property name="scale" type="float" value="0.55"/></properties><point/></object>
-  <object id="8" name="prop_118" type="prop_118" x="420.00" y="728.00"><properties><property name="scale" type="float" value="0.55"/></properties><point/></object>
-  <object id="9" name="prop_120" type="prop_120" x="1036.00" y="560.00"><properties><property name="scale" type="float" value="0.55"/></properties><point/></object>
+ <objectgroup id="3" name="Objects" draworder="topdown">
+  <object id="1" name="prop_28" type="prop_28" x="364.00" y="252.00">
+   <properties><property name="scale" type="float" value="1.00"/></properties>
+   <point/>
+  </object>
+  <object id="2" name="prop_28" type="prop_28" x="980.00" y="700.00">
+   <properties><property name="scale" type="float" value="1.00"/></properties>
+   <point/>
+  </object>
+  <object id="3" name="prop_29" type="prop_29" x="420.00" y="420.00">
+   <properties><property name="scale" type="float" value="0.90"/></properties>
+   <point/>
+  </object>
+  <object id="4" name="prop_29" type="prop_29" x="532.00" y="308.00">
+   <properties><property name="scale" type="float" value="0.85"/></properties>
+   <point/>
+  </object>
+  <object id="5" name="prop_29" type="prop_29" x="924.00" y="252.00">
+   <properties><property name="scale" type="float" value="0.90"/></properties>
+   <point/>
+  </object>
+  <object id="6" name="prop_29" type="prop_29" x="924.00" y="588.00">
+   <properties><property name="scale" type="float" value="0.85"/></properties>
+   <point/>
+  </object>
+  <object id="7" name="prop_30" type="prop_30" x="252.00" y="700.00">
+   <properties><property name="scale" type="float" value="1.00"/></properties>
+   <point/>
+  </object>
+  <object id="8" name="prop_30" type="prop_30" x="980.00" y="812.00">
+   <properties><property name="scale" type="float" value="0.95"/></properties>
+   <point/>
+  </object>
+  <object id="9" name="prop_32" type="prop_32" x="700.00" y="532.00">
+   <properties><property name="scale" type="float" value="1.00"/></properties>
+   <point/>
+  </object>
+  <object id="10" name="prop_32" type="prop_32" x="812.00" y="700.00">
+   <properties><property name="scale" type="float" value="1.00"/></properties>
+   <point/>
+  </object>
+  <object id="11" name="prop_116" type="prop_116" x="308.00" y="308.00">
+   <properties><property name="scale" type="float" value="0.55"/></properties>
+   <point/>
+  </object>
+  <object id="12" name="prop_117" type="prop_117" x="420.00" y="812.00">
+   <properties><property name="scale" type="float" value="0.55"/></properties>
+   <point/>
+  </object>
+  <object id="13" name="prop_118" type="prop_118" x="924.00" y="756.00">
+   <properties><property name="scale" type="float" value="0.55"/></properties>
+   <point/>
+  </object>
+  <object id="14" name="prop_120" type="prop_120" x="1036.00" y="420.00">
+   <properties><property name="scale" type="float" value="0.55"/></properties>
+   <point/>
+  </object>
+  <object id="15" name="prop_38" type="prop_38" x="308.00" y="812.00">
+   <properties><property name="scale" type="float" value="0.65"/></properties>
+   <point/>
+  </object>
+  <object id="16" name="prop_39" type="prop_39" x="980.00" y="308.00">
+   <properties><property name="scale" type="float" value="0.75"/></properties>
+   <point/>
+  </object>
  </objectgroup>
- <objectgroup id="4" name="Markers" color="#e7c77b">
-  <object id="200" name="spawn" type="spawn" x="196.00" y="532.00"><point/></object>
-  <object id="201" name="return" type="return" x="140.00" y="532.00"><point/></object>
-  <object id="202" name="grove_gate" type="grove_gate" x="140.00" y="532.00"><point/></object>
-  <object id="203" name="ruin_gate" type="ruin_gate" x="140.00" y="532.00"><point/></object>
-  <object id="204" name="shrine" type="shrine" x="980.00" y="420.00"><point/></object>
-  <object id="205" name="boss" type="boss" x="1036.00" y="756.00"><point/></object>
+ <objectgroup id="4" name="Markers" draworder="topdown">
+  <object id="223" name="spawn" type="spawn" x="140.00" y="532.00"><point/></object>
+  <object id="224" name="return" type="return" x="196.00" y="532.00"><point/></object>
+  <object id="225" name="grove_gate" type="grove_gate" x="252.00" y="532.00"><point/></object>
+  <object id="226" name="ruin_gate" type="ruin_gate" x="308.00" y="532.00"><point/></object>
+  <object id="227" name="shrine" type="shrine" x="588.00" y="532.00"><point/></object>
+  <object id="228" name="boss" type="boss" x="1036.00" y="868.00"><point/></object>
  </objectgroup>
 </map>
