@@ -136,8 +136,8 @@ def render_map(name,out_dir):
     draw=ImageDraw.Draw(marker_layer,"RGBA")
     font=ImageFont.load_default()
     markers=root.find("./objectgroup[@name='Markers']")
-    visible_markers={"coastal_camp":{"camp","return","grove_gate","ruin_gate","shrine"},
-                     "glowglade_grove":{"camp","return","shrine","boss"},
+    visible_markers={"coastal_camp":{"spawn","return","grove_gate","ruin_gate","shrine"},
+                     "glowglade_grove":{"spawn","return","shrine","boss"},
                      "tidal_ruins":{"camp","return","shrine","boss"},
                      "lighthouse_courtyard":{"camp","return","shrine","boss"}}[name]
     if markers is not None:
