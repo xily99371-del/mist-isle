@@ -823,7 +823,7 @@ static void RenderWorld(Game *g) {
         Vector2 screen=GetWorldToScreen2D(p,g->cam);
         if(screen.x<-180.0f||screen.x>SW+180.0f||screen.y<-180.0f||screen.y>SH+180.0f)continue;
         switch(it->kind) {
-            case RENDER_TREE: p.y+=8.0f; DrawFloraProp(8+(it->index%3),p,100*it->scale,112*it->scale); break;
+            case RENDER_TREE: p.y+=8.0f; DrawFloraProp(8+(it->index%3),p,138*it->scale,152*it->scale); break;
             case RENDER_PROP:
                 p.y+=7.0f;
                 if(it->index==4)DrawProp(4,p,72,68);
@@ -841,11 +841,21 @@ static void RenderWorld(Game *g) {
                 else if(it->index==17)DrawEnvProp(11,p,68*it->scale,38*it->scale);
                 else if(it->index==18)DrawEnvProp(8,p,38*it->scale,46*it->scale);
                 else if(it->index==33)DrawAreaPropTint(13,p,150*it->scale,190*it->scale,(Color){145,160,176,255});
-                else if(it->index==28)DrawAreaProp(8,p,150*it->scale,140*it->scale);
+                else if(it->index==20)DrawAreaProp(0,p,164*it->scale,112*it->scale);
+                else if(it->index==21)DrawAreaProp(1,p,126*it->scale,112*it->scale);
+                else if(it->index==22)DrawAreaProp(2,p,132*it->scale,126*it->scale);
+                else if(it->index==24)DrawAreaProp(4,p,150*it->scale,158*it->scale);
+                else if(it->index==25)DrawAreaProp(5,p,126*it->scale,126*it->scale);
+                else if(it->index==26)DrawAreaProp(6,p,102*it->scale,94*it->scale);
+                else if(it->index==27)DrawAreaProp(7,p,156*it->scale,168*it->scale);
+                else if(it->index==28)DrawAreaProp(8,p,184*it->scale,184*it->scale);
+                else if(it->index==29)DrawAreaProp(9,p,104*it->scale,122*it->scale);
+                else if(it->index==30)DrawAreaProp(10,p,128*it->scale,112*it->scale);
+                else if(it->index==31)DrawAreaProp(11,p,132*it->scale,132*it->scale);
                 else if(it->index==32)DrawAreaProp(12,p,130*it->scale,100*it->scale);
                 else if(it->index==34)DrawAreaProp(14,p,110*it->scale,118*it->scale);
                 else if(it->index==35)DrawAreaProp(15,p,112*it->scale,116*it->scale);
-                else if(it->index>=20&&it->index<=35)DrawAreaProp(it->index-20,p,76*it->scale,82*it->scale);
+                else if(it->index>=20&&it->index<=35)DrawAreaProp(it->index-20,p,100*it->scale,108*it->scale);
                 else if(it->index>=100&&it->index<200)DrawFloraProp(it->index-100,p,100*it->scale,108*it->scale);
                 else if(it->index>=200&&it->index<300)DrawCliffProp(it->index-200,p,112*it->scale,112*it->scale);
                 else if(it->index>=300&&it->index<400)DrawStructureProp(it->index-300,p,150*it->scale,140*it->scale);
