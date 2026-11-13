@@ -543,6 +543,20 @@ void GameUpdate(Game *g,float dt) {
     g->dayClock=fmodf(g->dayClock+dt/420.0f,1.0f);
     g->weatherClock+=dt;
     if(g->weatherClock>95.0f){g->weatherClock=0;g->weather=GetRandomValue(0,3);Toast(g,g->weather==0?"海风轻轻吹过。":g->weather==1?"林间飘起了细雨。":g->weather==2?"萤火虫开始活跃。":"云层散开，阳光洒进林地。");}
+    if(g->scene==SCENE_PLAY) {
+        if(IsKeyPressed(KEY_O))g->objectiveCollapsed=!g->objectiveCollapsed;
+        if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            Vector2 mouse=LogicalMousePosition();
+            Rectangle objectiveToggle=g->objectiveCollapsed
+                ?(Rectangle){SW-88.0f,24.0f,68.0f,28.0f}
+                :(Rectangle){SW-94.0f,26.0f,72.0f,28.0f};
+            if(CheckCollisionPointRec(mouse,objectiveToggle))g->objectiveCollapsed=!g->objectiveCollapsed;
+        }
+        if(IsKeyPressed(KEY_F7)) {
+            g->weather=(g->weather+1)%4;
+            Toast(g,g->weather==0?"天气：海风晴朗":g->weather==1?"天气：持续降雨":g->weather==2?"天气：萤火微光":"天气：云开见日");
+        }
+    }
     if(g->journalOpen || g->inventoryOpen || g->mapOpen) {
         if(IsKeyPressed(KEY_F5)){GameSave(g);Toast(g,"旅程已保存！");}
         if(IsKeyPressed(KEY_F9))GameLoad(g);
