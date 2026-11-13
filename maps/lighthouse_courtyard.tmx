@@ -55,7 +55,7 @@
   <object id="328" name="prop_128" type="prop_128" x="868.00" y="532.00"><properties><property name="scale" type="float" value="0.74"/></properties><point/></object>
    <object id="350" name="庭院苔石" type="prop_210" x="140.00" y="476.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
   <object id="351" name="庭院苔石" type="prop_211" x="868.00" y="476.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
-  <object id="352" name="海风灌木" type="prop_229" x="196.00" y="532.00"><properties><property name="scale" type="float" value="0.80"/></properties><point/></object>
+  <object id="352" name="海风灌木" type="prop_229" x="196.00" y="588.00"><properties><property name="scale" type="float" value="0.80"/></properties><point/></object>
   <object id="353" name="海风灌木" type="prop_229" x="812.00" y="532.00"><properties><property name="scale" type="float" value="0.80"/></properties><point/></object>
   <object id="354" name="庭院花簇" type="prop_116" x="308.00" y="532.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="355" name="庭院花簇" type="prop_117" x="756.00" y="532.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
