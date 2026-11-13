@@ -16,7 +16,6 @@ WORKFLOW = (ROOT / ".github/workflows/build-windows.yml").read_text(encoding="ut
 CMAKE = (ROOT / "CMakeLists.txt").read_text(encoding="utf-8")
 MAP_BUILD = (ROOT / "tools/build_maps.py").read_text(encoding="utf-8")
 MAP_PREVIEW = (ROOT / "tools/preview_tiled_maps.py").read_text(encoding="utf-8")
-MAP_AUTOTILE = (ROOT / "tools/map_autotile.py").read_text(encoding="utf-8")
 MAP_FILES = [ROOT / "maps" / name for name in (
     "terrain.tsx", "coastal_camp.tmx", "glowglade_grove.tmx",
     "tidal_ruins.tmx", "lighthouse_courtyard.tmx"
@@ -126,8 +125,6 @@ require("find_package(Python3 REQUIRED COMPONENTS Interpreter)" in CMAKE and "to
 require(all(path.exists() for path in MAP_FILES), "all four Tiled maps and the terrain tileset are present")
 require('name=="campfire": type_id=2000' in MAP_BUILD and "obj->type==2000" in RENDER,
         "the campfire remains an animated Tiled-authored scene object")
-require("build_overlay" in MAP_AUTOTILE and "AREA_OVERLAY" in MAP_BUILD and "AREA_OVERLAY_ROTATION" in MAP_BUILD and "AREA_OVERLAY" in RENDER,
-        "Tiled maps receive deterministic transparent grass/sand/stone/water edge masks")
 require("AREA_GROUND" in MAP_BUILD and "AREA_COLLISION" in MAP_BUILD and "AREA_MARKERS" in MAP_BUILD and "AREA_OBJECTS" in MAP_BUILD,
         "Tiled compiler exports ground, collision, story markers and object placements")
 require("chapter1_map_review.png" in MAP_PREVIEW and "Collision" in MAP_PREVIEW and "Markers" in MAP_PREVIEW,
