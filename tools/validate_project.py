@@ -119,8 +119,8 @@ require("TEX_ENDING_CG" in RENDER and "LoadEndingCG" in RENDER and "assets/cinem
         "ending uses a dedicated illustrated lighthouse scene")
 require("scene.width*.50f" in RENDER and "scene.width-4.0f" in RENDER,
         "ending scene adds a procedural moving beacon beam over the illustration")
-require("DrawAreaProp(11,p,112,116)" in RENDER and "DrawAreaProp(13" in RENDER,
-        "the shrine and lighthouse use their authored area-specific sprites")
+require("DrawAreaProp(11,p,112,116)" in RENDER and "DrawAreaPropTint(13,p" in RENDER,
+        "the shrine uses its authored sprite and the pre-finale lighthouse is dimmed")
 require("DrawUIText(objectiveTitle,872,52,21,(Color){246,239,217,255})" in RENDER,
         "dark HUD uses readable light objective text")
 require("DrawPlayer((Vector2){420,620}" in RENDER,
