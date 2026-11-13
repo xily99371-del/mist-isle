@@ -76,7 +76,7 @@ require("topdown_terrain_atlas_v1.png" in RENDER and "TILE_SIZE" in RENDER and "
 require("TEX_TOPDOWN_TILES" in RENDER and "for(int i=0;i<20;i++)" in RENDER, "top-down terrain and decor textures are loaded and released")
 require('type="prop_22"' in GROVE_MAP and 'type="prop_302"' not in GROVE_MAP,
         "Glowglade uses its own woodland shelter and never reuses the coastal lighthouse cottage")
-require("220*it->scale,176*it->scale" in RENDER and "dims={22:(220,176)" in MAP_PREVIEW,
+require("220*it->scale,176*it->scale" in RENDER and "22:(220,176)" in MAP_PREVIEW,
         "woodland shelter display size is synchronized between runtime and Tiled preview")
 require("Return route keeps the same grounded stone-arch language" in RENDER and "DrawAreaProp(8,(Vector2){p.x,p.y+2},160,168)" in RENDER,
         "return portal retains the authored stone-arch look instead of a placeholder black hole")
