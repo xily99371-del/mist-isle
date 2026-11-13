@@ -19,8 +19,7 @@
  </layer>
  <objectgroup id="2" name="Collision" draworder="topdown"/>
  <objectgroup id="3" name="Objects" draworder="topdown">
-  <object id="300" name="灯塔主楼" type="prop_33" x="532.00" y="140.00"><properties><property name="scale" type="float" value="1.08"/></properties><point/></object>
-  <object id="301" name="灯塔前庭装饰" type="prop_35" x="532.00" y="196.00"><properties><property name="scale" type="float" value="0.86"/></properties><point/></object>
+  <object id="300" name="灯塔主楼" type="prop_33" x="532.00" y="196.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
   <object id="302" name="tree0" type="tree0" x="140.00" y="84.00"><properties><property name="scale" type="float" value="1.00"/></properties><point/></object>
   <object id="303" name="tree1" type="tree1" x="252.00" y="140.00"><properties><property name="scale" type="float" value="0.96"/></properties><point/></object>
   <object id="304" name="tree2" type="tree2" x="812.00" y="84.00"><properties><property name="scale" type="float" value="1.00"/></properties><point/></object>
