@@ -84,42 +84,32 @@ static unsigned int TileHash(int x,int y,int salt) {
     unsigned int n=(unsigned int)(x*374761393u+y*668265263u+salt*2246822519u);
     n=(n^(n>>13))*1274126177u; return n^(n>>16);
 }
-static void DrawTopDownTile(int x,int y,Area area,int kind,float time) {
+static int TerrainKindFromAtlasIndex(unsigned char index) {
+    int row=(int)index/4;
+    if(row>=9)return 4;
+    if(row>=6)return 3;
+    if(row>=3)return 2;
+    return 0;
+}
+static void DrawTopDownTile(int x,int y,int tileIndex,int kind,float time) {
     Vector2 p=WorldToScreen((float)x,(float)y);
     Rectangle tile={p.x-TILE_SIZE*.5f,p.y-TILE_SIZE*.5f,TILE_SIZE,TILE_SIZE};
-    unsigned int hash=TileHash(x,y,(int)area);
-    int col=(int)(hash%3u);
-    int variant=(int)((hash>>5)&1u);
-    int baseRow=kind==4?9:kind==3?6:kind==2?3:0;
-    int atlasRow=baseRow+variant;
+    unsigned int hash=TileHash(x,y,kind+7);
     Color tileBase=kind==4?(Color){47,137,171,255}:kind==3?(Color){126,139,129,255}:kind==2?(Color){198,166,111,255}:(Color){91,145,84,255};
     DrawRectangleRec(tile,tileBase);
     if(TEX_TOPDOWN_TILES.id) {
-        // Use only the two full-surface variants in each material family.
-        // The third atlas row contains transparent edge/corner masks; scattering
-        // those masks as random decals caused the visible square holes in the map.
-        Rectangle src={(float)(col*56),(float)(atlasRow*56),56.0f,56.0f};
-        Rectangle dst={tile.x-1.5f,tile.y-1.5f,TILE_SIZE+3.0f,TILE_SIZE+3.0f};
+        Rectangle src={(float)((tileIndex%4)*56),(float)((tileIndex/4)*56),56.0f,56.0f};
+        Rectangle dst={tile.x-1.0f,tile.y-1.0f,TILE_SIZE+2.0f,TILE_SIZE+2.0f};
         DrawTexturePro(TEX_TOPDOWN_TILES,src,dst,(Vector2){0,0},0,WHITE);
         return;
     }
     if(kind==4) {
         float wave=6.0f*sinf(time*1.7f+y*.65f+x*.35f);
         DrawLineEx((Vector2){tile.x+7,tile.y+14+wave*.15f},(Vector2){tile.x+TILE_SIZE-9,tile.y+14+wave*.15f},2.0f,Fade((Color){190,229,222,255},.32f));
-        if((hash%4)==0)DrawLineEx((Vector2){tile.x+12,tile.y+34-wave*.12f},(Vector2){tile.x+30,tile.y+34-wave*.12f},1.0f,Fade(WHITE,.25f));
-    } else if(kind==2) {
-        for(int i=0;i<4;i++){float px=tile.x+7+(float)((hash>>(i*5))%43);float py=tile.y+8+(float)((hash>>(i*4+3))%40);DrawPixel((int)px,(int)py,(Color){230,207,157,255});}
-    } else if(kind==3) {
-        DrawRectangleLinesEx((Rectangle){tile.x+2,tile.y+2,TILE_SIZE-4,TILE_SIZE-4},1.0f,Fade((Color){70,84,78,255},.2f));
-        DrawLine((int)tile.x+7,(int)(tile.y+TILE_SIZE*.5f),(int)(tile.x+TILE_SIZE-7),(int)(tile.y+TILE_SIZE*.5f),Fade(WHITE,.12f));
+    } else if(kind==2||kind==3) {
+        for(int i=0;i<3;i++){float px=tile.x+7+(float)((hash>>(i*5))%43);float py=tile.y+8+(float)((hash>>(i*4+3))%40);DrawPixel((int)px,(int)py,kind==2?(Color){230,207,157,255}:(Color){93,105,95,255});}
     } else {
-        for(int i=0;i<5;i++){
-            float px=tile.x+5+(float)((hash>>(i*5))%47);
-            float py=tile.y+5+(float)((hash>>(i*3+7))%47);
-            Color fleck=(i%2)?(Color){158,198,119,255}:(Color){83,142,80,255};
-            DrawPixel((int)px,(int)py,Fade(fleck,.55f));
-        }
-        if((hash%7)==0){DrawCircle((int)(tile.x+17),(int)(tile.y+18),2,(Color){247,230,173,255});DrawPixel((int)(tile.x+20),(int)(tile.y+15),WHITE);}
+        for(int i=0;i<4;i++){float px=tile.x+5+(float)((hash>>(i*5))%47);float py=tile.y+5+(float)((hash>>(i*3+7))%47);DrawPixel((int)px,(int)py,Fade((Color){158,198,119,255},.55f));}
     }
 }
 static void DrawTerrainAccent(int x,int y,Area area,int kind,float time) {
@@ -664,53 +654,24 @@ static void DrawCoastalCliffs(Game *g,int terrainKinds[MAPH][MAPW]) {
         DrawTexturePro(TEX_CLIFF_ATLAS,src,dst,(Vector2){size*.5f,size*.5f},rotation,WHITE);
     }
 }
+#if defined(MISTISLE_PI_PROFILE)
+#define MISTISLE_RAIN_DROPS 84
+#define MISTISLE_RAIN_RIPPLES 10
+#else
+#define MISTISLE_RAIN_DROPS 190
+#define MISTISLE_RAIN_RIPPLES 22
+#endif
 static void RenderWorld(Game *g) {
     BeginMode2D(g->cam);
     DrawWorldBackdrop(g);
 
-    // Orthographic top-down map: terrain follows screen cardinal directions.
+    // Ground comes from the Tiled-authored map data. The same data drives collision.
     int terrainKinds[MAPH][MAPW]={{0}};
+    for(int y=0;y<MAPH;y++)for(int x=0;x<MAPW;x++)
+        terrainKinds[y][x]=TerrainKindFromAtlasIndex(g->world.terrain[y][x]);
     for(int y=0;y<MAPH;y++)for(int x=0;x<MAPW;x++) {
-        int kind=0;
-        if(g->world.kind[y][x]==1)kind=1;
-        if(g->world.kind[y][x]==2)kind=2;
-        if(g->world.kind[y][x]==3)kind=3;
-        if(g->area==AREA_CAMP) {
-            float nx=((float)x-10.5f)/11.0f, ny=((float)y-8.5f)/9.0f;
-            float coastNoise=.045f*sinf((float)x*.73f+(float)y*.29f)+.026f*cosf((float)y*.91f-(float)x*.24f);
-            float shore=nx*nx+ny*ny+coastNoise;
-            if(shore>.90f)kind=4;
-            else if(shore>.69f)kind=2;
-            // A narrow, connected footpath with short spurs to the campfire and eastern gates.
-            if((y==9&&x>=3&&x<=19)||(x==4&&y>=9&&y<=13)||(x==18&&y>=3&&y<=15))kind=2;
-            if(x>=1&&x<=3&&y>=11&&y<=15)kind=4;
-            if(g->world.kind[y][x]==1)kind=1;
-        } else if(g->area==AREA_GROVE) {
-            if(x>=9&&x<=11&&y>=3&&y<=14)kind=4;
-            if((x*3+y)%13==0&&kind==0)kind=2;
-            if((y==9&&x>=2&&x<=19))kind=2;
-            if(x==0||y==0||x==MAPW-1||y==MAPH-1)kind=1;
-        } else if(g->area==AREA_RUINS) {
-            // One continuous ancient-stone floor, with deliberate moss gardens and a readable bridge.
-            kind=3;
-            if((x>=2&&x<=6&&y>=3&&y<=6)||(x>=15&&x<=19&&y>=11&&y<=14)||
-               (x>=3&&x<=6&&y>=12&&y<=14))kind=0;
-            if(x>=9&&x<=11&&y>=3&&y<=14)kind=4;
-            if(y==9&&x>=2&&x<=19)kind=3;
-            if(x==0||y==0||x==MAPW-1||y==MAPH-1)kind=3;
-        } else {
-            // Lighthouse courtyard sits on an irregular island, not a rectangular cut-out.
-            float nx=((float)x-10.8f)/10.6f, ny=((float)y-8.5f)/8.7f;
-            float coastNoise=.038f*sinf((float)x*.68f+(float)y*.34f)+.024f*cosf((float)y*.86f-(float)x*.27f);
-            float shore=nx*nx+ny*ny+coastNoise;
-            kind=shore>.94f?4:shore>.75f?2:0;
-            if(x>=7&&x<=18&&y>=5&&y<=14)kind=3;
-            if(y==9&&x>=3&&x<=19)kind=3;
-            if(x>=16&&x<=18&&y>=6&&y<=14)kind=3;
-            if((x>=5&&x<=7&&y>=5&&y<=7)||(x>=5&&x<=8&&y>=12&&y<=14))kind=0;
-        }
-        terrainKinds[y][x]=kind;
-        DrawTopDownTile(x,y,g->area,kind,g->time);
+        int kind=terrainKinds[y][x];
+        DrawTopDownTile(x,y,g->world.terrain[y][x],kind,g->time);
         DrawTerrainAccent(x,y,g->area,kind,g->time);
     }
     // Broken foam traces where the sea meets the island and where streams meet their banks.
@@ -735,48 +696,14 @@ static void RenderWorld(Game *g) {
         }
     }
     DrawCoastalCliffs(g,terrainKinds);
-    // Sort objects by their ground-contact Y coordinate: walk behind trees from the top.
+    // Scene objects are authored in Tiled and depth-sorted by their ground point.
     RenderItem items[512]; int count=0;
-    for(int y=1;y<MAPH-1;y++)for(int x=1;x<MAPW-1;x++) {
-        if(g->world.kind[y][x]==1 || (g->area==AREA_GROVE&&(x==0||y==0||x==MAPW-1||y==MAPH-1)))
-            PushRenderItem(items,&count,RENDER_TREE,(x*3+y)%3,(Vector2){(float)x,(float)y},.82f+((x+y)%3)*.08f);
-    }
-    // Hand-authored scene dressing: curated 32px original sprite atlas plus existing refined tiles.
-    if(g->area==AREA_CAMP) {
-        PushRenderItem(items,&count,RENDER_PROP,500,(Vector2){4.5f,4.2f},1.0f); // Kenney blue cottage
-        PushRenderItem(items,&count,RENDER_PROP,501,(Vector2){14.0f,5.0f},.95f); // Kenney red cottage
-        PushRenderItem(items,&count,RENDER_PROP,413,(Vector2){8.0f,6.5f},1.10f); // tent
-        PushRenderItem(items,&count,RENDER_PROP,400,(Vector2){2.0f,14.0f},1.15f); // dock
-        PushRenderItem(items,&count,RENDER_PROP,403,(Vector2){2.2f,11.8f},.75f); // buoy
-        PushRenderItem(items,&count,RENDER_PROP,404,(Vector2){13.0f,4.0f},1.10f);
-        PushRenderItem(items,&count,RENDER_PROP,401,(Vector2){5.5f,14.5f},.8f);
-        PushRenderItem(items,&count,RENDER_PROP,402,(Vector2){6.5f,15.0f},.75f);
-        for(int i=0;i<5;i++) {
-            PushRenderItem(items,&count,RENDER_PROP,116+(i%5),(Vector2){5.5f+i*2.2f,11.7f+(i%2)*.55f},.55f);
-            if(i%2==0)PushRenderItem(items,&count,RENDER_PROP,121+(i%3),(Vector2){10.0f+i*1.8f,15.0f},.52f);
-        }
-    } else if(g->area==AREA_GROVE) {
-        PushRenderItem(items,&count,RENDER_PROP,405,(Vector2){5.0f,4.0f},1.15f);
-        PushRenderItem(items,&count,RENDER_PROP,404,(Vector2){16.0f,4.5f},1.05f);
-        PushRenderItem(items,&count,RENDER_PROP,406,(Vector2){9.0f,12.0f},1.0f);
-        PushRenderItem(items,&count,RENDER_PROP,407,(Vector2){14.5f,12.5f},1.05f);
-        for(int i=0;i<7;i++)PushRenderItem(items,&count,RENDER_PROP,116+(i%8),(Vector2){6.0f+i*2.0f,3.0f+(i%2)*.8f},.62f);
-        for(int i=0;i<6;i++)PushRenderItem(items,&count,RENDER_PROP,124+(i%6),(Vector2){5.0f+i*2.5f,14.5f-(i%2)*.7f},.58f);
-    } else if(g->area==AREA_RUINS) {
-        PushRenderItem(items,&count,RENDER_PROP,28,(Vector2){15.0f,5.5f},1.0f);  // ancient arch
-        PushRenderItem(items,&count,RENDER_PROP,29,(Vector2){6.0f,5.0f},.95f);   // standing pillar
-        PushRenderItem(items,&count,RENDER_PROP,30,(Vector2){18.0f,12.5f},.95f); // broken wall
-        PushRenderItem(items,&count,RENDER_PROP,32,(Vector2){10.0f,12.0f},1.0f); // stone bridge
-        PushRenderItem(items,&count,RENDER_PROP,116,(Vector2){5.5f,13.2f},.65f);
-        PushRenderItem(items,&count,RENDER_PROP,119,(Vector2){18.0f,5.5f},.62f);
-    } else {
-        PushRenderItem(items,&count,RENDER_PROP,33,(Vector2){17.0f,4.5f},1.2f); // lighthouse from area atlas
-        PushRenderItem(items,&count,RENDER_PROP,35,(Vector2){10.0f,6.5f},.95f);  // garden fountain
-        PushRenderItem(items,&count,RENDER_PROP,34,(Vector2){5.0f,13.0f},1.0f);  // courtyard gate
-        PushRenderItem(items,&count,RENDER_PROP,32,(Vector2){15.0f,13.0f},.82f); // stone bridge
-        PushRenderItem(items,&count,RENDER_PROP,116,(Vector2){6.2f,6.5f},.62f);
-        PushRenderItem(items,&count,RENDER_PROP,118,(Vector2){12.0f,13.6f},.62f);
-        PushRenderItem(items,&count,RENDER_PROP,120,(Vector2){19.0f,10.5f},.58f);
+    for(int i=0;i<g->world.objectCount;i++) {
+        MapObject *obj=&g->world.objects[i];
+        if(obj->type>=1000&&obj->type<1003)
+            PushRenderItem(items,&count,RENDER_TREE,obj->type-1000,obj->pos,obj->scale);
+        else
+            PushRenderItem(items,&count,RENDER_PROP,obj->type,obj->pos,obj->scale);
     }
     for(int i=0;i<g->world.pickupCount;i++) if(!g->world.pickups[i].taken)
         PushRenderItem(items,&count,RENDER_PICKUP,i,g->world.pickups[i].tile,1.0f);
@@ -803,7 +730,7 @@ static void RenderWorld(Game *g) {
         PushRenderItem(items,&count,RENDER_GATE,1,g->world.ruinGate,1.0f);
         PushRenderItem(items,&count,RENDER_GATE,2,g->world.shrine,1.0f);
     } else {
-        PushRenderItem(items,&count,RENDER_GATE,3,(Vector2){2,9},1.0f);
+        PushRenderItem(items,&count,RENDER_GATE,3,g->world.returnPoint,1.0f);
     }
     PushRenderItem(items,&count,RENDER_PLAYER,0,g->player.pos,1.0f);
 
@@ -889,7 +816,7 @@ static void RenderWorld(Game *g) {
     if(g->weather==1) {
         // Cool overcast tint, three rain depths and visible impacts on water surfaces.
         DrawRectangle(0,0,SW,SH,Fade((Color){34,57,75,255},.105f));
-        for(int i=0;i<190;i++) {
+        for(int i=0;i<MISTISLE_RAIN_DROPS;i++) {
             float speed=285.0f+(float)(i%5)*72.0f;
             float travel=fmodf(g->time*speed+(float)(i*83),SH+70.0f);
             float x=fmodf((float)(i*149)+g->time*(125.0f+(float)(i%4)*19.0f),SW+90.0f)-45.0f;
@@ -899,7 +826,7 @@ static void RenderWorld(Game *g) {
             float width=(i%7==0)?1.8f:1.0f;
             DrawLineEx((Vector2){x,y},(Vector2){x-8.0f,y+length},width,Fade((Color){197,222,232,255},alpha));
         }
-        for(int i=0;i<22;i++) {
+        for(int i=0;i<MISTISLE_RAIN_RIPPLES;i++) {
             float x=fmodf((float)(i*97)+g->time*31.0f,SW);
             float y=fmodf((float)(i*61)+g->time*19.0f,SH);
             float pulse=fmodf(g->time*1.8f+(float)i*.37f,1.0f);
@@ -909,7 +836,7 @@ static void RenderWorld(Game *g) {
         for(int y=1;y<MAPH-1;y++)for(int x=1;x<MAPW-1;x++) {
             if(terrainKinds[y][x]!=4)continue;
             unsigned int h=TileHash(x,y,91);
-            if(h%13u!=0u)continue;
+            if(h%23u!=0u)continue;
             Vector2 world=WorldToScreen((float)x,(float)y);
             Vector2 screen=GetWorldToScreen2D(world,g->cam);
             float pulse=fmodf(g->time*1.4f+(float)(h%19u)*.11f,1.0f);
@@ -982,7 +909,7 @@ static void RenderHUD(Game *g) {
         PanelDark((Rectangle){530,585,220,40});DrawUIText("E  前往潮汐遗迹",550,596,17,(Color){211,220,205,255});
     } else if(g->area==AREA_CAMP && Dist(g->player.pos,g->world.shrine)<1.6f && g->shrineSolved) {
         PanelDark((Rectangle){530,585,220,40});DrawUIText("E  前往灯塔庭院",550,596,17,(Color){211,220,205,255});
-    } else if(g->area!=AREA_CAMP && Dist(g->player.pos,(Vector2){2,9})<1.8f) {
+    } else if(g->area!=AREA_CAMP && Dist(g->player.pos,g->world.returnPoint)<1.8f) {
         PanelDark((Rectangle){530,585,220,40});DrawUIText("E  返回海岸营地",550,596,17,(Color){211,220,205,255});
     } else if(g->area==AREA_CAMP && !g->lumi.owned && Dist(g->player.pos,(Vector2){4,12})<1.65f) {
         PanelDark((Rectangle){530,585,220,40});DrawUIText("E  救助苔灯灵",550,596,17,(Color){211,220,205,255});
