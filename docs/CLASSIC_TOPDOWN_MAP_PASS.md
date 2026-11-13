@@ -1,30 +1,26 @@
-# Classic top-down RPG map pass
+# Classic top-down RPG map pass — visual revision 2
 
-This pass moves the four Chapter 1 maps toward the readable exploration grammar of classic handheld top-down RPGs.
+This revision responds to in-game screenshots from the first playable pass.
 
-## What changed
+## Problems identified from the screenshots
 
-- Re-authored the four Tiled Ground layers around intentional route networks instead of a visually noisy, repeating terrain pattern.
-- Coastal Camp now has a layered beach, a readable village/camp path network and an east-side route to each chapter entrance.
-- Glowglade Grove now has a winding trail, two stream crossings aligned to existing bridge props, a small secondary crossing and distinct clearings for exploration.
-- Tidal Ruins now reads as a stone causeway with two water cuts crossed by the existing bridges, plus worn sandy margins.
-- Lighthouse Courtyard now has a central stone plaza, garden pockets and a direct route from the entrance to the shrine and guardian.
-- Kept the existing 22 × 18 map dimensions, 56px orthogonal grid, named layers, object IDs, story marker positions, save data and gameplay progression unchanged.
+- The grove felt empty because the forest canopy was confined to the map perimeter, with too few large foreground/midground trees.
+- Grove trails and clearings occupied too much yellow ground, creating disconnected blocky patches rather than a readable route.
+- The ruins used broad sand bands and large water patches that competed with the stone architecture.
+- Arches, columns and small environmental props were underscaled relative to the player and the map.
 
-## Validation boundary
+## Revision
 
-The map compiler treats water as solid except for the three cells under each prop_32 bridge. Tree objects and authored collision rectangles also block movement. All six required markers on each map must remain reachable from spawn.
+- Narrowed the grove path to a single-tile winding trail. Exploration clearings remain grass rather than becoming large dirt rectangles.
+- Increased tree sprite display size from 100×112 to 138×152 logical pixels, and placed additional overlapping canopy groups around the route while keeping required paths and story points open.
+- Added a prominent luminous flowering tree, crystal landmark, and denser flower/mushroom clusters to give Glowglade Grove a distinct identity.
+- Removed bridge-dependent map composition. Current Chapter 1 maps do not place prop_32 bridges.
+- Rebuilt Tidal Ruins as a continuous stone floor with only small isolated reflecting pools and a few deliberate erosion marks. Sand is no longer used as a broad route or perimeter stripe.
+- Increased the display scale of arches, pillars, broken walls, docks, boats, tents, luminous trees and rune fountains. The map preview renderer uses the same display sizes as the runtime renderer.
+- Retained the existing map dimensions, tile size, story marker coordinates and save/progression model.
 
-The new ground layouts were checked against those rules before being committed. The repository build must still run tools/build_maps.py, tools/validate_generated_maps.py, and tools/validate_project.py in CI.
+## Validation
 
-## Next visual QA
+All six required story markers remain reachable from the authored spawn on each map when checking tree blockers and water cells. The grove remains within the 64-object map compiler limit.
 
-1. Review all four generated map previews at native resolution and as a chapter contact sheet.
-2. Adjust prop placement where trees, structures or foliage compete with the route.
-3. Check bridge alignment and player walkability in the actual game.
-4. Check water animation and shoreline foam at 60 FPS on Windows, then measure the Pi 5 profile with F3.
-5. Only after the top-down maps are visually accepted, tune the title, HUD and battle presentation to match the same pixel-art language.
-
-## Important
-
-This is a map-composition pass, not a final art sign-off. The current maps reuse the existing original Mist Isle terrain and prop atlases. Pokémon Emerald is a design reference for legibility and exploration flow only; no Pokémon artwork or map data is used.
+The previous CI run validated the earlier map pass. The enlarged renderer and latest decorative placements require a fresh Windows and Raspberry Pi 5 build before they should be treated as release-ready.
