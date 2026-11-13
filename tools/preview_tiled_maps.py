@@ -4,6 +4,7 @@ import argparse
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
+from map_autotile import build_overlay
 
 ROOT=Path(__file__).resolve().parents[1]
 MAPS=["coastal_camp","glowglade_grove","tidal_ruins","lighthouse_courtyard"]
@@ -17,6 +18,7 @@ def render_map(name,out_dir):
     gids=[int(v.strip()) for v in (layer.text or "").replace("\n","").split(",") if v.strip()]
     image=Image.new("RGBA",(W*T,H*T),(20,34,39,255))
     draw=ImageDraw.Draw(image,"RGBA")
+    overlay, rotations=build_overlay([gid-1 for gid in gids])
     for i,gid in enumerate(gids):
         index=gid-1
         row=index//4
@@ -25,6 +27,11 @@ def render_map(name,out_dir):
         draw.rectangle((x,y,x+T-1,y+T-1),fill=base)
         tile=atlas.crop(((index%4)*T,(index//4)*T,(index%4+1)*T,(index//4+1)*T))
         image.alpha_composite(tile,(x,y))
+    for i,index in enumerate(overlay):
+        if index<0: continue
+        tile=atlas.crop(((index%4)*T,(index//4)*T,(index%4+1)*T,(index//4+1)*T))
+        if rotations[i]: tile=tile.rotate(-rotations[i],resample=Image.Resampling.NEAREST)
+        image.alpha_composite(tile,((i%W)*T,(i//W)*T))
     draw=ImageDraw.Draw(image,"RGBA")
     collision=root.find("./objectgroup[@name='Collision']")
     if collision is not None:
