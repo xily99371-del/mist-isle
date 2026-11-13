@@ -31,6 +31,7 @@ set(MISTISLE_GROUND_ATLAS "${CMAKE_SOURCE_DIR}/assets/environment/topdown_terrai
 set(MISTISLE_GROUND_ATLAS_STAMP "${MISTISLE_GENERATED_DIR}/ground_atlas.stamp")
 add_custom_command(
   OUTPUT "${MISTISLE_GROUND_ATLAS_STAMP}"
+  COMMAND "${CMAKE_COMMAND}" -E make_directory "${MISTISLE_GENERATED_DIR}"
   COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/tools/generate_ground_atlas.py" --output "${MISTISLE_GROUND_ATLAS}"
   COMMAND "${CMAKE_COMMAND}" -E touch "${MISTISLE_GROUND_ATLAS_STAMP}"
   DEPENDS "${CMAKE_SOURCE_DIR}/tools/generate_ground_atlas.py"
