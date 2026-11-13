@@ -155,7 +155,7 @@ require("SetDialogueSequence(g,speakers,lines,3,false)" in GAME and "胸口的�
         "the boss encounter ends with a dedicated character dialogue scene")
 require("Place every pickup on a free, reachable tile" in GAME and "visual footprint of tall structures" in GAME,
         "collectibles avoid both collision footprints and visually occluding large props")
-require("330*it->scale,300*it->scale" in RENDER and "dims={302:(330,300)" in MAP_PREVIEW,
+require("330*it->scale,260*it->scale" in RENDER and "dims={302:(330,260)" in MAP_PREVIEW,
         "the coastal and forest cottages are enlarged consistently in runtime and map previews")
 require("DrawStructureProp(2,p,330*it->scale,300*it->scale)" in RENDER and "type_id in (302,500,501)" in MAP_BUILD,
         "large cottage structures use the structure atlas with matching collision foundations")
