@@ -250,7 +250,7 @@ static bool SolidPoint(Game *g,Vector2 p) {
         if(InRect(p,13.75f,11.45f,15.85f,13.15f))return true;// mushroom cluster
         if(!g->splash.owned && InRect(p,8.55f,4.55f,9.45f,5.45f))return true; // Moatail
         bool stream=(x>=9&&x<=11&&y>=3&&y<=14);
-        bool bridge=(y>=8&&y<=10&&x>=2&&x<=19);
+        bool bridge=(y==9&&x>=2&&x<=19);
         if(stream&&!bridge)return true;
     } else if(g->area==AREA_RUINS) {
         if(InRect(p,13.65f,3.95f,14.75f,6.45f))return true; // left arch footing
@@ -262,7 +262,7 @@ static bool SolidPoint(Game *g,Vector2 p) {
         if(InRect(p,16.68f,6.68f,17.32f,7.32f))return true;  // shrine base only
         if(!g->spark.owned && InRect(p,14.55f,6.55f,15.45f,7.45f))return true; // Crystal Gecko
         bool stream=(x>=9&&x<=11&&y>=3&&y<=14);
-        bool bridge=(y>=8&&y<=10&&x>=2&&x<=19);
+        bool bridge=(y==9&&x>=2&&x<=19);
         if(stream&&!bridge)return true;
     } else {
         if(InRect(p,15.45f,2.65f,18.65f,5.15f))return true; // lighthouse tower
