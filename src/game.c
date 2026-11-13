@@ -89,41 +89,12 @@ static int TerrainKindFromAtlasIndex(unsigned char index) {
     if(row>=3)return 2; // sand
     return 0;           // grass
 }
-static void BuildWorld(World *w,int seed) {
-    memset(w,0,sizeof(*w)); w->seed=seed;
-    for(int y=0;y<MAPH;y++)for(int x=0;x<MAPW;x++) {
-        int edge=(x==0||y==0||x==MAPW-1||y==MAPH-1);
-        w->kind[y][x]=edge?3:0;
-        if(!edge) {
-            unsigned v=(unsigned)(x*92837111u+y*689287499u+(unsigned)seed*283923481u);
-            v^=v>>13; v*=1274126177u; v^=v>>16;
-            if(v%100<8)w->kind[y][x]=1;
-            else if(v%100<13)w->kind[y][x]=2;
-        }
-    }
-    // Keep a guaranteed walkable spine between all story areas.
-    for(int x=2;x<20;x++) { w->kind[9][x]=0; w->kind[10][x]=0; }
-    for(int y=3;y<15;y++) { w->kind[y][4]=0; w->kind[y][5]=0; }
-    for(int y=5;y<14;y++) { w->kind[y][14]=0; w->kind[y][15]=0; }
-    for(int y=4;y<=8;y++)for(int x=8;x<=13;x++)w->kind[y][x]=0;
-    w->camp=(Vector2){3,12}; w->groveGate=(Vector2){8,8};
-    w->ruinGate=(Vector2){14,9}; w->shrine=(Vector2){17,5};
-    w->bossPos=(Vector2){18,13};
-    AddPickup(w,0,6,12); AddPickup(w,0,8,6); AddPickup(w,0,11,11);
-    AddPickup(w,1,10,5); AddPickup(w,1,15,7); AddPickup(w,1,18,8);
-    AddPickup(w,2,12,13); AddPickup(w,2,16,12);
-    AddPickup(w,3,7,4); AddPickup(w,3,19,5);
-    for(int i=0;i<8;i++) AddPickup(w,0,5+(i*3)%13,4+(i*5)%10);
-    // Forest-only forage, distributed away from the guaranteed path.
-    AddPickup(w,3,9,3); AddPickup(w,3,11,7); AddPickup(w,0,12,5);
-    AddPickup(w,0,7,6); AddPickup(w,1,13,6);
-}
-
 static void SwitchArea(Game *g,Area area);
 static void BuildAreaWorld(Game *g,Area area) {
-    BuildWorld(&g->world,g->lastSeed+(int)area*7919);
-    g->area=area;
     World *w=&g->world;
+    memset(w,0,sizeof(*w));
+    w->seed=g->lastSeed+(int)area*7919;
+    g->area=area;
     w->pickupCount=0;
     w->objectCount=0;
     for(int y=0;y<MAPH;y++)for(int x=0;x<MAPW;x++) {
@@ -262,8 +233,8 @@ bool GameLoad(Game *g) {
 }
 void GameReset(Game *g,int seed) {
     memset(g,0,sizeof(*g)); g->scene=SCENE_TITLE; g->area=AREA_CAMP;
-    g->lastSeed=seed; BuildWorld(&g->world,seed);
-    g->player.pos=g->world.camp; g->player.hp=g->player.maxHp=100; g->player.stamina=100;
+    g->lastSeed=seed; memset(&g->world,0,sizeof(g->world));
+    g->player.pos=(Vector2){4,13}; g->player.hp=g->player.maxHp=100; g->player.stamina=100;
     g->lumi=(Buddy){.pos={2.3f,12.4f},.owned=false,.level=1};
     g->splash=(Buddy){.pos={8,7},.owned=false,.level=1};
     g->spark=(Buddy){.pos={15,8},.owned=false,.level=1};
