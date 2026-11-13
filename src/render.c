@@ -719,7 +719,6 @@ static void RenderWorld(Game *g) {
         PushRenderItem(items,&count,RENDER_PROP,400,(Vector2){2.0f,14.0f},1.15f); // dock
         PushRenderItem(items,&count,RENDER_PROP,403,(Vector2){2.2f,11.8f},.75f); // buoy
         PushRenderItem(items,&count,RENDER_PROP,404,(Vector2){13.0f,4.0f},1.10f);
-        PushRenderItem(items,&count,RENDER_PROP,415,(Vector2){17.5f,13.0f},.9f);
         PushRenderItem(items,&count,RENDER_PROP,401,(Vector2){5.5f,14.5f},.8f);
         PushRenderItem(items,&count,RENDER_PROP,402,(Vector2){6.5f,15.0f},.75f);
         for(int i=0;i<5;i++) {
@@ -732,7 +731,6 @@ static void RenderWorld(Game *g) {
         PushRenderItem(items,&count,RENDER_PROP,406,(Vector2){9.0f,12.0f},1.0f);
         PushRenderItem(items,&count,RENDER_PROP,407,(Vector2){14.5f,12.5f},1.05f);
         for(int i=0;i<7;i++)PushRenderItem(items,&count,RENDER_PROP,116+(i%8),(Vector2){6.0f+i*2.0f,3.0f+(i%2)*.8f},.62f);
-        PushRenderItem(items,&count,RENDER_PROP,415,(Vector2){2.0f,9.0f},.75f);
         for(int i=0;i<6;i++)PushRenderItem(items,&count,RENDER_PROP,124+(i%6),(Vector2){5.0f+i*2.5f,14.5f-(i%2)*.7f},.58f);
     } else if(g->area==AREA_RUINS) {
         PushRenderItem(items,&count,RENDER_PROP,28,(Vector2){15.0f,5.5f},1.0f);  // ancient arch
