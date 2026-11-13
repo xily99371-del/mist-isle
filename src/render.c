@@ -742,9 +742,25 @@ static void RenderWorld(Game *g) {
         Rectangle src={0,0,(float)TEX_GROUND_CACHE.texture.width,-(float)TEX_GROUND_CACHE.texture.height};
         Rectangle dst={0,0,(float)WORLD_PIXEL_W,(float)WORLD_PIXEL_H};
         DrawTexturePro(TEX_GROUND_CACHE.texture,src,dst,(Vector2){0,0},0,WHITE);
+        for(int y=minY;y<=maxY;y++)for(int x=minX;x<=maxX;x++)
+            if(terrainKinds[y][x]==4)DrawTerrainAccent(x,y,g->area,4,g->time);
+    } else {
+        // Safe fallback if the target GPU cannot allocate the single-area ground cache.
+        for(int y=minY;y<=maxY;y++)for(int x=minX;x<=maxX;x++) {
+            int kind=terrainKinds[y][x];
+            DrawTopDownTile(x,y,g->world.terrain[y][x],kind,g->time);
+            int overlay=AREA_OVERLAY[(int)g->area][y][x];
+            if(overlay>=0&&TEX_TOPDOWN_TILES.id) {
+                Vector2 p=WorldToScreen((float)x,(float)y);
+                Rectangle src={(float)((overlay%4)*56),(float)((overlay/4)*56),56.0f,56.0f};
+                Rectangle dst={p.x-TILE_SIZE*.5f,p.y-TILE_SIZE*.5f,TILE_SIZE,TILE_SIZE};
+                DrawTexturePro(TEX_TOPDOWN_TILES,src,dst,(Vector2){TILE_SIZE*.5f,TILE_SIZE*.5f},
+                               (float)AREA_OVERLAY_ROTATION[(int)g->area][y][x],WHITE);
+            }
+            DrawTerrainAccent(x,y,g->area,kind,g->time);
+        }
+        DrawCoastalCliffs(g,terrainKinds,minX,minY,maxX,maxY);
     }
-    for(int y=minY;y<=maxY;y++)for(int x=minX;x<=maxX;x++)
-        if(terrainKinds[y][x]==4)DrawTerrainAccent(x,y,g->area,4,g->time);
 
     // Scene objects are authored in Tiled and depth-sorted by their ground point.
     RenderItem items[512]; int count=0;
