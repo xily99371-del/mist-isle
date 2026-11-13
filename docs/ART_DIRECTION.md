@@ -70,3 +70,10 @@ Chapter 1 maps use a compact 18×12 one-screen layout. Compose each area as a de
 ## Art production rule
 
 Do not create character portraits, buildings, trees, portals or decorative props from runtime primitives or procedural drawing code. Use authored atlas sprites, Tiled object placement, and finished static illustration assets. Runtime code is reserved for rendering, animation, lighting, collision and interaction. Procedural geometric silhouettes are temporary fallbacks only and must not be treated as final art.
+
+## Protagonist and portrait identity lock
+
+- The playable explorer is female. Keep the same chestnut-brown hair, red scarf, goggles, cream travel shirt, brown leather vest, utility straps and backpack language as the in-game sprite.
+- Do not add a hat. Goggles may rest on the hair; the face, hair silhouette and outfit must remain recognizably continuous with the pixel sprite.
+- The dialogue portrait is a dedicated static illustration, not an enlarged 32px walking frame.
+- Watcher and Lighthouse Guardian each have their own static illustrated portrait source. Keep portrait framing and lighting consistent across all three.
