@@ -563,23 +563,9 @@ static void DrawSeaBackdrop(float t) {
     DrawLineEx((Vector2){215,266},(Vector2){215,325},2,(Color){76,116,112,170});
 }
 static void DrawForestBackdrop(float t) {
-    DrawRectangleGradientV(0,0,WORLD_PIXEL_W,WORLD_PIXEL_H,(Color){196,220,174,255},(Color){104,151,111,255});
-    // Layered canopy silhouettes frame the playfield on all four sides.
-    for(int layer=0;layer<3;layer++) {
-        int y=95+layer*64;
-        Color leaf=layer==0?(Color){103,150,105,210}:layer==1?(Color){79,132,91,205}:(Color){65,116,82,190};
-        for(int x=-35;x<WORLD_PIXEL_W+60;x+=105) {
-            float sway=sinf(t*.35f+x*.02f+layer)*5;
-            DrawCircle((int)(x+sway),y,(int)(58-layer*7),leaf);
-            DrawCircle((int)(x+38+sway),y+22,(int)(43-layer*5),Fade(leaf,.9f));
-        }
-    }
-    DrawCloudPuff(250,165,.65f,(Color){235,240,204,90});
-    DrawCloudPuff(990,125,.55f,(Color){235,240,204,75});
-    for(int i=0;i<36;i++) {
-        float x=(float)((i*197)%(int)WORLD_PIXEL_W), y=(float)(220+(i*83)%(int)(WORLD_PIXEL_H-220));
-        DrawCircle((int)x,(int)y,2.0f+(i%3),Fade((Color){238,237,156,255},.25f));
-    }
+    // The forest silhouette is authored in Tiled with hand-painted tree sprites.
+    // Keep the underlay quiet so the actual canopy, flowers and props define the scene.
+    DrawRectangle(0,0,WORLD_PIXEL_W,WORLD_PIXEL_H,(Color){49,91,66,255});
 }
 static void DrawRuinsBackdrop(float t) {
     DrawRectangleGradientV(0,0,WORLD_PIXEL_W,WORLD_PIXEL_H,(Color){179,191,180,255},(Color){91,111,112,255});
