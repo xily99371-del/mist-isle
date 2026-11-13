@@ -85,6 +85,9 @@ def parse(path):
                 block_rect(cx-1,cy,cx+1,cy)              # boat hull
             elif type_id==22:
                 block_rect(cx-1,cy-1,cx+1,cy)            # woodland shelter canvas footprint
+            elif type_id in (200,201,202,203,204,205,206,207,208,209,210,211,212,213,
+                             217,218,219,220,221,222,224,225,227,228,229):
+                block_rect(cx,cy,cx,cy)                  # cliff bases, boulders, fences and dense edge shrubs
             elif type_id==28:
                 block_rect(cx-1,cy,cx-1,cy)
                 block_rect(cx+1,cy,cx+1,cy)            # ruin arch supports
