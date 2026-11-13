@@ -9,7 +9,7 @@ The four runtime maps are authored in Tiled and compiled into a small C header d
 - maps/lighthouse_courtyard.tmx
 - maps/terrain.tsx
 
-All maps are orthogonal, 22 × 18 cells, with 56 × 56 pixel tiles. The terrain tileset references assets/environment/topdown_terrain_atlas_v1.png.
+All maps are orthogonal, 18 × 12 cells, with 56 × 56 pixel tiles. The terrain tileset references assets/environment/topdown_terrain_atlas_v1.png.
 
 ## Layers
 - Ground: CSV tile layer. Use complete grass, sand, stone and water tiles only. The compiler rejects transparent edge-mask tiles used as full ground.
