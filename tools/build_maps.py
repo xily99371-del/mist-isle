@@ -70,14 +70,27 @@ def parse(path):
     if missing: fail(f"{path.name}: missing markers {missing}")
     for i,index in enumerate(ground):
         if index//4>=9: collision[i//W][i%W]=1
-    overlay,rotations=build_overlay(ground)
-    return ground,[v for row in collision for v in row],objects,markers,overlay,rotations
+    overlay=build_overlay(ground)
+    # Bridges are walkable spans over water. Each sprite spans roughly three
+    # 56px cells, so the three underlying water cells at its row are passable.
+    for type_id,x,y,scale in objects:
+        if type_id==2032:
+            bx,by=int(round(x)),int(round(y))
+            for xx in range(max(0,bx-1),min(W,bx+2)):
+                collision[by][xx]=0
+    for name,(mx,my) in markers.items():
+        gx,gy=int(round(mx)),int(round(my))
+        if not (0<=gx<W and 0<=gy<H):
+            fail(f"{path.name}: marker '{name}' outside map")
+        if collision[gy][gx]:
+            fail(f"{path.name}: marker '{name}' is blocked; move it to a walkable tile")
+    return ground,[v for row in collision for v in row],objects,markers,overlay
 
 def generate(out):
-    grounds=[]; solids=[]; objects=[]; markers=[]; overlays=[]; rotations=[]
+    grounds=[]; solids=[]; objects=[]; markers=[]; overlays=[]
     for name in MAPS:
-        g,c,o,m,edge,angle=parse(ROOT/"maps"/(name+".tmx"))
-        grounds.append(g); solids.append(c); objects.append(o); markers.append(m); overlays.append(edge); rotations.append(angle)
+        g,c,o,m,edge=parse(ROOT/"maps"/(name+".tmx"))
+        grounds.append(g); solids.append(c); objects.append(o); markers.append(m); overlays.append(edge)
         print(f"MAP OK: {name}: {len(o)} objects, {sum(c)} solid cells")
     lines=["/* Generated from maps/*.tmx by tools/build_maps.py. Do not edit. */",
            "#ifndef MIST_ISLE_AREA_MAPS_H","#define MIST_ISLE_AREA_MAPS_H",
@@ -91,15 +104,13 @@ def generate(out):
         lines.append("    {")
         for y in range(H): lines.append("        {"+", ".join(map(str,row[y*W:(y+1)*W]))+"},")
         lines.append("    },")
-    lines += ["};", "static const signed char AREA_OVERLAY[4][MAPH][MAPW] = {"]
-    for row in overlays:
+    lines += ["};", "static const signed char AREA_OVERLAY[4][4][MAPH][MAPW] = {"]
+    for area in overlays:
         lines.append("    {")
-        for y in range(H): lines.append("        {"+", ".join(str(v) for v in row[y*W:(y+1)*W])+"},")
-        lines.append("    },")
-    lines += ["};", "static const unsigned short AREA_OVERLAY_ROTATION[4][MAPH][MAPW] = {"]
-    for row in rotations:
-        lines.append("    {")
-        for y in range(H): lines.append("        {"+", ".join(str(v) for v in row[y*W:(y+1)*W])+"},")
+        for direction in area:
+            lines.append("        {")
+            for y in range(H): lines.append("            {"+", ".join(str(v) for v in direction[y*W:(y+1)*W])+"},")
+            lines.append("        },")
         lines.append("    },")
     lines += ["};", "/* Marker order: spawn, return, grove_gate, ruin_gate, shrine, boss. */",
               "static const Vector2 AREA_MARKERS[4][6] = {"]
