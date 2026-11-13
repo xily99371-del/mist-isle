@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="640" viewBox="0 0 512 640">
+<defs>
+ <linearGradient id="armor" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#839ca0"/><stop offset=".42" stop-color="#435d69"/><stop offset="1" stop-color="#172d40"/></linearGradient>
+ <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0ba"/><stop offset=".5" stop-color="#d4a45a"/><stop offset="1" stop-color="#73503b"/></linearGradient>
+ <linearGradient id="steel" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#c3d0c8"/><stop offset=".5" stop-color="#758d91"/><stop offset="1" stop-color="#344c5a"/></linearGradient>
+ <radialGradient id="core"><stop stop-color="#efffff"/><stop offset=".32" stop-color="#8be9ed"/><stop offset=".75" stop-color="#2c9caf"/><stop offset="1" stop-color="#15445c"/></radialGradient>
+ <linearGradient id="cape" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1e3449"/><stop offset="1" stop-color="#101d31"/></linearGradient>
+</defs>
+<!-- dark mantle -->
+<path d="M115 383Q66 441 47 640H464Q442 446 389 385Q321 348 255 367Q184 349 115 383Z" fill="url(#cape)" stroke="#101d2b" stroke-width="13"/>
+<path d="M120 411Q182 460 255 451Q329 459 389 409" fill="none" stroke="url(#gold)" stroke-width="10"/>
+<path d="M148 440Q190 488 207 640M365 439Q322 488 305 640" fill="none" stroke="#627e89" stroke-width="8"/>
+<!-- shoulder armor -->
+<path d="M119 399Q105 335 165 321L224 364L203 451L128 449Z" fill="url(#steel)" stroke="#152b3d" stroke-width="11"/>
+<path d="M393 399Q408 335 350 321L288 364L309 451L385 449Z" fill="url(#steel)" stroke="#152b3d" stroke-width="11"/>
+<path d="M137 371L179 345L203 386L166 421Z M375 371L333 345L309 386L346 421Z" fill="url(#gold)" stroke="#263e4b" stroke-width="6"/>
+<!-- breastplate -->
+<path d="M169 362Q255 324 343 362L374 640H137Z" fill="url(#armor)" stroke="#132b3c" stroke-width="12" stroke-linejoin="round"/>
+<path d="M192 383Q255 415 320 383L333 595Q255 625 179 595Z" fill="url(#steel)" stroke="#1c3444" stroke-width="8"/>
+<path d="M215 388L255 425L295 388L287 611H224Z" fill="#536f7b" stroke="#243e4d" stroke-width="7"/>
+<path d="M255 416L292 460L255 504L218 460Z" fill="url(#gold)" stroke="#172f41" stroke-width="7"/>
+<!-- glowing chest core -->
+<circle cx="255" cy="462" r="48" fill="#4bd5df" opacity=".12"/>
+<circle cx="255" cy="462" r="32" fill="url(#core)" stroke="#d7f4e9" stroke-width="7"/>
+<path d="M255 435L273 462L255 489L237 462Z" fill="#e9ffff" opacity=".75"/>
+<circle cx="255" cy="462" r="8" fill="white"/>
+<!-- collar and neck -->
+<path d="M205 320L204 369Q255 402 306 369L304 320Z" fill="#344f60" stroke="#172b3d" stroke-width="8"/>
+<!-- helmet -->
+<path d="M150 251Q139 113 255 69Q371 111 360 251L334 338Q255 389 176 338Z" fill="url(#armor)" stroke="#142b3d" stroke-width="13"/>
+<path d="M170 240Q175 132 255 103Q335 132 340 240L320 309Q255 351 190 309Z" fill="url(#steel)" stroke="#243e4d" stroke-width="8"/>
+<!-- lighthouse crown -->
+<path d="M176 157Q255 37 334 157L316 188Q255 144 194 188Z" fill="url(#gold)" stroke="#263b49" stroke-width="9"/>
+<path d="M214 125Q255 77 296 125L288 168H222Z" fill="#273f53" stroke="#162d3d" stroke-width="7"/>
+<rect x="229" y="104" width="52" height="49" rx="12" fill="#e6d29a" stroke="#283f4d" stroke-width="7"/>
+<rect x="238" y="113" width="34" height="31" rx="8" fill="url(#core)"/>
+<path d="M255 84V39M236 62L255 28L274 62" fill="none" stroke="url(#gold)" stroke-width="8" stroke-linecap="round"/>
+<!-- face slit -->
+<path d="M192 238Q255 211 318 238L312 275Q255 302 198 275Z" fill="#1b3448" stroke="#263e4b" stroke-width="7"/>
+<path d="M213 252Q255 236 297 252" fill="none" stroke="#8ce5e7" stroke-width="8" stroke-linecap="round"/>
+<circle cx="222" cy="255" r="5" fill="#dffeff"/><circle cx="288" cy="255" r="5" fill="#dffeff"/>
+<!-- helmet side fins -->
+<path d="M153 205L109 252L158 278ZM357 205L401 252L352 278Z" fill="url(#gold)" stroke="#172e40" stroke-width="8"/>
+<!-- arm guards -->
+<path d="M134 432Q100 456 111 520L156 573L192 543L172 470Z" fill="url(#steel)" stroke="#172b3d" stroke-width="9"/>
+<path d="M376 432Q411 456 400 520L355 573L320 543L340 470Z" fill="url(#steel)" stroke="#172b3d" stroke-width="9"/>
+<path d="M119 490L166 519M393 490L346 519" stroke="url(#gold)" stroke-width="9"/>
+<!-- rune inlays -->
+<path d="M162 572L186 549L209 572M350 572L326 549L303 572" fill="none" stroke="url(#gold)" stroke-width="7" stroke-linecap="round"/>
+<path d="M178 606Q255 629 332 606" fill="none" stroke="#8fdfe1" stroke-width="6" opacity=".7"/>
+</svg>
