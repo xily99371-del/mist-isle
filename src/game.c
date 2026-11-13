@@ -114,6 +114,20 @@ static void AddPickup(World *w,int kind,float x,float y) {
                 if((int)roundf(w->pickups[i].tile.x)==tx&&(int)roundf(w->pickups[i].tile.y)==ty) {
                     occupied=true;break;
                 }
+            // Keep collectible sprites outside the visual footprint of tall structures,
+            // broad canopies and altar silhouettes, not merely outside their trunk collision.
+            for(int i=0;!occupied&&i<w->objectCount;i++) {
+                MapObject *o=&w->objects[i];
+                float dx=fabsf((float)tx-o->pos.x),dy=fabsf((float)ty-o->pos.y);
+                float rx=.0f,ry=.0f;
+                if(o->type==302||o->type==500||o->type==501){rx=3.1f;ry=2.8f;}
+                else if(o->type==303||o->type==22){rx=2.1f;ry=1.8f;}
+                else if(o->type>=1000&&o->type<1003){rx=1.45f;ry=1.55f;}
+                else if(o->type==27||o->type==33){rx=1.9f;ry=1.8f;}
+                else if(o->type==28||o->type==31){rx=1.35f;ry=1.25f;}
+                else if(o->type==29||o->type==30){rx=1.0f;ry=1.0f;}
+                if(rx>0.0f&&dx<rx&&dy<ry)occupied=true;
+            }
             if(occupied)continue;
             float score=(float)(dx*dx+dy*dy)+(float)ty*0.0001f;
             if(score<best){best=score;bestX=tx;bestY=ty;}
