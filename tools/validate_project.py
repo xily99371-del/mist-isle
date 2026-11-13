@@ -18,6 +18,7 @@ MAP_BUILD = (ROOT / "tools/build_maps.py").read_text(encoding="utf-8")
 MAP_AUTOTILE = (ROOT / "tools/map_autotile.py").read_text(encoding="utf-8")
 MAP_HEADER_VALIDATOR = (ROOT / "tools/validate_generated_maps.py").read_text(encoding="utf-8")
 MAP_PREVIEW = (ROOT / "tools/preview_tiled_maps.py").read_text(encoding="utf-8")
+RASTERIZER = (ROOT / "tools/rasterize_assets.py").read_text(encoding="utf-8")
 GROVE_MAP = (ROOT / "maps/glowglade_grove.tmx").read_text(encoding="utf-8")
 MAP_FILES = [ROOT / "maps" / name for name in (
     "terrain.tsx", "coastal_camp.tmx", "glowglade_grove.tmx",
@@ -32,6 +33,9 @@ def require(condition, message):
 # The imported approved art is optional in CI, but if present its real frame geometry is enforced.
 assets = {
     "assets/characters/hero/hero_walk_4dir_64.png": (128, 128),
+    "assets/characters/png/heroine_portrait.png": (512, 640),
+    "assets/characters/png/watcher_portrait.png": (512, 640),
+    "assets/characters/png/lighthouse_guardian_portrait.png": (512, 640),
     "assets/characters/companions/moss_lumi_idle_64.png": (128, 32),
     "assets/characters/companions/moatail_idle_64.png": (128, 32),
     "assets/characters/companions/crystal_gecko_idle_64.png": (128, 32),
@@ -69,7 +73,7 @@ require("index*96" in RENDER, "environment props use 96px atlas cells")
 require("DrawAreaProp" in RENDER and "area_props_96.png" in RENDER, "area-specific supplemental prop atlas is integrated")
 require("DrawTopDownTile" in RENDER and "WorldToScreen" in RENDER, "orthographic top-down square-tile renderer is active")
 require("topdown_terrain_atlas_v1.png" in RENDER and "56,56" in RENDER, "detailed 56px top-down terrain atlas is integrated")
-require("TEX_TOPDOWN_TILES" in RENDER and "for(int i=0;i<17;i++)" in RENDER, "top-down terrain and decor textures are loaded and released")
+require("TEX_TOPDOWN_TILES" in RENDER and "for(int i=0;i<20;i++)" in RENDER, "top-down terrain and decor textures are loaded and released")
 require('type="prop_22"' in GROVE_MAP and 'type="prop_302"' not in GROVE_MAP,
         "Glowglade uses its own woodland shelter and never reuses the coastal lighthouse cottage")
 require("220*it->scale,176*it->scale" in RENDER and "dims={22:(220,176)" in MAP_PREVIEW,
@@ -128,6 +132,15 @@ require("!g->splash.owned" in RENDER and "!g->spark.owned" in RENDER,
         "unrecruited water and crystal companions are visible as world encounters")
 require("RenderInit(void)" in RENDER and "RenderClose(void)" in RENDER,
         "renderer owns texture load and release lifecycle")
+require(all((ROOT / f"assets/characters/svg/{name}.svg").exists() for name in ("heroine_portrait","watcher_portrait","lighthouse_guardian_portrait")),
+        "three authored static character portrait source illustrations are present")
+require("cairosvg" in RASTERIZER and all(name in RASTERIZER for name in ("heroine_portrait.svg","watcher_portrait.svg","lighthouse_guardian_portrait.svg")),
+        "portrait artwork is rasterized from editable high-resolution SVG source assets")
+require("python tools/rasterize_assets.py" in WORKFLOW and "cairosvg" in WORKFLOW,
+        "Windows and Raspberry Pi CI generate the static portrait PNGs before packaging")
+require(all(name in RENDER for name in ("TEX_HERO_PORTRAIT","TEX_WATCHER_PORTRAIT","TEX_GUARDIAN_PORTRAIT")) and "DrawTexturePro(*art" in RENDER,
+        "dialogue displays dedicated illustrated portraits instead of enlarged walking sprites or geometric stand-ins")
+
 require("FLAG_WINDOW_RESIZABLE" in MAIN and "1600,900" in MAIN and "LoadRenderTexture(SW,SH)" in MAIN,
         "Windows game opens in a larger resizable window with a fixed 16:9 logical canvas")
 require("MISTISLE_PI_PROFILE" in MAIN and "SetWindowMinSize(960,540)" in MAIN and "showPerfOverlay" in MAIN,
