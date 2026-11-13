@@ -52,7 +52,7 @@ def draw_object(image,obj,sheets):
         if prop.get("name")=="scale":scale=float(prop.get("value","1"))
     if kind.startswith("tree") and kind[-1:] in ("0","1","2"):
         sprite=crop_cell(sheets["flora"],8+int(kind[-1]),8,128)
-        paste_anchor(image,sprite,x,y+8,100*scale,112*scale)
+        paste_anchor(image,sprite,x,y+8,138*scale,152*scale)
     elif kind=="campfire":
         d=ImageDraw.Draw(image,"RGBA")
         d.ellipse((x-15,y-18,x+15,y+7),fill=(221,112,49,220),outline=(87,57,40,255),width=2)
@@ -61,9 +61,11 @@ def draw_object(image,obj,sheets):
         index=int(kind[5:])
         if 20<=index<=35:
             sprite=crop_cell(sheets["area"],index-20,16,96)
-            dims={22:(220,176),28:(150,140),29:(100,112),30:(140,120),32:(130,100),
+            dims={20:(164,112),21:(126,112),22:(220,176),24:(150,158),
+                  25:(126,126),26:(102,94),27:(156,168),28:(184,184),
+                  29:(104,122),30:(128,112),31:(132,132),32:(130,100),
                   33:(150,190),34:(110,118),35:(112,116)}
-            width,height=dims.get(index,(76,82))
+            width,height=dims.get(index,(100,108))
             paste_anchor(image,sprite,x,y+7,width*scale,height*scale)
         elif 100<=index<200:
             sprite=crop_cell(sheets["flora"],index-100,8,128)
@@ -84,6 +86,12 @@ def draw_object(image,obj,sheets):
                 sx=(index-500)*192+24
                 sprite=sheets["kenney"].crop((sx,0,sx+144,192))
                 paste_anchor(image,sprite,x,y+7,144*scale,192*scale)
+            elif index==502:
+                sprite=sheets["kenney"].crop((0,240,192,384))
+                paste_anchor(image,sprite,x,y+7,192*scale,144*scale)
+            else:
+                sprite=sheets["kenney"].crop((204,336,372,384))
+                paste_anchor(image,sprite,x,y+7,168*scale,48*scale)
 
 
 def render_map(name,out_dir):
