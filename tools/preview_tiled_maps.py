@@ -61,7 +61,7 @@ def draw_object(image,obj,sheets):
         index=int(kind[5:])
         if 20<=index<=35:
             sprite=crop_cell(sheets["area"],index-20,16,96)
-            dims={28:(150,140),29:(100,112),30:(140,120),32:(130,100),
+            dims={22:(220,176),28:(150,140),29:(100,112),30:(140,120),32:(130,100),
                   33:(150,190),34:(110,118),35:(112,116)}
             width,height=dims.get(index,(76,82))
             paste_anchor(image,sprite,x,y+7,width*scale,height*scale)
