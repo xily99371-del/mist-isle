@@ -18,6 +18,7 @@ MAP_BUILD = (ROOT / "tools/build_maps.py").read_text(encoding="utf-8")
 MAP_AUTOTILE = (ROOT / "tools/map_autotile.py").read_text(encoding="utf-8")
 MAP_HEADER_VALIDATOR = (ROOT / "tools/validate_generated_maps.py").read_text(encoding="utf-8")
 MAP_PREVIEW = (ROOT / "tools/preview_tiled_maps.py").read_text(encoding="utf-8")
+GROVE_MAP = (ROOT / "maps/glowglade_grove.tmx").read_text(encoding="utf-8")
 MAP_FILES = [ROOT / "maps" / name for name in (
     "terrain.tsx", "coastal_camp.tmx", "glowglade_grove.tmx",
     "tidal_ruins.tmx", "lighthouse_courtyard.tmx"
@@ -69,6 +70,17 @@ require("DrawAreaProp" in RENDER and "area_props_96.png" in RENDER, "area-specif
 require("DrawTopDownTile" in RENDER and "WorldToScreen" in RENDER, "orthographic top-down square-tile renderer is active")
 require("topdown_terrain_atlas_v1.png" in RENDER and "56,56" in RENDER, "detailed 56px top-down terrain atlas is integrated")
 require("TEX_TOPDOWN_TILES" in RENDER and "for(int i=0;i<17;i++)" in RENDER, "top-down terrain and decor textures are loaded and released")
+require('type="prop_22"' in GROVE_MAP and 'type="prop_302"' not in GROVE_MAP,
+        "Glowglade uses its own woodland shelter and never reuses the coastal lighthouse cottage")
+require("220*it->scale,176*it->scale" in RENDER and "dims={22:(220,176)" in MAP_PREVIEW,
+        "woodland shelter display size is synchronized between runtime and Tiled preview")
+require("Return route keeps the same grounded stone-arch language" in RENDER and "DrawAreaProp(8,(Vector2){p.x,p.y+2},160,168)" in RENDER,
+        "return portal retains the authored stone-arch look instead of a placeholder black hole")
+forest_start=RENDER.find("static void DrawForestBackdrop")
+forest_end=RENDER.find("static void DrawRuinsBackdrop",forest_start)
+require(forest_start>=0 and forest_end>forest_start and "DrawCircle" not in RENDER[forest_start:forest_end],
+        "forest backdrop no longer draws procedural canopy circles; Tiled sprites define the forest")
+
 require("flora_props_atlas_128.png" in RENDER and "cliffs_fences_atlas_128.png" in RENDER and "structures_atlas_128.png" in RENDER, "refined flora, cliff and structure sprite atlases are integrated")
 require("original_props_16_v1.png" in RENDER and "DrawOriginalProp" in RENDER, "curated original 16-prop atlas is integrated")
 require("TEX_ORIGINAL_PROPS" in RENDER and "for(int i=0;i<17;i++)" in RENDER, "original prop atlas texture lifecycle is complete")
