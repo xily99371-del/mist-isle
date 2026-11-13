@@ -1205,7 +1205,7 @@ static void RenderDialogue(Game *g) {
     DrawDialoguePortrait(g,portrait);
     DrawRectangleRounded((Rectangle){258,541,190,31},.16f,6,(Color){37,64,61,255});
     DrawUIText(speaker,274,547,17,(Color){255,224,165,255});
-    DrawTextWrapped(g->dialogue[page],270,592,930,23,2,(Color){44,61,55,255});
+    DrawUITextWrapped(g->dialogue[page],270,592,930,23,2,(Color){44,61,55,255});
     DrawLineEx((Vector2){260,638},(Vector2){1210,638},1.0f,(Color){177,158,119,150});
     DrawUIText("按 E / Enter / 鼠标左键继续",886,650,14,(Color){112,124,103,255});
 }
