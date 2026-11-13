@@ -58,3 +58,13 @@ These are original project vector illustrations created for this repository. The
 - Kenney Particle Pack: https://kenney.nl/assets/particle-pack
 
 Before importing third-party packs, inspect the exact current license shipped with the downloaded pack. Do not redistribute raw packs unless the license permits it. Keep license notices and source attribution in assets/licenses/.
+## Region-specific architecture and Tiled composition
+
+- Coastal Camp owns the lighthouse-keeper cottage compound, dock, boat and canvas supply tent. Do not reuse this compound asset in the grove.
+- Glowglade Grove uses the separate woodland shelter/canvas hideaway asset (Tiled object `prop_22`), framed by tree canopies, lanterns, luminous flowers and mushroom clusters. The coastal lighthouse silhouette must never appear in this map.
+- Tidal Ruins uses arches, columns, broken walls, rune basins and the unique multi-ring keystone. Do not place coastal or woodland buildings in the ruins.
+- Lighthouse Courtyard owns the lighthouse tower and formal stone forecourt.
+
+## Art production rule
+
+Do not create character portraits, buildings, trees, portals or decorative props from runtime primitives or procedural drawing code. Use authored atlas sprites, Tiled object placement, and finished static illustration assets. Runtime code is reserved for rendering, animation, lighting, collision and interaction. Procedural geometric silhouettes are temporary fallbacks only and must not be treated as final art.
