@@ -145,9 +145,19 @@ require("living stone arch" in RENDER and "beacon tower" in RENDER and "Return g
         "grove, ruins, lighthouse and return portals have distinct grounded visual identities")
 require("finalCore" in RENDER and "DrawAreaProp(11,p,190,194)" in RENDER,
         "the Tidal Ruins keystone is a larger multi-ring final altar, distinct from ordinary shrines")
-require("DrawLighthouseGuardian(p,g->time,1.48f)" in RENDER and "72,82" in RENDER,
-        "the lighthouse guardian and Watcher receive stronger world-scene silhouettes")
-require("DrawStructureProp(2,p,232*it->scale,210*it->scale)" in RENDER and "type_id in (302,500,501)" in MAP_BUILD,
+require("DrawLighthouseGuardian(p,g->time,1.48f)" in RENDER and "static void DrawKeeper(Vector2 p,float t,float scale)" in RENDER,
+        "the lighthouse guardian and Watcher use dedicated world-scene silhouettes")
+require("DrawDialoguePortrait" in RENDER and "dialoguePortrait[page]" in RENDER and "DrawKeeper((Vector2){144,650}" in RENDER,
+        "dialogue scenes render full-size portraits for the hero, Watcher and lighthouse guardian")
+require("dialogueStartsBossBattle" in GAME and "SetDialogueSequence(g,speakers,lines,4,true)" in GAME,
+        "the lighthouse guardian delivers a multi-speaker pre-battle conversation before combat")
+require("SetDialogueSequence(g,speakers,lines,3,false)" in GAME and "胸口的光" in GAME,
+        "the boss encounter ends with a dedicated character dialogue scene")
+require("Place every pickup on a free, reachable tile" in GAME and "visual footprint of tall structures" in GAME,
+        "collectibles avoid both collision footprints and visually occluding large props")
+require("330*it->scale,300*it->scale" in RENDER and "dims={302:(330,300)" in MAP_PREVIEW,
+        "the coastal and forest cottages are enlarged consistently in runtime and map previews")
+require("DrawStructureProp(2,p,330*it->scale,300*it->scale)" in RENDER and "type_id in (302,500,501)" in MAP_BUILD,
         "large cottage structures use the structure atlas with matching collision foundations")
 require('#include "area_maps.h"' in RENDER and "AREA_OVERLAY[(int)g->area][direction][y][x]" in RENDER and "direction*90" in RENDER,
         "renderer draws every directional shoreline mask from the generated Tiled map header")
