@@ -4,7 +4,7 @@ Mist Isle is developed on Windows and built natively on Raspberry Pi OS 64-bit. 
 
 ## Graphics compatibility
 
-The default Windows build uses raylib 5.5 with desktop OpenGL 3.3. The Pi profile selects raylib's desktop OpenGL 2.1 backend for the Raspberry Pi OS desktop/X11 path. Raspberry Pi 5's VideoCore VII supports OpenGL ES 3.1 and Vulkan 1.2, but this project intentionally starts with the conservative raylib desktop backend to keep one shared rendering code path.
+The default Windows build uses raylib 5.5 with desktop OpenGL 3.3. The Pi profile selects raylib's desktop OpenGL 2.1 backend for the Raspberry Pi OS desktop Wayland/X11 path. Raspberry Pi 5's VideoCore VII supports OpenGL ES 3.1 and Vulkan 1.2, but this project intentionally starts with the conservative raylib desktop backend to keep one shared rendering code path.
 
 The Pi profile disables 4x MSAA, opens a 1280x720 resizable window without forcing maximization, keeps the 1280x720 logical render canvas, and reduces rain/ripple draw counts. The renderer also culls terrain, props and weather ripples outside the camera view. F3 toggles a small FPS/frame-time overlay.
 
