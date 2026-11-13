@@ -5,8 +5,8 @@
 #include <stdbool.h>
 #define SW 1280
 #define SH 720
-#define MAPW 22
-#define MAPH 18
+#define MAPW 18
+#define MAPH 12
 #define TILE_SIZE 56.0f
 #define WORLD_PIXEL_W (MAPW*TILE_SIZE)
 #define WORLD_PIXEL_H (MAPH*TILE_SIZE)
