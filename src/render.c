@@ -635,6 +635,34 @@ static void DrawGateMarker(Game *g,int gateId,Vector2 grid) {
                      (Vector2){p.x+6,p.y-196.0f-sinf(g->time*4.0f)*3.0f},C_GOLD);
     }
 }
+static void DrawCoastalCliffs(Game *g,int terrainKinds[MAPH][MAPW]) {
+    if(g->area!=AREA_CAMP&&g->area!=AREA_LIGHTHOUSE)return;
+    if(!TEX_CLIFF_ATLAS.id)return;
+    // A cliff segment is stamped at every shoreline cell with generous overlap.
+    // This turns the former isolated bottom-edge chunks into one continuous,
+    // irregular coastline and also handles west/east/north-facing shore sections.
+    for(int y=1;y<MAPH-1;y++)for(int x=1;x<MAPW-1;x++) {
+        if(terrainKinds[y][x]==4)continue;
+        bool south=terrainKinds[y+1][x]==4;
+        bool north=terrainKinds[y-1][x]==4;
+        bool east=terrainKinds[y][x+1]==4;
+        bool west=terrainKinds[y][x-1]==4;
+        if(!south&&!north&&!east&&!west)continue;
+        unsigned int h=TileHash(x,y,(int)g->area+73);
+        int index=2+(int)(h%4u);
+        float rotation=0.0f,ox=0.0f,oy=0.0f;
+        if(south){rotation=0.0f;oy=28.0f;}
+        else if(north){rotation=180.0f;oy=-28.0f;}
+        else if(east){rotation=270.0f;ox=28.0f;}
+        else if(west){rotation=90.0f;ox=-28.0f;}
+        Vector2 p=WorldToScreen((float)x,(float)y);
+        p.x+=ox;p.y+=oy;
+        float size=140.0f;
+        Rectangle src={(float)((index%8)*128),(float)((index/8)*128),128.0f,128.0f};
+        Rectangle dst={p.x-size*.5f,p.y-size*.5f,size,size};
+        DrawTexturePro(TEX_CLIFF_ATLAS,src,dst,(Vector2){size*.5f,size*.5f},rotation,WHITE);
+    }
+}
 static void RenderWorld(Game *g) {
     BeginMode2D(g->cam);
     DrawWorldBackdrop(g);
@@ -648,18 +676,18 @@ static void RenderWorld(Game *g) {
         if(g->world.kind[y][x]==3)kind=3;
         if(g->area==AREA_CAMP) {
             float nx=((float)x-10.5f)/11.0f, ny=((float)y-8.5f)/9.0f;
-            float shore=nx*nx+ny*ny;
-            if(shore>.88f)kind=4;
-            else if(shore>.68f)kind=2;
-            // Broad sandy paths connect the dock, campfire and three area gates.
-            if((y>=8&&y<=9&&x>=3&&x<=19) ||
-               (x>=17&&x<=18&&y>=3&&y<=15))kind=2;
+            float coastNoise=.045f*sinf((float)x*.73f+(float)y*.29f)+.026f*cosf((float)y*.91f-(float)x*.24f);
+            float shore=nx*nx+ny*ny+coastNoise;
+            if(shore>.90f)kind=4;
+            else if(shore>.69f)kind=2;
+            // A narrow, connected footpath with short spurs to the campfire and eastern gates.
+            if((y==9&&x>=3&&x<=19)||(x==4&&y>=9&&y<=13)||(x==18&&y>=3&&y<=15))kind=2;
             if(x>=1&&x<=3&&y>=11&&y<=15)kind=4;
             if(g->world.kind[y][x]==1)kind=1;
         } else if(g->area==AREA_GROVE) {
             if(x>=9&&x<=11&&y>=3&&y<=14)kind=4;
             if((x*3+y)%13==0&&kind==0)kind=2;
-            if((y>=8&&y<=9&&x>=2&&x<=19))kind=2;
+            if((y==9&&x>=2&&x<=19))kind=2;
             if(x==0||y==0||x==MAPW-1||y==MAPH-1)kind=1;
         } else if(g->area==AREA_RUINS) {
             // One continuous ancient-stone floor, with deliberate moss gardens and a readable bridge.
@@ -667,18 +695,18 @@ static void RenderWorld(Game *g) {
             if((x>=2&&x<=6&&y>=3&&y<=6)||(x>=15&&x<=19&&y>=11&&y<=14)||
                (x>=3&&x<=6&&y>=12&&y<=14))kind=0;
             if(x>=9&&x<=11&&y>=3&&y<=14)kind=4;
-            if(y>=8&&y<=9&&x>=2&&x<=19)kind=3;
+            if(y==9&&x>=2&&x<=19)kind=3;
             if(x==0||y==0||x==MAPW-1||y==MAPH-1)kind=3;
         } else {
-            // Lighthouse courtyard: stone plaza, grass gardens, sandy shore and a clear approach.
-            kind=0;
-            if(x<3||x>19||y<2||y>15)kind=4;
-            if((x>=3&&x<=5)||(x>=18&&x<=19)||(y>=14&&y<=15))kind=2;
+            // Lighthouse courtyard sits on an irregular island, not a rectangular cut-out.
+            float nx=((float)x-10.8f)/10.6f, ny=((float)y-8.5f)/8.7f;
+            float coastNoise=.038f*sinf((float)x*.68f+(float)y*.34f)+.024f*cosf((float)y*.86f-(float)x*.27f);
+            float shore=nx*nx+ny*ny+coastNoise;
+            kind=shore>.94f?4:shore>.75f?2:0;
             if(x>=7&&x<=18&&y>=5&&y<=14)kind=3;
-            if(y>=8&&y<=9&&x>=3&&x<=19)kind=3;
+            if(y==9&&x>=3&&x<=19)kind=3;
             if(x>=16&&x<=18&&y>=6&&y<=14)kind=3;
             if((x>=5&&x<=7&&y>=5&&y<=7)||(x>=5&&x<=8&&y>=12&&y<=14))kind=0;
-            if(x==0||y==0||x==MAPW-1||y==MAPH-1)kind=4;
         }
         terrainKinds[y][x]=kind;
         DrawTopDownTile(x,y,g->area,kind,g->time);
@@ -705,6 +733,7 @@ static void RenderWorld(Game *g) {
             DrawLineEx((Vector2){xx,p.y+25},(Vector2){xx+8,p.y+28},1.6f,Fade(WHITE,.34f));
         }
     }
+    DrawCoastalCliffs(g,terrainKinds);
     // Sort objects by their ground-contact Y coordinate: walk behind trees from the top.
     RenderItem items[512]; int count=0;
     for(int y=1;y<MAPH-1;y++)for(int x=1;x<MAPW-1;x++) {
@@ -747,20 +776,6 @@ static void RenderWorld(Game *g) {
         PushRenderItem(items,&count,RENDER_PROP,116,(Vector2){6.2f,6.5f},.62f);
         PushRenderItem(items,&count,RENDER_PROP,118,(Vector2){12.0f,13.6f},.62f);
         PushRenderItem(items,&count,RENDER_PROP,120,(Vector2){19.0f,10.5f},.58f);
-    }
-    // Natural map rims: cliff faces meet water at the coast, stone retaining walls frame ruins.
-    if(g->area==AREA_CAMP) {
-        const int coastIdx[]={2,3,4,5,2,3};
-        for(int i=0;i<6;i++)PushRenderItem(items,&count,RENDER_PROP,200+coastIdx[i],(Vector2){4.0f+i*3.0f,16.1f},.92f);
-        PushRenderItem(items,&count,RENDER_PROP,202,(Vector2){20.0f,5.0f},.85f);
-        PushRenderItem(items,&count,RENDER_PROP,203,(Vector2){20.0f,9.0f},.85f);
-        PushRenderItem(items,&count,RENDER_PROP,204,(Vector2){20.0f,13.0f},.85f);
-    } else if(g->area==AREA_GROVE) {
-        for(int i=0;i<5;i++)PushRenderItem(items,&count,RENDER_PROP,208,(Vector2){4.0f+i*3.5f,16.0f},.88f);
-    } else if(g->area==AREA_RUINS) {
-        for(int i=0;i<5;i++)PushRenderItem(items,&count,RENDER_PROP,221+(i%2),(Vector2){4.0f+i*3.5f,16.0f},.9f);
-    } else {
-        for(int i=0;i<5;i++)PushRenderItem(items,&count,RENDER_PROP,202+(i%4),(Vector2){4.0f+i*3.5f,16.0f},.9f);
     }
     for(int i=0;i<g->world.pickupCount;i++) if(!g->world.pickups[i].taken)
         PushRenderItem(items,&count,RENDER_PICKUP,i,g->world.pickups[i].tile,1.0f);
@@ -870,8 +885,38 @@ static void RenderWorld(Game *g) {
     EndMode2D();
     float night=0.5f+0.5f*cosf(g->dayClock*PI2);
     if(night>0.62f)DrawRectangle(0,0,SW,SH,Fade((Color){43,59,99,255},(night-0.62f)*0.22f));
-    if(g->weather==1) { for(int i=0;i<72;i++){int x=(i*173+(int)(g->time*115))%SW;int y=(i*97+(int)(g->time*205))%SH;DrawLine(x,y,x-5,y+11,Fade((Color){183,211,224,255},.55f));} }
-    else if(g->weather==2) { for(int i=0;i<24;i++){int x=(i*97+(int)(sinf(g->time+i)*18)+SW)%SW;int y=(i*53+(int)(cosf(g->time*.7f+i)*12)+SH)%SH;DrawCircle(x,y,2,Fade(C_GOLD,.6f));} }
+    if(g->weather==1) {
+        // Cool overcast tint, three rain depths and visible impacts on water surfaces.
+        DrawRectangle(0,0,SW,SH,Fade((Color){34,57,75,255},.105f));
+        for(int i=0;i<190;i++) {
+            float speed=285.0f+(float)(i%5)*72.0f;
+            float travel=fmodf(g->time*speed+(float)(i*83),SH+70.0f);
+            float x=fmodf((float)(i*149)+g->time*(125.0f+(float)(i%4)*19.0f),SW+90.0f)-45.0f;
+            float y=travel-35.0f;
+            float length=12.0f+(float)(i%4)*4.5f;
+            float alpha=.28f+(float)(i%4)*.075f;
+            float width=(i%7==0)?1.8f:1.0f;
+            DrawLineEx((Vector2){x,y},(Vector2){x-8.0f,y+length},width,Fade((Color){197,222,232,255},alpha));
+        }
+        for(int i=0;i<22;i++) {
+            float x=fmodf((float)(i*97)+g->time*31.0f,SW);
+            float y=fmodf((float)(i*61)+g->time*19.0f,SH);
+            float pulse=fmodf(g->time*1.8f+(float)i*.37f,1.0f);
+            DrawCircleLines((int)x,(int)y,(int)(2.0f+pulse*4.0f),Fade((Color){196,225,231,255},.38f*(1.0f-pulse)));
+        }
+        // Ripples stay attached to the visible water tiles as the camera moves.
+        for(int y=1;y<MAPH-1;y++)for(int x=1;x<MAPW-1;x++) {
+            if(terrainKinds[y][x]!=4)continue;
+            unsigned int h=TileHash(x,y,91);
+            if(h%13u!=0u)continue;
+            Vector2 world=WorldToScreen((float)x,(float)y);
+            Vector2 screen=GetWorldToScreen2D(world,g->cam);
+            float pulse=fmodf(g->time*1.4f+(float)(h%19u)*.11f,1.0f);
+            DrawCircleLines((int)screen.x,(int)screen.y,(int)(2.0f+pulse*5.0f),Fade((Color){204,231,231,255},.40f*(1.0f-pulse)));
+        }
+    } else if(g->weather==2) {
+        for(int i=0;i<24;i++){int x=(i*97+(int)(sinf(g->time+i)*18)+SW)%SW;int y=(i*53+(int)(cosf(g->time*.7f+i)*12)+SH)%SH;DrawCircle(x,y,2,Fade(C_GOLD,.6f));}
+    }
 }
 static void Panel(Rectangle r) {
     Rectangle shadow={r.x+2.0f,r.y+4.0f,r.width,r.height};
@@ -903,17 +948,32 @@ static void RenderHUD(Game *g) {
     Vector2 objectiveTarget;
     bool hasObjectiveTarget=false;
     GetCurrentObjective(g,&objectiveTitle,&objectiveDetail,&objectiveTarget,&hasObjectiveTarget);
-    PanelDark((Rectangle){850,18,410,154});
-    DrawUIText("当前目标",872,29,15,(Color){205,214,198,255});
-    DrawUIText(objectiveTitle,872,52,21,(Color){246,239,217,255});
-    DrawUITextWrapped(objectiveDetail,872,81,365,14,2,(Color){211,220,205,255});
     int partyCount=(g->lumi.owned?1:0)+(g->splash.owned?1:0)+(g->spark.owned?1:0);
     const char *activeName=g->selectedBuddy==1&&g->splash.owned?"沫尾兽":g->selectedBuddy==2&&g->spark.owned?"鸣晶蜥":g->lumi.owned?"苔灯灵":partyCount>0?"伙伴":"尚无伙伴";
     Buddy *active=CurrentBuddy(g);
-    DrawUIText(TextFormat("伙伴 %d/3    当前：%s  Lv.%d",partyCount,activeName,active->level),872,137,13,(Color){211,220,205,255});
+    if(g->objectiveCollapsed) {
+        Rectangle panel={SW-300.0f,18.0f,280.0f,44.0f};
+        Rectangle toggle={SW-88.0f,24.0f,68.0f,28.0f};
+        PanelDark(panel);
+        DrawUIText(objectiveTitle,(int)panel.x+15,(int)panel.y+14,14,(Color){246,239,217,255});
+        DrawRectangleRounded(toggle,.18f,6,(Color){35,61,76,255});
+        DrawRectangleRoundedLines(toggle,.18f,6,Fade(C_GOLD,.7f));
+        DrawUIText("O 展开",(int)toggle.x+8,(int)toggle.y+7,11,(Color){255,226,173,255});
+    } else {
+        Rectangle panel={SW-350.0f,18.0f,330.0f,116.0f};
+        Rectangle toggle={SW-92.0f,26.0f,72.0f,28.0f};
+        PanelDark(panel);
+        DrawUIText("当前目标",(int)panel.x+18,(int)panel.y+10,14,(Color){205,214,198,255});
+        DrawRectangleRounded(toggle,.18f,6,(Color){35,61,76,255});
+        DrawRectangleRoundedLines(toggle,.18f,6,Fade(C_GOLD,.7f));
+        DrawUIText("O 收起",(int)toggle.x+7,(int)toggle.y+7,11,(Color){255,226,173,255});
+        DrawUIText(objectiveTitle,(int)panel.x+18,(int)panel.y+34,18,(Color){246,239,217,255});
+        DrawUITextWrapped(objectiveDetail,(int)panel.x+18,(int)panel.y+62,294,12,1,(Color){211,220,205,255});
+        DrawUIText(TextFormat("伙伴 %d/3  ·  %s Lv.%d",partyCount,activeName,active->level),(int)panel.x+18,(int)panel.y+91,11,(Color){172,193,184,255});
+    }
 
-    PanelDark((Rectangle){20,652,760,48});
-    DrawUIText("WASD 移动   SHIFT 冲刺   E 互动   TAB 切换伙伴   J 手记   I 背包   M 地图   F5 保存",38,667,13,(Color){211,220,205,255});
+    PanelDark((Rectangle){20,652,970,48});
+    DrawUIText("WASD 移动   SHIFT 冲刺   E 互动   TAB 伙伴   J 手记   I 背包   M 地图   O 任务栏   F7 天气   F5 保存",38,667,12,(Color){211,220,205,255});
 
     if(g->area==AREA_CAMP && Dist(g->player.pos,g->world.groveGate)<1.6f) {
         PanelDark((Rectangle){530,585,220,40});DrawUIText("E  前往辉光林地",550,596,17,(Color){211,220,205,255});
