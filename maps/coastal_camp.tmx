@@ -36,8 +36,8 @@
   <object id="307" name="tree1" type="tree1" x="252.00" y="196.00"><properties><property name="scale" type="float" value="1.02"/></properties><point/></object>
   <object id="308" name="tree2" type="tree2" x="980.00" y="196.00"><properties><property name="scale" type="float" value="1.02"/></properties><point/></object>
   <object id="309" name="tree0" type="tree0" x="644.00" y="140.00"><properties><property name="scale" type="float" value="1.02"/></properties><point/></object>
-  <object id="310" name="prop_500" type="prop_500" x="308.00" y="364.00"><properties><property name="scale" type="float" value="1.05"/></properties><point/></object>
-  <object id="311" name="prop_501" type="prop_501" x="588.00" y="308.00"><properties><property name="scale" type="float" value="1.05"/></properties><point/></object>
+  <object id="310" name="prop_302" type="prop_302" x="308.00" y="364.00"><properties><property name="scale" type="float" value="1.20"/></properties><point/></object>
+  <object id="311" name="prop_303" type="prop_303" x="588.00" y="308.00"><properties><property name="scale" type="float" value="1.05"/></properties><point/></object>
   <object id="312" name="prop_22" type="prop_22" x="252.00" y="588.00"><properties><property name="scale" type="float" value="1.05"/></properties><point/></object>
   <object id="313" name="prop_20" type="prop_20" x="308.00" y="812.00"><properties><property name="scale" type="float" value="1.05"/></properties><point/></object>
   <object id="314" name="prop_21" type="prop_21" x="476.00" y="868.00"><properties><property name="scale" type="float" value="0.95"/></properties><point/></object>
