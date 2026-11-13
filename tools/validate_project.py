@@ -13,6 +13,12 @@ GAME = (ROOT / "src/game.c").read_text(encoding="utf-8")
 HEADER = (ROOT / "src/game.h").read_text(encoding="utf-8")
 MAIN = (ROOT / "src/main.c").read_text(encoding="utf-8")
 WORKFLOW = (ROOT / ".github/workflows/build-windows.yml").read_text(encoding="utf-8")
+CMAKE = (ROOT / "CMakeLists.txt").read_text(encoding="utf-8")
+MAP_BUILD = (ROOT / "tools/build_maps.py").read_text(encoding="utf-8")
+MAP_FILES = [ROOT / "maps" / name for name in (
+    "terrain.tsx", "coastal_camp.tmx", "glowglade_grove.tmx",
+    "tidal_ruins.tmx", "lighthouse_courtyard.tmx"
+)]
 
 def require(condition, message):
     if not condition:
@@ -83,8 +89,8 @@ require("grid.y+" in RENDER and "RENDER_PLAYER" in RENDER, "actor sorting uses t
 require("g->cam.zoom=1.10f" in GAME and "UpdatePlayerCamera(g,dt)" in GAME and "MoveTowardsConstant" in GAME,
         "camera uses map bounds and direct constant-speed follow")
 require("RenderItem items[512]" in RENDER and "*count>=512" in RENDER, "render queue has capacity for expanded environment dressing and actors")
-require("world.kind[y][x]==1" in RENDER and "RENDER_TREE" in RENDER,
-        "visible forest trees are placed from the collision grid")
+require("g->world.objectCount" in RENDER and "RENDER_TREE" in RENDER and "AREA_OBJECTS" in GAME,
+        "Tiled-authored scene objects drive tree and prop placement")
 require("MoveTowardsConstant" in GAME and "680.0f*dt" in GAME,
         "camera uses direct constant-speed follow without an easing dead zone")
 require("InRect" in GAME and "const float r=.37f" in GAME and "distance/0.08f" in GAME,
@@ -97,8 +103,8 @@ require("endingTime" in GAME and "static void RenderEnd" in RENDER,
         "lighthouse ending uses a timed cinematic sequence")
 require("RENDER_PROP,33" in RENDER and "DrawAreaPropTint(13,p" in RENDER,
         "lighthouse courtyard uses the authored lighthouse sprite from the area atlas")
-require("SetSolidRect" in GAME and "MovePlayerWithCollision" in GAME and "dockWater" in GAME and "stream&&!bridge" in GAME,
-        "props, shore water and stream banks block movement with substep collision")
+require("AREA_COLLISION" in GAME and "TerrainKindFromAtlasIndex(g->world.terrain[y][x])==4" in GAME and "MovePlayerWithCollision" in GAME,
+        "Tiled collision rectangles and water tiles drive substep movement collision")
 require("GetCurrentObjective" in GAME and "DrawObjectiveMarker" in RENDER,
         "chapter objective guidance and in-world waypoint marker are active")
 require("OwnedBuddyIdAt" in GAME and "optionCount" in GAME and "选择出战伙伴" in RENDER,
@@ -108,7 +114,18 @@ require("!g->splash.owned" in RENDER and "!g->spark.owned" in RENDER,
 require("RenderInit(void)" in RENDER and "RenderClose(void)" in RENDER,
         "renderer owns texture load and release lifecycle")
 require("FLAG_WINDOW_RESIZABLE" in MAIN and "1600,900" in MAIN and "LoadRenderTexture(SW,SH)" in MAIN,
-        "game opens in a larger resizable window with a fixed 16:9 logical canvas")
+        "Windows game opens in a larger resizable window with a fixed 16:9 logical canvas")
+require("MISTISLE_PI_PROFILE" in MAIN and "SetWindowMinSize(960,540)" in MAIN and "showPerfOverlay" in MAIN,
+        "Pi profile uses a non-maximized 720p window and optional FPS diagnostics")
+require("MISTISLE_PI_PROFILE" in CMAKE and 'set(OPENGL_VERSION "2.1"' in CMAKE and "generate_area_maps" in CMAKE,
+        "CMake exposes a Raspberry Pi desktop OpenGL 2.1 profile and builds map data")
+require("find_package(Python3 REQUIRED COMPONENTS Interpreter)" in CMAKE and "tools/build_maps.py" in CMAKE,
+        "Python is required only at build time to compile Tiled maps")
+require(all(path.exists() for path in MAP_FILES), "all four Tiled maps and the terrain tileset are present")
+require("AREA_GROUND" in MAP_BUILD and "AREA_COLLISION" in MAP_BUILD and "AREA_MARKERS" in MAP_BUILD and "AREA_OBJECTS" in MAP_BUILD,
+        "Tiled compiler exports ground, collision, story markers and object placements")
+require('objectgroup[@name=\'Markers\']' in MAP_BUILD and 'objectgroup[@name=\'Collision\']' in MAP_BUILD,
+        "map compiler reads named marker and collision layers")
 require("GameUpdate(&g,dt)" in MAIN and "SCENE_END must pass through GameUpdate" in MAIN,
         "ending animation advances through the normal game update loop")
 require("LogicalMousePosition" in GAME and "GetScreenWidth()" in GAME,
@@ -144,10 +161,12 @@ require("for(int i=0;i<190;i++)" in RENDER and "DrawRainOverlay" not in RENDER a
         "rain has multiple visible streak depths, surface impacts and water ripples")
 require("IsKeyPressed(KEY_F7)" in GAME and "weather=(g->weather+1)%4" in GAME,
         "weather can be cycled on demand for reliable demonstration")
-require("DrawCoastalCliffs(g,terrainKinds)" in RENDER and "float coastNoise=" in RENDER,
-        "island shores use irregular masks and continuous overlapping cliff segments")
-require("y==9&&x>=3&&x<=19" in RENDER and "x==18&&y>=3&&y<=15" in RENDER,
-        "camp paths are narrow connected routes rather than broad rectangular bands")
+require("DrawCoastalCliffs(g,terrainKinds,minX,minY,maxX,maxY)" in RENDER and "AREA_GROUND" in GAME,
+        "shoreline and all four ground layouts are sourced from Tiled maps")
+require("GetVisibleTileBounds" in RENDER and "screen.x<-180.0f" in RENDER,
+        "terrain and scene objects outside the camera view are culled")
+require("MISTISLE_RAIN_DROPS 84" in RENDER and "MISTISLE_RAIN_RIPPLES 10" in RENDER,
+        "Raspberry Pi profile reduces weather draw calls")
 require("DrawPlayer((Vector2){420,620}" in RENDER,
         "finale character lineup stays clear of the bottom caption")
 require("g->area==AREA_LIGHTHOUSE&&g->bossDefeated&&Dist(p->pos,g->world.shrine)<3.0f" in GAME and "g->scene=SCENE_END" in GAME,
@@ -156,10 +175,10 @@ require("assets/cinematics" in WORKFLOW and "Copy-Item assets/cinematics/* dist/
         "the packaged Windows build includes the lighthouse cinematic asset")
 require("DrawLighthouseBackdrop(g->time,false)" in RENDER,
         "the lighthouse remains dark in exploration until the finale cutscene")
-require("baseRow=kind==4?9:kind==3?6:kind==2?3:0" in RENDER and "atlasRow=baseRow+variant" in RENDER,
-        "terrain selection uses only full grass, sand, stone and water tile variants")
-require("Rectangle src={(float)(col*56),(float)(atlasRow*56),56.0f,56.0f}" in RENDER and "TILE_SIZE+3.0f" in RENDER and "drawPatch" not in RENDER,
-        "every terrain cell draws a complete 56px material tile without isolated square decals")
+require("TerrainKindFromAtlasIndex" in RENDER and "tileIndex%4" in RENDER and "AREA_GROUND" in GAME,
+        "Tiled ground tile IDs map directly to the correct 56px atlas cells")
+require("Rectangle src={(float)((tileIndex%4)*56),(float)((tileIndex/4)*56),56.0f,56.0f}" in RENDER,
+        "runtime draws the exact tile selected in the Tiled editor")
 cg_file = ROOT / "assets/cinematics/lighthouse_final_scene.jpg.b64"
 require(cg_file.exists(), "lighthouse ending illustration asset is present")
 cg_data = cg_file.read_text(encoding="ascii").strip()
@@ -170,8 +189,8 @@ require("assets/cinematics" in WORKFLOW and "Copy-Item assets/cinematics/*" in W
         "Windows playtest package includes the cinematic asset")
 require("footY-66" in RENDER and "footY-56" in RENDER,
         "player and companion sprites use enlarged world-space dimensions")
-require("unsigned char solid[MAPH][MAPW]" in HEADER and "w->solid[y][x]=1" in GAME and "g->world.solid[y][x]" in GAME,
-        "collision footprints are independent from visible terrain and tree tiles")
+require("unsigned char solid[MAPH][MAPW]" in HEADER and "w->solid[y][x]=AREA_COLLISION" in GAME and "g->world.solid[y][x]" in GAME,
+        "Tiled collision layer is shared with gameplay collision")
 require("h%100" not in GAME[GAME.find("static void BuildAreaWorld"):GAME.find("static void SwitchArea",GAME.find("static void BuildAreaWorld"))],
         "area maps use authored layouts instead of random blocker placement")
 require("g->area==AREA_LIGHTHOUSE && g->bossDefeated && Dist(p->pos,g->world.shrine)<3.8f" in GAME and "点亮失落的灯塔" in RENDER,
