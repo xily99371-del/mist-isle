@@ -67,7 +67,9 @@ def parse(path):
             if 1000<=type_id<1003:
                 block_rect(cx,cy,cx,cy)                 # tree trunk
             elif type_id in (302,500,501):
-                block_rect(cx-1,cy-1,cx+1,cy)          # house/building foundation
+                block_rect(cx-2,cy-1,cx+2,cy-1)        # rear wall of the enlarged house
+                block_rect(cx-2,cy,cx-1,cy)            # left foundation; keep the doorway cell open
+                block_rect(cx+1,cy,cx+2,cy)            # right foundation; keep the doorway cell open
             elif type_id==303:
                 block_rect(cx-1,cy-1,cx+1,cy)          # tent footprint
             elif type_id==304:
