@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="640" viewBox="0 0 512 640">
+<defs>
+ <linearGradient id="cloak" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#506b78"/><stop offset=".55" stop-color="#263d53"/><stop offset="1" stop-color="#172b40"/></linearGradient>
+ <linearGradient id="silver" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f4e7d7"/><stop offset=".55" stop-color="#aebac0"/><stop offset="1" stop-color="#6d7c8b"/></linearGradient>
+ <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffe5d0"/><stop offset="1" stop-color="#d9a995"/></linearGradient>
+ <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0bd"/><stop offset=".55" stop-color="#c89c55"/><stop offset="1" stop-color="#755337"/></linearGradient>
+ <radialGradient id="lamp"><stop stop-color="#fff8cf"/><stop offset=".5" stop-color="#ffc86c"/><stop offset="1" stop-color="#d66e36"/></radialGradient>
+</defs>
+<!-- staff and cloak silhouette -->
+<path d="M126 388Q73 444 55 640H448Q430 453 371 386Q317 345 256 359Q190 350 126 388Z" fill="url(#cloak)" stroke="#17293a" stroke-width="12" stroke-linejoin="round"/>
+<path d="M112 430Q170 463 212 640M396 431Q349 486 315 640" fill="none" stroke="#8b9b9c" stroke-width="6" opacity=".5"/>
+<path d="M137 425Q189 476 255 470Q322 474 376 422" fill="none" stroke="url(#gold)" stroke-width="10"/>
+<!-- hood -->
+<path d="M116 259Q92 106 242 47Q400 54 403 253L368 425Q317 481 250 463Q166 467 128 408Z" fill="url(#cloak)" stroke="#17293a" stroke-width="13" stroke-linejoin="round"/>
+<path d="M141 250Q143 113 249 82Q353 85 377 246L342 353Q306 406 251 403Q188 399 155 347Z" fill="url(#silver)" stroke="#25394b" stroke-width="9"/>
+<path d="M125 232Q151 72 251 61Q365 68 391 235" fill="none" stroke="url(#gold)" stroke-width="12"/>
+<!-- face -->
+<path d="M170 222Q190 147 256 151Q328 148 347 226L333 323Q305 372 254 373Q201 367 178 322Z" fill="url(#skin)" stroke="#58616a" stroke-width="8"/>
+<path d="M190 244Q214 225 238 242M275 241Q301 224 323 245" fill="none" stroke="#59606c" stroke-width="7" stroke-linecap="round"/>
+<path d="M190 264Q214 240 240 266Q227 293 204 289Q193 281 190 264ZM273 265Q299 240 324 265Q314 291 290 289Q277 282 273 265Z" fill="#fff8ec" stroke="#5a5660" stroke-width="5"/>
+<ellipse cx="216" cy="266" rx="10" ry="17" fill="#7b8e9e"/><ellipse cx="300" cy="266" rx="10" ry="17" fill="#7b8e9e"/>
+<circle cx="220" cy="260" r="4" fill="white"/><circle cx="304" cy="260" r="4" fill="white"/>
+<path d="M251 275Q244 296 257 299" fill="none" stroke="#bc8c7b" stroke-width="5" stroke-linecap="round"/>
+<path d="M229 329Q254 340 279 328" fill="none" stroke="#a86c68" stroke-width="6" stroke-linecap="round"/>
+<ellipse cx="183" cy="304" rx="16" ry="7" fill="#e58e8c" opacity=".32"/><ellipse cx="328" cy="304" rx="16" ry="7" fill="#e58e8c" opacity=".32"/>
+<!-- silver bangs -->
+<path d="M153 236Q132 158 184 105Q225 70 278 91Q328 88 360 153Q326 134 304 166Q276 194 253 155Q222 208 181 223L171 276Z" fill="url(#silver)" stroke="#5b6571" stroke-width="8" stroke-linejoin="round"/>
+<path d="M183 124Q213 91 245 104Q220 141 224 192M270 98Q300 125 289 170M322 129Q346 170 331 212" fill="none" stroke="#fff1df" stroke-width="7" stroke-linecap="round" opacity=".8"/>
+<!-- cloak clasp and leaf embroidery -->
+<path d="M188 406Q255 440 326 404L354 640H156Z" fill="#23394e" stroke="#15293a" stroke-width="8"/>
+<path d="M207 424Q255 459 304 423L289 640H221Z" fill="#3f596a" stroke="#15293a" stroke-width="7"/>
+<path d="M255 436L270 462L255 488L240 462Z" fill="url(#gold)" stroke="#4a3c38" stroke-width="5"/>
+<path d="M183 497Q208 470 222 503Q197 511 183 497ZM329 497Q302 470 288 503Q315 511 329 497ZM183 551Q210 524 225 558Q201 565 183 551ZM329 551Q301 524 286 558Q311 565 329 551Z" fill="none" stroke="url(#gold)" stroke-width="5" stroke-linecap="round"/>
+<path d="M176 594Q207 570 227 604M334 594Q302 570 282 604" fill="none" stroke="#b6c4bd" stroke-width="4" opacity=".7"/>
+<!-- lantern staff -->
+<path d="M90 636L105 197" stroke="#4a342c" stroke-width="16" stroke-linecap="round"/>
+<path d="M90 636L105 197" stroke="#a27a50" stroke-width="6" stroke-linecap="round"/>
+<path d="M78 194Q104 160 132 194L125 216H84Z" fill="url(#gold)" stroke="#47362f" stroke-width="7"/>
+<path d="M83 213H127L119 293Q105 313 91 293Z" fill="url(#lamp)" stroke="#49352e" stroke-width="8"/>
+<path d="M93 229L93 279M105 223L105 289M117 229L117 279" stroke="#fff0b7" stroke-width="4" opacity=".65"/>
+<path d="M80 218H130M88 294H122" stroke="#49352e" stroke-width="8" stroke-linecap="round"/>
+<circle cx="105" cy="254" r="48" fill="#ffc96f" opacity=".08"/>
+<!-- shoulder mantle and pins -->
+<path d="M126 401Q168 382 202 403L183 447Q151 449 126 430ZM382 401Q342 382 307 403L329 447Q357 449 382 430Z" fill="#354e63" stroke="#17293a" stroke-width="7"/>
+<circle cx="165" cy="420" r="10" fill="url(#gold)" stroke="#17293a" stroke-width="4"/><circle cx="344" cy="420" r="10" fill="url(#gold)" stroke="#17293a" stroke-width="4"/>
+</svg>
