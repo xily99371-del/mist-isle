@@ -57,7 +57,34 @@ def parse(path):
                 if prop.get("name")=="scale": scale=float(prop.get("value","1"))
             if not .25<=scale<=2.0: fail(f"{path.name}: invalid scale for '{name}'")
             objects.append((type_id,x,y,scale))
-            if 1000<=type_id<1003: collision[int(round(y))][int(round(x))]=1
+            # Collision follows the visible object's ground footprint, not its full sprite.
+            # Tall canopies remain walk-under; only trunks, walls and structural bases block.
+            cx,cy=int(round(x)),int(round(y))
+            def block_rect(left,top,right,bottom):
+                for by in range(max(0,top),min(H-1,bottom)+1):
+                    for bx in range(max(0,left),min(W-1,right)+1):
+                        collision[by][bx]=1
+            if 1000<=type_id<1003:
+                block_rect(cx,cy,cx,cy)                 # tree trunk
+            elif type_id in (302,500,501):
+                block_rect(cx-1,cy-1,cx+1,cy)          # house/building foundation
+            elif type_id==303:
+                block_rect(cx-1,cy-1,cx+1,cy)          # tent footprint
+            elif type_id==304:
+                block_rect(cx-1,cy,cx-1,cy)
+                block_rect(cx+1,cy,cx+1,cy)            # arch posts; keep doorway open
+            elif type_id==305:
+                block_rect(cx-1,cy-1,cx+1,cy)          # fountain plinth
+            elif type_id in (25,27,29,31,33):
+                block_rect(cx,cy,cx,cy)                 # crystal, tree, pillar, altar, lighthouse base
+            elif type_id==28:
+                block_rect(cx-1,cy,cx-1,cy)
+                block_rect(cx+1,cy,cx+1,cy)            # ruin arch supports
+            elif type_id==30:
+                block_rect(cx-1,cy,cx+1,cy)            # broken wall segment
+            elif type_id==34:
+                block_rect(cx-1,cy,cx-1,cy)
+                block_rect(cx+1,cy,cx+1,cy)            # ornamental gate supports
     if len(objects)>MAX_OBJECTS: fail(f"{path.name}: object count exceeds {MAX_OBJECTS}")
     markers={}
     mg=root.find("./objectgroup[@name='Markers']")
