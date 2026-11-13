@@ -765,7 +765,7 @@ void GameUpdate(Game *g,float dt) {
             return;
         }
         // Rest beside the campfire after rescuing the first companion.
-        if(g->area==AREA_CAMP&&g->lumi.owned && Dist(p->pos,(Vector2){6.1f,8.5f})<1.25f) {
+        if(g->area==AREA_CAMP&&g->lumi.owned && Dist(p->pos,(Vector2){6.8f,6.7f})<1.25f) {
             p->hp=fminf(p->maxHp,p->hp+22.0f);
             Toast(g,"在营火旁休息了一会儿，恢复了生命。");
             Burst(g,WorldScreen((Vector2){6.1f,8.5f}),C_GOLD,10);
