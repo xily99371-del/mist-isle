@@ -93,6 +93,7 @@ typedef struct {
     bool journalOpen;
     bool inventoryOpen;
     bool mapOpen;
+    bool objectiveCollapsed;
     bool enemySoaked;
     int battleRound;
     int defeatedGuards;
