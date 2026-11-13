@@ -953,7 +953,7 @@ static void RenderWorld(Game *g) {
                 else if(it->index>=20&&it->index<=35)DrawAreaProp(it->index-20,p,100*it->scale,108*it->scale);
                 else if(it->index>=100&&it->index<200)DrawFloraProp(it->index-100,p,100*it->scale,108*it->scale);
                 else if(it->index>=200&&it->index<300)DrawCliffProp(it->index-200,p,112*it->scale,112*it->scale);
-                else if(it->index==302)DrawStructureProp(2,p,330*it->scale,300*it->scale);
+                else if(it->index==302)DrawStructureProp(2,p,330*it->scale,260*it->scale);
                 else if(it->index==303)DrawStructureProp(3,p,176*it->scale,154*it->scale);
                 else if(it->index==304)DrawStructureProp(4,p,166*it->scale,180*it->scale);
                 else if(it->index==305)DrawStructureProp(5,p,168*it->scale,152*it->scale);
