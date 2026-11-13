@@ -52,7 +52,6 @@ typedef struct {
 } Enemy;
 typedef struct { int type; Vector2 pos; float scale; } MapObject;
 typedef struct {
-    int kind[MAPH][MAPW];
     unsigned char terrain[MAPH][MAPW];
     unsigned char solid[MAPH][MAPW];
     int seed;
