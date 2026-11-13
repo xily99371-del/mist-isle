@@ -171,17 +171,16 @@ static void BuildAreaWorld(Game *g,Area area) {
     // Resource placement remains progression-driven; terrain, static objects,
     // collision and all major story markers are authored in Tiled.
     if(area==AREA_CAMP) {
-        AddPickup(w,0,7,7);AddPickup(w,0,9,11);AddPickup(w,0,13,10);
-        AddPickup(w,0,15,6);AddPickup(w,0,15,12);
-        AddPickup(w,1,15,6);AddPickup(w,2,15,12);
+        AddPickup(w,0,6,5);AddPickup(w,0,12,8);AddPickup(w,0,14,7);
+        AddPickup(w,0,5,9);AddPickup(w,1,3,10);AddPickup(w,2,14,9);
     } else if(area==AREA_GROVE) {
-        AddPickup(w,0,6,5);AddPickup(w,3,8,12);AddPickup(w,0,14,5);
-        AddPickup(w,1,16,11);AddPickup(w,2,17,13);
+        AddPickup(w,0,6,7);AddPickup(w,0,10,5);AddPickup(w,0,12,7);
+        AddPickup(w,1,4,10);AddPickup(w,2,12,9);
     } else if(area==AREA_RUINS) {
-        AddPickup(w,1,7,6);AddPickup(w,1,11,12);
-        AddPickup(w,2,15,5);AddPickup(w,2,18,11);
+        AddPickup(w,1,6,7);AddPickup(w,1,12,7);
+        AddPickup(w,2,7,8);AddPickup(w,2,12,9);
     } else {
-        AddPickup(w,0,6,5);AddPickup(w,1,12,12);AddPickup(w,2,17,5);
+        AddPickup(w,0,4,6);AddPickup(w,1,14,6);AddPickup(w,2,12,8);
     }
     for(int i=0;i<w->pickupCount;i++) {
         int px=(int)w->pickups[i].tile.x, py=(int)w->pickups[i].tile.y;
@@ -211,12 +210,12 @@ static bool SolidPoint(Game *g,Vector2 p) {
 
     // Dynamic characters and large interactables have compact ground footprints.
     if(g->area==AREA_CAMP) {
-        if(InRect(p,2.62f,9.62f,3.38f,10.38f))return true; // Watcher
-        if(!g->lumi.owned&&InRect(p,3.62f,11.62f,4.38f,12.38f))return true;
+        if(InRect(p,6.62f,6.62f,7.38f,7.38f))return true; // Watcher
+        if(!g->lumi.owned&&InRect(p,5.62f,7.62f,6.38f,8.38f))return true;
     } else if(g->area==AREA_GROVE) {
-        if(!g->splash.owned&&InRect(p,8.62f,4.62f,9.38f,5.38f))return true;
+        if(!g->splash.owned&&InRect(p,13.62f,6.62f,14.38f,7.38f))return true;
     } else if(g->area==AREA_RUINS) {
-        if(!g->spark.owned&&InRect(p,14.62f,6.62f,15.38f,7.38f))return true;
+        if(!g->spark.owned&&InRect(p,12.62f,7.62f,13.38f,8.38f))return true;
         if(InRect(p,g->world.shrine.x-.58f,g->world.shrine.y-.48f,
                     g->world.shrine.x+.58f,g->world.shrine.y+.48f))return true;
     } else {
@@ -363,7 +362,7 @@ void GetCurrentObjective(Game *g,const char **title,const char **detail,Vector2 
         if(g->area==AREA_CAMP) {
             *title="救助苔灯灵";
             *detail="到营火旁找苔灯灵，按 E 救助";
-            *target=(Vector2){4,12};
+            *target=(Vector2){6,8};
         } else {
             *title="返回海岸营地";
             *detail="沿西侧石路返回海岸营地，按 E";
@@ -380,11 +379,11 @@ void GetCurrentObjective(Game *g,const char **title,const char **detail,Vector2 
             if(g->player.berries>0) {
                 *title="招募沫尾兽";
                 *detail="带一颗果实，到浅水边喂沫尾兽";
-                *target=(Vector2){9,5};
+                *target=(Vector2){14,7};
             } else {
                 *title="收集岛屿果实";
                 *detail="在林地采集一颗果实";
-                if(!FindNearestPickup(g,0,3,target))*target=(Vector2){6,5};
+                if(!FindNearestPickup(g,0,3,target))*target=(Vector2){6,7};
             }
         } else {
             *title="返回辉光林地";
@@ -402,11 +401,11 @@ void GetCurrentObjective(Game *g,const char **title,const char **detail,Vector2 
             if(g->player.crystals>0) {
                 *title="招募鸣晶蜥";
                 *detail="带一枚星晶，到石台招募鸣晶蜥";
-                *target=(Vector2){15,7};
+                *target=(Vector2){13,8};
             } else {
                 *title="收集星晶";
                 *detail="在遗迹寻找并采集星晶";
-                if(!FindNearestPickup(g,2,2,target))*target=(Vector2){15,5};
+                if(!FindNearestPickup(g,2,2,target))*target=(Vector2){12,8};
             }
         } else {
             *title="返回潮汐遗迹";
@@ -424,7 +423,7 @@ void GetCurrentObjective(Game *g,const char **title,const char **detail,Vector2 
             if(g->player.shells<=0) {
                 *title="寻找潮汐贝壳";
                 *detail="沿水道寻找潮汐贝壳，按 E 采集";
-                if(!FindNearestPickup(g,1,1,target))*target=(Vector2){7,6};
+                if(!FindNearestPickup(g,1,1,target))*target=(Vector2){6,7};
             } else {
                 *title="激活遗迹机关";
                 *detail="带着潮汐贝壳，靠近中央机关按 E";
@@ -706,7 +705,7 @@ void GameUpdate(Game *g,float dt) {
     }
     if(IsKeyPressed(KEY_E)) {
         // Rescue Moss Lumi at the camp.
-        if(g->area==AREA_CAMP&&!g->lumi.owned&&Dist(p->pos,(Vector2){4,12})<1.5f) {
+        if(g->area==AREA_CAMP&&!g->lumi.owned&&Dist(p->pos,(Vector2){6,8})<1.5f) {
             AddBuddyFriend(g,0);
             GameSave(g);
             SetDialogue(g,"苔灯灵抬起头，灯囊重新亮了起来。",
@@ -730,7 +729,7 @@ void GameUpdate(Game *g,float dt) {
             }
         }
         // A shy forest firefly can be registered in the field journal.
-        Vector2 fireflyPos={10.6f+sinf(g->fireflyPhase*0.8f)*0.22f,6.2f+cosf(g->fireflyPhase*0.65f)*0.18f};
+        Vector2 fireflyPos={10.6f+sinf(g->fireflyPhase*0.8f)*0.22f,5.4f+cosf(g->fireflyPhase*0.65f)*0.18f};
         if(g->area==AREA_GROVE&&!g->fireflyDiscovered && Dist(p->pos,fireflyPos)<1.35f) {
             g->fireflyDiscovered=true;
             Burst(g,WorldScreen(fireflyPos),C_GOLD,22);
@@ -754,22 +753,22 @@ void GameUpdate(Game *g,float dt) {
             return;
         }
         // Water companion encounter.
-        if(g->area==AREA_GROVE&&!g->splash.owned&&Dist(p->pos,(Vector2){9,5})<1.6f) {
+        if(g->area==AREA_GROVE&&!g->splash.owned&&Dist(p->pos,(Vector2){14,7})<1.6f) {
             if(p->berries>=1){p->berries--;AddBuddyFriend(g,1);GameSave(g);SetDialogue(g,"沫尾兽被果实吸引，开心地绕着你转了一圈。","它可以喷水清理蒸汽，也能让遗迹机关显形。","按 TAB 切换伙伴。");}
             else Toast(g,"沫尾兽想吃一颗岛屿果实。");
             return;
         }
         // Crystal companion encounter.
-        if(g->area==AREA_RUINS&&!g->spark.owned&&Dist(p->pos,(Vector2){15,7})<1.6f) {
+        if(g->area==AREA_RUINS&&!g->spark.owned&&Dist(p->pos,(Vector2){13,8})<1.6f) {
             if(p->crystals>=1){p->crystals--;AddBuddyFriend(g,2);GameSave(g);SetDialogue(g,"鸣晶蜥吸收了星晶，背上的宝石依次亮起。","它能为古代装置供能，也能在战斗中放电。","按 TAB 切换伙伴。");}
             else Toast(g,"鸣晶蜥需要一枚星晶才愿意同行。");
             return;
         }
         // Rest beside the campfire after rescuing the first companion.
-        if(g->area==AREA_CAMP&&g->lumi.owned && Dist(p->pos,(Vector2){4.1f,12.5f})<1.25f) {
+        if(g->area==AREA_CAMP&&g->lumi.owned && Dist(p->pos,(Vector2){6.1f,8.5f})<1.25f) {
             p->hp=fminf(p->maxHp,p->hp+22.0f);
             Toast(g,"在营火旁休息了一会儿，恢复了生命。");
-            Burst(g,WorldScreen((Vector2){4.1f,12.5f}),C_GOLD,10);
+            Burst(g,WorldScreen((Vector2){6.1f,8.5f}),C_GOLD,10);
             return;
         }
         // Ruin puzzle.
@@ -804,7 +803,7 @@ void GameUpdate(Game *g,float dt) {
             return;
         }
         // NPC at camp.
-        if(g->area==AREA_CAMP&&Dist(p->pos,(Vector2){3,10})<1.6f) {
+        if(g->area==AREA_CAMP&&Dist(p->pos,(Vector2){7,7})<1.6f) {
             SetDialogueAs(g,"守望者","灯塔熄灭后，岛上的小生灵都变得不安。","找到三位伙伴，唤醒潮汐遗迹，灯塔就能重新点亮。","果实、贝壳和星晶散落在岛上，按 E 采集。");
             return;
         }
