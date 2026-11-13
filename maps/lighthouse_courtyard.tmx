@@ -1,148 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="22" height="18" tilewidth="56" tileheight="56" infinite="0" nextlayerid="5" nextobjectid="300">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="18" height="12" tilewidth="56" tileheight="56" infinite="0" nextlayerid="5" nextobjectid="600">
+ <properties>
+  <property name="level_id" value="lighthouse_courtyard"/>
+  <property name="layout_style" value="one_screen_handcrafted_topdown"/>
+  <property name="map_review_revision" type="int" value="12"/>
+  <property name="scene_description" value="Final lighthouse forecourt; axial approach, formal stone court, open guardian arena."/>
+ </properties>
  <tileset firstgid="1" source="terrain.tsx"/>
- <layer id="1" name="Ground" width="22" height="18">
+ <layer id="1" name="Ground" width="18" height="12">
   <data encoding="csv">
-   1, 8, 7, 6, 5, 4, 3, 2, 1, 8, 7, 6, 5, 4, 3, 2, 1, 8, 7, 13, 42, 41,
-   4, 3, 2, 1, 8, 7, 6, 5, 4, 3, 2, 1, 8, 7, 6, 5, 4, 3, 2, 16, 37, 44,
-   7, 6, 5, 4, 3, 2, 1, 8, 7, 6, 5, 4, 3, 2, 1, 8, 7, 6, 5, 19, 40, 39,
-   2, 1, 8, 7, 6, 5, 4, 25, 32, 31, 30, 29, 28, 27, 4, 3, 2, 31, 30, 14, 43, 42,
-   5, 4, 3, 2, 1, 8, 7, 6, 27, 26, 3, 32, 31, 8, 7, 6, 5, 4, 25, 17, 38, 37,
-   8, 7, 6, 5, 4, 3, 2, 31, 30, 7, 6, 5, 26, 25, 2, 1, 8, 29, 13, 42, 41, 40,
-   3, 2, 1, 8, 29, 28, 27, 26, 25, 32, 1, 30, 29, 28, 27, 26, 25, 32, 16, 37, 44, 43,
-   6, 5, 4, 3, 32, 31, 30, 29, 28, 27, 26, 25, 32, 31, 30, 29, 28, 27, 19, 40, 39, 38,
-   1, 8, 7, 6, 27, 26, 25, 32, 31, 30, 29, 28, 27, 26, 25, 32, 31, 30, 14, 43, 42, 41,
-   4, 3, 32, 31, 30, 29, 28, 27, 26, 25, 32, 16, 30, 29, 28, 27, 26, 25, 17, 16, 37, 44,
-   7, 6, 5, 4, 25, 32, 31, 30, 29, 28, 27, 26, 18, 17, 31, 30, 29, 13, 20, 19, 40, 39,
-   2, 1, 8, 7, 28, 27, 26, 25, 32, 31, 30, 29, 28, 27, 19, 25, 32, 16, 37, 44, 43, 42,
-   5, 4, 3, 2, 31, 30, 29, 28, 27, 26, 3, 32, 31, 30, 29, 13, 20, 19, 40, 39, 38, 37,
-   8, 7, 6, 5, 4, 3, 2, 31, 30, 7, 6, 5, 26, 3, 2, 1, 30, 14, 43, 42, 41, 40,
-   3, 2, 1, 8, 7, 6, 5, 4, 25, 32, 1, 30, 29, 6, 5, 4, 25, 17, 38, 37, 44, 43,
-   6, 5, 4, 3, 2, 1, 8, 7, 6, 5, 4, 3, 2, 1, 8, 7, 6, 20, 41, 40, 39, 38,
-   1, 8, 7, 6, 5, 4, 3, 2, 1, 8, 7, 6, 5, 4, 3, 2, 1, 15, 14, 13, 42, 41,
-   4, 3, 2, 1, 8, 7, 6, 5, 4, 3, 2, 1, 8, 7, 6, 5, 4, 3, 2, 16, 37, 44
+   2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1,
+   1, 1, 2, 1, 1, 25, 25, 25, 25, 25, 25, 25, 25, 2, 1, 1, 1, 1,
+   1, 1, 1, 1, 2, 25, 25, 25, 25, 25, 25, 25, 25, 1, 1, 2, 1, 1,
+   1, 1, 1, 1, 25, 25, 26, 25, 25, 25, 25, 25, 25, 25, 1, 1, 1, 2,
+   1, 1, 1, 1, 25, 25, 25, 25, 26, 25, 25, 25, 25, 25, 1, 1, 1, 1,
+   1, 1, 1, 1, 25, 25, 25, 25, 25, 25, 26, 25, 25, 25, 1, 1, 1, 1,
+   1, 2, 1, 1, 25, 25, 25, 25, 25, 25, 25, 25, 26, 25, 1, 1, 1, 1,
+   1, 1, 1, 2, 1, 25, 25, 25, 25, 25, 25, 25, 25, 1, 2, 1, 1, 1,
+   1, 1, 1, 1, 1, 26, 25, 25, 25, 25, 25, 25, 25, 1, 1, 1, 2, 1,
+   1, 1, 1, 13, 13, 13, 13, 14, 13, 13, 13, 13, 13, 13, 13, 1, 1, 1,
+   1, 1, 13, 13, 13, 13, 13, 13, 13, 14, 13, 13, 13, 13, 13, 1, 1, 1,
+   2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1
   </data>
  </layer>
- <objectgroup id="2" name="Collision" draworder="topdown">
-  <object id="126" name="solid" x="952.00" y="56.00" width="168.00" height="168.00"/>
-  <object id="127" name="solid" x="280.00" y="280.00" width="112.00" height="56.00"/>
-  <object id="128" name="solid" x="280.00" y="728.00" width="112.00" height="56.00"/>
-  <object id="129" name="solid" x="840.00" y="448.00" width="112.00" height="56.00"/>
-  <object id="130" name="solid" x="840.00" y="672.00" width="112.00" height="56.00"/>
-  <object id="131" name="solid" x="392.00" y="392.00" width="56.00" height="56.00"/>
-  <object id="132" name="solid" x="392.00" y="616.00" width="56.00" height="56.00"/>
-  <object id="133" name="solid" x="728.00" y="392.00" width="56.00" height="56.00"/>
-  <object id="134" name="solid" x="728.00" y="616.00" width="56.00" height="56.00"/>
-  <object id="135" name="solid" x="616.00" y="336.00" width="56.00" height="56.00"/>
- </objectgroup>
+ <objectgroup id="2" name="Collision" draworder="topdown"/>
  <objectgroup id="3" name="Objects" draworder="topdown">
-  <object id="1" name="prop_33" type="prop_33" x="1036.00" y="196.00">
-   <properties><property name="scale" type="float" value="1.05"/></properties>
-   <point/>
-  </object>
-  <object id="2" name="prop_35" type="prop_35" x="868.00" y="308.00">
-   <properties><property name="scale" type="float" value="0.95"/></properties>
-   <point/>
-  </object>
-  <object id="3" name="prop_34" type="prop_34" x="308.00" y="308.00">
-   <properties><property name="scale" type="float" value="1.00"/></properties>
-   <point/>
-  </object>
-  <object id="4" name="prop_34" type="prop_34" x="308.00" y="756.00">
-   <properties><property name="scale" type="float" value="1.00"/></properties>
-   <point/>
-  </object>
-  <object id="5" name="prop_34" type="prop_34" x="868.00" y="476.00">
-   <properties><property name="scale" type="float" value="0.85"/></properties>
-   <point/>
-  </object>
-  <object id="6" name="prop_34" type="prop_34" x="868.00" y="700.00">
-   <properties><property name="scale" type="float" value="0.85"/></properties>
-   <point/>
-  </object>
-  <object id="7" name="prop_32" type="prop_32" x="1036.00" y="700.00">
-   <properties><property name="scale" type="float" value="1.00"/></properties>
-   <point/>
-  </object>
-  <object id="8" name="prop_28" type="prop_28" x="532.00" y="308.00">
-   <properties><property name="scale" type="float" value="0.85"/></properties>
-   <point/>
-  </object>
-  <object id="9" name="prop_28" type="prop_28" x="532.00" y="756.00">
-   <properties><property name="scale" type="float" value="0.85"/></properties>
-   <point/>
-  </object>
-  <object id="10" name="prop_31" type="prop_31" x="644.00" y="364.00">
-   <properties><property name="scale" type="float" value="0.95"/></properties>
-   <point/>
-  </object>
-  <object id="11" name="prop_29" type="prop_29" x="420.00" y="420.00">
-   <properties><property name="scale" type="float" value="0.85"/></properties>
-   <point/>
-  </object>
-  <object id="12" name="prop_29" type="prop_29" x="420.00" y="644.00">
-   <properties><property name="scale" type="float" value="0.85"/></properties>
-   <point/>
-  </object>
-  <object id="13" name="prop_29" type="prop_29" x="756.00" y="420.00">
-   <properties><property name="scale" type="float" value="0.85"/></properties>
-   <point/>
-  </object>
-  <object id="14" name="prop_29" type="prop_29" x="756.00" y="644.00">
-   <properties><property name="scale" type="float" value="0.85"/></properties>
-   <point/>
-  </object>
-  <object id="15" name="tree0" type="tree0" x="196.00" y="196.00">
-   <properties><property name="scale" type="float" value="0.95"/></properties>
-   <point/>
-  </object>
-  <object id="16" name="tree1" type="tree1" x="252.00" y="196.00">
-   <properties><property name="scale" type="float" value="0.90"/></properties>
-   <point/>
-  </object>
-  <object id="17" name="tree2" type="tree2" x="196.00" y="812.00">
-   <properties><property name="scale" type="float" value="0.95"/></properties>
-   <point/>
-  </object>
-  <object id="18" name="tree0" type="tree0" x="252.00" y="868.00">
-   <properties><property name="scale" type="float" value="0.90"/></properties>
-   <point/>
-  </object>
-  <object id="19" name="tree1" type="tree1" x="532.00" y="812.00">
-   <properties><property name="scale" type="float" value="0.90"/></properties>
-   <point/>
-  </object>
-  <object id="20" name="tree2" type="tree2" x="700.00" y="812.00">
-   <properties><property name="scale" type="float" value="0.95"/></properties>
-   <point/>
-  </object>
-  <object id="21" name="prop_116" type="prop_116" x="364.00" y="252.00">
-   <properties><property name="scale" type="float" value="0.55"/></properties>
-   <point/>
-  </object>
-  <object id="22" name="prop_118" type="prop_118" x="420.00" y="756.00">
-   <properties><property name="scale" type="float" value="0.55"/></properties>
-   <point/>
-  </object>
-  <object id="23" name="prop_120" type="prop_120" x="756.00" y="308.00">
-   <properties><property name="scale" type="float" value="0.55"/></properties>
-   <point/>
-  </object>
-  <object id="24" name="prop_126" type="prop_126" x="756.00" y="756.00">
-   <properties><property name="scale" type="float" value="0.55"/></properties>
-   <point/>
-  </object>
-  <object id="25" name="prop_128" type="prop_128" x="924.00" y="812.00">
-   <properties><property name="scale" type="float" value="0.55"/></properties>
-   <point/>
-  </object>
- </objectgroup>
+  <object id="300" name="tree0" type="tree0" x="84.00" y="84.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
+  <object id="301" name="tree1" type="tree1" x="252.00" y="84.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
+  <object id="302" name="tree2" type="tree2" x="812.00" y="84.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
+  <object id="303" name="tree0" type="tree0" x="980.00" y="140.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
+  <object id="304" name="tree1" type="tree1" x="84.00" y="588.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
+  <object id="305" name="tree2" type="tree2" x="980.00" y="588.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
+  <object id="306" name="失落的灯塔" type="prop_33" x="532.00" y="252.00"><properties><property name="scale" type="float" value="1.18"/></properties><point/></object>
+  <object id="308" name="西侧庭院石柱" type="prop_29" x="308.00" y="308.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
+  <object id="309" name="东侧庭院石柱" type="prop_29" x="756.00" y="308.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
+  <object id="310" name="西侧庭院石柱" type="prop_29" x="308.00" y="476.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
+  <object id="311" name="东侧庭院石柱" type="prop_29" x="756.00" y="476.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
+  <object id="312" name="西侧残墙" type="prop_30" x="196.00" y="308.00"><properties><property name="scale" type="float" value="0.86"/></properties><point/></object>
+  <object id="313" name="东侧残墙" type="prop_30" x="868.00" y="308.00"><properties><property name="scale" type="float" value="0.86"/></properties><point/></object>
+  <object id="314" name="西侧残墙" type="prop_30" x="196.00" y="420.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
+  <object id="315" name="东侧残墙" type="prop_30" x="868.00" y="420.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
+  <object id="316" name="庭院围栏" type="prop_34" x="364.00" y="140.00"><properties><property name="scale" type="float" value="0.84"/></properties><point/></object>
+  <object id="317" name="庭院围栏" type="prop_34" x="700.00" y="140.00"><properties><property name="scale" type="float" value="0.84"/></properties><point/></object>
+  <object id="318" name="海崖" type="prop_200" x="84.00" y="252.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
+  <object id="319" name="海崖" type="prop_201" x="84.00" y="364.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
+  <object id="320" name="海崖瀑口" type="prop_202" x="924.00" y="308.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
+  <object id="321" name="prop_116" type="prop_116" x="196.00" y="588.00"><properties><property name="scale" type="float" value="0.76"/></properties><point/></object>
+  <object id="322" name="prop_117" type="prop_117" x="420.00" y="588.00"><properties><property name="scale" type="float" value="0.76"/></properties><point/></object>
+  <object id="323" name="prop_118" type="prop_118" x="644.00" y="588.00"><properties><property name="scale" type="float" value="0.76"/></properties><point/></object>
+  <object id="324" name="prop_119" type="prop_119" x="868.00" y="588.00"><properties><property name="scale" type="float" value="0.76"/></properties><point/></object>
+  <object id="325" name="prop_120" type="prop_120" x="252.00" y="252.00"><properties><property name="scale" type="float" value="0.74"/></properties><point/></object>
+  <object id="326" name="prop_124" type="prop_124" x="812.00" y="252.00"><properties><property name="scale" type="float" value="0.74"/></properties><point/></object>
+  <object id="327" name="prop_126" type="prop_126" x="196.00" y="532.00"><properties><property name="scale" type="float" value="0.74"/></properties><point/></object>
+  <object id="328" name="prop_128" type="prop_128" x="868.00" y="532.00"><properties><property name="scale" type="float" value="0.74"/></properties><point/></object>
+   <object id="350" name="庭院苔石" type="prop_210" x="140.00" y="476.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
+  <object id="351" name="庭院苔石" type="prop_211" x="868.00" y="476.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
+  <object id="352" name="海风灌木" type="prop_229" x="252.00" y="588.00"><properties><property name="scale" type="float" value="0.80"/></properties><point/></object>
+  <object id="353" name="海风灌木" type="prop_229" x="812.00" y="532.00"><properties><property name="scale" type="float" value="0.80"/></properties><point/></object>
+  <object id="354" name="庭院花簇" type="prop_116" x="308.00" y="532.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
+  <object id="355" name="庭院花簇" type="prop_117" x="756.00" y="532.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
+</objectgroup>
  <objectgroup id="4" name="Markers" draworder="topdown">
-  <object id="236" name="spawn" type="spawn" x="140.00" y="532.00"><point/></object>
-  <object id="237" name="return" type="return" x="196.00" y="532.00"><point/></object>
-  <object id="238" name="grove_gate" type="grove_gate" x="252.00" y="532.00"><point/></object>
-  <object id="239" name="ruin_gate" type="ruin_gate" x="308.00" y="532.00"><point/></object>
-  <object id="240" name="shrine" type="shrine" x="980.00" y="364.00"><point/></object>
-  <object id="241" name="boss" type="boss" x="868.00" y="532.00"><point/></object>
+  <object id="500" name="spawn" type="spawn" x="140.00" y="532.00"><point/></object>
+  <object id="501" name="return" type="return" x="140.00" y="588.00"><point/></object>
+  <object id="502" name="grove_gate" type="grove_gate" x="196.00" y="532.00"><point/></object>
+  <object id="503" name="ruin_gate" type="ruin_gate" x="252.00" y="532.00"><point/></object>
+  <object id="504" name="shrine" type="shrine" x="532.00" y="364.00"><point/></object>
+  <object id="505" name="boss" type="boss" x="532.00" y="476.00"><point/></object>
  </objectgroup>
 </map>

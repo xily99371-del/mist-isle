@@ -7,7 +7,7 @@ from map_autotile import build_overlay
 
 ROOT=Path(__file__).resolve().parents[1]
 MAPS=["coastal_camp","glowglade_grove","tidal_ruins","lighthouse_courtyard"]
-W,H,T,MAX_OBJECTS=22,18,56,64
+W,H,T,MAX_OBJECTS=18,12,56,64
 MARKERS=("spawn","return","grove_gate","ruin_gate","shrine","boss")
 
 def fail(message):
@@ -57,7 +57,45 @@ def parse(path):
                 if prop.get("name")=="scale": scale=float(prop.get("value","1"))
             if not .25<=scale<=2.0: fail(f"{path.name}: invalid scale for '{name}'")
             objects.append((type_id,x,y,scale))
-            if 1000<=type_id<1003: collision[int(round(y))][int(round(x))]=1
+            # Collision follows the visible object's ground footprint, not its full sprite.
+            # Tall canopies remain walk-under; only trunks, walls and structural bases block.
+            cx,cy=int(round(x)),int(round(y))
+            def block_rect(left,top,right,bottom):
+                for by in range(max(0,top),min(H-1,bottom)+1):
+                    for bx in range(max(0,left),min(W-1,right)+1):
+                        collision[by][bx]=1
+            if 1000<=type_id<1003:
+                block_rect(cx,cy,cx,cy)                 # tree trunk
+            elif type_id in (302,500,501):
+                block_rect(cx-2,cy-1,cx+2,cy-1)        # rear wall of the enlarged house
+                block_rect(cx-2,cy,cx-1,cy)            # left foundation; keep the doorway cell open
+                block_rect(cx+1,cy,cx+2,cy)            # right foundation; keep the doorway cell open
+            elif type_id==303:
+                block_rect(cx-1,cy-1,cx+1,cy)          # tent footprint
+            elif type_id==304:
+                block_rect(cx-1,cy,cx-1,cy)
+                block_rect(cx+1,cy,cx+1,cy)            # arch posts; keep doorway open
+            elif type_id==305:
+                block_rect(cx-1,cy-1,cx+1,cy)          # fountain plinth
+            elif type_id in (24,25,26,27,29,31,33):
+                block_rect(cx,cy,cx,cy)                 # flowering trees, crystal, pillar, altar, lighthouse base
+            elif type_id==20:
+                block_rect(cx-1,cy,cx+1,cy)              # dock deck; approach from its shore-facing edge
+            elif type_id==21:
+                block_rect(cx-1,cy,cx+1,cy)              # boat hull
+            elif type_id==22:
+                block_rect(cx-1,cy-1,cx+1,cy)            # woodland shelter canvas footprint
+            elif type_id in (200,201,202,203,204,205,206,207,208,209,210,211,212,213,
+                             217,218,219,220,221,222,224,225,227,228,229):
+                block_rect(cx,cy,cx,cy)                  # cliff bases, boulders, fences and dense edge shrubs
+            elif type_id==28:
+                block_rect(cx-1,cy,cx-1,cy)
+                block_rect(cx+1,cy,cx+1,cy)            # ruin arch supports
+            elif type_id==30:
+                block_rect(cx-1,cy,cx+1,cy)            # broken wall segment
+            elif type_id==34:
+                block_rect(cx-1,cy,cx-1,cy)
+                block_rect(cx+1,cy,cx+1,cy)            # ornamental gate supports
     if len(objects)>MAX_OBJECTS: fail(f"{path.name}: object count exceeds {MAX_OBJECTS}")
     markers={}
     mg=root.find("./objectgroup[@name='Markers']")

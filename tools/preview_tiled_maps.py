@@ -9,7 +9,7 @@ from map_autotile import build_overlay, DIRECTIONS
 
 ROOT=Path(__file__).resolve().parents[1]
 MAPS=["coastal_camp","glowglade_grove","tidal_ruins","lighthouse_courtyard"]
-W,H,T=22,18,56
+W,H,T=18,12,56
 ATLAS=ROOT/"assets/environment/topdown_terrain_atlas_v1.png"
 FLORA=ROOT/"assets/environment/flora_props_atlas_128.png"
 AREA=ROOT/"assets/environment/area_props_96.png"
@@ -19,10 +19,10 @@ CLIFFS=ROOT/"assets/environment/cliffs_fences_atlas_128.png"
 ORIGINAL=ROOT/"assets/environment/original_props_16_v1.png"
 KENNEY=ROOT/"assets/environment/kenney_buildings_atlas.png"
 PICKUPS={
-    "coastal_camp":[(7,7),(9,11),(13,10),(15,6),(15,12)],
-    "glowglade_grove":[(6,5),(8,12),(14,5),(16,11),(17,13)],
-    "tidal_ruins":[(7,6),(11,12),(15,5),(18,11)],
-    "lighthouse_courtyard":[(6,5),(12,12),(17,5)],
+    "coastal_camp":[(8,8),(12,8),(14,6),(5,9),(5,10),(12,9)],
+    "glowglade_grove":[(6,7),(12,6),(12,7),(4,10),(10,10)],
+    "tidal_ruins":[(7,7),(14,6),(7,8),(12,10)],
+    "lighthouse_courtyard":[(7,7),(11,7),(10,10)],
 }
 
 
@@ -61,7 +61,9 @@ def draw_object(image,obj,sheets):
         index=int(kind[5:])
         if 20<=index<=35:
             sprite=crop_cell(sheets["area"],index-20,16,96)
-            dims={20:(164,112),21:(126,112),22:(132,126),24:(150,158),25:(126,126),26:(102,94),27:(156,168),28:(184,184),29:(104,122),30:(128,112),31:(132,132),32:(130,100),
+            dims={20:(164,112),21:(126,112),22:(220,176),24:(150,158),
+                  25:(126,126),26:(102,94),27:(156,168),28:(184,184),
+                  29:(104,122),30:(128,112),31:(132,132),32:(130,100),
                   33:(150,190),34:(110,118),35:(112,116)}
             width,height=dims.get(index,(100,108))
             paste_anchor(image,sprite,x,y+7,width*scale,height*scale)
@@ -73,7 +75,9 @@ def draw_object(image,obj,sheets):
             paste_anchor(image,sprite,x,y+7,112*scale,112*scale)
         elif 300<=index<400:
             sprite=crop_cell(sheets["structures"],index-300,8,128)
-            paste_anchor(image,sprite,x,y+7,150*scale,140*scale)
+            dims={302:(330,260),303:(176,154),304:(166,180),305:(168,152)}
+            width,height=dims.get(index,(150,140))
+            paste_anchor(image,sprite,x,y+7,width*scale,height*scale)
         elif 400<=index<416:
             sprite=crop_cell(sheets["original"],index-400,4,32)
             paste_anchor(image,sprite,x,y+7,92*scale,92*scale)
@@ -82,6 +86,12 @@ def draw_object(image,obj,sheets):
                 sx=(index-500)*192+24
                 sprite=sheets["kenney"].crop((sx,0,sx+144,192))
                 paste_anchor(image,sprite,x,y+7,144*scale,192*scale)
+            elif index==502:
+                sprite=sheets["kenney"].crop((0,240,192,384))
+                paste_anchor(image,sprite,x,y+7,192*scale,144*scale)
+            else:
+                sprite=sheets["kenney"].crop((204,336,372,384))
+                paste_anchor(image,sprite,x,y+7,168*scale,48*scale)
 
 
 def render_map(name,out_dir):
@@ -138,8 +148,8 @@ def render_map(name,out_dir):
     markers=root.find("./objectgroup[@name='Markers']")
     visible_markers={"coastal_camp":{"spawn","return","grove_gate","ruin_gate","shrine"},
                      "glowglade_grove":{"spawn","return","shrine","boss"},
-                     "tidal_ruins":{"camp","return","shrine","boss"},
-                     "lighthouse_courtyard":{"camp","return","shrine","boss"}}[name]
+                     "tidal_ruins":{"spawn","return","shrine","boss"},
+                     "lighthouse_courtyard":{"spawn","return","shrine","boss"}}[name]
     if markers is not None:
         for obj in markers.findall("object"):
             marker=obj.get("type") or obj.get("class") or obj.get("name") or ""

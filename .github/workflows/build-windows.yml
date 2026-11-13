@@ -3,12 +3,18 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: [main, feature/scene-interaction-polish]
 jobs:
   build-windows:
+    needs: build-raspberry-pi5
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Download portable portrait PNGs from the Linux rasterizer
+        uses: actions/download-artifact@v4
+        with:
+          name: MistIsle-RaspberryPi5-ARM64
+          path: build-pi-artifact
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -19,6 +25,10 @@ jobs:
           python tools/generate_ground_atlas.py
           python tools/preview_kenney_pack.py
           python tools/build_kenney_runtime_atlas.py
+          New-Item -ItemType Directory -Force -Path assets/characters/png | Out-Null
+          Copy-Item build-pi-artifact/assets/characters/png/heroine_portrait.png assets/characters/png/ -Force
+          Copy-Item build-pi-artifact/assets/characters/png/watcher_portrait.png assets/characters/png/ -Force
+          Copy-Item build-pi-artifact/assets/characters/png/lighthouse_guardian_portrait.png assets/characters/png/ -Force
           python tools/preview_tiled_maps.py --output build/map-previews
           if (Test-Path third_party/kenney/rpg-base/KenneyRPGpack.zip) { python tools/preview_cc0_packs.py }
           python tools/validate_project.py
@@ -93,8 +103,9 @@ jobs:
           sudo apt-get install -y build-essential cmake git pkg-config libx11-dev libxext-dev libxcursor-dev libxinerama-dev libxrandr-dev libxi-dev libasound2-dev libgl1-mesa-dev libwayland-dev libxkbcommon-dev wayland-protocols
       - name: Generate art and validate Tiled maps
         run: |
-          python -m pip install pillow
+          python -m pip install pillow cairosvg
           python tools/generate_pixel_assets.py
+          python tools/rasterize_assets.py
           python tools/generate_ground_atlas.py
           python tools/preview_kenney_pack.py
           python tools/build_kenney_runtime_atlas.py

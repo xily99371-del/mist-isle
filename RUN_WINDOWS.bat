@@ -17,12 +17,16 @@ if errorlevel 1 (
   pause
   exit /b 1
 )
-python -c "import PIL" >nul 2>nul
-if errorlevel 1 python -m pip install pillow
+python -c "import PIL, cairosvg" >nul 2>nul
+if errorlevel 1 python -m pip install pillow cairosvg
 if errorlevel 1 goto failed
 
 echo [2/3] Generating pixel-art assets...
 python tools\generate_pixel_assets.py
+if errorlevel 1 goto failed
+if not exist assets\characters\png\heroine_portrait.png powershell -NoProfile -ExecutionPolicy Bypass -File tools\fetch_portrait_assets.ps1
+if errorlevel 1 goto failed
+if not exist assets\characters\png\watcher_portrait.png powershell -NoProfile -ExecutionPolicy Bypass -File tools\fetch_portrait_assets.ps1
 if errorlevel 1 goto failed
 python tools\generate_ground_atlas.py
 if errorlevel 1 goto failed

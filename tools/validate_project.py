@@ -18,6 +18,8 @@ MAP_BUILD = (ROOT / "tools/build_maps.py").read_text(encoding="utf-8")
 MAP_AUTOTILE = (ROOT / "tools/map_autotile.py").read_text(encoding="utf-8")
 MAP_HEADER_VALIDATOR = (ROOT / "tools/validate_generated_maps.py").read_text(encoding="utf-8")
 MAP_PREVIEW = (ROOT / "tools/preview_tiled_maps.py").read_text(encoding="utf-8")
+RASTERIZER = (ROOT / "tools/rasterize_assets.py").read_text(encoding="utf-8")
+GROVE_MAP = (ROOT / "maps/glowglade_grove.tmx").read_text(encoding="utf-8")
 MAP_FILES = [ROOT / "maps" / name for name in (
     "terrain.tsx", "coastal_camp.tmx", "glowglade_grove.tmx",
     "tidal_ruins.tmx", "lighthouse_courtyard.tmx"
@@ -31,6 +33,9 @@ def require(condition, message):
 # The imported approved art is optional in CI, but if present its real frame geometry is enforced.
 assets = {
     "assets/characters/hero/hero_walk_4dir_64.png": (128, 128),
+    "assets/characters/png/heroine_portrait.png": (512, 640),
+    "assets/characters/png/watcher_portrait.png": (512, 640),
+    "assets/characters/png/lighthouse_guardian_portrait.png": (512, 640),
     "assets/characters/companions/moss_lumi_idle_64.png": (128, 32),
     "assets/characters/companions/moatail_idle_64.png": (128, 32),
     "assets/characters/companions/crystal_gecko_idle_64.png": (128, 32),
@@ -67,11 +72,22 @@ require("frame*64" not in RENDER and "facing*64" not in RENDER,
 require("index*96" in RENDER, "environment props use 96px atlas cells")
 require("DrawAreaProp" in RENDER and "area_props_96.png" in RENDER, "area-specific supplemental prop atlas is integrated")
 require("DrawTopDownTile" in RENDER and "WorldToScreen" in RENDER, "orthographic top-down square-tile renderer is active")
-require("topdown_terrain_atlas_v1.png" in RENDER and "56,56" in RENDER, "detailed 56px top-down terrain atlas is integrated")
-require("TEX_TOPDOWN_TILES" in RENDER and "for(int i=0;i<17;i++)" in RENDER, "top-down terrain and decor textures are loaded and released")
+require("topdown_terrain_atlas_v1.png" in RENDER and "TILE_SIZE" in RENDER and "56.0f,56.0f" in RENDER, "detailed 56px top-down terrain atlas is integrated")
+require("TEX_TOPDOWN_TILES" in RENDER and "for(int i=0;i<20;i++)" in RENDER, "top-down terrain and decor textures are loaded and released")
+require('type="prop_22"' in GROVE_MAP and 'type="prop_302"' not in GROVE_MAP,
+        "Glowglade uses its own woodland shelter and never reuses the coastal lighthouse cottage")
+require("220*it->scale,176*it->scale" in RENDER and "22:(220,176)" in MAP_PREVIEW,
+        "woodland shelter display size is synchronized between runtime and Tiled preview")
+require("Return route keeps the same grounded stone-arch language" in RENDER and "DrawAreaProp(8,(Vector2){p.x,p.y+2},160,168)" in RENDER,
+        "return portal retains the authored stone-arch look instead of a placeholder black hole")
+forest_start=RENDER.find("static void DrawForestBackdrop")
+forest_end=RENDER.find("static void DrawRuinsBackdrop",forest_start)
+require(forest_start>=0 and forest_end>forest_start and "DrawCircle" not in RENDER[forest_start:forest_end],
+        "forest backdrop no longer draws procedural canopy circles; Tiled sprites define the forest")
+
 require("flora_props_atlas_128.png" in RENDER and "cliffs_fences_atlas_128.png" in RENDER and "structures_atlas_128.png" in RENDER, "refined flora, cliff and structure sprite atlases are integrated")
 require("original_props_16_v1.png" in RENDER and "DrawOriginalProp" in RENDER, "curated original 16-prop atlas is integrated")
-require("TEX_ORIGINAL_PROPS" in RENDER and "for(int i=0;i<17;i++)" in RENDER, "original prop atlas texture lifecycle is complete")
+require("TEX_ORIGINAL_PROPS" in RENDER and "for(int i=0;i<20;i++)" in RENDER, "original prop atlas texture lifecycle is complete")
 require("kenney_buildings_atlas.png" in RENDER and "DrawKenneyBuilding" in RENDER, "Kenney Tiny Town building atlas is integrated")
 rpg_pack = ROOT / "third_party/kenney/rpg-base/KenneyRPGpack.zip"
 ui_pack = ROOT / "third_party/kenney/pixel-ui/PixelUIpack.zip"
@@ -116,6 +132,15 @@ require("!g->splash.owned" in RENDER and "!g->spark.owned" in RENDER,
         "unrecruited water and crystal companions are visible as world encounters")
 require("RenderInit(void)" in RENDER and "RenderClose(void)" in RENDER,
         "renderer owns texture load and release lifecycle")
+require(all((ROOT / f"assets/characters/svg/{name}.svg").exists() for name in ("heroine_portrait","watcher_portrait","lighthouse_guardian_portrait")),
+        "three authored static character portrait source illustrations are present")
+require("cairosvg" in RASTERIZER and all(name in RASTERIZER for name in ("heroine_portrait.svg","watcher_portrait.svg","lighthouse_guardian_portrait.svg")),
+        "portrait artwork is rasterized from editable high-resolution SVG source assets")
+require("python tools/rasterize_assets.py" in WORKFLOW and "cairosvg" in WORKFLOW,
+        "Windows and Raspberry Pi CI generate the static portrait PNGs before packaging")
+require(all(name in RENDER for name in ("TEX_HERO_PORTRAIT","TEX_WATCHER_PORTRAIT","TEX_GUARDIAN_PORTRAIT")) and "DrawTexturePro(*art" in RENDER,
+        "dialogue displays dedicated illustrated portraits instead of enlarged walking sprites or geometric stand-ins")
+
 require("FLAG_WINDOW_RESIZABLE" in MAIN and "1600,900" in MAIN and "LoadRenderTexture(SW,SH)" in MAIN,
         "Windows game opens in a larger resizable window with a fixed 16:9 logical canvas")
 require("MISTISLE_PI_PROFILE" in MAIN and "SetWindowMinSize(960,540)" in MAIN and "showPerfOverlay" in MAIN,
@@ -125,6 +150,15 @@ require("MISTISLE_PI_PROFILE" in CMAKE and 'set(OPENGL_VERSION "2.1"' in CMAKE a
 require("find_package(Python3 REQUIRED COMPONENTS Interpreter)" in CMAKE and "tools/build_maps.py" in CMAKE,
         "Python is required only at build time to compile Tiled maps")
 require(all(path.exists() for path in MAP_FILES), "all four Tiled maps and the terrain tileset are present")
+require("#define MAPW 18" in HEADER and "#define MAPH 12" in HEADER and "W,H,T,MAX_OBJECTS=18,12,56,64" in MAP_BUILD and "WIDTH, HEIGHT = 18, 12" in MAP_AUTOTILE and "W,H,T=18,12,56" in MAP_PREVIEW,
+        "all four maps, runtime arrays, autotile masks and Tiled previews use compact 18×12 one-screen dimensions")
+require(all(f'width="18" height="12"' in path.read_text(encoding="utf-8") for path in MAP_FILES if path.suffix==".tmx"),
+        "every Chapter 1 Tiled map is authored at 18×12 cells")
+require('type="prop_22"' in GROVE_MAP and 'type="prop_302"' not in GROVE_MAP and 'type="prop_33"' not in GROVE_MAP,
+        "Glowglade Grove uses its own woodland shelter and excludes the coastal cottage, lighthouse and bridge props")
+require("PushRenderItem(items,&count,RENDER_KEEPER,0,(Vector2){7.0f,7.0f}" in RENDER and "PushRenderItem(items,&count,RENDER_MOATAIL,0,(Vector2){14,7}" in RENDER and "PushRenderItem(items,&count,RENDER_GECKO,0,(Vector2){13,8}" in RENDER,
+        "Watcher and companion actors are positioned for the compact Tiled scene layouts")
+
 require('name=="campfire": type_id=2000' in MAP_BUILD and "obj->type==2000" in RENDER,
         "the campfire remains an animated Tiled-authored scene object")
 require("generate_ground_atlas.py" in CMAKE and "topdown_terrain_atlas_v1.png" in CMAKE,
@@ -137,6 +171,32 @@ require("def build_overlay" in MAP_AUTOTILE and "DIRECTIONS" in MAP_AUTOTILE and
         "the four-direction shoreline autotile helper is present for clean Windows and ARM64 builds")
 require("if type_id==32:" in MAP_BUILD and "collision[by][xx]=0" in MAP_BUILD,
         "Tiled bridge objects open a real walkable span through the water collision grid")
+require("Collision follows the visible object's ground footprint" in MAP_BUILD and "rear wall of the enlarged house" in MAP_BUILD,
+        "Tiled buildings, tree trunks, walls, pillars and altar bases compile into gameplay collision")
+require("nearest free, reachable tile" in GAME and "occupied" in GAME,
+        "blocked or duplicate pickups are relocated to a distinct reachable ground tile")
+require("living stone arch" in RENDER and "beacon tower" in RENDER and "Return route keeps" in RENDER,
+        "grove, ruins, lighthouse and return portals have distinct grounded visual identities")
+require("finalCore" in RENDER and "DrawAreaProp(11,p,190,194)" in RENDER,
+        "the Tidal Ruins keystone is a larger multi-ring final altar, distinct from ordinary shrines")
+require("DrawLighthouseGuardian(p,g->time,1.48f)" in RENDER and "static void DrawKeeper(Vector2 p,float t,float scale)" in RENDER and "Hood and face" in RENDER,
+        "the lighthouse guardian and Watcher use dedicated world-scene silhouettes")
+require("DrawDialoguePortrait" in RENDER and "dialoguePortrait[page]" in RENDER and "DrawTexturePro(*art" in RENDER,
+        "dialogue scenes render full-size portraits for the hero, Watcher and lighthouse guardian")
+require('strncmp(speaker,"旅人",strlen("旅人"))==0' in GAME,
+        "traveler journal and protagonist lines resolve to the protagonist portrait rather than a companion")
+require('if(strncmp(speaker,"旅人",strlen("旅人"))==0)speaker="旅人";' in RENDER,
+        "protagonist dialogue uses the correct visible speaker label")
+require("dialogueStartsBossBattle" in GAME and "SetDialogueSequence(g,speakers,lines,4,true)" in GAME,
+        "the lighthouse guardian delivers a multi-speaker pre-battle conversation before combat")
+require("SetDialogueSequence(g,speakers,lines,3,false)" in GAME and "胸口的光" in GAME,
+        "the boss encounter ends with a dedicated character dialogue scene")
+require("nearest free, reachable tile" in GAME and "visual footprint of tall structures" in GAME,
+        "collectibles avoid both collision footprints and visually occluding large props")
+require("330*it->scale,260*it->scale" in RENDER and "dims={302:(330,260)" in MAP_PREVIEW,
+        "the coastal and forest cottages are enlarged consistently in runtime and map previews")
+require("DrawStructureProp(2,p,330*it->scale,260*it->scale)" in RENDER and "rear wall of the enlarged house" in MAP_BUILD,
+        "large cottage structures use the structure atlas with matching collision foundations")
 require('#include "area_maps.h"' in RENDER and "AREA_OVERLAY[(int)g->area][direction][y][x]" in RENDER and "direction*90" in RENDER,
         "renderer draws every directional shoreline mask from the generated Tiled map header")
 require("AREA_OVERLAY[4][4][MAPH][MAPW]" in MAP_HEADER_VALIDATOR and "validate_generated_maps.py" in CMAKE,
@@ -188,7 +248,7 @@ require("TEX_ENDING_CG" in RENDER and "LoadEndingCG" in RENDER and "assets/cinem
         "ending uses a dedicated illustrated lighthouse scene")
 require("scene.width*.535f" in RENDER and "scene.width-4.0f" in RENDER,
         "ending scene adds a procedural moving beacon beam over the illustration")
-require("DrawAreaProp(11,p,112,116)" in RENDER and "DrawAreaPropTint(13,p" in RENDER,
+require("DrawAreaProp(11,p,190,194)" in RENDER and "DrawAreaPropTint(13,p" in RENDER,
         "the shrine uses its authored sprite and the pre-finale lighthouse is dimmed")
 require("g->objectiveCollapsed" in RENDER and "O 收起" in RENDER and "O 展开" in RENDER,
         "objective tracker can collapse to a compact title chip and expand again")
@@ -226,7 +286,7 @@ with Image.open(io.BytesIO(base64.b64decode(cg_data, validate=True))) as cg:
     require(cg.size == (448, 448), "lighthouse finale illustration is a 448px square scene")
 require("assets/cinematics" in WORKFLOW and "Copy-Item assets/cinematics/*" in WORKFLOW,
         "Windows playtest package includes the cinematic asset")
-require("footY-66" in RENDER and "footY-56" in RENDER,
+require("footY-66" in RENDER and "66,66" in RENDER,
         "player and companion sprites use enlarged world-space dimensions")
 require("unsigned char solid[MAPH][MAPW]" in HEADER and "w->solid[y][x]=AREA_COLLISION" in GAME and "g->world.solid[y][x]" in GAME,
         "Tiled collision layer is shared with gameplay collision")
