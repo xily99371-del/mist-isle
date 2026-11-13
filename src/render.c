@@ -649,7 +649,8 @@ static void DrawCoastalCliffs(Game *g,int terrainKinds[MAPH][MAPW]) {
         bool west=terrainKinds[y][x-1]==4;
         if(!south&&!north&&!east&&!west)continue;
         unsigned int h=TileHash(x,y,(int)g->area+73);
-        int index=2+(int)(h%4u);
+        const int cliffVariants[3]={0,6,7};
+        int index=cliffVariants[h%3u];
         float rotation=0.0f,ox=0.0f,oy=0.0f;
         if(south){rotation=0.0f;oy=28.0f;}
         else if(north){rotation=180.0f;oy=-28.0f;}
@@ -657,7 +658,7 @@ static void DrawCoastalCliffs(Game *g,int terrainKinds[MAPH][MAPW]) {
         else if(west){rotation=90.0f;ox=-28.0f;}
         Vector2 p=WorldToScreen((float)x,(float)y);
         p.x+=ox;p.y+=oy;
-        float size=140.0f;
+        float size=112.0f;
         Rectangle src={(float)((index%8)*128),(float)((index/8)*128),128.0f,128.0f};
         Rectangle dst={p.x-size*.5f,p.y-size*.5f,size,size};
         DrawTexturePro(TEX_CLIFF_ATLAS,src,dst,(Vector2){size*.5f,size*.5f},rotation,WHITE);
