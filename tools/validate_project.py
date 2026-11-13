@@ -147,7 +147,7 @@ require("finalCore" in RENDER and "DrawAreaProp(11,p,190,194)" in RENDER,
         "the Tidal Ruins keystone is a larger multi-ring final altar, distinct from ordinary shrines")
 require("DrawLighthouseGuardian(p,g->time,1.48f)" in RENDER and "72,82" in RENDER,
         "the lighthouse guardian and Watcher receive stronger world-scene silhouettes")
-require("DrawStructureProp(2,p,232*it->scale,210*it->scale)" in RENDER and "prop_302" in MAP_BUILD,
+require("DrawStructureProp(2,p,232*it->scale,210*it->scale)" in RENDER and "type_id in (302,500,501)" in MAP_BUILD,
         "large cottage structures use the structure atlas with matching collision foundations")
 require('#include "area_maps.h"' in RENDER and "AREA_OVERLAY[(int)g->area][direction][y][x]" in RENDER and "direction*90" in RENDER,
         "renderer draws every directional shoreline mask from the generated Tiled map header")
