@@ -39,6 +39,12 @@
   <object id="318" name="prop_128" type="prop_128" x="252.00" y="308.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="319" name="prop_129" type="prop_129" x="868.00" y="196.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="320" name="prop_116" type="prop_116" x="140.00" y="476.00"><properties><property name="scale" type="float" value="0.76"/></properties><point/></object>
+   <object id="340" name="prop_116" type="prop_116" x="476.00" y="476.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
+  <object id="341" name="prop_117" type="prop_117" x="588.00" y="476.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
+  <object id="342" name="prop_118" type="prop_118" x="252.00" y="364.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
+  <object id="343" name="prop_119" type="prop_119" x="700.00" y="364.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
+  <object id="344" name="prop_124" type="prop_124" x="308.00" y="196.00"><properties><property name="scale" type="float" value="0.76"/></properties><point/></object>
+  <object id="345" name="prop_126" type="prop_126" x="812.00" y="532.00"><properties><property name="scale" type="float" value="0.76"/></properties><point/></object>
  </objectgroup>
  <objectgroup id="4" name="Markers" draworder="topdown">
   <object id="500" name="spawn" type="spawn" x="532.00" y="588.00"><point/></object>
