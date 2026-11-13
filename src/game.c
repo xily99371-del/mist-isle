@@ -554,7 +554,7 @@ void GameUpdate(Game *g,float dt) {
             Vector2 mouse=LogicalMousePosition();
             Rectangle objectiveToggle=g->objectiveCollapsed
                 ?(Rectangle){SW-88.0f,24.0f,68.0f,28.0f}
-                :(Rectangle){SW-94.0f,26.0f,72.0f,28.0f};
+                :(Rectangle){SW-92.0f,26.0f,72.0f,28.0f};
             if(CheckCollisionPointRec(mouse,objectiveToggle))g->objectiveCollapsed=!g->objectiveCollapsed;
         }
         if(IsKeyPressed(KEY_F7)) {
