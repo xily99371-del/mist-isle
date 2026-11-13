@@ -144,6 +144,7 @@ static void DrawTerrainAccent(int x,int y,Area area,int kind,float time) {
         return;
     }
 #if defined(MISTISLE_PI_PROFILE)
+    // Static grass, sand and stone detail is baked into the ground cache.
     return;
 #endif
     if(kind==2) {
