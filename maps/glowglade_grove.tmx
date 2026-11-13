@@ -68,7 +68,7 @@
   <object id="336" name="prop_25" type="prop_25" x="364.00" y="364.00"><properties><property name="scale" type="float" value="0.95"/></properties><point/></object>
   <object id="337" name="prop_116" type="prop_116" x="308.00" y="308.00"><properties><property name="scale" type="float" value="0.96"/></properties><point/></object>
   <object id="338" name="prop_117" type="prop_117" x="364.00" y="644.00"><properties><property name="scale" type="float" value="0.88"/></properties><point/></object>
-  <object id="339" name="prop_118" type="prop_118" x="476.00" y="252.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
+  <object id="339" name="prop_118" type="prop_118" x="532.00" y="700.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
   <object id="340" name="prop_119" type="prop_119" x="812.00" y="476.00"><properties><property name="scale" type="float" value="0.96"/></properties><point/></object>
   <object id="341" name="prop_120" type="prop_120" x="924.00" y="644.00"><properties><property name="scale" type="float" value="0.88"/></properties><point/></object>
   <object id="342" name="prop_124" type="prop_124" x="308.00" y="756.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
