@@ -1194,7 +1194,7 @@ static void DrawDialoguePortrait(Game *g,int portrait) {
     } else if(portrait==1) {
         DrawKeeper((Vector2){144,650},g->time,1.85f);
     } else if(portrait==2) {
-        DrawLighthouseGuardian((Vector2){144,666},g->time,1.55f);
+        DrawLighthouseGuardian((Vector2){144,635},g->time,1.45f);
     } else {
         DrawLumi((Vector2){144,625},g->time,0);
     }
