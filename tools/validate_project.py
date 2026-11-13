@@ -154,7 +154,7 @@ require("#define MAPW 18" in HEADER and "#define MAPH 12" in HEADER and "W,H,T,M
         "all four maps, runtime arrays, autotile masks and Tiled previews use compact 18×12 one-screen dimensions")
 require(all(f'width="18" height="12"' in path.read_text(encoding="utf-8") for path in MAP_FILES if path.suffix==".tmx"),
         "every Chapter 1 Tiled map is authored at 18×12 cells")
-require('type="prop_22"' in GROVE_MAP and 'type="prop_302"' not in GROVE_MAP and 'type="prop_133"' not in GROVE_MAP and 'type="prop_132"' not in GROVE_MAP,
+require('type="prop_22"' in GROVE_MAP and 'type="prop_302"' not in GROVE_MAP and 'type="prop_33"' not in GROVE_MAP,
         "Glowglade Grove uses its own woodland shelter and excludes the coastal cottage, lighthouse and bridge props")
 require("PushRenderItem(items,&count,RENDER_KEEPER,0,(Vector2){7.0f,7.0f}" in RENDER and "PushRenderItem(items,&count,RENDER_MOATAIL,0,(Vector2){14,7}" in RENDER and "PushRenderItem(items,&count,RENDER_GECKO,0,(Vector2){13,8}" in RENDER,
         "Watcher and companion actors are positioned for the compact Tiled scene layouts")
@@ -195,7 +195,7 @@ require("nearest free, reachable tile" in GAME and "visual footprint of tall str
         "collectibles avoid both collision footprints and visually occluding large props")
 require("330*it->scale,260*it->scale" in RENDER and "dims={302:(330,260)" in MAP_PREVIEW,
         "the coastal and forest cottages are enlarged consistently in runtime and map previews")
-require("DrawStructureProp(2,p,330*it->scale,300*it->scale)" in RENDER and "type_id in (302,500,501)" in MAP_BUILD,
+require("DrawStructureProp(2,p,330*it->scale,260*it->scale)" in RENDER and "type_id in (302,500,501)" in MAP_BUILD,
         "large cottage structures use the structure atlas with matching collision foundations")
 require('#include "area_maps.h"' in RENDER and "AREA_OVERLAY[(int)g->area][direction][y][x]" in RENDER and "direction*90" in RENDER,
         "renderer draws every directional shoreline mask from the generated Tiled map header")
