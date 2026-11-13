@@ -700,13 +700,16 @@ static void BuildGroundCache(Game *g) {
     for(int y=0;y<MAPH;y++)for(int x=0;x<MAPW;x++) {
         int kind=terrainKinds[y][x];
         DrawTopDownTile(x,y,g->world.terrain[y][x],kind,0.0f);
-        int overlay=AREA_OVERLAY[(int)g->area][y][x];
-        if(overlay>=0&&TEX_TOPDOWN_TILES.id) {
+        if(TEX_TOPDOWN_TILES.id) {
             Vector2 p=WorldToScreen((float)x,(float)y);
-            Rectangle src={(float)((overlay%4)*56),(float)((overlay/4)*56),56.0f,56.0f};
             Rectangle dst={p.x-TILE_SIZE*.5f,p.y-TILE_SIZE*.5f,TILE_SIZE,TILE_SIZE};
-            DrawTexturePro(TEX_TOPDOWN_TILES,src,dst,(Vector2){TILE_SIZE*.5f,TILE_SIZE*.5f},
-                           (float)AREA_OVERLAY_ROTATION[(int)g->area][y][x],WHITE);
+            for(int direction=0;direction<4;direction++) {
+                int overlay=AREA_OVERLAY[(int)g->area][direction][y][x];
+                if(overlay<0)continue;
+                Rectangle src={(float)((overlay%4)*56),(float)((overlay/4)*56),56.0f,56.0f};
+                DrawTexturePro(TEX_TOPDOWN_TILES,src,dst,(Vector2){TILE_SIZE*.5f,TILE_SIZE*.5f},
+                               (float)(direction*90),WHITE);
+            }
         }
         if(kind!=4)DrawTerrainAccent(x,y,g->area,kind,0.0f);
     }
@@ -754,13 +757,16 @@ static void RenderWorld(Game *g) {
         for(int y=minY;y<=maxY;y++)for(int x=minX;x<=maxX;x++) {
             int kind=terrainKinds[y][x];
             DrawTopDownTile(x,y,g->world.terrain[y][x],kind,g->time);
-            int overlay=AREA_OVERLAY[(int)g->area][y][x];
-            if(overlay>=0&&TEX_TOPDOWN_TILES.id) {
+            if(TEX_TOPDOWN_TILES.id) {
                 Vector2 p=WorldToScreen((float)x,(float)y);
-                Rectangle src={(float)((overlay%4)*56),(float)((overlay/4)*56),56.0f,56.0f};
                 Rectangle dst={p.x-TILE_SIZE*.5f,p.y-TILE_SIZE*.5f,TILE_SIZE,TILE_SIZE};
-                DrawTexturePro(TEX_TOPDOWN_TILES,src,dst,(Vector2){TILE_SIZE*.5f,TILE_SIZE*.5f},
-                               (float)AREA_OVERLAY_ROTATION[(int)g->area][y][x],WHITE);
+                for(int direction=0;direction<4;direction++) {
+                    int overlay=AREA_OVERLAY[(int)g->area][direction][y][x];
+                    if(overlay<0)continue;
+                    Rectangle src={(float)((overlay%4)*56),(float)((overlay/4)*56),56.0f,56.0f};
+                    DrawTexturePro(TEX_TOPDOWN_TILES,src,dst,(Vector2){TILE_SIZE*.5f,TILE_SIZE*.5f},
+                                   (float)(direction*90),WHITE);
+                }
             }
             DrawTerrainAccent(x,y,g->area,kind,g->time);
         }
