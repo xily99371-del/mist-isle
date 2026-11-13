@@ -147,8 +147,8 @@ require("DrawTexturePro(TEX_GROUND_CACHE.texture" in RENDER and "UnloadRenderTex
         "cached map is drawn as one texture and released cleanly")
 require("DrawWorldBackdrop(g)" in RENDER[RENDER.find("static void BuildGroundCache"):RENDER.find("static void RenderWorld")],
         "static sea, forest and ruins backdrops are baked into the same area cache")
-require("DrawWorldBackdrop(g);" not in RENDER[RENDER.find("static void RenderWorld"):RENDER.find("static void Panel")],
-        "the large decorative backdrop is not redrawn every frame")
+require(RENDER.count("DrawWorldBackdrop(g);")==2,
+        "the large decorative backdrop is cached once, with one allocation-failure fallback")
 require("#define MAX_PARTICLES 160" in HEADER and "#define MAX_PARTICLES 300" in HEADER,
         "Raspberry Pi uses a bounded particle pool while desktop keeps the full pool")
 require("Safe fallback if the target GPU cannot allocate the single-area ground cache" in RENDER,
