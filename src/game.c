@@ -98,7 +98,6 @@ static void BuildAreaWorld(Game *g,Area area) {
     w->pickupCount=0;
     w->objectCount=0;
     for(int y=0;y<MAPH;y++)for(int x=0;x<MAPW;x++) {
-        w->kind[y][x]=0;
         w->terrain[y][x]=AREA_GROUND[(int)area][y][x];
         w->solid[y][x]=AREA_COLLISION[(int)area][y][x];
     }
