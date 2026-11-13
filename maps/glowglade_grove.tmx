@@ -30,7 +30,6 @@
   <object id="308" name="tree1" type="tree1" x="644.00" y="588.00"><properties><property name="scale" type="float" value="1.02"/></properties><point/></object>
   <object id="309" name="tree2" type="tree2" x="980.00" y="588.00"><properties><property name="scale" type="float" value="1.08"/></properties><point/></object>
   <object id="310" name="tree0" type="tree0" x="308.00" y="252.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
-  <object id="311" name="tree1" type="tree1" x="644.00" y="196.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
   <object id="312" name="林间守望者小屋" type="prop_500" x="476.00" y="252.00"><properties><property name="scale" type="float" value="1.12"/></properties><point/></object>
   <object id="313" name="林间采集营帐" type="prop_22" x="700.00" y="252.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
   <object id="314" name="花荫树" type="prop_24" x="252.00" y="308.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
@@ -43,18 +42,15 @@
   <object id="321" name="溪谷崖壁" type="prop_200" x="924.00" y="140.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
   <object id="322" name="溪谷崖壁" type="prop_201" x="924.00" y="252.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
   <object id="323" name="溪谷瀑布崖壁" type="prop_202" x="924.00" y="476.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
-  <object id="324" name="prop_116" type="prop_116" x="364.00" y="308.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
+  <object id="324" name="prop_116" type="prop_116" x="252.00" y="420.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="325" name="prop_117" type="prop_117" x="420.00" y="476.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
-  <object id="326" name="prop_118" type="prop_118" x="588.00" y="364.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
+  <object id="326" name="prop_118" type="prop_118" x="700.00" y="420.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="327" name="prop_119" type="prop_119" x="700.00" y="420.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="328" name="prop_120" type="prop_120" x="252.00" y="532.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="329" name="prop_124" type="prop_124" x="476.00" y="532.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
-  <object id="330" name="prop_126" type="prop_126" x="644.00" y="532.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
+  <object id="330" name="prop_126" type="prop_126" x="588.00" y="588.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="331" name="prop_128" type="prop_128" x="308.00" y="364.00"><properties><property name="scale" type="float" value="0.76"/></properties><point/></object>
-  <object id="332" name="prop_129" type="prop_129" x="588.00" y="196.00"><properties><property name="scale" type="float" value="0.76"/></properties><point/></object>
   <object id="333" name="prop_132" type="prop_132" x="196.00" y="252.00"><properties><property name="scale" type="float" value="0.74"/></properties><point/></object>
-  <object id="334" name="prop_133" type="prop_133" x="756.00" y="196.00"><properties><property name="scale" type="float" value="0.74"/></properties><point/></object>
-  <object id="335" name="prop_134" type="prop_134" x="364.00" y="588.00"><properties><property name="scale" type="float" value="0.74"/></properties><point/></object>
   <object id="336" name="prop_135" type="prop_135" x="532.00" y="532.00"><properties><property name="scale" type="float" value="0.74"/></properties><point/></object>
  </objectgroup>
  <objectgroup id="4" name="Markers" draworder="topdown">
