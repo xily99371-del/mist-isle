@@ -16,7 +16,7 @@ The four Chapter 1 regions are now authored in Tiled:
 - Tidal Ruins
 - Lighthouse Courtyard
 
-Ground tiles, collision rectangles, scene-object placements and story markers are compiled into a lightweight C header during the CMake build. The executable does not parse TMX files and does not need Python or Tiled at runtime. See docs/MAP_AUTHORING.md.
+Ground tiles, collision rectangles, scene-object placements and story markers are compiled into a lightweight C header during the CMake build. Transparent grass/sand/stone/water edge masks are generated from adjacent materials, so coastlines, paths and garden borders are not limited to hard square boundaries. The executable does not parse TMX files and does not need Python or Tiled at runtime. See docs/MAP_AUTHORING.md.
 
 Windows remains the main development target. For native Raspberry Pi 5 ARM64 builds, use the dedicated low-cost profile:
 
