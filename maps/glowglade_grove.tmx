@@ -30,9 +30,6 @@
   <object id="300" name="tree0" type="tree0" x="28.00" y="28.00"><properties><property name="scale" type="float" value="1.12"/></properties><point/></object>
   <object id="301" name="tree1" type="tree1" x="140.00" y="28.00"><properties><property name="scale" type="float" value="1.16"/></properties><point/></object>
   <object id="302" name="tree2" type="tree2" x="308.00" y="28.00"><properties><property name="scale" type="float" value="1.20"/></properties><point/></object>
-  <object id="303" name="tree0" type="tree0" x="476.00" y="28.00"><properties><property name="scale" type="float" value="1.12"/></properties><point/></object>
-  <object id="304" name="tree1" type="tree1" x="644.00" y="28.00"><properties><property name="scale" type="float" value="1.16"/></properties><point/></object>
-  <object id="305" name="tree2" type="tree2" x="812.00" y="28.00"><properties><property name="scale" type="float" value="1.20"/></properties><point/></object>
   <object id="306" name="tree0" type="tree0" x="980.00" y="28.00"><properties><property name="scale" type="float" value="1.12"/></properties><point/></object>
   <object id="307" name="tree1" type="tree1" x="1148.00" y="28.00"><properties><property name="scale" type="float" value="1.16"/></properties><point/></object>
   <object id="308" name="tree2" type="tree2" x="1204.00" y="196.00"><properties><property name="scale" type="float" value="1.20"/></properties><point/></object>
@@ -56,7 +53,6 @@
   <object id="326" name="tree2" type="tree2" x="308.00" y="420.00"><properties><property name="scale" type="float" value="1.20"/></properties><point/></object>
   <object id="327" name="tree0" type="tree0" x="420.00" y="644.00"><properties><property name="scale" type="float" value="1.12"/></properties><point/></object>
   <object id="328" name="tree1" type="tree1" x="476.00" y="756.00"><properties><property name="scale" type="float" value="1.16"/></properties><point/></object>
-  <object id="329" name="tree2" type="tree2" x="812.00" y="196.00"><properties><property name="scale" type="float" value="1.20"/></properties><point/></object>
   <object id="330" name="tree0" type="tree0" x="924.00" y="196.00"><properties><property name="scale" type="float" value="1.12"/></properties><point/></object>
   <object id="331" name="tree1" type="tree1" x="980.00" y="420.00"><properties><property name="scale" type="float" value="1.16"/></properties><point/></object>
   <object id="332" name="tree2" type="tree2" x="924.00" y="588.00"><properties><property name="scale" type="float" value="1.20"/></properties><point/></object>
