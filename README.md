@@ -8,6 +8,25 @@ Explore a small island, befriend three companions, solve an elemental ruin puzzl
 ## Current status
 The repository contains the first chapter gameplay prototype, original pixel-art character sheets, an isometric ground atlas, and a Windows-first CMake build. The current milestone is focused on making the coastal camp and first companion sequence feel like a cohesive pixel-art adventure.
 
+## Data-driven maps and Raspberry Pi 5
+
+The four Chapter 1 regions are now authored in Tiled:
+- Coastal Camp
+- Glowglade Grove
+- Tidal Ruins
+- Lighthouse Courtyard
+
+Ground tiles, collision rectangles, scene-object placements and story markers are compiled into a lightweight C header during the CMake build. The executable does not parse TMX files and does not need Python or Tiled at runtime. See docs/MAP_AUTHORING.md.
+
+Windows remains the main development target. For native Raspberry Pi 5 ARM64 builds, use the dedicated low-cost profile:
+
+```bash
+chmod +x scripts/build_raspberry_pi.sh
+./scripts/build_raspberry_pi.sh
+```
+
+The Pi profile uses raylib 5.5 desktop OpenGL 2.1, disables MSAA, keeps the 1280x720 logical canvas and reduces weather draw calls. Press F3 to display FPS and frame time. See docs/RASPBERRY_PI5.md for dependencies and limitations.
+
 ## Build
 Requires CMake, Git, and a C compiler. CMake fetches raylib 5.5.
 
