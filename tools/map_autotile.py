@@ -1,64 +1,52 @@
-"""Deterministic four-direction terrain transition helper for Tiled maps.
+"""Four-direction Tiled terrain transitions.
 
-The terrain atlas reserves one transparent edge-mask row for each material.
-The compiler writes the selected mask and its rotation into static C arrays;
-the game never parses TMX or runs Python at runtime.
+The terrain atlas contains transparent edge masks for grass, sand, stone and
+water. One map cell can receive more than one edge mask (for example, at a
+curved creek bend), so the compiler emits four independent overlay planes.
 """
 from __future__ import annotations
 
 WIDTH, HEIGHT = 22, 18
-MASK_ROW = {0: 2, 1: 5, 2: 8, 3: 11}
+GRASS, SAND, STONE, WATER = range(4)
+MASK_ROW = {GRASS: 2, SAND: 5, STONE: 8, WATER: 11}
+PRIORITY = {GRASS: 0, SAND: 1, STONE: 2, WATER: 3}
+# north, east, south, west; raylib positive rotation is clockwise.
+DIRECTIONS = ((0, -1, 0), (1, 0, 90), (0, 1, 180), (-1, 0, 270))
 
 
 def material(atlas_index: int) -> int:
     row = atlas_index // 4
     if row >= 9:
-        return 3  # water
+        return WATER
     if row >= 6:
-        return 2  # stone
+        return STONE
     if row >= 3:
-        return 1  # sand
-    return 0      # grass
+        return SAND
+    return GRASS
 
 
-def _mask_for(overlay_material: int, base_material: int):
-    # Draw the edge of the neighbouring material over the current base tile.
-    if overlay_material == 0 and base_material in (1, 2):
-        return MASK_ROW[0]
-    if overlay_material == 1 and base_material in (2, 3):
-        return MASK_ROW[1]
-    if overlay_material == 2 and base_material in (0, 1):
-        return MASK_ROW[2]
-    if overlay_material == 3 and base_material in (0, 1):
-        return MASK_ROW[3]
-    return None
-
-
-def build_overlay(flat_ground: list[int]):
+def build_overlay(flat_ground: list[int]) -> list[list[int]]:
+    """Return four flat overlay planes, with -1 meaning no edge at that side."""
     if len(flat_ground) != WIDTH * HEIGHT:
         raise ValueError("ground layer has incorrect dimensions")
     materials = [material(value) for value in flat_ground]
-    overlay = [-1] * (WIDTH * HEIGHT)
-    rotation = [0] * (WIDTH * HEIGHT)
-    directions = (
-        (0, -1, 0),
-        (1, 0, 90),
-        (0, 1, 180),
-        (-1, 0, 270),
-    )
+    overlays = [[-1] * (WIDTH * HEIGHT) for _ in DIRECTIONS]
+
     for y in range(HEIGHT):
         for x in range(WIDTH):
             index = y * WIDTH + x
             base = materials[index]
-            for dx, dy, angle in directions:
+            for direction, (dx, dy, _angle) in enumerate(DIRECTIONS):
                 nx, ny = x + dx, y + dy
                 if not (0 <= nx < WIDTH and 0 <= ny < HEIGHT):
                     continue
                 adjacent = materials[ny * WIDTH + nx]
-                row = _mask_for(adjacent, base)
-                if row is None:
+                # Paint the higher-priority neighbouring material into the
+                # current tile. This avoids double-thick borders on both sides.
+                if adjacent == base or PRIORITY[adjacent] <= PRIORITY[base]:
                     continue
-                overlay[index] = row * 4 + 1
-                rotation[index] = angle
-                break
-    return overlay, rotation
+                row = MASK_ROW[adjacent]
+                column = (x * 3 + y * 5 + direction) % 4
+                overlays[direction][index] = row * 4 + column
+
+    return overlays
