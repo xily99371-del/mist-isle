@@ -73,6 +73,8 @@ static void DrawUITextWrapped(const char *text,int x,int y,int maxWidth,int size
 static Texture2D TEX_HERO={0}, TEX_LUMI={0}, TEX_MOATAIL={0}, TEX_GECKO={0}, TEX_KEEPER={0};
 static Texture2D TEX_HERO_PIXEL={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, TEX_GECKO_PIXEL={0}, TEX_TILES={0}, TEX_PROPS={0};
 static Texture2D TEX_ISO_TILES={0}, TEX_HERO_WALK={0}, TEX_ENV_PROPS={0}, TEX_LEAFLING={0}, TEX_GROVE_MOTE={0}, TEX_AREA_PROPS={0}, TEX_TOPDOWN_TILES={0}, TEX_FLORA_ATLAS={0}, TEX_CLIFF_ATLAS={0}, TEX_STRUCTURE_ATLAS={0}, TEX_ORIGINAL_PROPS={0}, TEX_KENNEY_BUILDINGS={0}, TEX_ENDING_CG={0};
+static RenderTexture2D TEX_GROUND_CACHE={0};
+static int CACHED_GROUND_AREA=-1;
 static void DrawPortrait(Texture2D tex, Vector2 p, float w, float h, float bob) {
     if (tex.id == 0) return;
     Rectangle src={0,0,(float)tex.width,(float)tex.height};
@@ -116,6 +118,15 @@ static void DrawTerrainAccent(int x,int y,Area area,int kind,float time) {
     Vector2 p=WorldToScreen((float)x,(float)y);
     unsigned int h=TileHash(x+41,y-19,(int)area+17);
     if(kind==4) {
+#if defined(MISTISLE_PI_PROFILE)
+        if((h%3u)==0u) {
+            float phase=time*1.25f+(float)(h%97u)*.08f;
+            float ox=(float)((h>>4)%22u)-11.0f;
+            float yy=p.y-10.0f+sinf(phase)*2.0f;
+            DrawLineEx((Vector2){p.x+ox,yy},(Vector2){p.x+ox+17.0f,yy-1.0f},1.2f,
+                       Fade((Color){211,239,230,255},.28f));
+        }
+#else
         float phase=time*1.35f+(float)(h%97u)*.08f;
         for(int i=0;i<3;i++) {
             float ox=(float)((h>>(i*4))%22u)-11.0f;
@@ -129,8 +140,12 @@ static void DrawTerrainAccent(int x,int y,Area area,int kind,float time) {
             float ry=p.y-18.0f+(float)((h>>11)%34u);
             DrawCircleLines((int)rx,(int)ry,3.0f,Fade((Color){202,237,226,255},.34f));
         }
+#endif
         return;
     }
+#if defined(MISTISLE_PI_PROFILE)
+    return;
+#endif
     if(kind==2) {
         if((h%2u)==0u) {
             for(int i=0;i<3;i++) {
@@ -664,29 +679,33 @@ static void DrawCoastalCliffs(Game *g,int terrainKinds[MAPH][MAPW],int minX,int 
     }
 }
 #if defined(MISTISLE_PI_PROFILE)
-#define MISTISLE_RAIN_DROPS 84
-#define MISTISLE_RAIN_RIPPLES 10
+#define MISTISLE_RAIN_DROPS 56
+#define MISTISLE_RAIN_RIPPLES 6
 #else
 #define MISTISLE_RAIN_DROPS 190
 #define MISTISLE_RAIN_RIPPLES 22
 #endif
-static void RenderWorld(Game *g) {
-    BeginMode2D(g->cam);
-    DrawWorldBackdrop(g);
-
-    // Ground comes from the Tiled-authored map data. The same data drives collision.
+static void BuildGroundCache(Game *g) {
+    if(!TEX_GROUND_CACHE.id || CACHED_GROUND_AREA==(int)g->area)return;
     int terrainKinds[MAPH][MAPW]={{0}};
     for(int y=0;y<MAPH;y++)for(int x=0;x<MAPW;x++)
         terrainKinds[y][x]=TerrainKindFromAtlasIndex(g->world.terrain[y][x]);
-    int minX,minY,maxX,maxY;
-    GetVisibleTileBounds(g,&minX,&minY,&maxX,&maxY);
-    for(int y=minY;y<=maxY;y++)for(int x=minX;x<=maxX;x++) {
+    BeginTextureMode(TEX_GROUND_CACHE);
+    ClearBackground((Color){20,34,39,255});
+    for(int y=0;y<MAPH;y++)for(int x=0;x<MAPW;x++) {
         int kind=terrainKinds[y][x];
-        DrawTopDownTile(x,y,g->world.terrain[y][x],kind,g->time);
-        DrawTerrainAccent(x,y,g->area,kind,g->time);
+        DrawTopDownTile(x,y,g->world.terrain[y][x],kind,0.0f);
+        int overlay=AREA_OVERLAY[(int)g->area][y][x];
+        if(overlay>=0&&TEX_TOPDOWN_TILES.id) {
+            Vector2 p=WorldToScreen((float)x,(float)y);
+            Rectangle src={(float)((overlay%4)*56),(float)((overlay/4)*56),56.0f,56.0f};
+            Rectangle dst={p.x-TILE_SIZE*.5f,p.y-TILE_SIZE*.5f,TILE_SIZE,TILE_SIZE};
+            DrawTexturePro(TEX_TOPDOWN_TILES,src,dst,(Vector2){TILE_SIZE*.5f,TILE_SIZE*.5f},
+                           (float)AREA_OVERLAY_ROTATION[(int)g->area][y][x],WHITE);
+        }
+        if(kind!=4)DrawTerrainAccent(x,y,g->area,kind,0.0f);
     }
-    // Broken foam traces where the sea meets the island and where streams meet their banks.
-    for(int y=minY;y<=maxY;y++)for(int x=minX;x<=maxX;x++)if(x>0&&y>0&&x<MAPW-1&&y<MAPH-1&&terrainKinds[y][x]!=4) {
+    for(int y=1;y<MAPH-1;y++)for(int x=1;x<MAPW-1;x++)if(terrainKinds[y][x]!=4) {
         Vector2 p=WorldToScreen((float)x,(float)y);
         unsigned int h=TileHash(x,y,(int)g->area+31);
         if(terrainKinds[y][x-1]==4) {
@@ -706,7 +725,27 @@ static void RenderWorld(Game *g) {
             DrawLineEx((Vector2){xx,p.y+25},(Vector2){xx+8,p.y+28},1.6f,Fade(WHITE,.34f));
         }
     }
-    DrawCoastalCliffs(g,terrainKinds,minX,minY,maxX,maxY);
+    DrawCoastalCliffs(g,terrainKinds,0,0,MAPW-1,MAPH-1);
+    EndTextureMode();
+    CACHED_GROUND_AREA=(int)g->area;
+}
+static void RenderWorld(Game *g) {
+    BuildGroundCache(g);
+    int terrainKinds[MAPH][MAPW]={{0}};
+    for(int y=0;y<MAPH;y++)for(int x=0;x<MAPW;x++)
+        terrainKinds[y][x]=TerrainKindFromAtlasIndex(g->world.terrain[y][x]);
+    int minX,minY,maxX,maxY;
+    GetVisibleTileBounds(g,&minX,&minY,&maxX,&maxY);
+    BeginMode2D(g->cam);
+    DrawWorldBackdrop(g);
+    if(TEX_GROUND_CACHE.id) {
+        Rectangle src={0,0,(float)TEX_GROUND_CACHE.texture.width,-(float)TEX_GROUND_CACHE.texture.height};
+        Rectangle dst={0,0,(float)WORLD_PIXEL_W,(float)WORLD_PIXEL_H};
+        DrawTexturePro(TEX_GROUND_CACHE.texture,src,dst,(Vector2){0,0},0,WHITE);
+    }
+    for(int y=minY;y<=maxY;y++)for(int x=minX;x<=maxX;x++)
+        if(terrainKinds[y][x]==4)DrawTerrainAccent(x,y,g->area,4,g->time);
+
     // Scene objects are authored in Tiled and depth-sorted by their ground point.
     RenderItem items[512]; int count=0;
     for(int i=0;i<g->world.objectCount;i++) {
@@ -1254,9 +1293,15 @@ void RenderInit(void) {
             if(targets[i]->id)SetTextureFilter(*targets[i],TEXTURE_FILTER_POINT);
         }
     }
+    TEX_GROUND_CACHE=LoadRenderTexture((int)WORLD_PIXEL_W,(int)WORLD_PIXEL_H);
+    if(TEX_GROUND_CACHE.id)SetTextureFilter(TEX_GROUND_CACHE.texture,TEXTURE_FILTER_POINT);
+    CACHED_GROUND_AREA=-1;
     LoadEndingCG();
 }
 void RenderClose(void) {
+    if(TEX_GROUND_CACHE.id)UnloadRenderTexture(TEX_GROUND_CACHE);
+    TEX_GROUND_CACHE=(RenderTexture2D){0};
+    CACHED_GROUND_AREA=-1;
     UnloadUIFont();
     Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS};
     for(int i=0;i<17;i++)if(textures[i]->id)UnloadTexture(*textures[i]);
