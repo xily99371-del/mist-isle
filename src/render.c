@@ -1172,7 +1172,7 @@ static void DrawDialoguePortrait(Game *g,int portrait) {
     Texture2D *art=portrait==0?&TEX_HERO_PORTRAIT:(portrait==1?&TEX_WATCHER_PORTRAIT:(portrait==2?&TEX_GUARDIAN_PORTRAIT:NULL));
     if(art&&art->id) {
         Rectangle src={0,0,(float)art->width,(float)art->height};
-        Rectangle dst={48,386,192,260};
+        Rectangle dst={48,386,192,240};
         DrawTexturePro(*art,src,dst,(Vector2){0,0},0,WHITE);
     } else if(portrait==0&&TEX_HERO_WALK.id) {
         Rectangle src={0,0,32,32},dst={55,390,180,250};
