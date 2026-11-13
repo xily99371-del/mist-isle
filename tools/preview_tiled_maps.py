@@ -25,13 +25,14 @@ def render_map(name,out_dir):
         draw.rectangle((x,y,x+T-1,y+T-1),fill=base)
         tile=atlas.crop(((index%4)*T,(index//4)*T,(index%4+1)*T,(index//4+1)*T))
         image.alpha_composite(tile,(x,y))
-    draw=ImageDraw.Draw(image,"RGBA")
+    overlay_layer=Image.new("RGBA",image.size,(0,0,0,0))
+    draw=ImageDraw.Draw(overlay_layer,"RGBA")
     collision=root.find("./objectgroup[@name='Collision']")
     if collision is not None:
         for obj in collision.findall("object"):
             x,y=float(obj.get("x","0")),float(obj.get("y","0"))
             w,h=float(obj.get("width","0")),float(obj.get("height","0"))
-            draw.rectangle((x,y,x+w,y+h),fill=(215,55,48,22),outline=(235,87,75,155),width=2)
+            draw.rectangle((x,y,x+w,y+h),fill=(215,55,48,35),outline=(235,87,75,190),width=2)
     markers=root.find("./objectgroup[@name='Markers']")
     if markers is not None:
         font=ImageFont.load_default()
@@ -40,6 +41,7 @@ def render_map(name,out_dir):
             x,y=float(obj.get("x","0")),float(obj.get("y","0"))
             draw.ellipse((x-7,y-7,x+7,y+7),fill=(255,221,105,230),outline=(35,32,20,255),width=2)
             draw.text((x+9,y-7),name2,font=font,fill=(20,28,31,255),stroke_width=1,stroke_fill=(240,231,196,220))
+    image.alpha_composite(overlay_layer)
     out=out_dir/(name+".png")
     image.save(out)
     return image,out
