@@ -127,6 +127,8 @@ require('name=="campfire": type_id=2000' in MAP_BUILD and "obj->type==2000" in R
         "the campfire remains an animated Tiled-authored scene object")
 require("AREA_GROUND" in MAP_BUILD and "AREA_COLLISION" in MAP_BUILD and "AREA_MARKERS" in MAP_BUILD and "AREA_OBJECTS" in MAP_BUILD,
         "Tiled compiler exports ground, collision, story markers and object placements")
+require("build_overlay(ground)" in MAP_BUILD and "AREA_OVERLAY[4][MAPH][MAPW]" in MAP_BUILD and "AREA_OVERLAY_ROTATION[4][MAPH][MAPW]" in MAP_BUILD,
+        "Tiled compiler emits autotile overlays and rotations consumed by the renderer")
 require("chapter1_map_review.png" in MAP_PREVIEW and "Collision" in MAP_PREVIEW and "Markers" in MAP_PREVIEW,
         "map preview generator creates a visual QA sheet with collision and story markers")
 require("python tools/preview_tiled_maps.py" in WORKFLOW,
