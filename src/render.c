@@ -106,7 +106,7 @@ static void DrawTopDownTile(int x,int y,Area area,int kind,float time) {
             Rectangle src={(float)((atlasIndex%4)*56+inset),(float)((atlasIndex/4)*56+inset),(float)patch,(float)patch};
             float dstSize=kind==3?49.0f:34.0f;
             Rectangle dst={p.x-dstSize*.5f,p.y-dstSize*.5f,dstSize,dstSize};
-            DrawTexturePro(TEX_TOPDOWN_TILES,src,dst,(Vector2){0,0},0,WHITE);
+            DrawTexturePro(TEX_TOPDOWN_TILES,src,dst,(Vector2){0,0},0,kind==3?WHITE:Fade(WHITE,.56f));
         }
         return;
     }
@@ -135,43 +135,68 @@ static void DrawTerrainAccent(int x,int y,Area area,int kind,float time) {
     Vector2 p=WorldToScreen((float)x,(float)y);
     unsigned int h=TileHash(x+41,y-19,(int)area+17);
     if(kind==4) {
-        if((h%3u)==0u) {
-            float phase=time*1.4f+(float)(h%97u)*.08f;
-            float yy=p.y-9.0f+sinf(phase)*3.0f;
-            DrawLineEx((Vector2){p.x-16.0f,yy},(Vector2){p.x+10.0f,yy-1.5f},1.6f,Fade((Color){211,239,230,255},.28f));
-            DrawLineEx((Vector2){p.x-4.0f,yy+13.0f},(Vector2){p.x+18.0f,yy+12.0f},1.1f,Fade((Color){91,178,190,255},.32f));
+        float phase=time*1.35f+(float)(h%97u)*.08f;
+        for(int i=0;i<3;i++) {
+            float ox=(float)((h>>(i*4))%22u)-11.0f;
+            float yy=p.y-13.0f+i*17.0f+sinf(phase+i*.9f)*2.8f;
+            float length=15.0f+(float)((h>>(i*5+3))%17u);
+            Color wave=i==1?(Color){91,178,190,255}:(Color){211,239,230,255};
+            DrawLineEx((Vector2){p.x+ox,yy},(Vector2){p.x+ox+length,yy-1.2f},i==1?1.1f:1.6f,Fade(wave,i==1?.28f:.34f));
+        }
+        if((h%4u)==0u) {
+            float rx=p.x-16.0f+(float)((h>>7)%32u);
+            float ry=p.y-18.0f+(float)((h>>11)%34u);
+            DrawCircleLines((int)rx,(int)ry,3.0f,Fade((Color){202,237,226,255},.34f));
         }
         return;
     }
     if(kind==2) {
-        if((h%4u)==0u) {
-            int ox=7+(int)((h>>4)%25u),oy=7+(int)((h>>9)%25u);
-            DrawCircle((int)p.x-28+ox,(int)p.y-28+oy,1.5f,(Color){190,166,126,150});
-            DrawCircle((int)p.x-28+ox+5,(int)p.y-28+oy-2,1.0f,(Color){226,211,173,170});
+        if((h%2u)==0u) {
+            for(int i=0;i<3;i++) {
+                int ox=5+(int)((h>>(i*4+3))%42u),oy=5+(int)((h>>(i*5+7))%42u);
+                DrawCircle((int)p.x-28+ox,(int)p.y-28+oy,(i==0)?1.7f:1.1f,(Color){177,151,112,165});
+                if(i==0)DrawCircle((int)p.x-28+ox+3,(int)p.y-28+oy-2,1.0f,(Color){238,219,177,190});
+            }
+        }
+        if((h%11u)==0u) {
+            float ox=(float)((h>>8)%28u)-14.0f,oy=(float)((h>>12)%24u)-12.0f;
+            DrawCircleV((Vector2){p.x+ox,p.y+oy},2.1f,(Color){228,210,167,220});
+            DrawCircleV((Vector2){p.x+ox-1,p.y+oy-1},.8f,WHITE);
         }
         return;
     }
     if(kind==3) {
-        if((h%5u)==0u) {
-            float ox=(float)((h>>5)%28u)-14.0f;
-            float oy=(float)((h>>10)%24u)-12.0f;
-            DrawLineEx((Vector2){p.x+ox-4,p.y+oy-2},(Vector2){p.x+ox+5,p.y+oy+2},1.0f,Fade((Color){72,88,82,255},.43f));
+        if((h%3u)==0u) {
+            float ox=(float)((h>>5)%30u)-15.0f,oy=(float)((h>>10)%26u)-13.0f;
+            DrawLineEx((Vector2){p.x+ox-5,p.y+oy-2},(Vector2){p.x+ox+4,p.y+oy+2},1.1f,Fade((Color){72,88,82,255},.38f));
+            if((h%2u)==0u)DrawLineEx((Vector2){p.x+ox+1,p.y+oy+1},(Vector2){p.x+ox+4,p.y+oy+6},.9f,Fade((Color){72,88,82,255},.32f));
         }
-        if((h%9u)==0u)DrawCircle((int)p.x-17+(int)((h>>3)%34u),(int)p.y-15+(int)((h>>8)%30u),2,Fade((Color){116,151,104,255},.65f));
+        if((h%4u)==0u) {
+            float ox=(float)((h>>7)%34u)-17.0f,oy=(float)((h>>12)%28u)-14.0f;
+            Color moss=(Color){113,151,102,255};
+            DrawCircleV((Vector2){p.x+ox,p.y+oy},2.0f,Fade(moss,.55f));
+            DrawCircleV((Vector2){p.x+ox+3,p.y+oy+1},1.2f,Fade(moss,.45f));
+        }
         return;
     }
-    if((h%3u)==0u) {
-        float ox=(float)((h>>4)%34u)-17.0f;
-        float oy=(float)((h>>9)%30u)-15.0f;
+    if((h%2u)==0u) {
         Color blade=area==AREA_RUINS?(Color){139,153,119,190}:(Color){87,145,83,205};
-        DrawLineEx((Vector2){p.x+ox,p.y+oy+3},(Vector2){p.x+ox-2,p.y+oy-2},1.3f,blade);
-        DrawLineEx((Vector2){p.x+ox+3,p.y+oy+3},(Vector2){p.x+ox+4,p.y+oy-2},1.2f,Fade(blade,.9f));
+        for(int i=0;i<3;i++) {
+            float ox=(float)((h>>(i*4+3))%38u)-19.0f;
+            float oy=(float)((h>>(i*5+8))%32u)-16.0f;
+            DrawLineEx((Vector2){p.x+ox,p.y+oy+4},(Vector2){p.x+ox-2.5f,p.y+oy-3},1.35f,blade);
+            DrawLineEx((Vector2){p.x+ox+3,p.y+oy+4},(Vector2){p.x+ox+4,p.y+oy-2},1.1f,Fade(blade,.9f));
+        }
     }
-    if((h%13u)==0u) {
+    if((h%7u)==0u) {
         Color petal=area==AREA_GROVE?(Color){245,220,154,255}:area==AREA_LIGHTHOUSE?(Color){223,190,225,255}:(Color){242,192,197,255};
-        float ox=(float)((h>>6)%26u)-13.0f,oy=(float)((h>>11)%22u)-11.0f;
+        float ox=(float)((h>>6)%28u)-14.0f,oy=(float)((h>>11)%24u)-12.0f;
         DrawCircleV((Vector2){p.x+ox,p.y+oy},2.0f,petal);
         DrawCircleV((Vector2){p.x+ox+3,p.y+oy-2},1.2f,Fade(WHITE,.8f));
+    }
+    if((h%13u)==0u) {
+        float ox=(float)((h>>8)%32u)-16.0f,oy=(float)((h>>13)%28u)-14.0f;
+        DrawCircleV((Vector2){p.x+ox,p.y+oy},1.8f,(Color){160,146,118,210});
     }
 }
 static void DrawAtlasSprite(Texture2D tex,int index,int columns,int cell,Vector2 p,float w,float h) {
