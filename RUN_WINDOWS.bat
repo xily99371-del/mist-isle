@@ -1,6 +1,15 @@
 @echo off
 setlocal
 cd /d "%~dp0"
+
+rem A packaged playtest contains the executable at the package root.
+rem Launch it directly instead of trying to rebuild a source tree that is not included.
+if exist "%~dp0mist_isle.exe" (
+  echo Starting packaged Mist Isle Windows build...
+  start "" "%~dp0mist_isle.exe"
+  exit /b 0
+)
+
 echo [1/3] Checking Python and Pillow...
 where python >nul 2>nul
 if errorlevel 1 (
