@@ -248,7 +248,7 @@ require("TEX_ENDING_CG" in RENDER and "LoadEndingCG" in RENDER and "assets/cinem
         "ending uses a dedicated illustrated lighthouse scene")
 require("scene.width*.535f" in RENDER and "scene.width-4.0f" in RENDER,
         "ending scene adds a procedural moving beacon beam over the illustration")
-require("DrawAreaProp(11,p,112,116)" in RENDER and "DrawAreaPropTint(13,p" in RENDER,
+require("DrawAreaProp(11,p,190,194)" in RENDER and "DrawAreaPropTint(13,p" in RENDER,
         "the shrine uses its authored sprite and the pre-finale lighthouse is dimmed")
 require("g->objectiveCollapsed" in RENDER and "O 收起" in RENDER and "O 展开" in RENDER,
         "objective tracker can collapse to a compact title chip and expand again")
