@@ -161,6 +161,10 @@ require("DrawLighthouseGuardian(p,g->time,1.48f)" in RENDER and "static void Dra
         "the lighthouse guardian and Watcher use dedicated world-scene silhouettes")
 require("DrawDialoguePortrait" in RENDER and "dialoguePortrait[page]" in RENDER and "DrawKeeper((Vector2){144,650}" in RENDER,
         "dialogue scenes render full-size portraits for the hero, Watcher and lighthouse guardian")
+require('strncmp(speaker,"旅人",strlen("旅人"))==0' in GAME,
+        "traveler journal and protagonist lines resolve to the protagonist portrait rather than a companion")
+require('if(strncmp(speaker,"旅人",strlen("旅人"))==0)speaker="旅人";' in RENDER,
+        "protagonist dialogue uses the correct visible speaker label")
 require("dialogueStartsBossBattle" in GAME and "SetDialogueSequence(g,speakers,lines,4,true)" in GAME,
         "the lighthouse guardian delivers a multi-speaker pre-battle conversation before combat")
 require("SetDialogueSequence(g,speakers,lines,3,false)" in GAME and "胸口的光" in GAME,
