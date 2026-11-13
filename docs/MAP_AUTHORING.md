@@ -30,7 +30,8 @@ Object and marker points are placed at the centre of their tile. Moving a marker
 - Props should frame the path, define clearings and establish area identity. Keep pickups, NPCs and story markers visually unobstructed.
 - Grove identity comes from a winding forest trail, dense perimeter tree groups and luminous mushroom/flower clusters.
 - Ruins identity comes from a broad stone processional, a few weathered sand edges, columns, arches, broken walls and a rune landmark.
-- Coastal Camp identity comes from its beach, dock/camp structures and a legible three-way hub route.
+- Coastal Camp identity comes from its beach, keeper's cottage compound, dock/camp structures and a legible three-way hub route.
+- Glowglade Grove uses the distinct woodland shelter prop_22 (area-prop atlas tent), not the coastal cottage compound prop_302. Frame it with tree canopies, lanterns, luminous flowers and mushroom clusters; keep its entrance and nearby pickups clear.
 - Lighthouse Courtyard identity comes from its central stone plaza, garden beds and lighthouse landmark.
 
 ## Terrain transitions
