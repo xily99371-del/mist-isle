@@ -80,7 +80,10 @@ typedef struct {
     int dialoguePage;
     char dialogue[4][180];
     char dialogueSpeaker[32];
+    char dialogueLineSpeaker[4][32];
+    int dialoguePortrait[4];
     int dialogueCount;
+    bool dialogueStartsBossBattle;
     int battleEnemy;
     int battleTurn;
     int battleMessage;
