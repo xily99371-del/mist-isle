@@ -26,10 +26,7 @@
  <objectgroup id="2" name="Collision" draworder="topdown">
  </objectgroup>
  <objectgroup id="3" name="Objects" draworder="topdown">
-  <object id="300" name="tree0" type="tree0" x="84.00" y="140.00"><properties><property name="scale" type="float" value="1.02"/></properties><point/></object>
-  <object id="301" name="tree1" type="tree1" x="196.00" y="140.00"><properties><property name="scale" type="float" value="1.02"/></properties><point/></object>
   <object id="302" name="tree2" type="tree2" x="1148.00" y="140.00"><properties><property name="scale" type="float" value="1.02"/></properties><point/></object>
-  <object id="303" name="tree0" type="tree0" x="84.00" y="308.00"><properties><property name="scale" type="float" value="1.02"/></properties><point/></object>
   <object id="304" name="tree1" type="tree1" x="1148.00" y="364.00"><properties><property name="scale" type="float" value="1.02"/></properties><point/></object>
   <object id="305" name="tree2" type="tree2" x="140.00" y="924.00"><properties><property name="scale" type="float" value="1.02"/></properties><point/></object>
   <object id="306" name="tree0" type="tree0" x="1092.00" y="924.00"><properties><property name="scale" type="float" value="1.02"/></properties><point/></object>
