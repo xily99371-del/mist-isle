@@ -23,6 +23,9 @@ SIZES = {
     "heroine_portrait.svg": (512, 640),
     "watcher_portrait.svg": (512, 640),
     "lighthouse_guardian_portrait.svg": (512, 640),
+    "moss_lumi.svg": (256, 256),
+    "moatail.svg": (256, 256),
+    "crystal_gecko.svg": (256, 256),
 }
 for svg in sorted(SRC.glob("*.svg")):
     width, height = SIZES.get(svg.name, (256, 256))
