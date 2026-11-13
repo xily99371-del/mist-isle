@@ -16,6 +16,7 @@ jobs:
         run: |
           python -m pip install pillow
           python tools/generate_pixel_assets.py
+          python tools/generate_ground_atlas.py
           python tools/preview_kenney_pack.py
           python tools/build_kenney_runtime_atlas.py
           python tools/preview_tiled_maps.py --output build/map-previews
