@@ -336,4 +336,13 @@ require("def draw_water_detail(image,indices,name)" in WATER_PREVIEW and
         "broken foam glint" in WATER_PREVIEW,
         "Tiled map previews show matching water highlights and broken shoreline foam")
 
+tree_case_start = RENDER.find("case RENDER_TREE:")
+tree_case_end = RENDER.find("case RENDER_PROP:", tree_case_start)
+tree_case = RENDER[tree_case_start:tree_case_end]
+require(tree_case_start >= 0 and tree_case_end > tree_case_start and
+        "DrawEllipse" in tree_case and "DrawFloraProp(8+(it->index%3),p,138*it->scale,152*it->scale)" in tree_case,
+        "large tree canopies have layered ground shadows and retain the authored 128px flora sprites")
+require('draw.ellipse((x-35*scale,y+1*scale,x+35*scale,y+15*scale)' in WATER_PREVIEW,
+        "map review previews reproduce the runtime tree grounding shadows")
+
 print(f"Validation complete. Imported art sheets checked: {present}/{len(assets)}.")
