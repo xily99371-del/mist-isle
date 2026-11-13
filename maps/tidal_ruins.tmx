@@ -4,44 +4,53 @@
  <layer id="1" name="Ground" width="22" height="18">
   <data encoding="csv">
    19, 18, 17, 16, 15, 14, 13, 20, 19, 18, 17, 16, 15, 14, 13, 20, 19, 18, 17, 16, 15, 14,
-   14, 14, 14, 14, 14, 17, 17, 17, 17, 17, 20, 20, 20, 20, 20, 15, 15, 15, 15, 15, 18, 18,
-   17, 18, 31, 27, 28, 20, 13, 14, 30, 31, 27, 28, 29, 25, 26, 30, 31, 32, 28, 29, 13, 14,
-   20, 14, 43, 37, 42, 27, 29, 26, 28, 25, 30, 32, 29, 31, 28, 25, 27, 44, 38, 31, 16, 18,
-   15, 18, 40, 38, 44, 30, 25, 31, 29, 27, 25, 28, 26, 32, 30, 28, 31, 41, 39, 25, 19, 14,
-   18, 17, 28, 27, 26, 25, 32, 31, 30, 29, 28, 27, 26, 25, 32, 31, 30, 29, 28, 27, 14, 13,
-   13, 13, 25, 25, 25, 28, 28, 28, 28, 28, 31, 31, 31, 31, 31, 26, 26, 26, 26, 26, 17, 17,
-   16, 17, 30, 26, 27, 31, 32, 25, 29, 30, 26, 27, 28, 32, 25, 29, 30, 31, 27, 28, 20, 13,
-   19, 13, 30, 32, 29, 26, 28, 25, 27, 32, 29, 31, 28, 30, 27, 32, 26, 31, 25, 30, 15, 17,
-   14, 17, 27, 25, 31, 29, 32, 30, 28, 26, 32, 27, 25, 31, 29, 27, 30, 28, 26, 32, 18, 13,
-   17, 16, 27, 26, 25, 32, 31, 30, 29, 28, 27, 26, 25, 32, 31, 30, 29, 28, 27, 26, 13, 20,
-   20, 20, 32, 32, 32, 27, 27, 27, 27, 27, 30, 30, 30, 30, 30, 25, 25, 25, 25, 25, 16, 16,
-   15, 16, 29, 25, 26, 30, 31, 32, 28, 29, 25, 26, 27, 31, 32, 28, 29, 30, 26, 27, 19, 20,
-   18, 20, 17, 19, 28, 25, 27, 32, 26, 31, 28, 30, 27, 29, 26, 31, 25, 30, 32, 29, 14, 16,
-   13, 16, 14, 20, 30, 28, 31, 29, 27, 25, 31, 26, 32, 30, 16, 14, 17, 27, 25, 31, 17, 20,
-   16, 15, 26, 25, 32, 31, 30, 29, 28, 27, 26, 25, 32, 31, 18, 17, 16, 27, 26, 25, 20, 19,
-   19, 19, 19, 19, 19, 14, 14, 14, 14, 14, 17, 17, 17, 17, 17, 20, 20, 20, 20, 20, 15, 15,
+   26, 26, 26, 26, 26, 29, 29, 29, 29, 29, 32, 32, 32, 32, 32, 27, 27, 27, 27, 27, 30, 30,
+   17, 30, 31, 27, 16, 20, 25, 26, 30, 31, 27, 28, 29, 25, 26, 30, 31, 32, 28, 29, 25, 14,
+   20, 26, 43, 37, 30, 27, 29, 26, 28, 25, 30, 32, 29, 31, 28, 25, 27, 32, 38, 43, 28, 18,
+   15, 30, 40, 38, 32, 30, 25, 31, 29, 27, 25, 28, 26, 32, 30, 28, 31, 29, 39, 37, 31, 14,
+   18, 29, 28, 27, 26, 25, 32, 31, 30, 29, 28, 27, 26, 25, 32, 31, 30, 29, 28, 27, 26, 13,
+   13, 25, 25, 25, 25, 28, 28, 28, 28, 28, 31, 31, 31, 31, 31, 26, 26, 26, 26, 26, 29, 17,
+   16, 29, 30, 26, 27, 31, 32, 25, 29, 30, 26, 27, 28, 32, 25, 29, 30, 31, 27, 28, 32, 13,
+   19, 25, 30, 32, 29, 26, 28, 25, 27, 32, 29, 31, 28, 30, 27, 32, 26, 31, 25, 30, 27, 17,
+   14, 29, 27, 25, 31, 29, 32, 30, 28, 26, 32, 27, 25, 31, 29, 27, 30, 28, 26, 32, 30, 13,
+   17, 28, 27, 26, 25, 32, 31, 30, 29, 28, 27, 26, 25, 32, 31, 30, 29, 28, 27, 26, 25, 20,
+   20, 32, 32, 32, 32, 27, 27, 27, 27, 27, 30, 30, 30, 30, 30, 25, 25, 25, 25, 25, 28, 16,
+   15, 28, 29, 25, 26, 30, 31, 32, 28, 29, 25, 26, 27, 31, 32, 28, 29, 30, 26, 27, 31, 20,
+   18, 32, 17, 31, 28, 25, 27, 32, 26, 31, 28, 30, 27, 29, 26, 31, 25, 30, 32, 29, 26, 16,
+   13, 28, 14, 32, 30, 28, 31, 29, 27, 25, 31, 26, 32, 30, 28, 26, 29, 27, 25, 31, 29, 20,
+   16, 27, 26, 25, 32, 31, 30, 29, 28, 27, 26, 25, 32, 31, 30, 29, 16, 15, 26, 25, 32, 19,
+   31, 31, 31, 31, 31, 26, 26, 26, 26, 26, 29, 29, 29, 29, 29, 32, 32, 32, 32, 32, 27, 27,
    14, 15, 16, 20, 13, 17, 18, 19, 15, 16, 20, 13, 14, 18, 19, 15, 16, 17, 13, 14, 18, 19
   </data>
  </layer>
  <objectgroup id="2" name="Collision" draworder="topdown">
  </objectgroup>
  <objectgroup id="3" name="Objects" draworder="topdown">
-  <object id="300" name="prop_28" type="prop_28" x="308.00" y="308.00"><properties><property name="scale" type="float" value="0.95"/></properties><point/></object>
-  <object id="301" name="prop_28" type="prop_28" x="924.00" y="308.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
-  <object id="302" name="prop_29" type="prop_29" x="420.00" y="252.00"><properties><property name="scale" type="float" value="0.80"/></properties><point/></object>
-  <object id="303" name="prop_29" type="prop_29" x="756.00" y="252.00"><properties><property name="scale" type="float" value="0.80"/></properties><point/></object>
-  <object id="304" name="prop_29" type="prop_29" x="308.00" y="700.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
-  <object id="305" name="prop_29" type="prop_29" x="812.00" y="756.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
-  <object id="306" name="prop_30" type="prop_30" x="196.00" y="364.00"><properties><property name="scale" type="float" value="0.85"/></properties><point/></object>
-  <object id="307" name="prop_30" type="prop_30" x="980.00" y="588.00"><properties><property name="scale" type="float" value="0.85"/></properties><point/></object>
-  <object id="308" name="prop_30" type="prop_30" x="532.00" y="812.00"><properties><property name="scale" type="float" value="0.80"/></properties><point/></object>
-  <object id="309" name="prop_31" type="prop_31" x="700.00" y="308.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
-  <object id="310" name="prop_116" type="prop_116" x="364.00" y="812.00"><properties><property name="scale" type="float" value="0.52"/></properties><point/></object>
-  <object id="311" name="prop_118" type="prop_118" x="868.00" y="196.00"><properties><property name="scale" type="float" value="0.50"/></properties><point/></object>
-  <object id="312" name="prop_120" type="prop_120" x="252.00" y="644.00"><properties><property name="scale" type="float" value="0.52"/></properties><point/></object>
-  <object id="313" name="prop_124" type="prop_124" x="980.00" y="420.00"><properties><property name="scale" type="float" value="0.50"/></properties><point/></object>
-  <object id="314" name="prop_126" type="prop_126" x="588.00" y="756.00"><properties><property name="scale" type="float" value="0.50"/></properties><point/></object>
-  <object id="315" name="prop_128" type="prop_128" x="196.00" y="308.00"><properties><property name="scale" type="float" value="0.50"/></properties><point/></object>
+  <object id="300" name="prop_28" type="prop_28" x="308.00" y="308.00"><properties><property name="scale" type="float" value="1.16"/></properties><point/></object>
+  <object id="301" name="prop_28" type="prop_28" x="924.00" y="308.00"><properties><property name="scale" type="float" value="1.12"/></properties><point/></object>
+  <object id="302" name="prop_29" type="prop_29" x="420.00" y="252.00"><properties><property name="scale" type="float" value="1.05"/></properties><point/></object>
+  <object id="303" name="prop_29" type="prop_29" x="700.00" y="252.00"><properties><property name="scale" type="float" value="1.13"/></properties><point/></object>
+  <object id="304" name="prop_29" type="prop_29" x="252.00" y="476.00"><properties><property name="scale" type="float" value="1.05"/></properties><point/></object>
+  <object id="305" name="prop_29" type="prop_29" x="980.00" y="476.00"><properties><property name="scale" type="float" value="1.13"/></properties><point/></object>
+  <object id="306" name="prop_29" type="prop_29" x="364.00" y="756.00"><properties><property name="scale" type="float" value="1.05"/></properties><point/></object>
+  <object id="307" name="prop_29" type="prop_29" x="812.00" y="756.00"><properties><property name="scale" type="float" value="1.13"/></properties><point/></object>
+  <object id="308" name="prop_29" type="prop_29" x="532.00" y="196.00"><properties><property name="scale" type="float" value="1.05"/></properties><point/></object>
+  <object id="309" name="prop_29" type="prop_29" x="1036.00" y="700.00"><properties><property name="scale" type="float" value="1.13"/></properties><point/></object>
+  <object id="310" name="prop_30" type="prop_30" x="196.00" y="364.00"><properties><property name="scale" type="float" value="1.05"/></properties><point/></object>
+  <object id="311" name="prop_30" type="prop_30" x="1036.00" y="364.00"><properties><property name="scale" type="float" value="1.05"/></properties><point/></object>
+  <object id="312" name="prop_30" type="prop_30" x="252.00" y="700.00"><properties><property name="scale" type="float" value="1.05"/></properties><point/></object>
+  <object id="313" name="prop_30" type="prop_30" x="980.00" y="812.00"><properties><property name="scale" type="float" value="1.05"/></properties><point/></object>
+  <object id="314" name="prop_30" type="prop_30" x="476.00" y="812.00"><properties><property name="scale" type="float" value="1.05"/></properties><point/></object>
+  <object id="315" name="prop_31" type="prop_31" x="756.00" y="308.00"><properties><property name="scale" type="float" value="1.05"/></properties><point/></object>
+  <object id="316" name="prop_31" type="prop_31" x="420.00" y="644.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
+  <object id="317" name="prop_116" type="prop_116" x="308.00" y="812.00"><properties><property name="scale" type="float" value="0.72"/></properties><point/></object>
+  <object id="318" name="prop_118" type="prop_118" x="868.00" y="196.00"><properties><property name="scale" type="float" value="0.72"/></properties><point/></object>
+  <object id="319" name="prop_120" type="prop_120" x="196.00" y="644.00"><properties><property name="scale" type="float" value="0.72"/></properties><point/></object>
+  <object id="320" name="prop_124" type="prop_124" x="1036.00" y="532.00"><properties><property name="scale" type="float" value="0.72"/></properties><point/></object>
+  <object id="321" name="prop_126" type="prop_126" x="588.00" y="756.00"><properties><property name="scale" type="float" value="0.72"/></properties><point/></object>
+  <object id="322" name="prop_128" type="prop_128" x="196.00" y="308.00"><properties><property name="scale" type="float" value="0.72"/></properties><point/></object>
+  <object id="323" name="prop_117" type="prop_117" x="924.00" y="812.00"><properties><property name="scale" type="float" value="0.72"/></properties><point/></object>
+  <object id="324" name="prop_119" type="prop_119" x="476.00" y="196.00"><properties><property name="scale" type="float" value="0.72"/></properties><point/></object>
  </objectgroup>
  <objectgroup id="4" name="Markers" draworder="topdown">
   <object id="223" name="spawn" type="spawn" x="140.00" y="532.00"><point/></object>
