@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 static Font UI_FONT={0};
-static const int UI_CODEPOINTS[]={32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,183,8211,8212,8230,8592,8594,12289,12290,19968,19977,19978,19981,19982,19990,19996,20013,20026,20027,20046,20063,20102,20110,20113,20114,20132,20142,20154,20173,20174,20195,20197,20214,20237,20241,20249,20250,20260,20276,20284,20301,20307,20316,20320,20351,20379,20381,20391,20415,20445,20572,20799,20808,20809,20811,20837,20840,20849,20851,20860,20861,20877,20889,20914,20915,20986,20987,20999,21040,21046,21050,21069,21147,21152,21160,21161,21191,21215,21253,21306,21319,21327,21335,21345,21355,21360,21457,21462,21463,21464,21475,21476,21482,21487,21488,21494,21507,21508,21512,21516,21518,21543,21560,21561,21629,21644,21709,21796,21890,21916,21943,22218,22238,22242,22270,22280,22312,22320,22495,22522,22612,22771,22788,22797,22806,22810,22830,22833,22836,22987,23384,23427,23432,23433,23436,23450,23453,23454,23475,23481,23494,23547,23548,23553,23558,23567,23578,23601,23614,23618,23679,23707,23736,24038,24050,24102,24110,24182,24212,24231,24237,24320,24341,24359,24403,24405,24418,24448,24452,24456,24471,24494,24515,24577,24674,24687,24819,24840,24847,24895,25104,25110,25112,25163,25165,25171,25214,25216,25226,25260,25307,25320,25321,25353,25361,25377,25442,25506,25509,25552,25805,25910,25915,25918,25928,25932,25937,25955,25972,25991,26007,26032,26041,26045,26049,26053,26080,26087,26102,26143,26159,26174,26222,26230,26263,26368,26377,26395,26410,26412,26426,26469,26519,26522,26524,26530,26597,26631,26723,27425,27426,27491,27573,27668,27700,27719,27728,27773,27785,27809,27819,27835,27839,27861,27873,27922,27963,27969,27973,28014,28023,28165,28287,28304,28418,28526,28608,28779,28781,28783,28784,28789,28857,29031,29060,29255,29256,29289,29366,29616,29702,29983,29992,30005,30028,30041,30333,30340,30446,30475,30528,30561,30707,30784,30830,31181,31192,31227,31243,31456,31526,31532,32034,32418,32441,32445,32447,32454,32463,32469,32473,32487,32493,32622,32769,32773,32852,32972,33016,33021,33394,33410,33469,33487,33492,33719,33828,33829,33853,33976,34067,34255,34276,34411,34597,34892,34987,35013,35199,35201,35299,35748,35753,35760,35835,35848,36125,36133,36164,36208,36215,36234,36291,36319,36335,36454,36530,36716,36731,36745,36793,36807,36817,36820,36825,36827,36828,36857,36864,36873,36890,36896,36935,36947,36951,36973,37117,37266,37319,37324,37325,37327,38145,38190,38271,38378,38381,38388,38395,38431,38451,38459,38498,38500,38505,38544,38598,38632,38654,38656,38706,38752,38754,39063,39069,39118,39128,39295,39321,39564,40483,40736,65281,65292,65306,65307};
+static const int UI_CODEPOINTS[]={32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,183,8211,8212,8230,8592,8594,12289,12290,19968,19977,19978,19981,19982,19990,19996,20004,20013,20026,20027,20046,20063,20102,20107,20110,20113,20114,20132,20142,20154,20173,20174,20195,20197,20204,20214,20237,20241,20249,20250,20260,20276,20284,20301,20307,20316,20320,20351,20379,20381,20391,20415,20445,20572,20799,20808,20809,20811,20837,20840,20849,20851,20860,20861,20877,20889,20914,20915,20986,20987,20999,21040,21046,21050,21069,21147,21152,21160,21161,21191,21215,21253,21306,21319,21327,21335,21345,21355,21360,21457,21462,21463,21464,21475,21476,21482,21487,21488,21494,21507,21508,21512,21516,21518,21543,21560,21561,21629,21644,21709,21796,21890,21916,21943,22218,22238,22242,22270,22280,22312,22320,22495,22522,22612,22771,22788,22797,22806,22810,22830,22833,22836,22987,23384,23427,23432,23433,23436,23450,23453,23454,23475,23478,23481,23494,23547,23548,23553,23558,23567,23578,23601,23614,23618,23679,23707,23736,24038,24050,24102,24110,24182,24212,24231,24237,24320,24341,24359,24403,24405,24418,24448,24452,24453,24456,24471,24494,24515,24577,24674,24687,24819,24840,24847,24895,25104,25110,25112,25163,25165,25171,25214,25216,25226,25260,25307,25320,25321,25353,25361,25377,25442,25506,25509,25552,25805,25910,25915,25918,25925,25928,25932,25937,25955,25972,25991,26007,26032,26041,26045,26049,26053,26080,26087,26102,26143,26159,26174,26222,26230,26263,26356,26368,26377,26395,26410,26412,26426,26469,26519,26522,26524,26530,26597,26631,26723,27425,27426,27491,27573,27668,27700,27719,27728,27773,27785,27809,27819,27835,27839,27861,27873,27922,27963,27969,27973,28014,28023,28145,28165,28287,28304,28418,28526,28608,28779,28781,28783,28784,28789,28857,29031,29060,29255,29256,29289,29366,29616,29702,29983,29992,30005,30028,30041,30333,30340,30446,30475,30528,30561,30707,30784,30830,30865,31181,31192,31227,31243,31456,31526,31532,31561,32034,32418,32441,32445,32447,32454,32456,32463,32469,32473,32487,32493,32622,32769,32773,32852,32972,33016,33021,33394,33410,33469,33487,33492,33719,33828,33829,33853,33976,34067,34255,34276,34411,34597,34892,34987,35013,35199,35201,35299,35748,35753,35760,35835,35848,36125,36133,36164,36208,36215,36234,36291,36319,36335,36454,36530,36716,36731,36745,36793,36807,36817,36820,36824,36825,36827,36828,36857,36864,36873,36890,36896,36935,36947,36951,36973,37117,37266,37319,37324,37325,37327,38145,38190,38271,38378,38381,38388,38395,38431,38451,38459,38498,38500,38505,38544,38598,38632,38654,38656,38706,38752,38754,39063,39064,39069,39118,39128,39295,39321,39564,40483,40736,65281,65292,65306,65307};
 static bool UIFontHasRequiredGlyphs(Font f) {
     for(int i=0;i<(int)(sizeof(UI_CODEPOINTS)/sizeof(UI_CODEPOINTS[0]));i++) {
         int cp=UI_CODEPOINTS[i];
@@ -88,30 +88,21 @@ static void DrawTopDownTile(int x,int y,Area area,int kind,float time) {
     Vector2 p=WorldToScreen((float)x,(float)y);
     Rectangle tile={p.x-TILE_SIZE*.5f,p.y-TILE_SIZE*.5f,TILE_SIZE,TILE_SIZE};
     unsigned int hash=TileHash(x,y,(int)area);
-    int col=(int)(hash%3u),row=(int)((hash>>5)%3u),atlasIndex;
+    int col=(int)(hash%3u);
+    int variant=(int)((hash>>5)&1u);
+    int baseRow=kind==4?9:kind==3?6:kind==2?3:0;
+    int atlasRow=baseRow+variant;
     Color tileBase=kind==4?(Color){47,137,171,255}:kind==3?(Color){126,139,129,255}:kind==2?(Color){198,166,111,255}:(Color){91,145,84,255};
-    if(kind==4)atlasIndex=36+row*4+col;
-    else if(kind==3)atlasIndex=24+row*4+col;
-    else if(kind==2)atlasIndex=12+row*4+col;
-    else atlasIndex=row*4+col;
     DrawRectangleRec(tile,tileBase);
     if(TEX_TOPDOWN_TILES.id) {
-        // The source atlas is a collection of framed 56px tiles. Use only their
-        // interior texture as occasional ground decals over a continuous base,
-        // instead of repeating the beveled tile borders across the whole map.
-        bool drawPatch=kind==3 ? (hash%100u)<78u : kind==4 ? false : (hash%100u)<34u;
-        if(drawPatch) {
-            int patch=kind==3?44:28;
-            int inset=(56-patch)/2;
-            Rectangle src={(float)((atlasIndex%4)*56+inset),(float)((atlasIndex/4)*56+inset),(float)patch,(float)patch};
-            float dstSize=kind==3?49.0f:34.0f;
-            Rectangle dst={p.x-dstSize*.5f,p.y-dstSize*.5f,dstSize,dstSize};
-            DrawTexturePro(TEX_TOPDOWN_TILES,src,dst,(Vector2){0,0},0,kind==3?WHITE:Fade(WHITE,.56f));
-        }
+        // Use only the two full-surface variants in each material family.
+        // The third atlas row contains transparent edge/corner masks; scattering
+        // those masks as random decals caused the visible square holes in the map.
+        Rectangle src={(float)(col*56),(float)(atlasRow*56),56.0f,56.0f};
+        Rectangle dst={tile.x-1.5f,tile.y-1.5f,TILE_SIZE+3.0f,TILE_SIZE+3.0f};
+        DrawTexturePro(TEX_TOPDOWN_TILES,src,dst,(Vector2){0,0},0,WHITE);
         return;
     }
-    Color fallback=kind==4?(Color){67,158,190,255}:kind==3?(Color){126,132,119,255}:kind==2?(Color){207,180,126,255}:(Color){111,166,91,255};
-    DrawRectangleRec(tile,fallback);
     if(kind==4) {
         float wave=6.0f*sinf(time*1.7f+y*.65f+x*.35f);
         DrawLineEx((Vector2){tile.x+7,tile.y+14+wave*.15f},(Vector2){tile.x+TILE_SIZE-9,tile.y+14+wave*.15f},2.0f,Fade((Color){190,229,222,255},.32f));
@@ -378,12 +369,12 @@ static void DrawPickup(Pickup *p) {
 }
 typedef enum {
     RENDER_TREE, RENDER_PROP, RENDER_FIRE, RENDER_PICKUP, RENDER_SHRINE,
-    RENDER_KEEPER, RENDER_LUMI, RENDER_MOATAIL, RENDER_GECKO, RENDER_FIREFLY, RENDER_LEAFLING, RENDER_MOTE, RENDER_BOSS, RENDER_PLAYER
+    RENDER_KEEPER, RENDER_LUMI, RENDER_MOATAIL, RENDER_GECKO, RENDER_FIREFLY, RENDER_LEAFLING, RENDER_MOTE, RENDER_BOSS, RENDER_GATE, RENDER_PLAYER
 } RenderKind;
 typedef struct { float depth; RenderKind kind; int index; Vector2 grid; float scale; } RenderItem;
 static void PushRenderItem(RenderItem *items,int *count,RenderKind kind,int index,Vector2 grid,float scale) {
     if(*count>=512)return;
-    items[*count]=(RenderItem){grid.y+((kind==RENDER_PLAYER||kind==RENDER_TREE||kind==RENDER_PROP||kind==RENDER_BOSS)?0.16f:0.0f),kind,index,grid,scale};
+    items[*count]=(RenderItem){grid.y+((kind==RENDER_PLAYER||kind==RENDER_TREE||kind==RENDER_PROP||kind==RENDER_BOSS||kind==RENDER_GATE)?0.16f:0.0f),kind,index,grid,scale};
     (*count)++;
 }
 static void DrawMoatail(Vector2 p,float t) {
@@ -608,6 +599,42 @@ static void DrawObjectiveMarker(Vector2 grid,float time) {
     DrawLineEx((Vector2){p.x,p.y-58.0f-5.0f*pulse},(Vector2){p.x,p.y-19.0f},3.0f,Fade(C_GOLD,.72f));
     DrawTriangle((Vector2){p.x,p.y-66.0f-5.0f*pulse},(Vector2){p.x-8,p.y-51.0f-5.0f*pulse},(Vector2){p.x+8,p.y-51.0f-5.0f*pulse},Fade(C_GOLD,.95f));
   }
+static void DrawGateMarker(Game *g,int gateId,Vector2 grid) {
+    const char *name="返回海岸营地";
+    const char *status="E  返回营地";
+    Color accent=(Color){226,195,126,255};
+    bool locked=false;
+    if(gateId==0) {
+        name="辉光林地";status="E  进入林地";accent=(Color){153,213,128,255};
+    } else if(gateId==1) {
+        name="潮汐遗迹";locked=!(g->lumi.owned&&g->splash.owned);
+        status=locked?"需要两位伙伴":"E  进入遗迹";accent=(Color){117,197,220,255};
+    } else if(gateId==2) {
+        name="灯塔庭院";locked=!g->shrineSolved;
+        status=locked?"封印尚未解除":"E  进入庭院";accent=(Color){245,198,112,255};
+    }
+    bool nearby=Dist(g->player.pos,grid)<2.35f;
+    Vector2 p=WorldToScreen(grid.x,grid.y);
+    float pulse=.5f+.5f*sinf(g->time*2.8f+gateId);
+    DrawEllipse((int)p.x,(int)p.y+5,34,9,(Color){27,48,48,105});
+    DrawCircleV((Vector2){p.x,p.y-63},42.0f,Fade(accent,locked?.07f:.12f+.08f*pulse));
+    DrawCircleLines((int)p.x,(int)p.y-63,31.0f,Fade(accent,locked?.30f:.72f));
+    DrawStructureProp(4,(Vector2){p.x,p.y+4},118.0f,132.0f);
+    DrawCircleV((Vector2){p.x,p.y-69},4.0f,locked?(Color){138,144,137,255}:Fade(accent,.75f+.25f*pulse));
+    Rectangle sign={p.x-84.0f,p.y-176.0f,168.0f,42.0f};
+    DrawRectangleRounded(sign,.16f,6,(Color){8,27,43,242});
+    DrawRectangleRoundedLinesEx(sign,.16f,6,1.6f,Fade(accent,locked?.42f:.88f));
+    float nameWidth=UI_FONT.texture.id?MeasureTextEx(UI_FONT,name,15.0f,1.0f).x:(float)MeasureText(name,15);
+    DrawUIText(name,(int)(p.x-nameWidth*.5f),(int)sign.y+4,15,(Color){248,239,211,255});
+    float statusWidth=UI_FONT.texture.id?MeasureTextEx(UI_FONT,status,11.0f,1.0f).x:(float)MeasureText(status,11);
+    DrawUIText(status,(int)(p.x-statusWidth*.5f),(int)sign.y+23,11,locked?(Color){201,190,161,255}:(nearby?(Color){255,226,154,255}:(Color){177,202,194,255}));
+    if(nearby&&!locked) {
+        DrawCircleV((Vector2){p.x,p.y-191.0f-sinf(g->time*4.0f)*3.0f},4.0f,C_GOLD);
+        DrawTriangle((Vector2){p.x,p.y-185.0f-sinf(g->time*4.0f)*3.0f},
+                     (Vector2){p.x-6,p.y-196.0f-sinf(g->time*4.0f)*3.0f},
+                     (Vector2){p.x+6,p.y-196.0f-sinf(g->time*4.0f)*3.0f},C_GOLD);
+    }
+}
 static void RenderWorld(Game *g) {
     BeginMode2D(g->cam);
     DrawWorldBackdrop(g);
@@ -625,14 +652,14 @@ static void RenderWorld(Game *g) {
             if(shore>.88f)kind=4;
             else if(shore>.68f)kind=2;
             // Broad sandy paths connect the dock, campfire and three area gates.
-            if((y>=8&&y<=10&&x>=3&&x<=19) ||
-               (x>=17&&x<=19&&y>=3&&y<=15))kind=2;
+            if((y>=8&&y<=9&&x>=3&&x<=19) ||
+               (x>=17&&x<=18&&y>=3&&y<=15))kind=2;
             if(x>=1&&x<=3&&y>=11&&y<=15)kind=4;
             if(g->world.kind[y][x]==1)kind=1;
         } else if(g->area==AREA_GROVE) {
             if(x>=9&&x<=11&&y>=3&&y<=14)kind=4;
             if((x*3+y)%13==0&&kind==0)kind=2;
-            if((y>=8&&y<=10&&x>=2&&x<=19))kind=2;
+            if((y>=8&&y<=9&&x>=2&&x<=19))kind=2;
             if(x==0||y==0||x==MAPW-1||y==MAPH-1)kind=1;
         } else if(g->area==AREA_RUINS) {
             // One continuous ancient-stone floor, with deliberate moss gardens and a readable bridge.
@@ -640,7 +667,7 @@ static void RenderWorld(Game *g) {
             if((x>=2&&x<=6&&y>=3&&y<=6)||(x>=15&&x<=19&&y>=11&&y<=14)||
                (x>=3&&x<=6&&y>=12&&y<=14))kind=0;
             if(x>=9&&x<=11&&y>=3&&y<=14)kind=4;
-            if(y>=8&&y<=10&&x>=2&&x<=19)kind=3;
+            if(y>=8&&y<=9&&x>=2&&x<=19)kind=3;
             if(x==0||y==0||x==MAPW-1||y==MAPH-1)kind=3;
         } else {
             // Lighthouse courtyard: stone plaza, grass gardens, sandy shore and a clear approach.
@@ -648,7 +675,7 @@ static void RenderWorld(Game *g) {
             if(x<3||x>19||y<2||y>15)kind=4;
             if((x>=3&&x<=5)||(x>=18&&x<=19)||(y>=14&&y<=15))kind=2;
             if(x>=7&&x<=18&&y>=5&&y<=14)kind=3;
-            if(y>=8&&y<=10&&x>=3&&x<=19)kind=3;
+            if(y>=8&&y<=9&&x>=3&&x<=19)kind=3;
             if(x>=16&&x<=18&&y>=6&&y<=14)kind=3;
             if((x>=5&&x<=7&&y>=5&&y<=7)||(x>=5&&x<=8&&y>=12&&y<=14))kind=0;
             if(x==0||y==0||x==MAPW-1||y==MAPH-1)kind=4;
@@ -758,6 +785,13 @@ static void RenderWorld(Game *g) {
     }
     if(g->area==AREA_LIGHTHOUSE&&!g->bossDefeated)
         PushRenderItem(items,&count,RENDER_BOSS,0,g->world.bossPos,1.0f);
+    if(g->area==AREA_CAMP) {
+        PushRenderItem(items,&count,RENDER_GATE,0,g->world.groveGate,1.0f);
+        PushRenderItem(items,&count,RENDER_GATE,1,g->world.ruinGate,1.0f);
+        PushRenderItem(items,&count,RENDER_GATE,2,g->world.shrine,1.0f);
+    } else {
+        PushRenderItem(items,&count,RENDER_GATE,3,(Vector2){2,9},1.0f);
+    }
     PushRenderItem(items,&count,RENDER_PLAYER,0,g->player.pos,1.0f);
 
     for(int i=1;i<count;i++) {
@@ -823,6 +857,7 @@ static void RenderWorld(Game *g) {
                 DrawLighthouseGuardian(p,g->time,1.12f);
                 DrawUIText("灯塔守卫",(int)p.x-28,(int)p.y-112,13,(Color){255,232,170,255});
                 break;
+            case RENDER_GATE: DrawGateMarker(g,it->index,it->grid); break;
             case RENDER_PLAYER: DrawPlayer(p,g->time,Vector2Length(g->player.vel)>.1f,g->player.facing); break;
         }
     }
