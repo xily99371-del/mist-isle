@@ -145,6 +145,12 @@ require("CACHED_GROUND_AREA==(int)g->area" in RENDER and "CACHED_GROUND_AREA=(in
         "ground cache is rebuilt only when the player changes area")
 require("DrawTexturePro(TEX_GROUND_CACHE.texture" in RENDER and "UnloadRenderTexture(TEX_GROUND_CACHE)" in RENDER,
         "cached map is drawn as one texture and released cleanly")
+require("DrawWorldBackdrop(g)" in RENDER[RENDER.find("static void BuildGroundCache"):RENDER.find("static void RenderWorld")],
+        "static sea, forest and ruins backdrops are baked into the same area cache")
+require("DrawWorldBackdrop(g);" not in RENDER[RENDER.find("static void RenderWorld"):RENDER.find("static void Panel")],
+        "the large decorative backdrop is not redrawn every frame")
+require("#define MAX_PARTICLES 160" in HEADER and "#define MAX_PARTICLES 300" in HEADER,
+        "Raspberry Pi uses a bounded particle pool while desktop keeps the full pool")
 require("Safe fallback if the target GPU cannot allocate the single-area ground cache" in RENDER,
         "terrain still renders if a Raspberry Pi GPU cannot allocate the cache")
 require("#define MISTISLE_RAIN_DROPS 56" in RENDER and "#define MISTISLE_RAIN_RIPPLES 6" in RENDER,
