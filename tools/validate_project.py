@@ -157,7 +157,7 @@ require("IsKeyPressed(KEY_O)" in GAME and "objectiveToggle" in GAME,
         "objective tracker supports keyboard and mouse toggles")
 require("Rectangle panel={SW-350.0f,18.0f,330.0f,116.0f}" in RENDER,
         "expanded objective tracker is narrower and shorter than the previous HUD panel")
-require("for(int i=0;i<190;i++)" in RENDER and "DrawRainOverlay" not in RENDER and "g->weather==1" in RENDER,
+require("MISTISLE_RAIN_DROPS 84" in RENDER and "MISTISLE_RAIN_DROPS 190" in RENDER and "g->weather==1" in RENDER,
         "rain has multiple visible streak depths, surface impacts and water ripples")
 require("IsKeyPressed(KEY_F7)" in GAME and "weather=(g->weather+1)%4" in GAME,
         "weather can be cycled on demand for reliable demonstration")
