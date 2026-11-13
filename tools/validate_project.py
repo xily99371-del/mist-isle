@@ -95,7 +95,7 @@ require("DrawUITextWrapped" in RENDER and "UI_CODEPOINTS" in RENDER,
         "Chinese UI includes the complete source glyph set and wrapped objective text")
 require("endingTime" in GAME and "static void RenderEnd" in RENDER,
         "lighthouse ending uses a timed cinematic sequence")
-require("RENDER_PROP,33" in RENDER and "DrawAreaProp(13" in RENDER,
+require("RENDER_PROP,33" in RENDER and "DrawAreaPropTint(13,p" in RENDER,
         "lighthouse courtyard uses the authored lighthouse sprite from the area atlas")
 require("SetSolidRect" in GAME and "MovePlayerWithCollision" in GAME and "dockWater" in GAME and "stream&&!bridge" in GAME,
         "props, shore water and stream banks block movement with substep collision")
@@ -117,7 +117,7 @@ require("DrawTerrainAccent" in RENDER and "terrainKinds" in RENDER and "512" in 
         "world maps include layered ground detail, shoreline foam and a larger render queue")
 require("TEX_ENDING_CG" in RENDER and "LoadEndingCG" in RENDER and "assets/cinematics/lighthouse_final_scene.jpg.b64" in RENDER,
         "ending uses a dedicated illustrated lighthouse scene")
-require("scene.width*.50f" in RENDER and "scene.width-4.0f" in RENDER,
+require("scene.width*.535f" in RENDER and "scene.width-4.0f" in RENDER,
         "ending scene adds a procedural moving beacon beam over the illustration")
 require("DrawAreaProp(11,p,112,116)" in RENDER and "DrawAreaPropTint(13,p" in RENDER,
         "the shrine uses its authored sprite and the pre-finale lighthouse is dimmed")
