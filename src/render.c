@@ -283,33 +283,15 @@ static void DrawProp(int index,Vector2 p,float w,float h) {
     DrawTexturePro(TEX_PROPS,src,dst,(Vector2){0,0},0,WHITE);
 }
 static void DrawKeeper(Vector2 p,float t,float scale) {
+    (void)t;
     const float footY=p.y+8.0f*scale;
-    float sway=sinf(t*1.7f)*1.4f*scale;
-    Color cloak=(Color){61,104,88,255},light=(Color){130,164,119,255};
-    DrawEllipse((int)p.x,(int)footY,23*scale,7*scale,(Color){35,49,45,125});
-    DrawTriangle((Vector2){p.x-22*scale,footY-8*scale},
-                 (Vector2){p.x+22*scale,footY-8*scale},
-                 (Vector2){p.x+15*scale,footY-72*scale},(Color){43,76,69,255});
-    DrawTriangle((Vector2){p.x-22*scale,footY-8*scale},
-                 (Vector2){p.x-16*scale,footY-72*scale},
-                 (Vector2){p.x+2*scale,footY-17*scale},cloak);
-    DrawTriangle((Vector2){p.x-14*scale,footY-15*scale},
-                 (Vector2){p.x+14*scale,footY-15*scale},
-                 (Vector2){p.x+7*scale,footY-61*scale},light);
-    // Hood and face.
-    DrawCircleV((Vector2){p.x,p.y-58*scale},19*scale,(Color){49,78,71,255});
-    DrawCircleV((Vector2){p.x,p.y-57*scale},14*scale,(Color){225,211,176,255});
-    DrawCircleV((Vector2){p.x-5*scale,p.y-58*scale},1.8f*scale,(Color){46,60,53,255});
-    DrawCircleV((Vector2){p.x+5*scale,p.y-58*scale},1.8f*scale,(Color){46,60,53,255});
-    DrawLineEx((Vector2){p.x-4*scale,p.y-51*scale},(Vector2){p.x+4*scale,p.y-51*scale},1.4f*scale,(Color){139,105,82,255});
-    // Staff and lantern.
-    DrawLineEx((Vector2){p.x+24*scale,footY-3*scale},
-               (Vector2){p.x+28*scale+sway,footY-91*scale},4.0f*scale,(Color){88,68,51,255});
-    DrawCircleV((Vector2){p.x+28*scale+sway,footY-94*scale},10*scale,(Color){122,84,51,255});
-    DrawCircleV((Vector2){p.x+28*scale+sway,footY-94*scale},6*scale,C_GOLD);
-    DrawCircleV((Vector2){p.x+28*scale+sway,footY-94*scale},2.5f*scale,WHITE);
-    DrawLineEx((Vector2){p.x-15*scale,footY-15*scale},
-               (Vector2){p.x+15*scale,footY-15*scale},2*scale,(Color){198,177,129,255});
+    DrawEllipse((int)p.x,(int)footY,(int)(29*scale),(int)(8*scale),(Color){35,49,45,105});
+    if(TEX_WATCHER_PORTRAIT.id) {
+        Rectangle src={0,0,(float)TEX_WATCHER_PORTRAIT.width,(float)TEX_WATCHER_PORTRAIT.height};
+        float w=104.0f*scale,h=130.0f*scale;
+        Rectangle dst={p.x-w*.5f,footY-h,w,h};
+        DrawTexturePro(TEX_WATCHER_PORTRAIT,src,dst,(Vector2){0,0},0,WHITE);
+    }
 }
 static void DrawFirefly(Vector2 p,float t) {
     float bob=sinf(t*3.8f)*4.0f;
@@ -324,21 +306,14 @@ static void DrawMote(Vector2 p,float t) {
     const float footY=p.y+7.0f;
     DrawEllipse((int)p.x,(int)footY,12,4,(Color){48,66,57,95});
     if(TEX_GROVE_MOTE.id){int frame=(int)(t*2.5f)%4;Rectangle src={(float)(frame*32),0,32,32};Rectangle dst={p.x-25,footY-50-bob,50,50};DrawTexturePro(TEX_GROVE_MOTE,src,dst,(Vector2){0,0},0,WHITE);return;}
-    DrawCircleV((Vector2){p.x,p.y-11-bob},11,(Color){168,183,211,255});
-    DrawTriangle((Vector2){p.x-7,p.y-17-bob},(Vector2){p.x,p.y-29-bob},(Vector2){p.x+7,p.y-17-bob},(Color){202,195,226,255});
-    DrawCircleV((Vector2){p.x-4,p.y-12-bob},1.7f,C_INK);
-    DrawCircleV((Vector2){p.x+4,p.y-12-bob},1.7f,C_INK);
+    // Render only the authored Grove Mote sprite sheet; no procedural character silhouette.
 }
 static void DrawLeafling(Vector2 p,float t) {
     float bob=sinf(t*4.0f)*2.5f;
     const float footY=p.y+7.0f;
     DrawEllipse((int)p.x,(int)footY,11,4,(Color){48,66,57,95});
     if(TEX_LEAFLING.id){int frame=(int)(t*2.5f)%4;Rectangle src={(float)(frame*32),0,32,32};Rectangle dst={p.x-25,footY-50-bob,50,50};DrawTexturePro(TEX_LEAFLING,src,dst,(Vector2){0,0},0,WHITE);return;}
-    DrawCircleV((Vector2){p.x,p.y-10-bob},10,(Color){157,192,118,255});
-    DrawTriangle((Vector2){p.x-5,p.y-16-bob},(Vector2){p.x+1,p.y-29-bob},(Vector2){p.x+7,p.y-15-bob},(Color){102,160,94,255});
-    DrawCircleV((Vector2){p.x-3,p.y-11-bob},1.6f,C_INK);
-    DrawCircleV((Vector2){p.x+3,p.y-11-bob},1.6f,C_INK);
-    DrawCircleV((Vector2){p.x,p.y-6-bob},1.4f,(Color){189,111,102,255});
+    // Render only the authored Leafling sprite sheet; no procedural character silhouette.
 }
 static void DrawCampfire(Vector2 p,float t) {
     DrawProp(8,p,48,48);
@@ -361,16 +336,7 @@ static void DrawLumi(Vector2 p,float t,float bob) {
         return;
     }
     if (TEX_LUMI.id) { DrawPortrait(TEX_LUMI,p,58,58,sinf(t*4.4f)*3.0f); return; }
-    p.y-=bob*16;
-    DrawCircleV((Vector2){p.x,p.y-11},14,(Color){159,202,145,255});
-    DrawCircleV((Vector2){p.x-7,p.y-21},8,(Color){128,181,121,255});
-    DrawCircleV((Vector2){p.x+7,p.y-21},8,(Color){128,181,121,255});
-    DrawTriangle((Vector2){p.x-7,p.y-26},(Vector2){p.x+7,p.y-26},(Vector2){p.x,p.y-42},(Color){116,171,110,255});
-    DrawCircleV((Vector2){p.x,p.y-13},9,(Color){218,232,180,255});
-    DrawCircleV((Vector2){p.x-4,p.y-15},2.1f,(Color){53,69,56,255});
-    DrawCircleV((Vector2){p.x+4,p.y-15},2.1f,(Color){53,69,56,255});
-    DrawCircleV((Vector2){p.x,p.y-34},7,Fade(C_GOLD,.45f+.3f*sinf(t*2)));
-    DrawCircleV((Vector2){p.x,p.y-34},3.3f,(Color){255,244,185,255});
+    (void)bob; // The authored companion sprite is required; no geometric stand-in is drawn.
 }
 static void DrawPlayer(Vector2 p,float t,bool moving,int facing) {
     float bob=moving?fabsf(sinf(t*13))*1.2f:0.0f;
@@ -384,12 +350,11 @@ static void DrawPlayer(Vector2 p,float t,bool moving,int facing) {
         return;
     }
     if (TEX_HERO.id) { DrawPortrait(TEX_HERO,p,66,72,bob); return; }
-    DrawTriangle((Vector2){p.x-12,p.y-20-bob},(Vector2){p.x+12,p.y-20-bob},(Vector2){p.x,p.y+2-bob},(Color){105,161,190,255});
-    DrawCircleV((Vector2){p.x,p.y-32-bob},11,(Color){250,218,185,255});
-    DrawCircleV((Vector2){p.x-4,p.y-33-bob},2,(Color){59,65,75,255});
-    DrawCircleV((Vector2){p.x+4,p.y-33-bob},2,(Color){59,65,75,255});
-    DrawCircleV((Vector2){p.x-8,p.y-41-bob},3,(Color){228,166,111,255});
-    DrawCircleV((Vector2){p.x+8,p.y-41-bob},3,(Color){228,166,111,255});
+    if(TEX_HERO_PORTRAIT.id) {
+        Rectangle src={0,0,(float)TEX_HERO_PORTRAIT.width,(float)TEX_HERO_PORTRAIT.height};
+        Rectangle dst={p.x-43.0f,footY-108.0f-bob,86.0f,108.0f};
+        DrawTexturePro(TEX_HERO_PORTRAIT,src,dst,(Vector2){0,0},0,WHITE);
+    }
 }
 static void DrawShrine(Vector2 p,float t,bool solved,bool finalCore) {
     Color c=solved?C_GOLD:(Color){158,185,166,255};
@@ -466,13 +431,7 @@ static void DrawMoatail(Vector2 p,float t) {
         Rectangle dst={p.x-33,footY-66-sinf(t*4)*2.0f,66,66};
         DrawTexturePro(TEX_MOATAIL_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_MOATAIL.id) DrawPortrait(TEX_MOATAIL,p,58,58,sinf(t*4)*2.5f);
-    else {
-        DrawCircleV((Vector2){p.x,p.y-11},12,(Color){121,202,215,255});
-        DrawCircleV((Vector2){p.x-5,p.y-20},5,(Color){151,220,224,255});
-        DrawCircleV((Vector2){p.x+5,p.y-20},5,(Color){151,220,224,255});
-        DrawCircleV((Vector2){p.x-4,p.y-12},2,(Color){52,83,94,255});
-        DrawCircleV((Vector2){p.x+4,p.y-12},2,(Color){52,83,94,255});
-    }
+    // The authored four-frame companion sheet is required; never substitute primitive shapes.
 }
 static void DrawGecko(Vector2 p,float t) {
     const float footY=p.y+8.0f;
@@ -483,77 +442,16 @@ static void DrawGecko(Vector2 p,float t) {
         Rectangle dst={p.x-33,footY-66-sinf(t*5)*2.0f,66,66};
         DrawTexturePro(TEX_GECKO_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_GECKO.id) DrawPortrait(TEX_GECKO,p,58,58,sinf(t*5)*2.0f);
-    else {
-        DrawCircleV((Vector2){p.x,p.y-10},11,(Color){155,154,214,255});
-        DrawTriangle((Vector2){p.x-7,p.y-17},(Vector2){p.x,p.y-32},(Vector2){p.x+7,p.y-17},(Color){179,218,229,255});
-        DrawCircleV((Vector2){p.x-4,p.y-11},2,(Color){50,60,88,255});
-        DrawCircleV((Vector2){p.x+4,p.y-11},2,(Color){50,60,88,255});
-    }
+    // The authored four-frame companion sheet is required; never substitute primitive shapes.
 }
 static void DrawLighthouseGuardian(Vector2 p,float t,float scale) {
-    // A tall, solemn lighthouse sentinel: readable humanoid silhouette, layered stone armor and a lantern crown.
     float bob=sinf(t*1.8f)*1.4f*scale;
-    Vector2 c={p.x,p.y-48.0f*scale+bob};
-    Color outline=(Color){35,52,62,255},stone=(Color){76,105,112,255};
-    Color plate=(Color){133,158,151,255},shadow=(Color){51,73,80,255};
-    Color gold=(Color){255,211,127,255},glow=(Color){128,221,225,255};
-    DrawEllipse((int)p.x,(int)(p.y+5*scale),42*scale,12*scale,(Color){24,39,47,135});
-    // Split mantle and rear pennant.
-    DrawTriangle((Vector2){c.x-22*scale,c.y-3*scale},(Vector2){c.x-37*scale,c.y+69*scale},
-                 (Vector2){c.x-5*scale,c.y+48*scale},(Color){53,83,91,255});
-    DrawTriangle((Vector2){c.x+20*scale,c.y-2*scale},(Vector2){c.x+34*scale,c.y+68*scale},
-                 (Vector2){c.x+4*scale,c.y+47*scale},(Color){66,103,108,255});
-    DrawTriangle((Vector2){c.x-9*scale,c.y+38*scale},(Vector2){c.x+9*scale,c.y+38*scale},
-                 (Vector2){c.x+2*scale,c.y+81*scale},(Color){119,91,68,255});
-    // Boots and greaves.
-    for(int side=-1;side<=1;side+=2) {
-        float x=c.x+side*13*scale;
-        DrawRectangleRounded((Rectangle){x-8*scale,c.y+39*scale,16*scale,34*scale},.18f,5,outline);
-        DrawRectangleRounded((Rectangle){x-5*scale,c.y+41*scale,10*scale,28*scale},.16f,5,plate);
-        DrawRectangleRounded((Rectangle){x-12*scale,c.y+67*scale,24*scale,12*scale},.2f,5,shadow);
-        DrawLineEx((Vector2){x-5*scale,c.y+52*scale},(Vector2){x+5*scale,c.y+52*scale},2*scale,gold);
-    }
-    // Torso, layered breastplate and shoulder pauldrons.
-    DrawRectangleRounded((Rectangle){c.x-27*scale,c.y-8*scale,54*scale,62*scale},.22f,8,outline);
-    DrawRectangleRounded((Rectangle){c.x-23*scale,c.y-7*scale,46*scale,54*scale},.20f,8,stone);
-    DrawTriangle((Vector2){c.x-21*scale,c.y+1*scale},(Vector2){c.x,c.y+49*scale},
-                 (Vector2){c.x+21*scale,c.y+1*scale},plate);
-    DrawLineEx((Vector2){c.x-17*scale,c.y+4*scale},(Vector2){c.x,c.y+35*scale},2*scale,(Color){184,199,177,255});
-    DrawLineEx((Vector2){c.x+17*scale,c.y+4*scale},(Vector2){c.x,c.y+35*scale},2*scale,shadow);
-    for(int side=-1;side<=1;side+=2) {
-        Vector2 shoulder={c.x+side*27*scale,c.y+2*scale};
-        DrawPoly(shoulder,6,16*scale,side<0?20:40,outline);
-        DrawPoly(shoulder,6,12*scale,side<0?20:40,plate);
-        DrawLineEx((Vector2){shoulder.x,c.y+12*scale},
-                   (Vector2){c.x+side*34*scale,c.y+39*scale},11*scale,outline);
-        DrawLineEx((Vector2){shoulder.x,c.y+12*scale},
-                   (Vector2){c.x+side*34*scale,c.y+39*scale},6*scale,stone);
-        DrawCircleV((Vector2){c.x+side*34*scale,c.y+39*scale},6*scale,gold);
-    }
-    // Helmet with a lighthouse lantern crown.
-    DrawRectangleRounded((Rectangle){c.x-19*scale,c.y-47*scale,38*scale,42*scale},.28f,8,outline);
-    DrawRectangleRounded((Rectangle){c.x-15*scale,c.y-44*scale,30*scale,34*scale},.24f,8,plate);
-    DrawTriangle((Vector2){c.x-20*scale,c.y-39*scale},(Vector2){c.x,c.y-66*scale},
-                 (Vector2){c.x+20*scale,c.y-39*scale},shadow);
-    DrawTriangle((Vector2){c.x-13*scale,c.y-41*scale},(Vector2){c.x,c.y-60*scale},
-                 (Vector2){c.x+13*scale,c.y-41*scale},stone);
-    DrawRectangleRounded((Rectangle){c.x-10*scale,c.y-65*scale,20*scale,17*scale},.18f,5,gold);
-    DrawRectangle((int)(c.x-6*scale),(int)(c.y-62*scale),(int)(12*scale),(int)(10*scale),glow);
-    DrawCircleV((Vector2){c.x,c.y-57*scale},13*scale,Fade(glow,.13f));
-    DrawRectangle((int)(c.x-13*scale),(int)(c.y-29*scale),(int)(26*scale),(int)(5*scale),outline);
-    DrawRectangle((int)(c.x-8*scale),(int)(c.y-28*scale),(int)(5*scale),(int)(3*scale),gold);
-    DrawRectangle((int)(c.x+3*scale),(int)(c.y-28*scale),(int)(5*scale),(int)(3*scale),gold);
-    // A bright chest lens echoes the lost lighthouse beacon.
-    float pulse=.72f+.28f*sinf(t*3.2f);
-    DrawCircleV((Vector2){c.x,c.y+17*scale},18*scale,Fade(glow,.12f*pulse));
-    DrawPoly((Vector2){c.x,c.y+17*scale},6,11*scale,30,(Color){43,83,91,255});
-    DrawPoly((Vector2){c.x,c.y+17*scale},6,7*scale,30,Fade(gold,pulse));
-    DrawCircleV((Vector2){c.x,c.y+17*scale},3*scale,WHITE);
-    // Floating beacon shards are subtle accents, not a noisy aura.
-    for(int i=0;i<3;i++) {
-        float a=t*.55f+(float)i*PI2/3.0f;
-        Vector2 q={c.x+cosf(a)*47*scale,c.y+7*scale+sinf(a)*40*scale};
-        DrawPoly(q,4,4.0f*scale,45,Fade(i==1?glow:gold,.72f));
+    DrawEllipse((int)p.x,(int)(p.y+6*scale),(int)(44*scale),(int)(12*scale),(Color){24,39,47,135});
+    if(TEX_GUARDIAN_PORTRAIT.id) {
+        Rectangle src={0,0,(float)TEX_GUARDIAN_PORTRAIT.width,(float)TEX_GUARDIAN_PORTRAIT.height};
+        float w=148.0f*scale,h=184.0f*scale;
+        Rectangle dst={p.x-w*.5f,p.y-h+bob,w,h};
+        DrawTexturePro(TEX_GUARDIAN_PORTRAIT,src,dst,(Vector2){0,0},0,WHITE);
     }
 }
 static void DrawCloudPuff(float x,float y,float s,Color color) {
