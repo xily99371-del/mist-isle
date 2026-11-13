@@ -867,13 +867,13 @@ static void RenderWorld(Game *g) {
         PushRenderItem(items,&count,RENDER_PICKUP,i,g->world.pickups[i].tile,1.0f);
     if(g->area==AREA_RUINS||g->area==AREA_LIGHTHOUSE)PushRenderItem(items,&count,RENDER_SHRINE,0,g->world.shrine,1.0f);
     if(g->area==AREA_CAMP) {
-        PushRenderItem(items,&count,RENDER_KEEPER,0,(Vector2){3.0f,10.0f},1.0f);
-        if(!g->lumi.owned)PushRenderItem(items,&count,RENDER_LUMI,0,(Vector2){4.0f,12.0f},1.0f);
+        PushRenderItem(items,&count,RENDER_KEEPER,0,(Vector2){7.0f,7.0f},1.0f);
+        if(!g->lumi.owned)PushRenderItem(items,&count,RENDER_LUMI,0,(Vector2){6.0f,8.0f},1.0f);
     }
     if(g->lumi.owned)PushRenderItem(items,&count,RENDER_LUMI,0,g->lumi.pos,1.0f);
-    if(g->area==AREA_GROVE&&!g->splash.owned)PushRenderItem(items,&count,RENDER_MOATAIL,0,(Vector2){9,5},1.0f);
+    if(g->area==AREA_GROVE&&!g->splash.owned)PushRenderItem(items,&count,RENDER_MOATAIL,0,(Vector2){14,7},1.0f);
     else if(g->splash.owned)PushRenderItem(items,&count,RENDER_MOATAIL,0,g->splash.pos,1.0f);
-    if(g->area==AREA_RUINS&&!g->spark.owned)PushRenderItem(items,&count,RENDER_GECKO,0,(Vector2){15,7},1.0f);
+    if(g->area==AREA_RUINS&&!g->spark.owned)PushRenderItem(items,&count,RENDER_GECKO,0,(Vector2){13,8},1.0f);
     else if(g->spark.owned)PushRenderItem(items,&count,RENDER_GECKO,0,g->spark.pos,1.0f);
     if(g->area==AREA_GROVE) {
         Vector2 fireflyGrid={10.6f+sinf(g->fireflyPhase*0.8f)*0.22f,6.2f+cosf(g->fireflyPhase*0.65f)*0.18f};
@@ -1092,11 +1092,11 @@ static void RenderHUD(Game *g) {
         PanelDark((Rectangle){530,585,220,40});DrawUIText("E  前往灯塔庭院",550,596,17,(Color){211,220,205,255});
     } else if(g->area!=AREA_CAMP && Dist(g->player.pos,g->world.returnPoint)<1.8f) {
         PanelDark((Rectangle){530,585,220,40});DrawUIText("E  返回海岸营地",550,596,17,(Color){211,220,205,255});
-    } else if(g->area==AREA_CAMP && !g->lumi.owned && Dist(g->player.pos,(Vector2){4,12})<1.65f) {
+    } else if(g->area==AREA_CAMP && !g->lumi.owned && Dist(g->player.pos,(Vector2){6,8})<1.65f) {
         PanelDark((Rectangle){530,585,220,40});DrawUIText("E  救助苔灯灵",550,596,17,(Color){211,220,205,255});
-    } else if(g->area==AREA_CAMP && Dist(g->player.pos,(Vector2){3,10})<2.0f) {
+    } else if(g->area==AREA_CAMP && Dist(g->player.pos,(Vector2){7,7})<2.0f) {
         PanelDark((Rectangle){530,585,220,40});DrawUIText("E  与守望者交谈",550,596,17,(Color){211,220,205,255});
-    } else if(g->area==AREA_CAMP && g->lumi.owned && Dist(g->player.pos,(Vector2){4.1f,12.5f})<1.5f) {
+    } else if(g->area==AREA_CAMP && g->lumi.owned && Dist(g->player.pos,(Vector2){6.1f,8.5f})<1.5f) {
         PanelDark((Rectangle){530,585,220,40});DrawUIText("E  在营火旁休息",550,596,17,(Color){211,220,205,255});
     } else if(g->area==AREA_LIGHTHOUSE && !g->bossDefeated && Dist(g->player.pos,g->world.bossPos)<2.2f) {
         PanelDark((Rectangle){530,585,250,40});DrawUIText("E  挑战灯塔守卫",550,596,17,(Color){211,220,205,255});
