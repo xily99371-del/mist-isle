@@ -713,6 +713,8 @@ static void RenderWorld(Game *g) {
         MapObject *obj=&g->world.objects[i];
         if(obj->type>=1000&&obj->type<1003)
             PushRenderItem(items,&count,RENDER_TREE,obj->type-1000,obj->pos,obj->scale);
+        else if(obj->type==2000)
+            PushRenderItem(items,&count,RENDER_FIRE,0,obj->pos,obj->scale);
         else
             PushRenderItem(items,&count,RENDER_PROP,obj->type,obj->pos,obj->scale);
     }
