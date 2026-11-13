@@ -749,6 +749,7 @@ static void RenderWorld(Game *g) {
             if(terrainKinds[y][x]==4)DrawTerrainAccent(x,y,g->area,4,g->time);
     } else {
         // Safe fallback if the target GPU cannot allocate the single-area ground cache.
+        DrawWorldBackdrop(g);
         for(int y=minY;y<=maxY;y++)for(int x=minX;x<=maxX;x++) {
             int kind=terrainKinds[y][x];
             DrawTopDownTile(x,y,g->world.terrain[y][x],kind,g->time);
