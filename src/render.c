@@ -693,6 +693,9 @@ static void BuildGroundCache(Game *g) {
         terrainKinds[y][x]=TerrainKindFromAtlasIndex(g->world.terrain[y][x]);
     BeginTextureMode(TEX_GROUND_CACHE);
     ClearBackground((Color){20,34,39,255});
+    // The backdrop's gradients, distant scenery and static decorative marks are
+    // also baked once. Repainting them per frame was a major source of Pi overdraw.
+    DrawWorldBackdrop(g);
     for(int y=0;y<MAPH;y++)for(int x=0;x<MAPW;x++) {
         int kind=terrainKinds[y][x];
         DrawTopDownTile(x,y,g->world.terrain[y][x],kind,0.0f);
@@ -738,7 +741,6 @@ static void RenderWorld(Game *g) {
     int minX,minY,maxX,maxY;
     GetVisibleTileBounds(g,&minX,&minY,&maxX,&maxY);
     BeginMode2D(g->cam);
-    DrawWorldBackdrop(g);
     if(TEX_GROUND_CACHE.id) {
         Rectangle src={0,0,(float)TEX_GROUND_CACHE.texture.width,-(float)TEX_GROUND_CACHE.texture.height};
         Rectangle dst={0,0,(float)WORLD_PIXEL_W,(float)WORLD_PIXEL_H};
