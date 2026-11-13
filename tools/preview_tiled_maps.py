@@ -92,6 +92,9 @@ def draw_object(image,obj,sheets):
     for prop in obj.findall("./properties/property"):
         if prop.get("name")=="scale":scale=float(prop.get("value","1"))
     if kind.startswith("tree") and kind[-1:] in ("0","1","2"):
+        draw=ImageDraw.Draw(image,"RGBA")
+        draw.ellipse((x-35*scale,y+1*scale,x+35*scale,y+15*scale),fill=(35,67,49,72))
+        draw.ellipse((x-26*scale,y+3*scale,x+26*scale,y+11*scale),fill=(71,111,70,48))
         sprite=crop_cell(sheets["flora"],8+int(kind[-1]),8,128)
         paste_anchor(image,sprite,x,y+8,138*scale,152*scale)
     elif kind=="campfire":
