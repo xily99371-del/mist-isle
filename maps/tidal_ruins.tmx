@@ -3,7 +3,7 @@
  <properties>
   <property name="level_id" value="tidal_ruins"/>
   <property name="layout_style" value="one_screen_handcrafted_topdown"/>
-  <property name="map_review_revision" type="int" value="10"/>
+  <property name="map_review_revision" type="int" value="11"/>
   <property name="scene_description" value="Ancient stone processional; flanking shrines, broken arches, central keystone."/>
  </properties>
  <tileset firstgid="1" source="terrain.tsx"/>
@@ -47,7 +47,13 @@
   <object id="326" name="prop_119" type="prop_119" x="756.00" y="532.00"><properties><property name="scale" type="float" value="0.76"/></properties><point/></object>
   <object id="327" name="prop_120" type="prop_120" x="252.00" y="140.00"><properties><property name="scale" type="float" value="0.74"/></properties><point/></object>
   <object id="328" name="prop_124" type="prop_124" x="812.00" y="140.00"><properties><property name="scale" type="float" value="0.74"/></properties><point/></object>
- </objectgroup>
+   <object id="350" name="西侧潮池礁石" type="prop_210" x="140.00" y="252.00"><properties><property name="scale" type="float" value="0.84"/></properties><point/></object>
+  <object id="351" name="东侧潮池礁石" type="prop_210" x="868.00" y="252.00"><properties><property name="scale" type="float" value="0.84"/></properties><point/></object>
+  <object id="352" name="遗迹碎石" type="prop_211" x="196.00" y="476.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
+  <object id="353" name="遗迹碎石" type="prop_212" x="812.00" y="476.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
+  <object id="354" name="石缝苔藓" type="prop_229" x="252.00" y="532.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
+  <object id="355" name="石缝苔藓" type="prop_229" x="812.00" y="532.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
+</objectgroup>
  <objectgroup id="4" name="Markers" draworder="topdown">
   <object id="500" name="spawn" type="spawn" x="140.00" y="532.00"><point/></object>
   <object id="501" name="return" type="return" x="140.00" y="588.00"><point/></object>
