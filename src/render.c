@@ -928,7 +928,7 @@ static void RenderWorld(Game *g) {
         Vector2 screen=GetWorldToScreen2D(p,g->cam);
         if(screen.x<-180.0f||screen.x>SW+180.0f||screen.y<-180.0f||screen.y>SH+180.0f)continue;
         switch(it->kind) {
-            case RENDER_TREE: p.y+=8.0f; DrawFloraProp(8+(it->index%3),p,138*it->scale,152*it->scale); break;
+            case RENDER_TREE: p.y+=8.0f; DrawEllipse((int)p.x,(int)p.y+7,(int)(34*it->scale),(int)(8*it->scale),(Color){35,67,49,72}); DrawEllipse((int)p.x,(int)p.y+5,(int)(25*it->scale),(int)(5*it->scale),(Color){71,111,70,48}); DrawFloraProp(8+(it->index%3),p,138*it->scale,152*it->scale); break;
             case RENDER_PROP:
                 p.y+=7.0f;
                 if(it->index==4)DrawProp(4,p,72,68);
