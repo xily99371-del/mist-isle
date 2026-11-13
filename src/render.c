@@ -1169,14 +1169,16 @@ static void DrawDialoguePortrait(Game *g,int portrait) {
     DrawRectangleRounded(card,.10f,10,(Color){11,31,43,245});
     DrawRectangleRoundedLinesEx(card,.10f,10,2.0f,(Color){208,177,111,255});
     DrawRectangleGradientV(48,386,192,286,(Color){62,83,86,255},(Color){22,43,54,255});
-    Texture2D *art=portrait==0?&TEX_HERO_PORTRAIT:(portrait==1?&TEX_WATCHER_PORTRAIT:&TEX_GUARDIAN_PORTRAIT);
-    if(art->id) {
+    Texture2D *art=portrait==0?&TEX_HERO_PORTRAIT:(portrait==1?&TEX_WATCHER_PORTRAIT:(portrait==2?&TEX_GUARDIAN_PORTRAIT:NULL));
+    if(art&&art->id) {
         Rectangle src={0,0,(float)art->width,(float)art->height};
         Rectangle dst={48,386,192,260};
         DrawTexturePro(*art,src,dst,(Vector2){0,0},0,WHITE);
     } else if(portrait==0&&TEX_HERO_WALK.id) {
         Rectangle src={0,0,32,32},dst={55,390,180,250};
         DrawTexturePro(TEX_HERO_WALK,src,dst,(Vector2){0,0},0,WHITE);
+    } else if(portrait==3) {
+        DrawLumi((Vector2){144,625},g->time,0);
     }
     DrawRectangleRounded((Rectangle){52,647,184,27},.2f,5,(Color){8,25,36,225});
     DrawUIText(portrait==0?"旅人":portrait==1?"守望者":"灯塔守卫",88,651,14,(Color){255,231,178,255});
