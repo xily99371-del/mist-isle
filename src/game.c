@@ -100,7 +100,7 @@ static void SetDialogue(Game *g,const char *a,const char *b,const char *c) {
 static int TerrainKindFromAtlasIndex(unsigned char index);
 static void AddPickup(World *w,int kind,float x,float y) {
     if(w->pickupCount>=MAX_PICKUPS)return;
-    // Place every pickup on a free, reachable tile; relocate it when a prop,
+    // Place every pickup on the nearest free, reachable tile; relocate it when a prop,
     // tree trunk or water cell occupies its authored position.
     int ox=(int)roundf(x),oy=(int)roundf(y),bestX=-1,bestY=-1;
     float best=1.0e9f;
