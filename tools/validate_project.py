@@ -125,6 +125,10 @@ require("DrawUIText(objectiveTitle,872,52,21,(Color){246,239,217,255})" in RENDE
         "dark HUD uses readable light objective text")
 require("DrawPlayer((Vector2){420,620}" in RENDER,
         "finale character lineup stays clear of the bottom caption")
+require("g->area==AREA_LIGHTHOUSE&&g->bossDefeated&&Dist(p->pos,g->world.shrine)<3.0f" in GAME and "g->scene=SCENE_END" in GAME,
+        "finale is triggered by explicit E interaction with the beacon stone after the boss is defeated")
+require("assets/cinematics" in WORKFLOW and "Copy-Item assets/cinematics/* dist/assets/cinematics/" in WORKFLOW,
+        "the packaged Windows build includes the lighthouse cinematic asset")
 require("DrawLighthouseBackdrop(g->time,false)" in RENDER,
         "the lighthouse remains dark in exploration until the finale cutscene")
 require("atlasIndex=36+row*4+col" in RENDER and "row=(int)((hash>>5)%3u)" in RENDER,
