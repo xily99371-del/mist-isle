@@ -174,17 +174,21 @@ static bool SolidPoint(Game *g,Vector2 p) {
     if(g->world.solid[y][x])return true;
     if(TerrainKindFromAtlasIndex(g->world.terrain[y][x])==4)return true;
 
-    // Dynamic actors remain solid; static scenery collision is authored in Tiled.
+    // Dynamic characters and large interactables have compact ground footprints.
     if(g->area==AREA_CAMP) {
-        if(InRect(p,2.55f,9.55f,3.45f,10.45f))return true;
-        if(!g->lumi.owned&&InRect(p,3.55f,11.55f,4.45f,12.45f))return true;
+        if(InRect(p,2.62f,9.62f,3.38f,10.38f))return true; // Watcher
+        if(!g->lumi.owned&&InRect(p,3.62f,11.62f,4.38f,12.38f))return true;
     } else if(g->area==AREA_GROVE) {
-        if(!g->splash.owned&&InRect(p,8.55f,4.55f,9.45f,5.45f))return true;
+        if(!g->splash.owned&&InRect(p,8.62f,4.62f,9.38f,5.38f))return true;
     } else if(g->area==AREA_RUINS) {
-        if(!g->spark.owned&&InRect(p,14.55f,6.55f,15.45f,7.45f))return true;
+        if(!g->spark.owned&&InRect(p,14.62f,6.62f,15.38f,7.38f))return true;
+        if(InRect(p,g->world.shrine.x-.58f,g->world.shrine.y-.48f,
+                    g->world.shrine.x+.58f,g->world.shrine.y+.48f))return true;
     } else {
-        if(InRect(p,16.68f,6.68f,17.32f,7.32f))return true;
-        if(!g->bossDefeated&&InRect(p,17.55f,12.55f,18.45f,13.45f))return true;
+        if(InRect(p,g->world.shrine.x-.58f,g->world.shrine.y-.48f,
+                    g->world.shrine.x+.58f,g->world.shrine.y+.48f))return true;
+        if(!g->bossDefeated&&InRect(p,g->world.bossPos.x-.62f,g->world.bossPos.y-.48f,
+                                    g->world.bossPos.x+.62f,g->world.bossPos.y+.48f))return true;
     }
     return false;
 }
