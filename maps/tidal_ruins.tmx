@@ -51,7 +51,7 @@
   <object id="351" name="东侧潮池礁石" type="prop_210" x="868.00" y="252.00"><properties><property name="scale" type="float" value="0.84"/></properties><point/></object>
   <object id="352" name="遗迹碎石" type="prop_211" x="196.00" y="476.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="353" name="遗迹碎石" type="prop_212" x="812.00" y="476.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
-  <object id="354" name="石缝苔藓" type="prop_229" x="252.00" y="532.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
+  <object id="354" name="石缝苔藓" type="prop_229" x="252.00" y="588.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="355" name="石缝苔藓" type="prop_229" x="812.00" y="532.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
 </objectgroup>
  <objectgroup id="4" name="Markers" draworder="topdown">
