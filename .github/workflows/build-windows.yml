@@ -18,7 +18,7 @@ jobs:
           python tools/generate_pixel_assets.py
           python tools/preview_kenney_pack.py
           python tools/build_kenney_runtime_atlas.py
-          if [ -f third_party/kenney/rpg-base/KenneyRPGpack.zip ]; then python tools/preview_cc0_packs.py; fi
+          if (Test-Path third_party/kenney/rpg-base/KenneyRPGpack.zip) { python tools/preview_cc0_packs.py }
           python tools/validate_project.py
       - name: Configure
         run: cmake -S . -B build -A x64
@@ -91,7 +91,7 @@ jobs:
           python tools/generate_pixel_assets.py
           python tools/preview_kenney_pack.py
           python tools/build_kenney_runtime_atlas.py
-          if (Test-Path third_party/kenney/rpg-base/KenneyRPGpack.zip) { python tools/preview_cc0_packs.py }
+          if [ -f third_party/kenney/rpg-base/KenneyRPGpack.zip ]; then python tools/preview_cc0_packs.py; fi
           python tools/validate_project.py
       - name: Configure Raspberry Pi 5 profile
         run: cmake -S . -B build-pi -DCMAKE_BUILD_TYPE=Release -DMISTISLE_PI_PROFILE=ON
