@@ -133,6 +133,8 @@ require("build_overlay(ground)" in MAP_BUILD and "AREA_OVERLAY[4][MAPH][MAPW]" i
         "Tiled compiler emits autotile overlays and rotations consumed by the renderer")
 require("def build_overlay" in MAP_AUTOTILE and "MASK_ROW" in MAP_AUTOTILE,
         "the deterministic autotile helper is present for clean Windows and ARM64 builds")
+require('#include "area_maps.h"' in RENDER and "AREA_OVERLAY" in RENDER and "AREA_OVERLAY_ROTATION" in RENDER,
+        "renderer includes the generated Tiled map header that declares autotile arrays")
 require("AREA_OVERLAY[4][MAPH][MAPW]" in MAP_HEADER_VALIDATOR and "validate_generated_maps.py" in CMAKE,
         "CMake validates the generated Tiled header before compiling renderer references")
 require("chapter1_map_review.png" in MAP_PREVIEW and "Collision" in MAP_PREVIEW and "Markers" in MAP_PREVIEW,
