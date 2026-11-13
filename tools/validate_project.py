@@ -127,6 +127,8 @@ require("find_package(Python3 REQUIRED COMPONENTS Interpreter)" in CMAKE and "to
 require(all(path.exists() for path in MAP_FILES), "all four Tiled maps and the terrain tileset are present")
 require('name=="campfire": type_id=2000' in MAP_BUILD and "obj->type==2000" in RENDER,
         "the campfire remains an animated Tiled-authored scene object")
+require("generate_ground_atlas.py" in CMAKE and "topdown_terrain_atlas_v1.png" in CMAKE,
+        "CMake regenerates the same seamless ground atlas for desktop and Raspberry Pi")
 require("AREA_GROUND" in MAP_BUILD and "AREA_COLLISION" in MAP_BUILD and "AREA_MARKERS" in MAP_BUILD and "AREA_OBJECTS" in MAP_BUILD,
         "Tiled compiler exports ground, collision, story markers and object placements")
 require("build_overlay(ground)" in MAP_BUILD and "AREA_OVERLAY[4][MAPH][MAPW]" in MAP_BUILD and "AREA_OVERLAY_ROTATION[4][MAPH][MAPW]" in MAP_BUILD,
