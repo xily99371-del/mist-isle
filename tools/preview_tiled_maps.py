@@ -19,10 +19,10 @@ CLIFFS=ROOT/"assets/environment/cliffs_fences_atlas_128.png"
 ORIGINAL=ROOT/"assets/environment/original_props_16_v1.png"
 KENNEY=ROOT/"assets/environment/kenney_buildings_atlas.png"
 PICKUPS={
-    "coastal_camp":[(7,7),(9,11),(13,10),(15,6),(15,12)],
-    "glowglade_grove":[(6,5),(8,12),(14,5),(16,11),(17,13)],
-    "tidal_ruins":[(7,6),(11,12),(15,5),(18,11)],
-    "lighthouse_courtyard":[(6,5),(12,12),(17,5)],
+    "coastal_camp":[(8,8),(12,8),(14,6),(5,9),(5,10),(12,9)],
+    "glowglade_grove":[(6,7),(12,6),(12,7),(4,10),(10,10)],
+    "tidal_ruins":[(7,7),(14,6),(7,8),(12,10)],
+    "lighthouse_courtyard":[(7,7),(11,7),(10,10)],
 }
 
 
@@ -140,8 +140,8 @@ def render_map(name,out_dir):
     markers=root.find("./objectgroup[@name='Markers']")
     visible_markers={"coastal_camp":{"spawn","return","grove_gate","ruin_gate","shrine"},
                      "glowglade_grove":{"spawn","return","shrine","boss"},
-                     "tidal_ruins":{"camp","return","shrine","boss"},
-                     "lighthouse_courtyard":{"camp","return","shrine","boss"}}[name]
+                     "tidal_ruins":{"spawn","return","shrine","boss"},
+                     "lighthouse_courtyard":{"spawn","return","shrine","boss"}}[name]
     if markers is not None:
         for obj in markers.findall("object"):
             marker=obj.get("type") or obj.get("class") or obj.get("name") or ""
