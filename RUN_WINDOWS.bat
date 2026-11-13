@@ -17,12 +17,14 @@ if errorlevel 1 (
   pause
   exit /b 1
 )
-python -c "import PIL" >nul 2>nul
-if errorlevel 1 python -m pip install pillow
+python -c "import PIL, cairosvg" >nul 2>nul
+if errorlevel 1 python -m pip install pillow cairosvg
 if errorlevel 1 goto failed
 
 echo [2/3] Generating pixel-art assets...
 python tools\generate_pixel_assets.py
+if errorlevel 1 goto failed
+python tools\rasterize_assets.py
 if errorlevel 1 goto failed
 python tools\generate_ground_atlas.py
 if errorlevel 1 goto failed
