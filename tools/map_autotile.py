@@ -6,7 +6,7 @@ curved creek bend), so the compiler emits four independent overlay planes.
 """
 from __future__ import annotations
 
-WIDTH, HEIGHT = 22, 18
+WIDTH, HEIGHT = 18, 12
 GRASS, SAND, STONE, WATER = range(4)
 MASK_ROW = {GRASS: 2, SAND: 5, STONE: 8, WATER: 11}
 PRIORITY = {GRASS: 0, SAND: 1, STONE: 2, WATER: 3}
