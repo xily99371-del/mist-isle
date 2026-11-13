@@ -65,13 +65,33 @@ static void AddParticle(Game *g,Vector2 p,Color c,float size) {
 static void Burst(Game *g,Vector2 p,Color c,int n) {
     for(int i=0;i<n;i++) AddParticle(g,p,c,(float)GetRandomValue(2,6));
 }
+static int DialoguePortraitForSpeaker(const char *speaker) {
+    if(!speaker)return 0;
+    if(strcmp(speaker,"守望者")==0)return 1;
+    if(strcmp(speaker,"灯塔守卫")==0)return 2;
+    if(strcmp(speaker,"旅人")==0||strcmp(speaker,"主角")==0)return 0;
+    return 3;
+}
+static void SetDialogueSequence(Game *g,const char *const *speakers,const char *const *lines,int count,bool startsBossBattle) {
+    g->dialogueCount=count<4?count:4;
+    g->dialoguePage=0;
+    g->dialogueStartsBossBattle=startsBossBattle;
+    for(int i=0;i<g->dialogueCount;i++) {
+        const char *speaker=speakers&&speakers[i]?speakers[i]:"旁白";
+        snprintf(g->dialogueLineSpeaker[i],sizeof(g->dialogueLineSpeaker[i]),"%s",speaker);
+        snprintf(g->dialogue[i],sizeof(g->dialogue[i]),"%s",lines&&lines[i]?lines[i]:"");
+        g->dialoguePortrait[i]=DialoguePortraitForSpeaker(speaker);
+    }
+    if(g->dialogueCount>0)snprintf(g->dialogueSpeaker,sizeof(g->dialogueSpeaker),"%s",g->dialogueLineSpeaker[0]);
+    g->scene=SCENE_DIALOGUE;
+}
 static void SetDialogueAs(Game *g,const char *speaker,const char *a,const char *b,const char *c) {
-    snprintf(g->dialogueSpeaker,sizeof(g->dialogueSpeaker),"%s",speaker?speaker:"旁白");
-    g->dialogueCount=0;
-    if(a){snprintf(g->dialogue[g->dialogueCount++],180,"%s",a);}
-    if(b){snprintf(g->dialogue[g->dialogueCount++],180,"%s",b);}
-    if(c){snprintf(g->dialogue[g->dialogueCount++],180,"%s",c);}
-    g->dialoguePage=0; g->scene=SCENE_DIALOGUE;
+    const char *speakers[3]={speaker?speaker:"旁白",speaker?speaker:"旁白",speaker?speaker:"旁白"};
+    const char *lines[3]={a,b,c};
+    int count=(a?1:0)+(b?1:0)+(c?1:0);
+    const char *compact[3];int n=0;
+    for(int i=0;i<3;i++)if(lines[i])compact[n++]=lines[i];
+    SetDialogueSequence(g,speakers,compact,count,false);
 }
 static void SetDialogue(Game *g,const char *a,const char *b,const char *c) {
     SetDialogueAs(g,"苔灯灵",a,b,c);
@@ -493,7 +513,15 @@ void GameUpdate(Game *g,float dt) {
     if(g->scene==SCENE_DIALOGUE) {
         if(IsKeyPressed(KEY_E)||IsKeyPressed(KEY_ENTER)||IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             g->dialoguePage++;
-            if(g->dialoguePage>=g->dialogueCount)g->scene=SCENE_PLAY;
+            if(g->dialoguePage>=g->dialogueCount) {
+                if(g->dialogueStartsBossBattle) {
+                    g->dialogueStartsBossBattle=false;
+                    AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,150);
+                    EnterBattle(g,g->enemyCount-1);
+                } else g->scene=SCENE_PLAY;
+            } else {
+                snprintf(g->dialogueSpeaker,sizeof(g->dialogueSpeaker),"%s",g->dialogueLineSpeaker[g->dialoguePage]);
+            }
         }
         return;
     }
@@ -560,7 +588,16 @@ void GameUpdate(Game *g,float dt) {
                     } else Toast(g,"敌人被击退！");
                     GameSave(g);
                     if(e->type==ENEMY_MOTE){g->groveMoteDefeated=true;g->player.berries+=2;GameSave(g);Toast(g,"击退林地微光兽，获得2颗果实！");}
-                    if(e->type==ENEMY_BOSS){g->bossDefeated=true;g->player.crystals+=3;g->player.shells+=2;GameSave(g);}
+                    if(e->type==ENEMY_BOSS) {
+                        g->bossDefeated=true;g->player.crystals+=3;g->player.shells+=2;GameSave(g);
+                        const char *speakers[3]={"灯塔守卫","旅人","灯塔守卫"};
+                        const char *lines[3]={
+                            "胸口的光……终于不再灼痛了。原来我一直在等待有人唤醒灯塔。",
+                            "你不必再独自守着这里了。让这束光照亮整座岛吧。",
+                            "去吧，旅人。灯火会记住你们。"
+                        };
+                        SetDialogueSequence(g,speakers,lines,3,false);
+                    }
                 }
             } else {
                 float incoming=e->type==ENEMY_BOSS?16.0f:10.0f;
@@ -729,9 +766,17 @@ void GameUpdate(Game *g,float dt) {
             } else Toast(g,"遗迹需要三位伙伴协力，并带来一枚潮汐贝壳。");
             return;
         }
-        // Final encounter trigger.
+        // The lighthouse guardian speaks before the battle begins.
         if(g->area==AREA_LIGHTHOUSE&&g->shrineSolved&&Dist(p->pos,g->world.bossPos)<2.0f&&!g->bossDefeated) {
-            AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,150);EnterBattle(g,g->enemyCount-1);return;
+            const char *speakers[4]={"灯塔守卫","旅人","灯塔守卫","旅人"};
+            const char *lines[4]={
+                "停下。灯塔的光已经沉睡太久，我不会让任何人再次触碰它。",
+                "这座岛屿正在失去光。我们不是来夺走它的。",
+                "我曾守护灯火，直到潮汐吞没了我的名字……",
+                "那就让我们一起找回它。"
+            };
+            SetDialogueSequence(g,speakers,lines,4,true);
+            return;
         }
         // Chapter finale: the player must explicitly activate the central beacon stone.
         // The stone's collision footprint prevents standing on its centre, so use a generous
