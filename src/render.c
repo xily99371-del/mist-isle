@@ -625,13 +625,22 @@ static void DrawGateMarker(Game *g,int gateId,Vector2 grid) {
                      (Vector2){p.x+6,p.y-196.0f-sinf(g->time*4.0f)*3.0f},C_GOLD);
     }
 }
-static void DrawCoastalCliffs(Game *g,int terrainKinds[MAPH][MAPW]) {
+static void GetVisibleTileBounds(Game *g,int *minX,int *minY,int *maxX,int *maxY) {
+    Vector2 a=GetScreenToWorld2D((Vector2){0,0},g->cam);
+    Vector2 b=GetScreenToWorld2D((Vector2){SW,SH},g->cam);
+    float left=fminf(a.x,b.x),right=fmaxf(a.x,b.x);
+    float top=fminf(a.y,b.y),bottom=fmaxf(a.y,b.y);
+    *minX=(int)Clamp((float)floorf(left/TILE_SIZE)-1.0f,0.0f,(float)(MAPW-1));
+    *maxX=(int)Clamp((float)floorf(right/TILE_SIZE)+1.0f,0.0f,(float)(MAPW-1));
+    *minY=(int)Clamp((float)floorf(top/TILE_SIZE)-1.0f,0.0f,(float)(MAPH-1));
+    *maxY=(int)Clamp((float)floorf(bottom/TILE_SIZE)+1.0f,0.0f,(float)(MAPH-1));
+}
+static void DrawCoastalCliffs(Game *g,int terrainKinds[MAPH][MAPW],int minX,int minY,int maxX,int maxY) {
     if(g->area!=AREA_CAMP&&g->area!=AREA_LIGHTHOUSE)return;
     if(!TEX_CLIFF_ATLAS.id)return;
-    // A cliff segment is stamped at every shoreline cell with generous overlap.
-    // This turns the former isolated bottom-edge chunks into one continuous,
-    // irregular coastline and also handles west/east/north-facing shore sections.
-    for(int y=1;y<MAPH-1;y++)for(int x=1;x<MAPW-1;x++) {
+    // Draw only the coastline segments inside the camera's visible tile bounds.
+    for(int y=minY;y<=maxY;y++)for(int x=minX;x<=maxX;x++) {
+        if(x<=0||y<=0||x>=MAPW-1||y>=MAPH-1)continue;
         if(terrainKinds[y][x]==4)continue;
         bool south=terrainKinds[y+1][x]==4;
         bool north=terrainKinds[y-1][x]==4;
@@ -669,13 +678,15 @@ static void RenderWorld(Game *g) {
     int terrainKinds[MAPH][MAPW]={{0}};
     for(int y=0;y<MAPH;y++)for(int x=0;x<MAPW;x++)
         terrainKinds[y][x]=TerrainKindFromAtlasIndex(g->world.terrain[y][x]);
-    for(int y=0;y<MAPH;y++)for(int x=0;x<MAPW;x++) {
+    int minX,minY,maxX,maxY;
+    GetVisibleTileBounds(g,&minX,&minY,&maxX,&maxY);
+    for(int y=minY;y<=maxY;y++)for(int x=minX;x<=maxX;x++) {
         int kind=terrainKinds[y][x];
         DrawTopDownTile(x,y,g->world.terrain[y][x],kind,g->time);
         DrawTerrainAccent(x,y,g->area,kind,g->time);
     }
     // Broken foam traces where the sea meets the island and where streams meet their banks.
-    for(int y=1;y<MAPH-1;y++)for(int x=1;x<MAPW-1;x++)if(terrainKinds[y][x]!=4) {
+    for(int y=minY;y<=maxY;y++)for(int x=minX;x<=maxX;x++)if(x>0&&y>0&&x<MAPW-1&&y<MAPH-1&&terrainKinds[y][x]!=4) {
         Vector2 p=WorldToScreen((float)x,(float)y);
         unsigned int h=TileHash(x,y,(int)g->area+31);
         if(terrainKinds[y][x-1]==4) {
@@ -695,7 +706,7 @@ static void RenderWorld(Game *g) {
             DrawLineEx((Vector2){xx,p.y+25},(Vector2){xx+8,p.y+28},1.6f,Fade(WHITE,.34f));
         }
     }
-    DrawCoastalCliffs(g,terrainKinds);
+    DrawCoastalCliffs(g,terrainKinds,minX,minY,maxX,maxY);
     // Scene objects are authored in Tiled and depth-sorted by their ground point.
     RenderItem items[512]; int count=0;
     for(int i=0;i<g->world.objectCount;i++) {
@@ -741,6 +752,8 @@ static void RenderWorld(Game *g) {
     }
     for(int i=0;i<count;i++) {
         RenderItem *it=&items[i]; Vector2 p=WorldToScreen(it->grid.x,it->grid.y);
+        Vector2 screen=GetWorldToScreen2D(p,g->cam);
+        if(screen.x<-180.0f||screen.x>SW+180.0f||screen.y<-180.0f||screen.y>SH+180.0f)continue;
         switch(it->kind) {
             case RENDER_TREE: p.y+=8.0f; DrawFloraProp(8+(it->index%3),p,100*it->scale,112*it->scale); break;
             case RENDER_PROP:
@@ -833,7 +846,8 @@ static void RenderWorld(Game *g) {
             DrawCircleLines((int)x,(int)y,(int)(2.0f+pulse*4.0f),Fade((Color){196,225,231,255},.38f*(1.0f-pulse)));
         }
         // Ripples stay attached to the visible water tiles as the camera moves.
-        for(int y=1;y<MAPH-1;y++)for(int x=1;x<MAPW-1;x++) {
+        int rippleCount=0;
+        for(int y=minY;y<=maxY&&rippleCount<MISTISLE_RAIN_RIPPLES;y++)for(int x=minX;x<=maxX&&rippleCount<MISTISLE_RAIN_RIPPLES;x++) {
             if(terrainKinds[y][x]!=4)continue;
             unsigned int h=TileHash(x,y,91);
             if(h%23u!=0u)continue;
@@ -841,6 +855,7 @@ static void RenderWorld(Game *g) {
             Vector2 screen=GetWorldToScreen2D(world,g->cam);
             float pulse=fmodf(g->time*1.4f+(float)(h%19u)*.11f,1.0f);
             DrawCircleLines((int)screen.x,(int)screen.y,(int)(2.0f+pulse*5.0f),Fade((Color){204,231,231,255},.40f*(1.0f-pulse)));
+            rippleCount++;
         }
     } else if(g->weather==2) {
         for(int i=0;i<24;i++){int x=(i*97+(int)(sinf(g->time+i)*18)+SW)%SW;int y=(i*53+(int)(cosf(g->time*.7f+i)*12)+SH)%SH;DrawCircle(x,y,2,Fade(C_GOLD,.6f));}
