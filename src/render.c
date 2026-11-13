@@ -73,6 +73,7 @@ static void DrawUITextWrapped(const char *text,int x,int y,int maxWidth,int size
 
 static Texture2D TEX_HERO={0}, TEX_LUMI={0}, TEX_MOATAIL={0}, TEX_GECKO={0}, TEX_KEEPER={0};
 static Texture2D TEX_HERO_PORTRAIT={0}, TEX_WATCHER_PORTRAIT={0}, TEX_GUARDIAN_PORTRAIT={0};
+static Texture2D TEX_LUMI_ILLUSTRATION={0}, TEX_MOATAIL_ILLUSTRATION={0}, TEX_GECKO_ILLUSTRATION={0};
 static Texture2D TEX_HERO_PIXEL={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, TEX_GECKO_PIXEL={0}, TEX_TILES={0}, TEX_PROPS={0};
 static Texture2D TEX_ISO_TILES={0}, TEX_HERO_WALK={0}, TEX_ENV_PROPS={0}, TEX_LEAFLING={0}, TEX_GROVE_MOTE={0}, TEX_AREA_PROPS={0}, TEX_TOPDOWN_TILES={0}, TEX_FLORA_ATLAS={0}, TEX_CLIFF_ATLAS={0}, TEX_STRUCTURE_ATLAS={0}, TEX_ORIGINAL_PROPS={0}, TEX_KENNEY_BUILDINGS={0}, TEX_ENDING_CG={0};
 static RenderTexture2D TEX_GROUND_CACHE={0};
@@ -326,34 +327,33 @@ static void DrawCampfire(Vector2 p,float t) {
     }
 }
 static void DrawLumi(Vector2 p,float t,float bob) {
+    (void)bob;
     const float footY=p.y+8.0f;
-    DrawEllipse((int)p.x,(int)footY,19,7,(Color){48,66,57,95});
-    if (TEX_LUMI_PIXEL.id) {
-        int frame=(int)(t*2.5f)%4;
-        Rectangle src={(float)(frame*32),0,32,32};
-        Rectangle dst={p.x-33,footY-66-sinf(t*4.4f)*2.0f,66,66};
-        DrawTexturePro(TEX_LUMI_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
-        return;
+    float floatY=sinf(t*4.4f)*2.0f;
+    DrawEllipse((int)p.x,(int)footY,19,7,(Color){48,66,57,72});
+    if(TEX_LUMI_ILLUSTRATION.id) {
+        Rectangle src={0,0,(float)TEX_LUMI_ILLUSTRATION.width,(float)TEX_LUMI_ILLUSTRATION.height};
+        Rectangle dst={p.x-35.0f,footY-70.0f-floatY,70.0f,70.0f};
+        DrawTexturePro(TEX_LUMI_ILLUSTRATION,src,dst,(Vector2){0,0},0,WHITE);
     }
-    if (TEX_LUMI.id) { DrawPortrait(TEX_LUMI,p,58,58,sinf(t*4.4f)*3.0f); return; }
-    (void)bob; // The authored companion sprite is required; no geometric stand-in is drawn.
 }
 static void DrawPlayer(Vector2 p,float t,bool moving,int facing) {
     float bob=moving?fabsf(sinf(t*13))*1.2f:0.0f;
     const float footY=p.y+9.0f;
     DrawEllipse((int)p.x,(int)footY,16,5,(Color){48,66,57,105});
-    if (TEX_HERO_WALK.id) {
-        int frame = moving ? ((int)(t*8.0f)%4) : 0;
-        Rectangle src={(float)(frame*32),(float)(facing*32),32,32};
-        Rectangle dst={p.x-33,footY-66-bob,66,66};
-        DrawTexturePro(TEX_HERO_WALK,src,dst,(Vector2){0,0},0,WHITE);
-        return;
-    }
-    if (TEX_HERO.id) { DrawPortrait(TEX_HERO,p,66,72,bob); return; }
+    (void)facing;
+    // The authored heroine illustration is the world-character source of truth.
+    // Keep a gentle idle/run bob until the dedicated 4-direction illustrated
+    // animation sheet replaces the legacy block-built walk cycle.
     if(TEX_HERO_PORTRAIT.id) {
         Rectangle src={0,0,(float)TEX_HERO_PORTRAIT.width,(float)TEX_HERO_PORTRAIT.height};
         Rectangle dst={p.x-43.0f,footY-108.0f-bob,86.0f,108.0f};
         DrawTexturePro(TEX_HERO_PORTRAIT,src,dst,(Vector2){0,0},0,WHITE);
+    } else if(TEX_HERO_WALK.id) {
+        int frame=moving?((int)(t*8.0f)%4):0;
+        Rectangle src={(float)(frame*32),(float)(facing*32),32,32};
+        Rectangle dst={p.x-33,footY-66-bob,66,66};
+        DrawTexturePro(TEX_HERO_WALK,src,dst,(Vector2){0,0},0,WHITE);
     }
 }
 static void DrawShrine(Vector2 p,float t,bool solved,bool finalCore) {
@@ -424,25 +424,23 @@ static void PushRenderItem(RenderItem *items,int *count,RenderKind kind,int inde
 }
 static void DrawMoatail(Vector2 p,float t) {
     const float footY=p.y+8.0f;
-    DrawEllipse((int)p.x,(int)footY,18,6,(Color){48,66,57,95});
-    if(TEX_MOATAIL_PIXEL.id) {
-        int frame=(int)(t*2.5f)%4;
-        Rectangle src={(float)(frame*32),0,32,32};
-        Rectangle dst={p.x-33,footY-66-sinf(t*4)*2.0f,66,66};
-        DrawTexturePro(TEX_MOATAIL_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
-    } else if(TEX_MOATAIL.id) DrawPortrait(TEX_MOATAIL,p,58,58,sinf(t*4)*2.5f);
-    // The authored four-frame companion sheet is required; never substitute primitive shapes.
+    float bob=sinf(t*4.0f)*2.0f;
+    DrawEllipse((int)p.x,(int)footY,18,6,(Color){48,66,57,75});
+    if(TEX_MOATAIL_ILLUSTRATION.id) {
+        Rectangle src={0,0,(float)TEX_MOATAIL_ILLUSTRATION.width,(float)TEX_MOATAIL_ILLUSTRATION.height};
+        Rectangle dst={p.x-35.0f,footY-70.0f-bob,70.0f,70.0f};
+        DrawTexturePro(TEX_MOATAIL_ILLUSTRATION,src,dst,(Vector2){0,0},0,WHITE);
+    }
 }
 static void DrawGecko(Vector2 p,float t) {
     const float footY=p.y+8.0f;
-    DrawEllipse((int)p.x,(int)footY,18,6,(Color){48,66,57,95});
-    if(TEX_GECKO_PIXEL.id) {
-        int frame=(int)(t*2.5f)%4;
-        Rectangle src={(float)(frame*32),0,32,32};
-        Rectangle dst={p.x-33,footY-66-sinf(t*5)*2.0f,66,66};
-        DrawTexturePro(TEX_GECKO_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
-    } else if(TEX_GECKO.id) DrawPortrait(TEX_GECKO,p,58,58,sinf(t*5)*2.0f);
-    // The authored four-frame companion sheet is required; never substitute primitive shapes.
+    float bob=sinf(t*5.0f)*1.8f;
+    DrawEllipse((int)p.x,(int)footY,18,6,(Color){48,66,57,75});
+    if(TEX_GECKO_ILLUSTRATION.id) {
+        Rectangle src={0,0,(float)TEX_GECKO_ILLUSTRATION.width,(float)TEX_GECKO_ILLUSTRATION.height};
+        Rectangle dst={p.x-35.0f,footY-70.0f-bob,70.0f,70.0f};
+        DrawTexturePro(TEX_GECKO_ILLUSTRATION,src,dst,(Vector2){0,0},0,WHITE);
+    }
 }
 static void DrawLighthouseGuardian(Vector2 p,float t,float scale) {
     float bob=sinf(t*1.8f)*1.4f*scale;
@@ -1361,10 +1359,13 @@ void RenderInit(void) {
         "assets/tiles/png/environment_props.png",
         "assets/characters/png/heroine_portrait.png",
         "assets/characters/png/watcher_portrait.png",
-        "assets/characters/png/lighthouse_guardian_portrait.png"
+        "assets/characters/png/lighthouse_guardian_portrait.png",
+        "assets/characters/png/moss_lumi.png",
+        "assets/characters/png/moatail.png",
+        "assets/characters/png/crystal_gecko.png"
     };
-    Texture2D *targets[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS,&TEX_HERO_PORTRAIT,&TEX_WATCHER_PORTRAIT,&TEX_GUARDIAN_PORTRAIT};
-    for(int i=0;i<20;i++) {
+    Texture2D *targets[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS,&TEX_HERO_PORTRAIT,&TEX_WATCHER_PORTRAIT,&TEX_GUARDIAN_PORTRAIT,&TEX_LUMI_ILLUSTRATION,&TEX_MOATAIL_ILLUSTRATION,&TEX_GECKO_ILLUSTRATION};
+    for(int i=0;i<23;i++) {
         if(FileExists(paths[i])) {
             *targets[i]=LoadTexture(paths[i]);
             if(targets[i]->id)SetTextureFilter(*targets[i],i>=17?TEXTURE_FILTER_BILINEAR:TEXTURE_FILTER_POINT);
@@ -1380,8 +1381,8 @@ void RenderClose(void) {
     TEX_GROUND_CACHE=(RenderTexture2D){0};
     CACHED_GROUND_AREA=-1;
     UnloadUIFont();
-    Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS,&TEX_HERO_PORTRAIT,&TEX_WATCHER_PORTRAIT,&TEX_GUARDIAN_PORTRAIT};
-    for(int i=0;i<20;i++)if(textures[i]->id)UnloadTexture(*textures[i]);
+    Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS,&TEX_HERO_PORTRAIT,&TEX_WATCHER_PORTRAIT,&TEX_GUARDIAN_PORTRAIT,&TEX_LUMI_ILLUSTRATION,&TEX_MOATAIL_ILLUSTRATION,&TEX_GECKO_ILLUSTRATION};
+    for(int i=0;i<23;i++)if(textures[i]->id)UnloadTexture(*textures[i]);
     if(TEX_ENDING_CG.id)UnloadTexture(TEX_ENDING_CG);
 }
 void GameRender(Game *g) {
