@@ -44,6 +44,47 @@ def paste_anchor(dst,sprite,cx,foot_y,width,height):
     dst.alpha_composite(sprite,(int(cx-width/2),int(foot_y-height)))
 
 
+
+def draw_water_detail(image,indices,name):
+    """Static counterpart of the runtime water shimmer for map-review images."""
+    palette={
+        "coastal_camp":((111,188,199,105),(231,246,225,150)),
+        "glowglade_grove":((119,194,179,105),(230,245,211,155)),
+        "tidal_ruins":((100,164,187,110),(211,235,229,150)),
+        "lighthouse_courtyard":((120,177,202,110),(241,241,220,160)),
+    }
+    deep,crest=palette[name]
+    draw=ImageDraw.Draw(image,"RGBA")
+    water=lambda x,y: indices[y*W+x]//4>=9
+    for y in range(H):
+        for x in range(W):
+            if not water(x,y):
+                continue
+            left,top=x*T,y*T
+            seed=(x*73856093+y*19349663+len(name)*83492791)&0xffffffff
+            ox=7+(seed%23)
+            oy=9+((seed>>5)%29)
+            span=13+((seed>>11)%14)
+            draw.line([(left+ox,top+oy+2),(left+ox+span//2,top+oy),
+                       (left+ox+span,top+oy+1)],fill=crest,width=2)
+            ox2=8+((seed>>17)%25)
+            oy2=34+((seed>>23)%13)
+            draw.line([(left+ox2,top+oy2),(left+ox2+8,top+oy2-1)],
+                      fill=deep,width=1)
+            if seed%3==0:
+                gx=left+5+((seed>>9)%45)
+                gy=top+5+((seed>>15)%45)
+                draw.ellipse((gx-1,gy-1,gx+1,gy+1),fill=crest)
+            # A broken foam glint sits just inside the water edge, never as a
+            # continuous white outline that would make the shore look tiled.
+            if y>0 and not water(x,y-1):
+                fx=left+8+((seed>>7)%34)
+                draw.line([(fx,top+2),(fx+5,top+3)],fill=(236,245,222,135),width=1)
+            if x>0 and not water(x-1,y):
+                fy=top+8+((seed>>13)%34)
+                draw.line([(left+2,fy),(left+3,fy+5)],fill=(236,245,222,125),width=1)
+
+
 def draw_object(image,obj,sheets):
     kind=obj.get("class") or obj.get("type") or obj.get("name") or ""
     x,y=float(obj.get("x","0")),float(obj.get("y","0"))
@@ -51,6 +92,9 @@ def draw_object(image,obj,sheets):
     for prop in obj.findall("./properties/property"):
         if prop.get("name")=="scale":scale=float(prop.get("value","1"))
     if kind.startswith("tree") and kind[-1:] in ("0","1","2"):
+        draw=ImageDraw.Draw(image,"RGBA")
+        draw.ellipse((x-35*scale,y+1*scale,x+35*scale,y+15*scale),fill=(35,67,49,72))
+        draw.ellipse((x-26*scale,y+3*scale,x+26*scale,y+11*scale),fill=(71,111,70,48))
         sprite=crop_cell(sheets["flora"],8+int(kind[-1]),8,128)
         paste_anchor(image,sprite,x,y+8,138*scale,152*scale)
     elif kind=="campfire":
@@ -122,6 +166,8 @@ def render_map(name,out_dir):
                              (overlay%4+1)*T,(overlay//4+1)*T))
             if angle:edge=edge.rotate(-angle,resample=Image.Resampling.NEAREST)
             image.alpha_composite(edge,(tx,ty))
+
+    draw_water_detail(image,indices,name)
 
     # Collision review is translucent so it does not hide the actual art.
     collision_layer=Image.new("RGBA",image.size,(0,0,0,0))

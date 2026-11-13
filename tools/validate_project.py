@@ -18,6 +18,7 @@ MAP_BUILD = (ROOT / "tools/build_maps.py").read_text(encoding="utf-8")
 MAP_AUTOTILE = (ROOT / "tools/map_autotile.py").read_text(encoding="utf-8")
 MAP_HEADER_VALIDATOR = (ROOT / "tools/validate_generated_maps.py").read_text(encoding="utf-8")
 MAP_PREVIEW = (ROOT / "tools/preview_tiled_maps.py").read_text(encoding="utf-8")
+WATER_PREVIEW = MAP_PREVIEW
 RASTERIZER = (ROOT / "tools/rasterize_assets.py").read_text(encoding="utf-8")
 GROVE_MAP = (ROOT / "maps/glowglade_grove.tmx").read_text(encoding="utf-8")
 MAP_FILES = [ROOT / "maps" / name for name in (
@@ -318,5 +319,30 @@ for token, label in [
     ("g->area==AREA_GROVE", "area-specific interaction/render routing"),
 ]:
     require(token in GAME or token in HEADER, label + " is present")
+
+
+# Water must read as a layered material in both the runtime and generated map review.
+water_start = RENDER.find("static void DrawTerrainAccent")
+water_end = RENDER.find("static void DrawAtlasSprite", water_start)
+water_renderer = RENDER[water_start:water_end]
+require(water_start >= 0 and water_end > water_start and
+        all(token in water_renderer for token in ("area==AREA_GROVE", "area==AREA_RUINS",
+                                                   "sinf(phase", "DrawLineEx", "DrawCircleV")),
+        "water uses area-tinted animated wave crests and reflective glints")
+require("MISTISLE_PI_PROFILE" in water_renderer and "DrawCircleLines" in water_renderer,
+        "Raspberry Pi keeps a reduced water shimmer path while desktop uses layered ripples")
+require("def draw_water_detail(image,indices,name)" in WATER_PREVIEW and
+        "draw_water_detail(image,indices,name)" in WATER_PREVIEW and
+        "broken foam glint" in WATER_PREVIEW,
+        "Tiled map previews show matching water highlights and broken shoreline foam")
+
+tree_case_start = RENDER.find("case RENDER_TREE:")
+tree_case_end = RENDER.find("case RENDER_PROP:", tree_case_start)
+tree_case = RENDER[tree_case_start:tree_case_end]
+require(tree_case_start >= 0 and tree_case_end > tree_case_start and
+        "DrawEllipse" in tree_case and "DrawFloraProp(8+(it->index%3),p,138*it->scale,152*it->scale)" in tree_case,
+        "large tree canopies have layered ground shadows and retain the authored 128px flora sprites")
+require('draw.ellipse((x-35*scale,y+1*scale,x+35*scale,y+15*scale)' in WATER_PREVIEW,
+        "map review previews reproduce the runtime tree grounding shadows")
 
 print(f"Validation complete. Imported art sheets checked: {present}/{len(assets)}.")
