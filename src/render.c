@@ -709,16 +709,14 @@ static void DrawGateMarker(Game *g,int gateId,Vector2 grid) {
         DrawCircleV((Vector2){p.x,p.y-119},8,Fade((Color){255,229,157,255},.85f));
         DrawCircleLines((int)p.x,(int)p.y-119,23,Fade(C_GOLD,.75f));
     } else {
-        // Return gate: a compact circular waystone, distinct from destination monuments.
-        DrawEllipse((int)p.x,(int)p.y-30,37,54,(Color){63,91,96,255});
-        DrawEllipseLines((int)p.x,(int)p.y-30,37,54,(Color){166,188,161,255});
-        DrawEllipse((int)p.x,(int)p.y-30,25,40,(Color){23,51,65,255});
-        DrawEllipseLines((int)p.x,(int)p.y-30,25,40,Fade((Color){127,204,224,255},.82f));
-        DrawCircleV((Vector2){p.x,p.y-30},12,Fade((Color){104,199,222,255},.18f+.08f*pulse));
-        DrawCircleV((Vector2){p.x,p.y-30},5,Fade((Color){147,224,239,255},.9f));
+        // Return route keeps the same grounded stone-arch language as the entry portal.
+        DrawAreaProp(8,(Vector2){p.x,p.y+2},160,168);
+        DrawCircleLines((int)p.x,(int)p.y-63,37,Fade((Color){119,205,228,255},.62f));
+        DrawCircleV((Vector2){p.x,p.y-63},8,Fade((Color){123,218,238,255},.72f));
+        DrawCircleV((Vector2){p.x,p.y-63},3,WHITE);
         for(int i=0;i<4;i++) {
-            float a=(float)i*PI2/4.0f+g->time*.25f;
-            DrawCircleV((Vector2){p.x+cosf(a)*47,p.y-30+sinf(a)*61},2.4f,Fade(C_BLUE,.75f));
+            float a=(float)i*PI2/4.0f+g->time*.18f;
+            DrawCircleV((Vector2){p.x+cosf(a)*37,p.y-63+sinf(a)*37},2.6f,Fade(C_BLUE,.72f));
         }
     }
     if(locked)DrawCircleV((Vector2){p.x,p.y-69},5,(Color){138,144,137,255});
@@ -938,7 +936,7 @@ static void RenderWorld(Game *g) {
                 else if(it->index==33)DrawAreaPropTint(13,p,150*it->scale,190*it->scale,(Color){145,160,176,255});
                 else if(it->index==20)DrawAreaProp(0,p,164*it->scale,112*it->scale);
                 else if(it->index==21)DrawAreaProp(1,p,126*it->scale,112*it->scale);
-                else if(it->index==22)DrawAreaProp(2,p,132*it->scale,126*it->scale);
+                else if(it->index==22)DrawAreaProp(2,p,220*it->scale,176*it->scale);
                 else if(it->index==24)DrawAreaProp(4,p,150*it->scale,158*it->scale);
                 else if(it->index==25)DrawAreaProp(5,p,126*it->scale,126*it->scale);
                 else if(it->index==26)DrawAreaProp(6,p,102*it->scale,94*it->scale);
