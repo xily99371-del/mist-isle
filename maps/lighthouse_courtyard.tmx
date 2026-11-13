@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="22" height="18" tilewidth="56" tileheight="56" infinite="0" nextlayerid="5" nextobjectid="300">
+ <tileset firstgid="1" source="terrain.tsx"/>
+ <layer id="1" name="Ground" width="22" height="18">
+  <data encoding="csv">
+44,43,42,41,40,39,38,37,44,43,42,41,40,39,38,37,44,43,42,41,40,39,
+39,39,39,39,39,42,18,18,18,18,13,13,13,13,13,16,16,40,40,40,43,43,
+42,43,44,40,41,13,2,3,7,8,4,5,6,2,3,7,8,13,41,42,38,39,
+37,39,44,14,19,4,6,3,5,2,7,1,6,8,5,2,4,1,15,44,41,43,
+40,43,41,15,1,7,2,8,6,4,2,5,3,1,7,5,8,30,16,14,44,39,
+43,42,17,4,3,2,1,32,31,30,29,28,27,26,25,32,31,30,29,16,39,38,
+38,38,14,2,2,5,5,5,29,29,32,32,32,32,32,27,27,27,27,3,18,42,
+41,18,7,3,4,8,1,2,30,31,27,28,29,25,26,30,31,32,28,5,13,38,
+44,14,7,1,6,3,5,26,28,25,30,32,29,31,28,25,27,32,26,7,4,42,
+39,18,28,26,32,30,25,31,29,27,25,28,26,32,30,28,31,29,27,1,7,38,
+42,17,4,3,2,1,8,31,30,29,28,27,26,25,32,31,30,29,28,3,2,37,
+37,13,1,1,1,4,4,28,28,28,31,31,31,31,31,26,26,26,26,2,17,41,
+40,41,18,2,3,7,8,1,29,30,26,3,28,8,25,29,30,31,27,4,20,37,
+43,37,18,20,5,2,4,1,27,32,29,7,28,6,27,32,26,31,25,18,39,41,
+38,41,39,37,19,5,8,6,28,26,32,3,1,7,29,27,30,28,26,44,42,37,
+41,40,39,38,37,20,19,6,5,4,3,2,1,8,7,6,17,16,39,38,37,44,
+44,44,44,44,44,39,39,15,15,3,6,18,18,18,18,13,13,37,37,37,40,40,
+39,40,41,37,38,42,43,44,40,41,37,38,39,43,44,40,41,42,38,39,43,44
+  </data>
+ </layer>
+ <objectgroup id="2" name="Collision" color="#d65c55">
+  <object id="100" name="solid_1" x="896" y="168" width="168" height="112"/>
+  <object id="101" name="solid_2" x="504" y="336" width="112" height="112"/>
+  <object id="102" name="solid_3" x="224" y="672" width="112" height="112"/>
+  <object id="103" name="solid_4" x="784" y="672" width="112" height="112"/>
+  <object id="104" name="solid_5" x="280" y="280" width="56" height="56"/>
+  <object id="105" name="solid_6" x="392" y="280" width="56" height="56"/>
+  <object id="106" name="solid_7" x="280" y="728" width="56" height="56"/>
+  <object id="107" name="solid_8" x="392" y="784" width="56" height="56"/>
+  <object id="108" name="solid_9" x="672" y="784" width="56" height="56"/>
+  <object id="109" name="solid_10" x="1064" y="616" width="56" height="56"/>
+ </objectgroup>
+ <objectgroup id="3" name="Objects">
+  <object id="1" name="tree0" type="tree0" x="308.00" y="308.00"><properties><property name="scale" type="float" value="1"/></properties><point/></object>
+  <object id="2" name="tree1" type="tree1" x="420.00" y="308.00"><properties><property name="scale" type="float" value="1"/></properties><point/></object>
+  <object id="3" name="tree2" type="tree2" x="308.00" y="756.00"><properties><property name="scale" type="float" value="1"/></properties><point/></object>
+  <object id="4" name="tree0" type="tree0" x="420.00" y="812.00"><properties><property name="scale" type="float" value="1"/></properties><point/></object>
+  <object id="5" name="tree1" type="tree1" x="700.00" y="812.00"><properties><property name="scale" type="float" value="1"/></properties><point/></object>
+  <object id="6" name="tree2" type="tree2" x="1092.00" y="644.00"><properties><property name="scale" type="float" value="0.95"/></properties><point/></object>
+  <object id="7" name="prop_33" type="prop_33" x="980.00" y="280.00"><properties><property name="scale" type="float" value="1.2"/></properties><point/></object>
+  <object id="8" name="prop_35" type="prop_35" x="588.00" y="392.00"><properties><property name="scale" type="float" value="0.95"/></properties><point/></object>
+  <object id="9" name="prop_34" type="prop_34" x="308.00" y="756.00"><properties><property name="scale" type="float" value="1"/></properties><point/></object>
+  <object id="10" name="prop_32" type="prop_32" x="868.00" y="756.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
+  <object id="11" name="prop_116" type="prop_116" x="375.20" y="392.00"><properties><property name="scale" type="float" value="0.62"/></properties><point/></object>
+  <object id="12" name="prop_118" type="prop_118" x="700.00" y="789.60"><properties><property name="scale" type="float" value="0.62"/></properties><point/></object>
+  <object id="13" name="prop_120" type="prop_120" x="1092.00" y="616.00"><properties><property name="scale" type="float" value="0.58"/></properties><point/></object>
+  <object id="14" name="prop_117" type="prop_117" x="476.00" y="767.20"><properties><property name="scale" type="float" value="0.55"/></properties><point/></object>
+  <object id="15" name="prop_119" type="prop_119" x="812.00" y="722.40"><properties><property name="scale" type="float" value="0.55"/></properties><point/></object>
+ </objectgroup>
+ <objectgroup id="4" name="Markers" color="#e7c77b">
+  <object id="200" name="spawn" type="spawn" x="196.00" y="532.00"><point/></object>
+  <object id="201" name="return" type="return" x="140.00" y="532.00"><point/></object>
+  <object id="202" name="grove_gate" type="grove_gate" x="140.00" y="532.00"><point/></object>
+  <object id="203" name="ruin_gate" type="ruin_gate" x="140.00" y="532.00"><point/></object>
+  <object id="204" name="shrine" type="shrine" x="980.00" y="420.00"><point/></object>
+  <object id="205" name="boss" type="boss" x="1036.00" y="756.00"><point/></object>
+ </objectgroup>
+</map>
