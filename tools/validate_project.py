@@ -121,7 +121,7 @@ require("辉光林地" in RENDER and "潮汐遗迹" in RENDER and "灯塔庭院"
         "camp entrances and sub-map return route have explicit Chinese destination labels")
 require("需要两位伙伴" in RENDER and "封印尚未解除" in RENDER,
         "locked entrances explain their unlock conditions")
-const_glyph_match = re.search(r"static const int UI_CODEPOINTS\\[\\]=\\{([^}]+)\\}", RENDER)
+const_glyph_match = re.search(r"static const int UI_CODEPOINTS\[\]=\{([^}]+)\}", RENDER)
 require(const_glyph_match is not None, "UI font atlas has an explicit Unicode glyph set")
 font_codepoints = {int(value) for value in const_glyph_match.group(1).split(",") if value.strip()}
 source_cjk = {ord(ch) for ch in RENDER + GAME if 0x3400 <= ord(ch) <= 0x9FFF}
