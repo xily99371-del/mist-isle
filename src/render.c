@@ -739,7 +739,6 @@ static void RenderWorld(Game *g) {
         PushRenderItem(items,&count,RENDER_PROP,32,(Vector2){10.0f,12.0f},1.0f); // stone bridge
         PushRenderItem(items,&count,RENDER_PROP,116,(Vector2){5.5f,13.2f},.65f);
         PushRenderItem(items,&count,RENDER_PROP,119,(Vector2){18.0f,5.5f},.62f);
-        PushRenderItem(items,&count,RENDER_PROP,415,(Vector2){2.0f,9.0f},.75f);
     } else {
         PushRenderItem(items,&count,RENDER_PROP,33,(Vector2){17.0f,4.5f},1.2f); // lighthouse from area atlas
         PushRenderItem(items,&count,RENDER_PROP,35,(Vector2){10.0f,6.5f},.95f);  // garden fountain
