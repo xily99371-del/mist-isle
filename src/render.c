@@ -593,7 +593,7 @@ static void DrawWorldBackdrop(Game *g) {
         case AREA_CAMP: DrawSeaBackdrop(g->time); break;
         case AREA_GROVE: DrawForestBackdrop(g->time); break;
         case AREA_RUINS: DrawRuinsBackdrop(g->time); break;
-        default: DrawLighthouseBackdrop(g->time,g->bossDefeated&&g->scene!=SCENE_END); break;
+        default: DrawLighthouseBackdrop(g->time,false); break;
     }
 }
 
@@ -857,51 +857,51 @@ static void PanelDark(Rectangle r) {
 }
 static void RenderHUD(Game *g) {
     PanelDark((Rectangle){20,18,405,112});
-    DrawUIText("MIST ISLE  /  CHAPTER 01",40,32,15,(Color){119,145,116,255});
+    DrawUIText("MIST ISLE  /  CHAPTER 01",40,32,15,(Color){205,214,198,255});
     const char *areaName=g->area==AREA_CAMP?"海岸营地":g->area==AREA_GROVE?"辉光林地":g->area==AREA_RUINS?"潮汐遗迹":"灯塔庭院";
-    DrawUIText(areaName,560,32,18,(Color){83,119,88,255});
+    DrawUIText(areaName,560,32,18,(Color){255,221,158,255});
     DrawCircle(397,42,8,Fade(C_GOLD,.75f));
     DrawUIText("失落的灯塔",40,54,28,(Color){246,239,217,255});
-    DrawUIText(TextFormat("生命 %d    果实 %d    贝壳 %d    星晶 %d",(int)g->player.hp,g->player.berries,g->player.shells,g->player.crystals),40,96,17,(Color){104,119,93,255});
+    DrawUIText(TextFormat("生命 %d    果实 %d    贝壳 %d    星晶 %d",(int)g->player.hp,g->player.berries,g->player.shells,g->player.crystals),40,96,17,(Color){211,220,205,255});
 
     const char *objectiveTitle,*objectiveDetail;
     Vector2 objectiveTarget;
     bool hasObjectiveTarget=false;
     GetCurrentObjective(g,&objectiveTitle,&objectiveDetail,&objectiveTarget,&hasObjectiveTarget);
     PanelDark((Rectangle){850,18,410,154});
-    DrawUIText("当前目标",872,29,15,(Color){119,145,116,255});
+    DrawUIText("当前目标",872,29,15,(Color){205,214,198,255});
     DrawUIText(objectiveTitle,872,52,21,C_INK);
-    DrawUITextWrapped(objectiveDetail,872,81,365,14,2,(Color){91,115,96,255});
+    DrawUITextWrapped(objectiveDetail,872,81,365,14,2,(Color){211,220,205,255});
     int partyCount=(g->lumi.owned?1:0)+(g->splash.owned?1:0)+(g->spark.owned?1:0);
     const char *activeName=g->selectedBuddy==1&&g->splash.owned?"沫尾兽":g->selectedBuddy==2&&g->spark.owned?"鸣晶蜥":g->lumi.owned?"苔灯灵":partyCount>0?"伙伴":"尚无伙伴";
     Buddy *active=CurrentBuddy(g);
-    DrawUIText(TextFormat("伙伴 %d/3    当前：%s  Lv.%d",partyCount,activeName,active->level),872,137,13,(Color){104,119,93,255});
+    DrawUIText(TextFormat("伙伴 %d/3    当前：%s  Lv.%d",partyCount,activeName,active->level),872,137,13,(Color){211,220,205,255});
 
     PanelDark((Rectangle){20,652,760,48});
-    DrawUIText("WASD 移动   SHIFT 冲刺   E 互动   TAB 切换伙伴   J 手记   I 背包   M 地图   F5 保存",38,667,13,(Color){91,115,96,255});
+    DrawUIText("WASD 移动   SHIFT 冲刺   E 互动   TAB 切换伙伴   J 手记   I 背包   M 地图   F5 保存",38,667,13,(Color){211,220,205,255});
 
     if(g->area==AREA_CAMP && Dist(g->player.pos,g->world.groveGate)<1.6f) {
-        PanelDark((Rectangle){530,585,220,40});DrawUIText("E  前往辉光林地",550,596,17,(Color){91,115,96,255});
+        PanelDark((Rectangle){530,585,220,40});DrawUIText("E  前往辉光林地",550,596,17,(Color){211,220,205,255});
     } else if(g->area==AREA_CAMP && Dist(g->player.pos,g->world.ruinGate)<1.6f) {
-        PanelDark((Rectangle){530,585,220,40});DrawUIText("E  前往潮汐遗迹",550,596,17,(Color){91,115,96,255});
+        PanelDark((Rectangle){530,585,220,40});DrawUIText("E  前往潮汐遗迹",550,596,17,(Color){211,220,205,255});
     } else if(g->area==AREA_CAMP && Dist(g->player.pos,g->world.shrine)<1.6f && g->shrineSolved) {
-        PanelDark((Rectangle){530,585,220,40});DrawUIText("E  前往灯塔庭院",550,596,17,(Color){91,115,96,255});
+        PanelDark((Rectangle){530,585,220,40});DrawUIText("E  前往灯塔庭院",550,596,17,(Color){211,220,205,255});
     } else if(g->area!=AREA_CAMP && Dist(g->player.pos,(Vector2){2,9})<1.8f) {
-        PanelDark((Rectangle){530,585,220,40});DrawUIText("E  返回海岸营地",550,596,17,(Color){91,115,96,255});
+        PanelDark((Rectangle){530,585,220,40});DrawUIText("E  返回海岸营地",550,596,17,(Color){211,220,205,255});
     } else if(g->area==AREA_CAMP && !g->lumi.owned && Dist(g->player.pos,(Vector2){4,12})<1.65f) {
-        PanelDark((Rectangle){530,585,220,40});DrawUIText("E  救助苔灯灵",550,596,17,(Color){91,115,96,255});
+        PanelDark((Rectangle){530,585,220,40});DrawUIText("E  救助苔灯灵",550,596,17,(Color){211,220,205,255});
     } else if(g->area==AREA_CAMP && Dist(g->player.pos,(Vector2){3,10})<2.0f) {
-        PanelDark((Rectangle){530,585,220,40});DrawUIText("E  与守望者交谈",550,596,17,(Color){91,115,96,255});
+        PanelDark((Rectangle){530,585,220,40});DrawUIText("E  与守望者交谈",550,596,17,(Color){211,220,205,255});
     } else if(g->area==AREA_CAMP && g->lumi.owned && Dist(g->player.pos,(Vector2){4.1f,12.5f})<1.5f) {
-        PanelDark((Rectangle){530,585,220,40});DrawUIText("E  在营火旁休息",550,596,17,(Color){91,115,96,255});
+        PanelDark((Rectangle){530,585,220,40});DrawUIText("E  在营火旁休息",550,596,17,(Color){211,220,205,255});
     } else if(g->area==AREA_LIGHTHOUSE && !g->bossDefeated && Dist(g->player.pos,g->world.bossPos)<2.2f) {
-        PanelDark((Rectangle){530,585,250,40});DrawUIText("E  挑战灯塔守卫",550,596,17,(Color){91,115,96,255});
+        PanelDark((Rectangle){530,585,250,40});DrawUIText("E  挑战灯塔守卫",550,596,17,(Color){211,220,205,255});
     } else if(g->area==AREA_LIGHTHOUSE && g->bossDefeated && Dist(g->player.pos,g->world.shrine)<3.8f) {
-        PanelDark((Rectangle){500,585,280,40});DrawUIText("E  点亮失落的灯塔",525,596,17,(Color){91,115,96,255});
+        PanelDark((Rectangle){500,585,280,40});DrawUIText("E  点亮失落的灯塔",525,596,17,(Color){211,220,205,255});
     }
     if(g->toastTimer>0) {
         PanelDark((Rectangle){380,600,520,42});
-        DrawUIText(g->toast,400,612,18,(Color){78,112,91,255});
+        DrawUIText(g->toast,400,612,18,(Color){247,235,207,255});
     }
 }
 static void RenderJournal(Game *g) {
