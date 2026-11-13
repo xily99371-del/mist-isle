@@ -34,7 +34,7 @@
   <object id="315" name="海岸灌木" type="prop_27" x="812.00" y="532.00"><properties><property name="scale" type="float" value="0.72"/></properties><point/></object>
   <object id="316" name="prop_116" type="prop_116" x="308.00" y="308.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="317" name="prop_117" type="prop_117" x="756.00" y="364.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
-  <object id="318" name="prop_118" type="prop_118" x="756.00" y="364.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
+  <object id="318" name="prop_118" type="prop_118" x="588.00" y="476.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="319" name="prop_119" type="prop_119" x="252.00" y="476.00"><properties><property name="scale" type="float" value="0.76"/></properties><point/></object>
   <object id="320" name="prop_120" type="prop_120" x="308.00" y="532.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="321" name="prop_124" type="prop_124" x="588.00" y="532.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
