@@ -73,7 +73,9 @@ def draw_object(image,obj,sheets):
             paste_anchor(image,sprite,x,y+7,112*scale,112*scale)
         elif 300<=index<400:
             sprite=crop_cell(sheets["structures"],index-300,8,128)
-            paste_anchor(image,sprite,x,y+7,150*scale,140*scale)
+            dims={302:(232,210),303:(176,154),304:(166,180),305:(168,152)}
+            width,height=dims.get(index,(150,140))
+            paste_anchor(image,sprite,x,y+7,width*scale,height*scale)
         elif 400<=index<416:
             sprite=crop_cell(sheets["original"],index-400,4,32)
             paste_anchor(image,sprite,x,y+7,92*scale,92*scale)
