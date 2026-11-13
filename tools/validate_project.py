@@ -138,7 +138,7 @@ require("g->objectiveCollapsed" in RENDER and "O 收起" in RENDER and "O 展开
         "objective tracker can collapse to a compact title chip and expand again")
 require("IsKeyPressed(KEY_O)" in GAME and "objectiveToggle" in GAME,
         "objective tracker supports keyboard and mouse toggles")
-require("PanelDark((Rectangle){SW-350.0f,18.0f,330.0f,116.0f})" in RENDER,
+require("Rectangle panel={SW-350.0f,18.0f,330.0f,116.0f}" in RENDER,
         "expanded objective tracker is narrower and shorter than the previous HUD panel")
 require("for(int i=0;i<190;i++)" in RENDER and "DrawRainOverlay" not in RENDER and "g->weather==1" in RENDER,
         "rain has multiple visible streak depths, surface impacts and water ripples")
