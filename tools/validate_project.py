@@ -121,6 +121,8 @@ require("scene.width*.50f" in RENDER and "scene.width-4.0f" in RENDER,
         "ending scene adds a procedural moving beacon beam over the illustration")
 require("DrawAreaProp(11,p,112,116)" in RENDER and "DrawAreaProp(13" in RENDER,
         "the shrine and lighthouse use their authored area-specific sprites")
+require("DrawLighthouseBackdrop(g->time,false)" in RENDER,
+        "the lighthouse remains dark in exploration until the finale cutscene")
 require("atlasIndex=36+row*4+col" in RENDER and "row=(int)((hash>>5)%3u)" in RENDER,
         "terrain selection avoids the transparent atlas column and uses all ground variants")
 require("drawPatch=kind==3" in RENDER and "dstSize=kind==3?49.0f:34.0f" in RENDER,
