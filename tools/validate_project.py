@@ -137,7 +137,7 @@ require("def build_overlay" in MAP_AUTOTILE and "DIRECTIONS" in MAP_AUTOTILE and
         "the four-direction shoreline autotile helper is present for clean Windows and ARM64 builds")
 require("if type_id==32:" in MAP_BUILD and "collision[by][xx]=0" in MAP_BUILD,
         "Tiled bridge objects open a real walkable span through the water collision grid")
-require("Collision follows the visible object's ground footprint" in MAP_BUILD and "house/building foundation" in MAP_BUILD,
+require("Collision follows the visible object's ground footprint" in MAP_BUILD and "rear wall of the enlarged house" in MAP_BUILD,
         "Tiled buildings, tree trunks, walls, pillars and altar bases compile into gameplay collision")
 require("nearest free, reachable tile" in GAME and "occupied" in GAME,
         "blocked or duplicate pickups are relocated to a distinct reachable ground tile")
@@ -145,7 +145,7 @@ require("living stone arch" in RENDER and "beacon tower" in RENDER and "Return g
         "grove, ruins, lighthouse and return portals have distinct grounded visual identities")
 require("finalCore" in RENDER and "DrawAreaProp(11,p,190,194)" in RENDER,
         "the Tidal Ruins keystone is a larger multi-ring final altar, distinct from ordinary shrines")
-require("DrawLighthouseGuardian(p,g->time,1.48f)" in RENDER and "static void DrawKeeper(Vector2 p,float t,float scale)" in RENDER,
+require("DrawLighthouseGuardian(p,g->time,1.48f)" in RENDER and "static void DrawKeeper(Vector2 p,float t,float scale)" in RENDER and "Hood and face" in RENDER,
         "the lighthouse guardian and Watcher use dedicated world-scene silhouettes")
 require("DrawDialoguePortrait" in RENDER and "dialoguePortrait[page]" in RENDER and "DrawKeeper((Vector2){144,650}" in RENDER,
         "dialogue scenes render full-size portraits for the hero, Watcher and lighthouse guardian")
