@@ -6,7 +6,7 @@
 - Tidal Ruins is a dedicated puzzle and crystal companion map.
 - Lighthouse Courtyard is the final encounter map.
 
-Each map is rebuilt from a deterministic seed plus its area ID. The active map has its own terrain palette, obstacle layout, pickup list and landmark composition. The hub exposes three entrances; the sub-maps return through a shared west-side exit.
+Each map is hand-authored in Tiled. Ground tiles, collision rectangles, scene-object placements and story markers are compiled into static C arrays at build time. The hub exposes three entrances; the sub-maps return through their marked west-side exits.
 
 ## Progression
 1. Start at Coastal Camp and rescue Moss Lumi.
@@ -22,7 +22,7 @@ Each map is rebuilt from a deterministic seed plus its area ID. The active map h
 - Gate transitions save the current area; loading rebuilds the corresponding map and restores its resources.
 
 ## Visual composition
-- Each area receives a distinct ground palette and separate environment prop composition.
+- Each area receives a hand-authored ground layer, collision layer, object layer and marker layer. Its ground palette and object composition are edited in Tiled rather than generated from a random seed.
 - Camp uses house, tent, crates, fence and campfire props.
 - Grove uses trees, mushrooms, fallen log, shrubs and stream tiles.
 - Ruins uses stone floor, water channels and rune-stone pillars.
@@ -45,3 +45,8 @@ The renderer loads this as an optional atlas and places the matching props in ea
 
 ## Orthographic top-down control update
 The world renderer now uses an orthographic 2D grid with 56px square cells. WASD and arrow keys map directly to screen directions: W/up moves toward the top of the screen, S/down toward the bottom, A/left and D/right horizontally. The camera follows the player and clamps to each sub-map's world bounds. Ground and object projection use the same tile-center transform; trees and props are sorted by ground-contact Y for correct foreground overlap. The coastal hub uses an irregular oval shoreline with sand transition, while forest, ruins and lighthouse maps use distinct border treatments.
+
+
+## Tiled map pipeline
+
+The editable map sources live in maps/*.tmx and use maps/terrain.tsx. tools/build_maps.py validates the 22x18 layers and compiles them to area_maps.h in the CMake build directory. Runtime terrain, static collision, object placement and gate/spawn positions all read from that generated data. See MAP_AUTHORING.md.
