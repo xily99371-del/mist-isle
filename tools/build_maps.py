@@ -7,7 +7,7 @@ from map_autotile import build_overlay
 
 ROOT=Path(__file__).resolve().parents[1]
 MAPS=["coastal_camp","glowglade_grove","tidal_ruins","lighthouse_courtyard"]
-W,H,T,MAX_OBJECTS=22,18,56,64
+W,H,T,MAX_OBJECTS=18,12,56,64
 MARKERS=("spawn","return","grove_gate","ruin_gate","shrine","boss")
 
 def fail(message):
