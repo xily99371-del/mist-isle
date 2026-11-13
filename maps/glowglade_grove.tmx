@@ -21,8 +21,6 @@
  <objectgroup id="3" name="Objects" draworder="topdown">
   <object id="300" name="tree0" type="tree0" x="84.00" y="84.00"><properties><property name="scale" type="float" value="1.10"/></properties><point/></object>
   <object id="301" name="tree1" type="tree1" x="252.00" y="84.00"><properties><property name="scale" type="float" value="1.12"/></properties><point/></object>
-  <object id="302" name="tree2" type="tree2" x="420.00" y="84.00"><properties><property name="scale" type="float" value="1.08"/></properties><point/></object>
-  <object id="303" name="tree0" type="tree0" x="700.00" y="84.00"><properties><property name="scale" type="float" value="1.12"/></properties><point/></object>
   <object id="304" name="tree2" type="tree2" x="980.00" y="84.00"><properties><property name="scale" type="float" value="1.12"/></properties><point/></object>
   <object id="305" name="tree1" type="tree1" x="84.00" y="308.00"><properties><property name="scale" type="float" value="1.08"/></properties><point/></object>
   <object id="306" name="tree2" type="tree2" x="196.00" y="420.00"><properties><property name="scale" type="float" value="1.08"/></properties><point/></object>
@@ -43,10 +41,6 @@
   <object id="321" name="prop_126" type="prop_126" x="700.00" y="532.00"><properties><property name="scale" type="float" value="0.84"/></properties><point/></object>
   <object id="322" name="prop_128" type="prop_128" x="812.00" y="308.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
   <object id="323" name="prop_129" type="prop_129" x="364.00" y="196.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
-  <object id="324" name="prop_132" type="prop_132" x="756.00" y="420.00"><properties><property name="scale" type="float" value="0.88"/></properties><point/></object>
-  <object id="325" name="prop_133" type="prop_133" x="812.00" y="476.00"><properties><property name="scale" type="float" value="0.88"/></properties><point/></object>
-  <object id="326" name="prop_134" type="prop_134" x="700.00" y="196.00"><properties><property name="scale" type="float" value="0.84"/></properties><point/></object>
-  <object id="327" name="prop_135" type="prop_135" x="308.00" y="476.00"><properties><property name="scale" type="float" value="0.84"/></properties><point/></object>
  </objectgroup>
  <objectgroup id="4" name="Markers" draworder="topdown">
   <object id="500" name="spawn" type="spawn" x="140.00" y="532.00"><point/></object>
