@@ -6,140 +6,48 @@
    1, 8, 7, 6, 5, 4, 3, 2, 1, 8, 7, 6, 5, 4, 3, 2, 1, 8, 7, 6, 5, 4,
    4, 4, 4, 4, 4, 7, 7, 7, 7, 7, 2, 2, 2, 2, 2, 5, 5, 5, 5, 5, 8, 8,
    7, 8, 1, 5, 6, 2, 3, 4, 8, 1, 5, 6, 7, 3, 4, 8, 1, 2, 6, 7, 3, 4,
-   2, 4, 1, 3, 8, 5, 7, 4, 6, 3, 8, 2, 7, 1, 6, 3, 5, 14, 16, 13, 6, 8,
-   5, 8, 6, 4, 2, 8, 3, 1, 7, 5, 3, 6, 4, 2, 8, 6, 1, 19, 17, 15, 1, 4,
-   8, 7, 6, 5, 4, 27, 26, 25, 32, 31, 6, 5, 4, 3, 2, 1, 8, 19, 18, 17, 4, 3,
-   3, 3, 3, 3, 3, 30, 30, 30, 30, 30, 1, 1, 1, 1, 1, 4, 4, 16, 16, 16, 7, 7,
-   6, 7, 8, 4, 5, 25, 26, 27, 31, 32, 4, 5, 6, 2, 3, 7, 8, 13, 17, 18, 2, 3,
-   1, 3, 20, 14, 19, 16, 18, 27, 29, 26, 31, 13, 18, 20, 17, 14, 16, 13, 15, 20, 5, 7,
-   4, 7, 17, 15, 13, 19, 14, 32, 30, 28, 26, 17, 15, 13, 19, 17, 20, 18, 16, 14, 8, 3,
-   7, 6, 17, 16, 15, 14, 13, 32, 31, 30, 29, 16, 15, 14, 13, 20, 19, 18, 17, 16, 3, 2,
-   2, 2, 2, 2, 2, 5, 5, 29, 29, 29, 8, 8, 8, 8, 8, 3, 3, 15, 15, 15, 6, 6,
-   5, 18, 19, 15, 16, 20, 13, 26, 30, 31, 15, 16, 17, 25, 26, 30, 31, 32, 28, 17, 1, 2,
-   8, 14, 19, 13, 18, 15, 17, 26, 28, 25, 18, 20, 17, 31, 28, 25, 27, 32, 26, 19, 4, 6,
-   15, 18, 16, 14, 20, 18, 13, 31, 29, 27, 13, 16, 14, 32, 30, 28, 31, 29, 27, 13, 19, 14,
+   2, 4, 1, 3, 8, 5, 7, 4, 6, 3, 8, 2, 7, 1, 6, 3, 5, 2, 4, 1, 6, 8,
+   5, 8, 6, 4, 2, 8, 3, 1, 7, 5, 3, 6, 4, 2, 8, 6, 1, 7, 17, 15, 1, 4,
+   8, 7, 6, 5, 4, 3, 2, 1, 8, 7, 6, 5, 4, 3, 2, 1, 8, 7, 18, 17, 4, 3,
+   3, 3, 3, 3, 3, 6, 6, 6, 6, 6, 1, 1, 1, 1, 1, 4, 4, 4, 16, 16, 7, 7,
+   6, 7, 8, 4, 5, 1, 2, 3, 7, 8, 4, 5, 6, 2, 3, 7, 8, 13, 17, 18, 2, 3,
+   1, 3, 8, 2, 7, 4, 6, 3, 5, 2, 19, 13, 18, 8, 5, 2, 4, 13, 15, 8, 5, 7,
+   4, 7, 5, 3, 1, 7, 14, 20, 18, 16, 14, 17, 15, 13, 19, 17, 20, 18, 16, 2, 8, 3,
+   7, 6, 5, 4, 3, 2, 13, 20, 19, 18, 17, 16, 15, 14, 13, 20, 19, 18, 17, 4, 3, 2,
+   2, 2, 2, 2, 2, 5, 17, 17, 17, 17, 20, 8, 8, 8, 8, 3, 3, 15, 15, 15, 6, 6,
+   5, 6, 7, 3, 4, 20, 13, 14, 18, 19, 3, 4, 5, 1, 2, 6, 7, 8, 16, 17, 1, 2,
+   8, 2, 7, 13, 18, 15, 17, 14, 16, 13, 6, 8, 5, 7, 4, 1, 3, 20, 14, 19, 4, 6,
+   3, 6, 4, 14, 20, 18, 1, 7, 17, 15, 13, 16, 14, 20, 18, 4, 7, 17, 15, 1, 7, 2,
    18, 17, 16, 15, 14, 13, 20, 19, 18, 17, 16, 15, 14, 13, 20, 19, 18, 17, 16, 15, 14, 13,
    13, 13, 13, 13, 13, 16, 16, 16, 16, 16, 19, 19, 19, 19, 19, 14, 14, 14, 14, 14, 17, 17,
    40, 41, 42, 38, 39, 43, 44, 37, 41, 42, 38, 39, 40, 44, 37, 41, 42, 43, 39, 40, 44, 37
   </data>
  </layer>
  <objectgroup id="2" name="Collision" draworder="topdown">
-  <object id="129" name="solid" x="336.00" y="224.00" width="168.00" height="112.00"/>
-  <object id="130" name="solid" x="560.00" y="224.00" width="168.00" height="112.00"/>
  </objectgroup>
  <objectgroup id="3" name="Objects" draworder="topdown">
-  <object id="1" name="tree0" type="tree0" x="252.00" y="252.00">
-   <properties><property name="scale" type="float" value="0.95"/></properties>
-   <point/>
-  </object>
-  <object id="2" name="tree1" type="tree1" x="196.00" y="252.00">
-   <properties><property name="scale" type="float" value="1.00"/></properties>
-   <point/>
-  </object>
-  <object id="3" name="tree2" type="tree2" x="252.00" y="308.00">
-   <properties><property name="scale" type="float" value="0.90"/></properties>
-   <point/>
-  </object>
-  <object id="4" name="tree0" type="tree0" x="196.00" y="364.00">
-   <properties><property name="scale" type="float" value="0.90"/></properties>
-   <point/>
-  </object>
-  <object id="5" name="tree1" type="tree1" x="812.00" y="140.00">
-   <properties><property name="scale" type="float" value="0.95"/></properties>
-   <point/>
-  </object>
-  <object id="6" name="tree2" type="tree2" x="868.00" y="140.00">
-   <properties><property name="scale" type="float" value="0.90"/></properties>
-   <point/>
-  </object>
-  <object id="7" name="tree0" type="tree0" x="924.00" y="196.00">
-   <properties><property name="scale" type="float" value="1.00"/></properties>
-   <point/>
-  </object>
-  <object id="8" name="tree1" type="tree1" x="812.00" y="868.00">
-   <properties><property name="scale" type="float" value="0.95"/></properties>
-   <point/>
-  </object>
-  <object id="9" name="tree2" type="tree2" x="868.00" y="868.00">
-   <properties><property name="scale" type="float" value="1.00"/></properties>
-   <point/>
-  </object>
-  <object id="10" name="tree0" type="tree0" x="924.00" y="812.00">
-   <properties><property name="scale" type="float" value="0.90"/></properties>
-   <point/>
-  </object>
-  <object id="11" name="prop_500" type="prop_500" x="420.00" y="308.00">
-   <properties><property name="scale" type="float" value="1.00"/></properties>
-   <point/>
-  </object>
-  <object id="12" name="prop_501" type="prop_501" x="644.00" y="308.00">
-   <properties><property name="scale" type="float" value="0.92"/></properties>
-   <point/>
-  </object>
-  <object id="13" name="prop_20" type="prop_20" x="196.00" y="644.00">
-   <properties><property name="scale" type="float" value="1.00"/></properties>
-   <point/>
-  </object>
-  <object id="14" name="prop_21" type="prop_21" x="140.00" y="588.00">
-   <properties><property name="scale" type="float" value="0.90"/></properties>
-   <point/>
-  </object>
-  <object id="15" name="prop_22" type="prop_22" x="420.00" y="420.00">
-   <properties><property name="scale" type="float" value="0.90"/></properties>
-   <point/>
-  </object>
-  <object id="16" name="prop_23" type="prop_23" x="84.00" y="476.00">
-   <properties><property name="scale" type="float" value="0.80"/></properties>
-   <point/>
-  </object>
-  <object id="17" name="prop_24" type="prop_24" x="532.00" y="812.00">
-   <properties><property name="scale" type="float" value="0.90"/></properties>
-   <point/>
-  </object>
-  <object id="18" name="prop_26" type="prop_26" x="700.00" y="756.00">
-   <properties><property name="scale" type="float" value="0.90"/></properties>
-   <point/>
-  </object>
-  <object id="19" name="prop_27" type="prop_27" x="812.00" y="364.00">
-   <properties><property name="scale" type="float" value="0.90"/></properties>
-   <point/>
-  </object>
-  <object id="20" name="prop_116" type="prop_116" x="364.00" y="364.00">
-   <properties><property name="scale" type="float" value="0.60"/></properties>
-   <point/>
-  </object>
-  <object id="21" name="prop_117" type="prop_117" x="476.00" y="364.00">
-   <properties><property name="scale" type="float" value="0.55"/></properties>
-   <point/>
-  </object>
-  <object id="22" name="prop_118" type="prop_118" x="532.00" y="420.00">
-   <properties><property name="scale" type="float" value="0.58"/></properties>
-   <point/>
-  </object>
-  <object id="23" name="prop_119" type="prop_119" x="700.00" y="364.00">
-   <properties><property name="scale" type="float" value="0.55"/></properties>
-   <point/>
-  </object>
-  <object id="24" name="prop_120" type="prop_120" x="756.00" y="420.00">
-   <properties><property name="scale" type="float" value="0.55"/></properties>
-   <point/>
-  </object>
-  <object id="25" name="prop_124" type="prop_124" x="364.00" y="812.00">
-   <properties><property name="scale" type="float" value="0.55"/></properties>
-   <point/>
-  </object>
-  <object id="26" name="prop_126" type="prop_126" x="644.00" y="812.00">
-   <properties><property name="scale" type="float" value="0.55"/></properties>
-   <point/>
-  </object>
-  <object id="27" name="prop_128" type="prop_128" x="756.00" y="812.00">
-   <properties><property name="scale" type="float" value="0.55"/></properties>
-   <point/>
-  </object>
-  <object id="28" name="campfire" type="campfire" x="308.00" y="700.00">
-   <properties><property name="scale" type="float" value="1.00"/></properties>
-   <point/>
-  </object>
+  <object id="300" name="tree0" type="tree0" x="84.00" y="140.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
+  <object id="301" name="tree1" type="tree1" x="196.00" y="140.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
+  <object id="302" name="tree2" type="tree2" x="1148.00" y="140.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
+  <object id="303" name="tree0" type="tree0" x="84.00" y="308.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
+  <object id="304" name="tree1" type="tree1" x="1148.00" y="364.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
+  <object id="305" name="tree2" type="tree2" x="140.00" y="924.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
+  <object id="306" name="tree0" type="tree0" x="1092.00" y="924.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
+  <object id="307" name="prop_500" type="prop_500" x="308.00" y="364.00"><properties><property name="scale" type="float" value="1.00"/></properties><point/></object>
+  <object id="308" name="prop_501" type="prop_501" x="588.00" y="308.00"><properties><property name="scale" type="float" value="0.95"/></properties><point/></object>
+  <object id="309" name="prop_22" type="prop_22" x="252.00" y="588.00"><properties><property name="scale" type="float" value="0.95"/></properties><point/></object>
+  <object id="310" name="prop_20" type="prop_20" x="308.00" y="812.00"><properties><property name="scale" type="float" value="1.00"/></properties><point/></object>
+  <object id="311" name="prop_21" type="prop_21" x="476.00" y="868.00"><properties><property name="scale" type="float" value="0.85"/></properties><point/></object>
+  <object id="312" name="campfire" type="campfire" x="420.00" y="644.00"><properties><property name="scale" type="float" value="1.00"/></properties><point/></object>
+  <object id="313" name="prop_116" type="prop_116" x="196.00" y="420.00"><properties><property name="scale" type="float" value="0.60"/></properties><point/></object>
+  <object id="314" name="prop_117" type="prop_117" x="532.00" y="364.00"><properties><property name="scale" type="float" value="0.62"/></properties><point/></object>
+  <object id="315" name="prop_118" type="prop_118" x="700.00" y="700.00"><properties><property name="scale" type="float" value="0.58"/></properties><point/></object>
+  <object id="316" name="prop_119" type="prop_119" x="868.00" y="252.00"><properties><property name="scale" type="float" value="0.58"/></properties><point/></object>
+  <object id="317" name="prop_120" type="prop_120" x="756.00" y="756.00"><properties><property name="scale" type="float" value="0.58"/></properties><point/></object>
+  <object id="318" name="prop_124" type="prop_124" x="140.00" y="644.00"><properties><property name="scale" type="float" value="0.55"/></properties><point/></object>
+  <object id="319" name="prop_126" type="prop_126" x="588.00" y="756.00"><properties><property name="scale" type="float" value="0.55"/></properties><point/></object>
+  <object id="320" name="prop_128" type="prop_128" x="924.00" y="644.00"><properties><property name="scale" type="float" value="0.55"/></properties><point/></object>
+  <object id="321" name="prop_129" type="prop_129" x="1036.00" y="812.00"><properties><property name="scale" type="float" value="0.60"/></properties><point/></object>
  </objectgroup>
  <objectgroup id="4" name="Markers" draworder="topdown">
   <object id="231" name="spawn" type="spawn" x="196.00" y="756.00"><point/></object>
