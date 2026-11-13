@@ -37,6 +37,9 @@ assets = {
     "assets/characters/png/heroine_portrait.png": (512, 640),
     "assets/characters/png/watcher_portrait.png": (512, 640),
     "assets/characters/png/lighthouse_guardian_portrait.png": (512, 640),
+    "assets/characters/png/moss_lumi.png": (256, 256),
+    "assets/characters/png/moatail.png": (256, 256),
+    "assets/characters/png/crystal_gecko.png": (256, 256),
     "assets/characters/companions/moss_lumi_idle_64.png": (128, 32),
     "assets/characters/companions/moatail_idle_64.png": (128, 32),
     "assets/characters/companions/crystal_gecko_idle_64.png": (128, 32),
@@ -344,5 +347,40 @@ require(tree_case_start >= 0 and tree_case_end > tree_case_start and
         "large tree canopies have layered ground shadows and retain the authored 128px flora sprites")
 require('draw.ellipse((x-35*scale,y+1*scale,x+35*scale,y+15*scale)' in WATER_PREVIEW,
         "map review previews reproduce the runtime tree grounding shadows")
+
+
+# World characters must come from authored illustrations/sprite sheets, never primitive stand-ins.
+require(all(token in RASTERIZER for token in ("moss_lumi.svg", "moatail.svg", "crystal_gecko.svg")),
+        "high-resolution companion illustrations are generated from editable SVG sources")
+require(all(token in RENDER for token in ("TEX_LUMI_ILLUSTRATION", "TEX_MOATAIL_ILLUSTRATION",
+                                           "TEX_GECKO_ILLUSTRATION", "TEX_WATCHER_PORTRAIT",
+                                           "TEX_GUARDIAN_PORTRAIT", "TEX_HERO_PORTRAIT")),
+        "heroine, Watcher, guardian and all three recruited companions have authored illustration textures")
+for signature, forbidden, label in [
+    ("static void DrawPlayer(", ("DrawTriangle(", "DrawCircleV("), "heroine world renderer has no geometric body fallback"),
+    ("static void DrawKeeper(", ("DrawTriangle(", "DrawCircleV("), "Watcher world renderer uses the authored portrait illustration"),
+    ("static void DrawLighthouseGuardian(", ("DrawTriangle(", "DrawCircleV("), "guardian world renderer uses the authored portrait illustration"),
+    ("static void DrawLumi(", ("DrawTriangle(", "DrawCircleV("), "Moss Lumi world renderer uses the authored illustration"),
+    ("static void DrawMoatail(", ("DrawTriangle(", "DrawCircleV("), "Moatail world renderer uses the authored illustration"),
+    ("static void DrawGecko(", ("DrawTriangle(", "DrawCircleV("), "Crystal Gecko world renderer uses the authored illustration"),
+]:
+    start = RENDER.find(signature)
+    brace = RENDER.find("{", start)
+    depth = 0
+    end = -1
+    for i in range(brace, len(RENDER)):
+        if RENDER[i] == "{": depth += 1
+        elif RENDER[i] == "}":
+            depth -= 1
+            if depth == 0:
+                end = i + 1
+                break
+    body = RENDER[start:end] if start >= 0 and end > start else ""
+    require(bool(body) and all(token not in body for token in forbidden), label)
+require('"assets/characters/png/moss_lumi.png"' in RENDER and
+        '"assets/characters/png/moatail.png"' in RENDER and
+        '"assets/characters/png/crystal_gecko.png"' in RENDER and
+        "for(int i=0;i<23;i++)" in RENDER,
+        "illustration texture load/unload lifecycle is complete")
 
 print(f"Validation complete. Imported art sheets checked: {present}/{len(assets)}.")
