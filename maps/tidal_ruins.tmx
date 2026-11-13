@@ -46,6 +46,6 @@
   <object id="502" name="grove_gate" type="grove_gate" x="196.00" y="532.00"><point/></object>
   <object id="503" name="ruin_gate" type="ruin_gate" x="252.00" y="532.00"><point/></object>
   <object id="504" name="shrine" type="shrine" x="532.00" y="308.00"><point/></object>
-  <object id="505" name="boss" type="boss" x="812.00" y="476.00"><point/></object>
+  <object id="505" name="boss" type="boss" x="868.00" y="588.00"><point/></object>
  </objectgroup>
 </map>
