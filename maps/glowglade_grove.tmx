@@ -40,7 +40,7 @@
   <object id="324" name="prop_116" type="prop_116" x="252.00" y="420.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="325" name="prop_117" type="prop_117" x="308.00" y="476.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="326" name="prop_118" type="prop_118" x="532.00" y="476.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
-  <object id="327" name="prop_119" type="prop_119" x="700.00" y="532.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
+  <object id="327" name="prop_119" type="prop_119" x="644.00" y="420.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="328" name="prop_120" type="prop_120" x="252.00" y="532.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="329" name="prop_124" type="prop_124" x="476.00" y="532.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="330" name="prop_126" type="prop_126" x="476.00" y="588.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
