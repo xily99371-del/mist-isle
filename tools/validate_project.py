@@ -191,7 +191,7 @@ require("dialogueStartsBossBattle" in GAME and "SetDialogueSequence(g,speakers,l
         "the lighthouse guardian delivers a multi-speaker pre-battle conversation before combat")
 require("SetDialogueSequence(g,speakers,lines,3,false)" in GAME and "胸口的光" in GAME,
         "the boss encounter ends with a dedicated character dialogue scene")
-require("Place every pickup on a free, reachable tile" in GAME and "visual footprint of tall structures" in GAME,
+require("nearest free, reachable tile" in GAME and "visual footprint of tall structures" in GAME,
         "collectibles avoid both collision footprints and visually occluding large props")
 require("330*it->scale,260*it->scale" in RENDER and "dims={302:(330,260)" in MAP_PREVIEW,
         "the coastal and forest cottages are enlarged consistently in runtime and map previews")
