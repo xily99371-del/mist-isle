@@ -15,6 +15,7 @@ MAIN = (ROOT / "src/main.c").read_text(encoding="utf-8")
 WORKFLOW = (ROOT / ".github/workflows/build-windows.yml").read_text(encoding="utf-8")
 CMAKE = (ROOT / "CMakeLists.txt").read_text(encoding="utf-8")
 MAP_BUILD = (ROOT / "tools/build_maps.py").read_text(encoding="utf-8")
+MAP_AUTOTILE = (ROOT / "tools/map_autotile.py").read_text(encoding="utf-8")
 MAP_PREVIEW = (ROOT / "tools/preview_tiled_maps.py").read_text(encoding="utf-8")
 MAP_FILES = [ROOT / "maps" / name for name in (
     "terrain.tsx", "coastal_camp.tmx", "glowglade_grove.tmx",
@@ -129,6 +130,8 @@ require("AREA_GROUND" in MAP_BUILD and "AREA_COLLISION" in MAP_BUILD and "AREA_M
         "Tiled compiler exports ground, collision, story markers and object placements")
 require("build_overlay(ground)" in MAP_BUILD and "AREA_OVERLAY[4][MAPH][MAPW]" in MAP_BUILD and "AREA_OVERLAY_ROTATION[4][MAPH][MAPW]" in MAP_BUILD,
         "Tiled compiler emits autotile overlays and rotations consumed by the renderer")
+require("def build_overlay" in MAP_AUTOTILE and "MASK_ROW" in MAP_AUTOTILE,
+        "the deterministic autotile helper is present for clean Windows and ARM64 builds")
 require("chapter1_map_review.png" in MAP_PREVIEW and "Collision" in MAP_PREVIEW and "Markers" in MAP_PREVIEW,
         "map preview generator creates a visual QA sheet with collision and story markers")
 require("python tools/preview_tiled_maps.py" in WORKFLOW,
