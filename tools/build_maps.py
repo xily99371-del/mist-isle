@@ -56,7 +56,7 @@ def parse(path):
                 if prop.get("name")=="scale": scale=float(prop.get("value","1"))
             if not .25<=scale<=2.0: fail(f"{path.name}: invalid scale for '{name}'")
             objects.append((type_id,x,y,scale))
-            if type_id>=1000: collision[int(round(y))][int(round(x))]=1
+            if 1000<=type_id<1003: collision[int(round(y))][int(round(x))]=1
     if len(objects)>MAX_OBJECTS: fail(f"{path.name}: object count exceeds {MAX_OBJECTS}")
     markers={}
     mg=root.find("./objectgroup[@name='Markers']")
