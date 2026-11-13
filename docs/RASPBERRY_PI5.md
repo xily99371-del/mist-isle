@@ -10,12 +10,12 @@ The Pi profile disables 4x MSAA, opens a 1280x720 resizable window without forci
 
 ## Prepare Raspberry Pi OS
 
-Use a 64-bit Raspberry Pi OS desktop installation. Install the native build dependencies:
+Use a 64-bit Raspberry Pi OS desktop installation. The build supports the default Wayland session and X11 through GLFW's dual backend. Install the native build dependencies:
 
     sudo apt update
     sudo apt install -y build-essential cmake git python3 \
       libx11-dev libxcursor-dev libxinerama-dev libxrandr-dev libxi-dev \
-      libasound2-dev libgl1-mesa-dev
+      libasound2-dev libgl1-mesa-dev libwayland-dev libxkbcommon-dev wayland-protocols
 
 The first CMake configure downloads raylib 5.5 through FetchContent, so internet access is required for the initial build.
 
