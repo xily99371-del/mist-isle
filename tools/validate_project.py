@@ -115,6 +115,19 @@ require("LogicalMousePosition" in GAME and "GetScreenWidth()" in GAME,
         "battle mouse selection remains aligned after window scaling")
 require("DrawTerrainAccent" in RENDER and "terrainKinds" in RENDER and "512" in RENDER,
         "world maps include layered ground detail, shoreline foam and a larger render queue")
+require("RENDER_GATE" in RENDER and "DrawGateMarker" in RENDER and "DrawStructureProp(4" in RENDER,
+        "all area transitions use a visible authored stone-arch portal with destination signage")
+require("辉光林地" in RENDER and "潮汐遗迹" in RENDER and "灯塔庭院" in RENDER and "返回海岸营地" in RENDER,
+        "camp entrances and sub-map return route have explicit Chinese destination labels")
+require("需要两位伙伴" in RENDER and "封印尚未解除" in RENDER,
+        "locked entrances explain their unlock conditions")
+const_glyph_match = re.search(r"static const int UI_CODEPOINTS\\[\\]=\\{([^}]+)\\}", RENDER)
+require(const_glyph_match is not None, "UI font atlas has an explicit Unicode glyph set")
+font_codepoints = {int(value) for value in const_glyph_match.group(1).split(",") if value.strip()}
+source_cjk = {ord(ch) for ch in RENDER + GAME if 0x3400 <= ord(ch) <= 0x9FFF}
+require(source_cjk.issubset(font_codepoints),
+        "font atlas contains every Chinese character used by gameplay, HUD and ending CG captions")
+
 require("TEX_ENDING_CG" in RENDER and "LoadEndingCG" in RENDER and "assets/cinematics/lighthouse_final_scene.jpg.b64" in RENDER,
         "ending uses a dedicated illustrated lighthouse scene")
 require("scene.width*.535f" in RENDER and "scene.width-4.0f" in RENDER,
@@ -131,10 +144,10 @@ require("assets/cinematics" in WORKFLOW and "Copy-Item assets/cinematics/* dist/
         "the packaged Windows build includes the lighthouse cinematic asset")
 require("DrawLighthouseBackdrop(g->time,false)" in RENDER,
         "the lighthouse remains dark in exploration until the finale cutscene")
-require("atlasIndex=36+row*4+col" in RENDER and "row=(int)((hash>>5)%3u)" in RENDER,
-        "terrain selection avoids the transparent atlas column and uses all ground variants")
-require("drawPatch=kind==3" in RENDER and "dstSize=kind==3?49.0f:34.0f" in RENDER,
-        "grass, sand and water render as continuous ground with sparse texture decals")
+require("baseRow=kind==4?9:kind==3?6:kind==2?3:0" in RENDER and "atlasRow=baseRow+variant" in RENDER,
+        "terrain selection uses only full grass, sand, stone and water tile variants")
+require("Rectangle src={(float)(col*56),(float)(atlasRow*56),56.0f,56.0f}" in RENDER and "TILE_SIZE+3.0f" in RENDER and "drawPatch" not in RENDER,
+        "every terrain cell draws a complete 56px material tile without isolated square decals")
 cg_file = ROOT / "assets/cinematics/lighthouse_final_scene.jpg.b64"
 require(cg_file.exists(), "lighthouse ending illustration asset is present")
 cg_data = cg_file.read_text(encoding="ascii").strip()
