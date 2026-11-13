@@ -3,7 +3,7 @@
  <properties>
   <property name="level_id" value="glowglade_grove"/>
   <property name="layout_style" value="one_screen_handcrafted_topdown"/>
-  <property name="map_review_revision" type="int" value="4"/>
+  <property name="map_review_revision" type="int" value="5"/>
   <property name="scene_description" value="Forest sanctuary; winding trail, woodland cottage, creek, bridge and shallow-water nook."/>
  </properties>
  <tileset firstgid="1" source="terrain.tsx"/>
