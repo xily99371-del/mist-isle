@@ -27,6 +27,16 @@ FetchContent_MakeAvailable(raylib)
 
 set(MISTISLE_GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
 set(MISTISLE_MAP_HEADER "${MISTISLE_GENERATED_DIR}/area_maps.h")
+set(MISTISLE_GROUND_ATLAS "${CMAKE_SOURCE_DIR}/assets/environment/topdown_terrain_atlas_v1.png")
+set(MISTISLE_GROUND_ATLAS_STAMP "${MISTISLE_GENERATED_DIR}/ground_atlas.stamp")
+add_custom_command(
+  OUTPUT "${MISTISLE_GROUND_ATLAS_STAMP}"
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/tools/generate_ground_atlas.py" --output "${MISTISLE_GROUND_ATLAS}"
+  COMMAND "${CMAKE_COMMAND}" -E touch "${MISTISLE_GROUND_ATLAS_STAMP}"
+  DEPENDS "${CMAKE_SOURCE_DIR}/tools/generate_ground_atlas.py"
+  VERBATIM
+)
+add_custom_target(generate_ground_atlas DEPENDS "${MISTISLE_GROUND_ATLAS_STAMP}")
 add_custom_command(
   OUTPUT "${MISTISLE_MAP_HEADER}"
   COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/tools/build_maps.py" --output "${MISTISLE_MAP_HEADER}"
@@ -51,6 +61,7 @@ add_executable(mist_isle
   "${MISTISLE_MAP_HEADER}"
 )
 add_dependencies(mist_isle generate_area_maps)
+add_dependencies(mist_isle generate_ground_atlas)
 target_include_directories(mist_isle PRIVATE src "${MISTISLE_GENERATED_DIR}")
 target_link_libraries(mist_isle PRIVATE raylib)
 if(MSVC)
