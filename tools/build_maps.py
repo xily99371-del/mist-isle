@@ -84,6 +84,22 @@ def parse(path):
             fail(f"{path.name}: marker '{name}' outside map")
         if collision[gy][gx]:
             fail(f"{path.name}: marker '{name}' is blocked; move it to a walkable tile")
+    # All story markers must be reachable from the authored entrance.
+    from collections import deque
+    sx,sy=(int(round(v)) for v in markers["spawn"])
+    queue=deque([(sx,sy)])
+    visited={(sx,sy)}
+    while queue:
+        x,y=queue.popleft()
+        for dx,dy in ((1,0),(-1,0),(0,1),(0,-1)):
+            nx,ny=x+dx,y+dy
+            if 0<=nx<W and 0<=ny<H and not collision[ny][nx] and (nx,ny) not in visited:
+                visited.add((nx,ny))
+                queue.append((nx,ny))
+    for name,(mx,my) in markers.items():
+        target=(int(round(mx)),int(round(my)))
+        if target not in visited:
+            fail(f"{path.name}: marker '{name}' is unreachable from spawn")
     return ground,[v for row in collision for v in row],objects,markers,overlay
 
 def generate(out):
