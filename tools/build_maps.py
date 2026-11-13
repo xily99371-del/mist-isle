@@ -74,7 +74,7 @@ def parse(path):
     # Bridges are walkable spans over water. Each sprite spans roughly three
     # 56px cells, so the three underlying water cells at its row are passable.
     for type_id,x,y,scale in objects:
-        if type_id==2032:
+        if type_id==32:
             bx,by=int(round(x)),int(round(y))
             for xx in range(max(0,bx-1),min(W,bx+2)):
                 collision[by][xx]=0
