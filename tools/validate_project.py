@@ -121,6 +121,10 @@ require("scene.width*.50f" in RENDER and "scene.width-4.0f" in RENDER,
         "ending scene adds a procedural moving beacon beam over the illustration")
 require("DrawAreaProp(11,p,112,116)" in RENDER and "DrawAreaProp(13" in RENDER,
         "the shrine and lighthouse use their authored area-specific sprites")
+require("DrawUIText(objectiveTitle,872,52,21,(Color){246,239,217,255})" in RENDER,
+        "dark HUD uses readable light objective text")
+require("DrawPlayer((Vector2){420,620}" in RENDER,
+        "finale character lineup stays clear of the bottom caption")
 require("DrawLighthouseBackdrop(g->time,false)" in RENDER,
         "the lighthouse remains dark in exploration until the finale cutscene")
 require("atlasIndex=36+row*4+col" in RENDER and "row=(int)((hash>>5)%3u)" in RENDER,
