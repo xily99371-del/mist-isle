@@ -47,6 +47,7 @@ def parse(path):
             name=kind(obj)
             if name.startswith("tree") and name[-1:] in ("0","1","2"): type_id=1000+int(name[-1])
             elif name.startswith("prop_") and name[5:].isdigit(): type_id=int(name[5:])
+            elif name=="campfire": type_id=2000
             else: fail(f"{path.name}: unsupported object type '{name}'")
             x=float(obj.get("x","0"))/T-.5; y=float(obj.get("y","0"))/T-.5
             if not (0<=x<W and 0<=y<H): fail(f"{path.name}: object '{name}' outside map")
