@@ -709,10 +709,17 @@ static void DrawGateMarker(Game *g,int gateId,Vector2 grid) {
         DrawCircleV((Vector2){p.x,p.y-119},8,Fade((Color){255,229,157,255},.85f));
         DrawCircleLines((int)p.x,(int)p.y-119,23,Fade(C_GOLD,.75f));
     } else {
-        // Return gate: familiar arch, but blue-lit and visibly set into a stone landing.
-        DrawAreaProp(8,(Vector2){p.x,p.y+2},146,154);
-        DrawCircleLines((int)p.x,(int)p.y-58,34,Fade((Color){127,204,224,255},.75f));
-        DrawCircleV((Vector2){p.x,p.y-62},5,Fade((Color){147,224,239,255},.9f));
+        // Return gate: a compact circular waystone, distinct from destination monuments.
+        DrawEllipse((int)p.x,(int)p.y-30,37,54,(Color){63,91,96,255});
+        DrawEllipseLines((int)p.x,(int)p.y-30,37,54,(Color){166,188,161,255});
+        DrawEllipse((int)p.x,(int)p.y-30,25,40,(Color){23,51,65,255});
+        DrawEllipseLines((int)p.x,(int)p.y-30,25,40,Fade((Color){127,204,224,255},.82f));
+        DrawCircleV((Vector2){p.x,p.y-30},12,Fade((Color){104,199,222,255},.18f+.08f*pulse));
+        DrawCircleV((Vector2){p.x,p.y-30},5,Fade((Color){147,224,239,255},.9f));
+        for(int i=0;i<4;i++) {
+            float a=(float)i*PI2/4.0f+g->time*.25f;
+            DrawCircleV((Vector2){p.x+cosf(a)*47,p.y-30+sinf(a)*61},2.4f,Fade(C_BLUE,.75f));
+        }
     }
     if(locked)DrawCircleV((Vector2){p.x,p.y-69},5,(Color){138,144,137,255});
     else DrawCircleV((Vector2){p.x,p.y-69},5,Fade(accent,.75f+.25f*pulse));
