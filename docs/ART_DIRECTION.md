@@ -60,6 +60,8 @@ These are original project vector illustrations created for this repository. The
 Before importing third-party packs, inspect the exact current license shipped with the downloaded pack. Do not redistribute raw packs unless the license permits it. Keep license notices and source attribution in assets/licenses/.
 ## Region-specific architecture and Tiled composition
 
+Chapter 1 maps use a compact 18×12 one-screen layout. Compose each area as a deliberate level stage with one primary route, clear interaction clearings, and a small number of strong landmarks; do not fill unused space with random props.
+
 - Coastal Camp owns the lighthouse-keeper cottage compound, dock, boat and canvas supply tent. Do not reuse this compound asset in the grove.
 - Glowglade Grove uses the separate woodland shelter/canvas hideaway asset (Tiled object `prop_22`), framed by tree canopies, lanterns, luminous flowers and mushroom clusters. The coastal lighthouse silhouette must never appear in this map.
 - Tidal Ruins uses arches, columns, broken walls, rune basins and the unique multi-ring keystone. Do not place coastal or woodland buildings in the ruins.
