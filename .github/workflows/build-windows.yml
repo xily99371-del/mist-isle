@@ -1,4 +1,4 @@
-name: Windows build
+name: Windows and Raspberry Pi builds
 on:
   push:
     branches: [main]
@@ -72,4 +72,39 @@ jobs:
         with:
           name: MistIsle-Windows-Playtest-v1
           path: dist/
+          if-no-files-found: error
+
+  build-raspberry-pi5:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Raspberry Pi desktop build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake git libx11-dev libxcursor-dev libxinerama-dev libxrandr-dev libxi-dev libasound2-dev libgl1-mesa-dev
+      - name: Generate art and validate Tiled maps
+        run: |
+          python -m pip install pillow
+          python tools/generate_pixel_assets.py
+          python tools/preview_kenney_pack.py
+          python tools/build_kenney_runtime_atlas.py
+          python tools/validate_project.py
+      - name: Configure Raspberry Pi 5 profile
+        run: cmake -S . -B build-pi -DCMAKE_BUILD_TYPE=Release -DMISTISLE_PI_PROFILE=ON
+      - name: Build ARM64 executable
+        run: cmake --build build-pi --parallel 4
+      - name: Package Raspberry Pi build
+        run: |
+          mkdir -p dist-pi
+          cp build-pi/mist_isle dist-pi/
+          cp -a assets dist-pi/
+          cp README.md docs/RASPBERRY_PI5.md dist-pi/
+      - name: Upload Raspberry Pi 5 ARM64 build
+        uses: actions/upload-artifact@v4
+        with:
+          name: MistIsle-RaspberryPi5-ARM64
+          path: dist-pi/
           if-no-files-found: error
