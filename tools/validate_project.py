@@ -134,8 +134,20 @@ require("scene.width*.535f" in RENDER and "scene.width-4.0f" in RENDER,
         "ending scene adds a procedural moving beacon beam over the illustration")
 require("DrawAreaProp(11,p,112,116)" in RENDER and "DrawAreaPropTint(13,p" in RENDER,
         "the shrine uses its authored sprite and the pre-finale lighthouse is dimmed")
-require("DrawUIText(objectiveTitle,872,52,21,(Color){246,239,217,255})" in RENDER,
-        "dark HUD uses readable light objective text")
+require("g->objectiveCollapsed" in RENDER and "O 收起" in RENDER and "O 展开" in RENDER,
+        "objective tracker can collapse to a compact title chip and expand again")
+require("IsKeyPressed(KEY_O)" in GAME and "objectiveToggle" in GAME,
+        "objective tracker supports keyboard and mouse toggles")
+require("PanelDark((Rectangle){SW-350.0f,18.0f,330.0f,116.0f})" in RENDER,
+        "expanded objective tracker is narrower and shorter than the previous HUD panel")
+require("for(int i=0;i<190;i++)" in RENDER and "DrawRainOverlay" not in RENDER and "g->weather==1" in RENDER,
+        "rain has multiple visible streak depths, surface impacts and water ripples")
+require("IsKeyPressed(KEY_F7)" in GAME and "weather=(g->weather+1)%4" in GAME,
+        "weather can be cycled on demand for reliable demonstration")
+require("DrawCoastalCliffs(g,terrainKinds)" in RENDER and "float coastNoise=" in RENDER,
+        "island shores use irregular masks and continuous overlapping cliff segments")
+require("y==9&&x>=3&&x<=19" in RENDER and "x==18&&y>=3&&y<=15" in RENDER,
+        "camp paths are narrow connected routes rather than broad rectangular bands")
 require("DrawPlayer((Vector2){420,620}" in RENDER,
         "finale character lineup stays clear of the bottom caption")
 require("g->area==AREA_LIGHTHOUSE&&g->bossDefeated&&Dist(p->pos,g->world.shrine)<3.0f" in GAME and "g->scene=SCENE_END" in GAME,
