@@ -13,6 +13,7 @@
 #define MAX_ENEMIES 8
 #define MAX_PARTICLES 300
 #define MAX_PICKUPS 32
+#define MAX_MAP_OBJECTS 64
 #define PI2 6.28318530718f
 typedef enum { SCENE_TITLE, SCENE_PLAY, SCENE_DIALOGUE, SCENE_BATTLE, SCENE_END } Scene;
 typedef enum { AREA_CAMP, AREA_GROVE, AREA_RUINS, AREA_LIGHTHOUSE } Area;
@@ -49,13 +50,17 @@ typedef struct {
     float hp, maxHp, phase, attackCd;
     bool alive;
 } Enemy;
+typedef struct { int type; Vector2 pos; float scale; } MapObject;
 typedef struct {
     int kind[MAPH][MAPW];
+    unsigned char terrain[MAPH][MAPW];
     unsigned char solid[MAPH][MAPW];
     int seed;
     Pickup pickups[MAX_PICKUPS];
     int pickupCount;
-    Vector2 camp, groveGate, ruinGate, shrine, bossPos;
+    MapObject objects[MAX_MAP_OBJECTS];
+    int objectCount;
+    Vector2 camp, returnPoint, groveGate, ruinGate, shrine, bossPos;
 } World;
 
 typedef struct {
