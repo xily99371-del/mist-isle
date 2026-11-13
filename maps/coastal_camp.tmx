@@ -24,7 +24,7 @@
   <object id="303" name="tree2" type="tree2" x="980.00" y="84.00"><properties><property name="scale" type="float" value="1.08"/></properties><point/></object>
   <object id="304" name="tree0" type="tree0" x="84.00" y="420.00"><properties><property name="scale" type="float" value="1.02"/></properties><point/></object>
   <object id="305" name="tree1" type="tree1" x="980.00" y="588.00"><properties><property name="scale" type="float" value="1.00"/></properties><point/></object>
-  <object id="306" name="海岸守望宅邸" type="prop_302" x="532.00" y="140.00"><properties><property name="scale" type="float" value="1.15"/></properties><point/></object>
+  <object id="306" name="海岸守望宅邸" type="prop_302" x="532.00" y="252.00"><properties><property name="scale" type="float" value="0.95"/></properties><point/></object>
   <object id="307" name="补给营帐" type="prop_303" x="812.00" y="196.00"><properties><property name="scale" type="float" value="1.00"/></properties><point/></object>
   <object id="308" name="木质码头" type="prop_20" x="196.00" y="532.00"><properties><property name="scale" type="float" value="1.00"/></properties><point/></object>
   <object id="309" name="停泊小船" type="prop_21" x="140.00" y="588.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
