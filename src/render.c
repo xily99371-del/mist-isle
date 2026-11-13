@@ -876,7 +876,7 @@ static void RenderWorld(Game *g) {
     if(g->area==AREA_RUINS&&!g->spark.owned)PushRenderItem(items,&count,RENDER_GECKO,0,(Vector2){13,8},1.0f);
     else if(g->spark.owned)PushRenderItem(items,&count,RENDER_GECKO,0,g->spark.pos,1.0f);
     if(g->area==AREA_GROVE) {
-        Vector2 fireflyGrid={10.6f+sinf(g->fireflyPhase*0.8f)*0.22f,6.2f+cosf(g->fireflyPhase*0.65f)*0.18f};
+        Vector2 fireflyGrid={10.6f+sinf(g->fireflyPhase*0.8f)*0.22f,5.4f+cosf(g->fireflyPhase*0.65f)*0.18f};
         if(!g->fireflyDiscovered)PushRenderItem(items,&count,RENDER_FIREFLY,0,fireflyGrid,1.0f);
         if(!g->leaflingFed)PushRenderItem(items,&count,RENDER_LEAFLING,0,(Vector2){12.4f,8.0f},1.0f);
         if(!g->groveMoteDefeated)PushRenderItem(items,&count,RENDER_MOTE,0,(Vector2){13.2f,9.2f},1.0f);
@@ -1096,7 +1096,7 @@ static void RenderHUD(Game *g) {
         PanelDark((Rectangle){530,585,220,40});DrawUIText("E  救助苔灯灵",550,596,17,(Color){211,220,205,255});
     } else if(g->area==AREA_CAMP && Dist(g->player.pos,(Vector2){7,7})<2.0f) {
         PanelDark((Rectangle){530,585,220,40});DrawUIText("E  与守望者交谈",550,596,17,(Color){211,220,205,255});
-    } else if(g->area==AREA_CAMP && g->lumi.owned && Dist(g->player.pos,(Vector2){6.1f,8.5f})<1.5f) {
+    } else if(g->area==AREA_CAMP && g->lumi.owned && Dist(g->player.pos,(Vector2){6.8f,6.7f})<1.5f) {
         PanelDark((Rectangle){530,585,220,40});DrawUIText("E  在营火旁休息",550,596,17,(Color){211,220,205,255});
     } else if(g->area==AREA_LIGHTHOUSE && !g->bossDefeated && Dist(g->player.pos,g->world.bossPos)<2.2f) {
         PanelDark((Rectangle){530,585,250,40});DrawUIText("E  挑战灯塔守卫",550,596,17,(Color){211,220,205,255});
