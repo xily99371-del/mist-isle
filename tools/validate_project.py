@@ -77,7 +77,7 @@ require("index*96" in RENDER, "environment props use 96px atlas cells")
 require("DrawAreaProp" in RENDER and "area_props_96.png" in RENDER, "area-specific supplemental prop atlas is integrated")
 require("DrawTopDownTile" in RENDER and "WorldToScreen" in RENDER, "orthographic top-down square-tile renderer is active")
 require("topdown_terrain_atlas_v1.png" in RENDER and "TILE_SIZE" in RENDER and "56.0f,56.0f" in RENDER, "detailed 56px top-down terrain atlas is integrated")
-require("TEX_TOPDOWN_TILES" in RENDER and "for(int i=0;i<23;i++)" in RENDER, "top-down terrain and decor textures are loaded and released")
+require("TEX_TOPDOWN_TILES" in RENDER and "for(int i=0;i<25;i++)" in RENDER and "heroine_approved_8x4.png" in RENDER and "lighthouse_guardian_4x2.png" in RENDER, "top-down terrain and decor textures are loaded and released")
 require('type="prop_22"' in GROVE_MAP and 'type="prop_302"' not in GROVE_MAP,
         "Glowglade uses its own woodland shelter and never reuses the coastal lighthouse cottage")
 require("220*it->scale,176*it->scale" in RENDER and "22:(220,176)" in MAP_PREVIEW,
@@ -354,7 +354,7 @@ require(all(token in RASTERIZER for token in ("moss_lumi.svg", "moatail.svg", "c
         "high-resolution companion illustrations are generated from editable SVG sources")
 require(all(token in RENDER for token in ("TEX_LUMI_ILLUSTRATION", "TEX_MOATAIL_ILLUSTRATION",
                                            "TEX_GECKO_ILLUSTRATION", "TEX_WATCHER_PORTRAIT",
-                                           "TEX_GUARDIAN_PORTRAIT", "TEX_HERO_PORTRAIT")),
+                                           "TEX_GUARDIAN_PORTRAIT", "TEX_HERO_PORTRAIT", "TEX_HEROINE_APPROVED", "TEX_GUARDIAN_APPROVED")),
         "heroine, Watcher, guardian and all three recruited companions have authored illustration textures")
 for signature, forbidden, label in [
     ("static void DrawPlayer(", ("DrawTriangle(", "DrawCircleV("), "heroine world renderer has no geometric body fallback"),

@@ -51,6 +51,10 @@ jobs:
             New-Item -ItemType Directory -Force -Path dist/assets/characters/hero | Out-Null
             Copy-Item assets/characters/hero/* dist/assets/characters/hero/
           }
+          if (Test-Path assets/characters/boss) {
+            New-Item -ItemType Directory -Force -Path dist/assets/characters/boss | Out-Null
+            Copy-Item assets/characters/boss/* dist/assets/characters/boss/
+          }
           if (Test-Path assets/characters/companions) {
             New-Item -ItemType Directory -Force -Path dist/assets/characters/companions | Out-Null
             Copy-Item assets/characters/companions/* dist/assets/characters/companions/
