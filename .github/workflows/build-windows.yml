@@ -21,7 +21,9 @@ jobs:
       - name: Extract approved art bundle when supplied
         shell: pwsh
         run: |
-          if (Test-Path MistIsle_ApprovedArt_v4.zip) {
+          if (Test-Path MistIsle_ApprovedArt_v5.zip) {
+            Expand-Archive -LiteralPath MistIsle_ApprovedArt_v5.zip -DestinationPath . -Force
+          } elseif (Test-Path MistIsle_ApprovedArt_v4.zip) {
             Expand-Archive -LiteralPath MistIsle_ApprovedArt_v4.zip -DestinationPath . -Force
           } elseif (Test-Path MistIsle_ApprovedArt_v3.zip) {
             Expand-Archive -LiteralPath MistIsle_ApprovedArt_v3.zip -DestinationPath . -Force
@@ -47,17 +49,17 @@ jobs:
       - name: Verify approved art integration
         shell: pwsh
         run: |
-          $bundle = (Test-Path MistIsle_ApprovedArt_v4.zip) -or (Test-Path MistIsle_ApprovedArt_v3.zip)
+          $bundle = (Test-Path MistIsle_ApprovedArt_v5.zip) -or (Test-Path MistIsle_ApprovedArt_v4.zip) -or (Test-Path MistIsle_ApprovedArt_v3.zip)
           if (-not $bundle) {
             Write-Warning "Approved art bundle is not committed to this checkout. Source/compile checks will continue, but this run is not a visual-art release validation."
           } else {
             $required = @(
-              'assets/characters/portraits/heroine_portrait.jpg',
-              'assets/characters/portraits/watcher_portrait.jpg',
-              'assets/characters/portraits/guardian_portrait.jpg',
-              'assets/characters/portraits/moss_lumi_portrait.jpg',
-              'assets/characters/portraits/moatail_portrait.jpg',
-              'assets/characters/portraits/crystal_gecko_portrait.jpg',
+              'assets/characters/portraits/heroine_portrait.png',
+              'assets/characters/portraits/watcher_portrait.png',
+              'assets/characters/portraits/guardian_portrait.png',
+              'assets/characters/portraits/moss_lumi_portrait.png',
+              'assets/characters/portraits/moatail_portrait.png',
+              'assets/characters/portraits/crystal_gecko_portrait.png',
               'assets/characters/hero/heroine_pixel_4x4_64x80.png',
               'assets/characters/npc/watcher_pixel_4x4_48x76.png',
               'assets/environment/coastal_keeper_house.png'
