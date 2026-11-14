@@ -42,3 +42,18 @@ The approved heroine has brown hair, a blue ribbon, teal scarf, cream adventurer
 ## Boss encounter presentation
 
 The lighthouse guardian's idle view is kept front-facing in exploration. Its second sprite-sheet row is reserved for the four-frame attack sequence and is played only during the enemy turn. The battle scene switches to a darker slate-and-ember palette, uses a dedicated `BOSS` heading and displays the guardian's lantern core as its health bar. This keeps the guardian visually and mechanically distinct from the ordinary ruin sentry and from the camp watcher.
+
+
+## User-confirmed runtime art set — 2026-11-14
+
+The latest user-provided references supersede earlier generated stand-ins for these roles:
+- `heroine_portrait.jpg`: high-resolution anime illustration of the female traveller; dialogue portrait only.
+- `watcher_portrait.jpg`: high-resolution male Watcher illustration; dialogue portrait only.
+- `guardian_portrait.jpg`: high-resolution lighthouse guardian illustration; dialogue portrait only.
+- `moss_lumi_portrait.jpg`, `moatail_portrait.jpg`, `crystal_gecko_portrait.jpg`: high-resolution companion illustrations; dialogue/character-card portraits only. Never enlarge the small pixel idle sheets into portrait art.
+- `heroine_pixel_4x4_64x80.png`: the user's approved 4×4 directional pixel sprite sheet; rows are front, left, right, back, with four frames per row. This is the only preferred exploration sprite for the heroine.
+- `coastal_keeper_house.png`: the user's approved pixel-art coastal keeper house cutout.
+
+The bundle is distributed as `MistIsle_ApprovedArt_v3.zip`. Place it in the repository root; `RUN_WINDOWS.bat` and CMake extract it to the exact runtime paths. The Windows package must include `assets/characters/portraits/`, `assets/characters/hero/`, and `assets/environment/`.
+
+The Watcher and guardian anime illustrations are not world-scale sprites. The Watcher remains a compact pixel NPC in exploration; the high-resolution illustration is used in dialogue. The guardian uses its dedicated pixel boss animation in exploration/battle and the anime illustration in dialogue/large character art panels.
