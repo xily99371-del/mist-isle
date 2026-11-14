@@ -10,28 +10,22 @@
  <tileset firstgid="1" source="terrain.tsx"/>
  <layer id="1" name="Ground" width="18" height="12">
   <data encoding="csv">
-1,1,1,1,1,1,1,25,25,25,25,1,1,1,1,1,1,1,
-1,1,1,1,1,25,25,25,25,25,25,25,25,1,1,1,1,1,
-1,37,37,13,13,25,25,25,25,25,25,25,25,13,13,37,37,1,
-1,37,37,13,13,25,25,25,25,25,25,25,25,13,13,37,37,1,
-1,37,37,1,1,25,25,25,25,25,25,25,25,1,1,37,37,1,
-1,1,1,1,1,25,25,25,25,25,25,25,25,1,1,1,1,1,
-1,1,1,1,1,25,25,25,25,25,25,25,25,1,1,1,1,1,
-1,1,1,1,1,25,25,25,25,25,25,25,25,1,1,1,1,1,
-1,1,25,25,25,25,25,25,25,25,25,25,25,13,13,1,1,1,
-1,25,25,25,25,25,25,25,25,25,25,25,25,13,13,1,1,1,
-1,1,25,25,25,25,25,25,25,25,25,25,25,1,1,1,1,1,
-1,1,1,1,1,1,1,25,25,25,25,1,1,1,1,1,1,1
+25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,
+25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,
+25,37,37,25,25,25,25,25,25,25,25,25,25,25,25,37,37,25,
+25,37,37,25,25,25,25,25,25,25,25,25,25,25,25,37,37,25,
+25,37,37,25,25,25,25,25,25,25,25,25,25,25,25,37,37,25,
+25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,
+25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,
+25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,
+25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,
+25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,
+25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,
+25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25
 </data>
  </layer>
  <objectgroup id="2" name="Collision" draworder="topdown"/>
  <objectgroup id="3" name="Objects" draworder="topdown">
-  <object id="300" name="tree0" type="tree0" x="84.00" y="84.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
-  <object id="301" name="tree1" type="tree1" x="252.00" y="84.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
-  <object id="302" name="tree2" type="tree2" x="812.00" y="84.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
-  <object id="303" name="tree0" type="tree0" x="980.00" y="140.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
-  <object id="304" name="tree1" type="tree1" x="84.00" y="588.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
-  <object id="305" name="tree2" type="tree2" x="980.00" y="588.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
   <object id="306" name="失落的灯塔" type="prop_33" x="532.00" y="196.00"><properties><property name="scale" type="float" value="1.18"/></properties><point/></object>
   <object id="308" name="西侧庭院石柱" type="prop_29" x="308.00" y="308.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
   <object id="309" name="东侧庭院石柱" type="prop_29" x="756.00" y="308.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
@@ -41,43 +35,26 @@
   <object id="313" name="东侧残墙" type="prop_30" x="868.00" y="308.00"><properties><property name="scale" type="float" value="0.86"/></properties><point/></object>
   <object id="314" name="西侧残墙" type="prop_30" x="196.00" y="420.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
   <object id="315" name="东侧残墙" type="prop_30" x="868.00" y="420.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
-  <object id="316" name="庭院围栏" type="prop_34" x="364.00" y="140.00"><properties><property name="scale" type="float" value="0.84"/></properties><point/></object>
-  <object id="317" name="庭院围栏" type="prop_34" x="700.00" y="140.00"><properties><property name="scale" type="float" value="0.84"/></properties><point/></object>
-  <object id="318" name="海崖" type="prop_200" x="84.00" y="252.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
-  <object id="319" name="海崖" type="prop_201" x="84.00" y="364.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
-  <object id="320" name="海崖瀑口" type="prop_202" x="924.00" y="308.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>
-  <object id="321" name="prop_116" type="prop_116" x="196.00" y="588.00"><properties><property name="scale" type="float" value="0.76"/></properties><point/></object>
-  <object id="322" name="prop_117" type="prop_117" x="420.00" y="588.00"><properties><property name="scale" type="float" value="0.76"/></properties><point/></object>
-  <object id="323" name="prop_118" type="prop_118" x="644.00" y="588.00"><properties><property name="scale" type="float" value="0.76"/></properties><point/></object>
-  <object id="324" name="prop_119" type="prop_119" x="868.00" y="588.00"><properties><property name="scale" type="float" value="0.76"/></properties><point/></object>
-  <object id="325" name="prop_120" type="prop_120" x="252.00" y="252.00"><properties><property name="scale" type="float" value="0.74"/></properties><point/></object>
-  <object id="326" name="prop_124" type="prop_124" x="812.00" y="252.00"><properties><property name="scale" type="float" value="0.74"/></properties><point/></object>
-  <object id="327" name="prop_126" type="prop_126" x="196.00" y="532.00"><properties><property name="scale" type="float" value="0.74"/></properties><point/></object>
-  <object id="328" name="prop_128" type="prop_128" x="868.00" y="532.00"><properties><property name="scale" type="float" value="0.74"/></properties><point/></object>
-   <object id="350" name="庭院苔石" type="prop_210" x="140.00" y="476.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
-  <object id="351" name="庭院苔石" type="prop_211" x="868.00" y="476.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
-  <object id="352" name="海风灌木" type="prop_229" x="252.00" y="588.00"><properties><property name="scale" type="float" value="0.80"/></properties><point/></object>
-  <object id="353" name="海风灌木" type="prop_229" x="812.00" y="532.00"><properties><property name="scale" type="float" value="0.80"/></properties><point/></object>
-  <object id="354" name="庭院花簇" type="prop_116" x="308.00" y="532.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
-  <object id="355" name="庭院花簇" type="prop_117" x="756.00" y="532.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="660" name="庭院枯树" type="prop_660" x="140.00" y="140.00"><properties><property name="scale" type="float" value="0.48"/></properties><point/></object>
   <object id="661" name="风蚀枯木" type="prop_661" x="980.00" y="140.00"><properties><property name="scale" type="float" value="0.46"/></properties><point/></object>
-  <object id="662" name="枯朽树根" type="prop_662" x="140.00" y="532.00"><properties><property name="scale" type="float" value="0.48"/></properties><point/></object>
-  <object id="663" name="断裂石柱" type="prop_663" x="252.00" y="252.00"><properties><property name="scale" type="float" value="0.42"/></properties><point/></object>
-  <object id="665" name="倒塌石柱" type="prop_665" x="868.00" y="252.00"><properties><property name="scale" type="float" value="0.42"/></properties><point/></object>
-  <object id="666" name="破败祭坛" type="prop_666" x="252.00" y="476.00"><properties><property name="scale" type="float" value="0.40"/></properties><point/></object>
-  <object id="668" name="庭院瓦砾" type="prop_668" x="140.00" y="588.00"><properties><property name="scale" type="float" value="0.46"/></properties><point/></object>
-  <object id="671" name="荆棘残骸" type="prop_671" x="868.00" y="532.00"><properties><property name="scale" type="float" value="0.40"/></properties><point/></object>
-  <object id="673" name="枯草地表" type="prop_673" x="364.00" y="588.00"><properties><property name="scale" type="float" value="0.42"/></properties><point/></object>
   <object id="675" name="幽蓝火灯" type="prop_675" x="980.00" y="476.00"><properties><property name="scale" type="float" value="0.38"/></properties><point/></object>
-  <object id="701" name="断裂石柱残段" type="prop_664" x="364.00" y="252.00"><properties><property name="scale" type="float" value="0.38"/></properties><point/></object>
-  <object id="702" name="祭坛残垣" type="prop_667" x="868.00" y="364.00"><properties><property name="scale" type="float" value="0.36"/></properties><point/></object>
-  <object id="703" name="庭院碎石瓦砾" type="prop_669" x="196.00" y="588.00"><properties><property name="scale" type="float" value="0.42"/></properties><point/></object>
-  <object id="704" name="残破战旗" type="prop_670" x="812.00" y="140.00"><properties><property name="scale" type="float" value="0.38"/></properties><point/></object>
-  <object id="705" name="黑荆棘枯枝" type="prop_672" x="868.00" y="588.00"><properties><property name="scale" type="float" value="0.36"/></properties><point/></object>
-  <object id="706" name="焦黑枯草地" type="prop_674" x="532.00" y="588.00"><properties><property name="scale" type="float" value="0.38"/></properties><point/></object>
-  <object id="707" name="西侧幽蓝火盆" type="prop_676" x="364.00" y="364.00"><properties><property name="scale" type="float" value="0.36"/></properties><point/></object>
-  <object id="708" name="东侧幽蓝火盆" type="prop_676" x="700.00" y="364.00"><properties><property name="scale" type="float" value="0.36"/></properties><point/></object>
+  <object id="720" name="庭院枯树·西" type="prop_660" x="84.00" y="140.00"><properties><property name="scale" type="float" value="0.52"/></properties><point/></object>
+  <object id="721" name="庭院枯树·东" type="prop_661" x="980.00" y="140.00"><properties><property name="scale" type="float" value="0.50"/></properties><point/></object>
+  <object id="722" name="枯树根·西" type="prop_662" x="140.00" y="532.00"><properties><property name="scale" type="float" value="0.48"/></properties><point/></object>
+  <object id="723" name="枯树根·东" type="prop_662" x="924.00" y="532.00"><properties><property name="scale" type="float" value="0.46"/></properties><point/></object>
+  <object id="724" name="断裂石柱·西" type="prop_663" x="196.00" y="252.00"><properties><property name="scale" type="float" value="0.42"/></properties><point/></object>
+  <object id="725" name="断裂石柱·东" type="prop_665" x="868.00" y="252.00"><properties><property name="scale" type="float" value="0.42"/></properties><point/></object>
+  <object id="726" name="破败祭坛·西" type="prop_666" x="196.00" y="420.00"><properties><property name="scale" type="float" value="0.38"/></properties><point/></object>
+  <object id="727" name="破败祭坛·东" type="prop_667" x="868.00" y="420.00"><properties><property name="scale" type="float" value="0.38"/></properties><point/></object>
+  <object id="728" name="庭院瓦砾·西" type="prop_668" x="140.00" y="588.00"><properties><property name="scale" type="float" value="0.44"/></properties><point/></object>
+  <object id="729" name="庭院瓦砾·东" type="prop_669" x="924.00" y="588.00"><properties><property name="scale" type="float" value="0.42"/></properties><point/></object>
+  <object id="730" name="残破战旗" type="prop_670" x="812.00" y="140.00"><properties><property name="scale" type="float" value="0.34"/></properties><point/></object>
+  <object id="731" name="黑荆棘残骸·西" type="prop_671" x="252.00" y="532.00"><properties><property name="scale" type="float" value="0.34"/></properties><point/></object>
+  <object id="732" name="黑荆棘残骸·东" type="prop_672" x="812.00" y="532.00"><properties><property name="scale" type="float" value="0.34"/></properties><point/></object>
+  <object id="733" name="焦黑地表·西" type="prop_673" x="364.00" y="588.00"><properties><property name="scale" type="float" value="0.40"/></properties><point/></object>
+  <object id="734" name="焦黑地表·东" type="prop_674" x="700.00" y="588.00"><properties><property name="scale" type="float" value="0.40"/></properties><point/></object>
+  <object id="735" name="西侧幽蓝火盆" type="prop_676" x="252.00" y="364.00"><properties><property name="scale" type="float" value="0.40"/></properties><point/></object>
+  <object id="736" name="东侧幽蓝火盆" type="prop_676" x="812.00" y="364.00"><properties><property name="scale" type="float" value="0.40"/></properties><point/></object>
 </objectgroup>
  <objectgroup id="4" name="Markers" draworder="topdown">
   <object id="500" name="spawn" type="spawn" x="140.00" y="532.00"><point/></object>
