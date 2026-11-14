@@ -320,9 +320,10 @@ def watcher_frame(direction, frame):
         d.rectangle((12, 54, 15, 56), fill=WP["gold"])
     return im
 
-watcher_sheet = Image.new("RGBA", (256, 320), (0, 0, 0, 0))
+watcher_sheet = Image.new("RGBA", (192, 304), (0, 0, 0, 0))
 for row, direction in enumerate(("front", "left", "right", "back")):
     for col in range(4):
-        watcher_sheet.alpha_composite(watcher_frame(direction, col), (col * 64, row * 80))
+        frame = watcher_frame(direction, col).resize((48, 76), Image.Resampling.NEAREST)
+        watcher_sheet.alpha_composite(frame, (col * 48, row * 76))
 watcher_sheet.save(WATCHER_OUT, optimize=True)
-print(f"Generated native pixel Watcher sprite sheet: {WATCHER_OUT} (256x320, 4x4 cells at 64x80)")
+print(f"Generated native pixel Watcher sprite sheet: {WATCHER_OUT} (192x304, 4x4 cells at 48x76)")
