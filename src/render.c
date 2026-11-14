@@ -1307,29 +1307,29 @@ static void RenderBattle(Game *g) {
         if(id==0) {
             DrawIllustratedPortrait(TEX_LUMI_ILLUSTRATION,(Rectangle){card.x+10,card.y+17,56,75});
             DrawUIText("苔灯灵",(int)card.x+78,(int)card.y+22,17,C_INK);
-            DrawUIText("星光治愈",(int)card.x+78,(int)card.y+50,14,(Color){104,119,93,255});
-            DrawUIText("回复生命",(int)card.x+78,(int)card.y+73,13,(Color){104,119,93,255});
+            DrawUIText("星光治愈",(int)card.x+78,(int)card.y+45,14,(Color){104,119,93,255});
+            DrawUIText("回复生命",(int)card.x+78,(int)card.y+63,13,(Color){104,119,93,255});
         } else if(id==1) {
             DrawIllustratedPortrait(TEX_MOATAIL_ILLUSTRATION,(Rectangle){card.x+15,card.y+14,48,78});
             DrawUIText("沫尾兽",(int)card.x+78,(int)card.y+22,17,C_INK);
-            DrawUIText("泡泡水流",(int)card.x+78,(int)card.y+50,14,(Color){104,119,93,255});
-            DrawUIText("施加潮湿",(int)card.x+78,(int)card.y+73,13,(Color){104,119,93,255});
+            DrawUIText("泡泡水流",(int)card.x+78,(int)card.y+45,14,(Color){104,119,93,255});
+            DrawUIText("施加潮湿",(int)card.x+78,(int)card.y+63,13,(Color){104,119,93,255});
         } else if(id==2) {
             DrawIllustratedPortrait(TEX_GECKO_ILLUSTRATION,(Rectangle){card.x+15,card.y+14,48,78});
             DrawUIText("鸣晶蜥",(int)card.x+78,(int)card.y+22,17,C_INK);
-            DrawUIText("晶弧放电",(int)card.x+78,(int)card.y+50,14,(Color){104,119,93,255});
-            DrawUIText("克制潮湿",(int)card.x+78,(int)card.y+73,13,(Color){104,119,93,255});
+            DrawUIText("晶弧放电",(int)card.x+78,(int)card.y+45,14,(Color){104,119,93,255});
+            DrawUIText("克制潮湿",(int)card.x+78,(int)card.y+63,13,(Color){104,119,93,255});
         } else {
             DrawPlayer((Vector2){card.x+43,card.y+78},g->time,false,0);
             DrawUIText("旅人",(int)card.x+78,(int)card.y+22,17,C_INK);
-            DrawUIText("基础攻击",(int)card.x+78,(int)card.y+50,14,(Color){104,119,93,255});
-            DrawUIText("造成普通伤害",(int)card.x+78,(int)card.y+73,13,(Color){104,119,93,255});
+            DrawUIText("基础攻击",(int)card.x+78,(int)card.y+45,14,(Color){104,119,93,255});
+            DrawUIText("造成普通伤害",(int)card.x+78,(int)card.y+63,13,(Color){104,119,93,255});
         }
         if(id>=0) {
             Buddy *buddy=id==0?&g->lumi:(id==1?&g->splash:&g->spark);
-            DrawUIText(TextFormat("体力 %d/%d",(int)buddy->hp,(int)buddy->maxHp),(int)card.x+78,(int)card.y+78,11,(Color){104,119,93,255});
-            DrawRectangle((int)card.x+78,(int)card.y+96,132,6,(Color){215,211,193,255});
-            DrawRectangle((int)card.x+78,(int)card.y+96,(int)(132.0f*fmaxf(0.0f,buddy->hp/buddy->maxHp)),6,
+            DrawUIText(TextFormat("体力 %d/%d",(int)buddy->hp,(int)buddy->maxHp),(int)card.x+78,(int)card.y+81,11,(Color){104,119,93,255});
+            DrawRectangle((int)card.x+78,(int)card.y+98,132,6,(Color){215,211,193,255});
+            DrawRectangle((int)card.x+78,(int)card.y+98,(int)(132.0f*fmaxf(0.0f,buddy->hp/buddy->maxHp)),6,
                           buddy->hp>35.0f?(Color){111,174,112,255}:(Color){205,112,91,255});
         }
     }
