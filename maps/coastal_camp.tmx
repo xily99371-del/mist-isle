@@ -58,6 +58,12 @@
   <object id="356" name="石滩碎石" type="prop_212" x="700.00" y="476.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="357" name="海岸灌木" type="prop_229" x="756.00" y="532.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="358" name="海岸灌木" type="prop_229" x="812.00" y="588.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
+  <object id="600" name="营地花冠树" type="prop_600" x="196.00" y="140.00"><properties><property name="scale" type="float" value="0.52"/></properties><point/></object>
+  <object id="602" name="海岸白花树" type="prop_602" x="868.00" y="140.00"><properties><property name="scale" type="float" value="0.50"/></properties><point/></object>
+  <object id="604" name="营地灌木" type="prop_604" x="252.00" y="532.00"><properties><property name="scale" type="float" value="0.52"/></properties><point/></object>
+  <object id="607" name="路边小花" type="prop_607" x="364.00" y="420.00"><properties><property name="scale" type="float" value="0.42"/></properties><point/></object>
+  <object id="611" name="海岸苔石" type="prop_611" x="980.00" y="476.00"><properties><property name="scale" type="float" value="0.42"/></properties><point/></object>
+  <object id="615" name="新生树苗" type="prop_615" x="420.00" y="140.00"><properties><property name="scale" type="float" value="0.42"/></properties><point/></object>
 </objectgroup>
  <objectgroup id="4" name="Markers" draworder="topdown">
   <object id="500" name="spawn" type="spawn" x="532.00" y="588.00"><point/></object>
