@@ -2,6 +2,12 @@
 setlocal
 cd /d "%~dp0"
 
+if exist "%~dp0MistIsle_ApprovedArt_v3.zip" (
+  echo Installing the approved high-resolution portraits, heroine sprite sheet and coastal house...
+  powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_ApprovedArt_v3.zip' -DestinationPath '%~dp0' -Force"
+  if errorlevel 1 goto failed
+)
+
 rem A packaged playtest contains the executable at the package root.
 rem Launch it directly instead of trying to rebuild a source tree that is not included.
 if exist "%~dp0mist_isle.exe" (
