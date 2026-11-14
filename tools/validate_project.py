@@ -56,7 +56,7 @@ assets = {
     "assets/tiles/png/island_iso_tiles.png": (384, 32),
 }
 present = 0
-art_imported = (ROOT / "assets/characters/portraits/heroine_portrait.jpg").exists()
+art_imported = (ROOT / "assets/characters/portraits/heroine_portrait.png").exists()
 if art_imported:
     for rel, expected in assets.items():
         path = ROOT / rel
@@ -174,12 +174,12 @@ require("RenderInit(void)" in RENDER and "RenderClose(void)" in RENDER,
 
 # The user's approved high-resolution portraits and pixel sheet are a separate import bundle.
 approved_assets = {
-    "assets/characters/portraits/heroine_portrait.jpg": (320, 427),
-    "assets/characters/portraits/watcher_portrait.jpg": (320, 427),
-    "assets/characters/portraits/guardian_portrait.jpg": (320, 427),
-    "assets/characters/portraits/moss_lumi_portrait.jpg": (320, 427),
-    "assets/characters/portraits/moatail_portrait.jpg": (320, 427),
-    "assets/characters/portraits/crystal_gecko_portrait.jpg": (320, 427),
+    "assets/characters/portraits/heroine_portrait.png": (1086, 1448),
+    "assets/characters/portraits/watcher_portrait.png": (1086, 1448),
+    "assets/characters/portraits/guardian_portrait.png": (1086, 1448),
+    "assets/characters/portraits/moss_lumi_portrait.png": (1086, 1448),
+    "assets/characters/portraits/moatail_portrait.png": (1086, 1448),
+    "assets/characters/portraits/crystal_gecko_portrait.png": (1086, 1448),
     "assets/characters/hero/heroine_pixel_4x4_64x80.png": (256, 320),
     "assets/characters/npc/watcher_pixel_4x4_48x76.png": (192, 304),
     "assets/environment/coastal_keeper_house.png": (360, 291),
@@ -194,10 +194,10 @@ if all((ROOT / p).exists() for p in approved_assets):
                 require(im.size == expected, f"approved user art {rel} has expected dimensions {expected}")
     require("TEX_HEROINE_PIXEL" in RENDER and "heroine_pixel_4x4_64x80.png" in RENDER and "TEX_WATCHER_PIXEL" in RENDER,
             "the exact user-approved 4x4 pixel sheet drives the playable heroine")
-    require("assets/characters/portraits/heroine_portrait.jpg" in RENDER and
-            "assets/characters/portraits/moss_lumi_portrait.jpg" in RENDER and
-            "assets/characters/portraits/moatail_portrait.jpg" in RENDER and
-            "assets/characters/portraits/crystal_gecko_portrait.jpg" in RENDER,
+    require("assets/characters/portraits/heroine_portrait.png" in RENDER and
+            "assets/characters/portraits/moss_lumi_portrait.png" in RENDER and
+            "assets/characters/portraits/moatail_portrait.png" in RENDER and
+            "assets/characters/portraits/crystal_gecko_portrait.png" in RENDER,
             "dialogue portrait paths use the user's high-resolution anime illustrations")
     require("DrawIllustratedPortrait(TEX_LUMI_ILLUSTRATION" in RENDER and
             "DrawIllustratedPortrait(TEX_MOATAIL_ILLUSTRATION" in RENDER and
@@ -205,7 +205,7 @@ if all((ROOT / p).exists() for p in approved_assets):
             "battle cards and party roster use high-resolution companion illustrations, not pixel idle sprites")
     require("DrawCoastalHouse" in RENDER and "coastal_keeper_house.png" in RENDER,
             "coastal keeper house uses the user's approved pixel-art building")
-    require("Rectangle src={0,0,48,76}" in RENDER and "TEX_WATCHER_PIXEL" in RENDER,
+    require("frame*48" in RENDER and "TEX_WATCHER_PIXEL" in RENDER,
             "Watcher world actor is a native 48x76 pixel RPG sprite frame, not a portrait crop")
     require("DrawLighthouseGuardian((Vector2){880,454},g->time,1.5f,g->battleTurn!=0)" in RENDER and
             "else if(TEX_GUARDIAN_PORTRAIT.id)" not in RENDER,
@@ -261,7 +261,7 @@ require("if type_id==32:" in MAP_BUILD and "collision[by][xx]=0" in MAP_BUILD,
         "Tiled bridge objects open a real walkable span through the water collision grid")
 require("Collision follows the visible object's ground footprint" in MAP_BUILD and "compact rear wall of the cottage" in MAP_BUILD,
         "Tiled buildings, tree trunks, walls, pillars and altar bases compile into gameplay collision")
-require("nearest free, reachable tile" in GAME and "occupied" in GAME,
+require("Pokémon-Center-style recovery service" in GAME and "SetDialogueAs(g,\"守望者\"" in GAME and "g->lumi.hp=g->lumi.maxHp" in GAME,\n        "Watcher heals the whole party before the overlapping campfire interaction");\nrequire("SetDialogueAs(g,\"旅人\",\"三种伙伴的力量" in GAME, "ruin seal-unlock dialogue uses the traveller portrait");\nrequire("nearest free, reachable tile" in GAME and "occupied" in GAME,
         "blocked or duplicate pickups are relocated to a distinct reachable ground tile")
 require("living stone arch" in RENDER and "beacon tower" in RENDER and "Return route keeps" in RENDER,
         "grove, ruins, lighthouse and return portals have distinct grounded visual identities")
@@ -482,9 +482,9 @@ for signature, forbidden, label in [
                 break
     body = RENDER[start:end] if start >= 0 and end > start else ""
     require(bool(body) and all(token not in body for token in forbidden), label)
-require('"assets/characters/portraits/moss_lumi_portrait.jpg"' in RENDER and
-        '"assets/characters/portraits/moatail_portrait.jpg"' in RENDER and
-        '"assets/characters/portraits/crystal_gecko_portrait.jpg"' in RENDER and
+require('"assets/characters/portraits/moss_lumi_portrait.png"' in RENDER and
+        '"assets/characters/portraits/moatail_portrait.png"' in RENDER and
+        '"assets/characters/portraits/crystal_gecko_portrait.png"' in RENDER and
         "for(int i=0;i<29;i++)" in RENDER,
         "high-resolution companion portrait texture load/unload lifecycle is complete")
 
