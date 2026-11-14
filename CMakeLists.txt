@@ -45,7 +45,7 @@ set(MISTISLE_ATLAS_BOUNDS_HEADER "${MISTISLE_GENERATED_DIR}/atlas_bounds.h")
 add_custom_command(
   OUTPUT "${MISTISLE_ATLAS_BOUNDS_HEADER}"
   COMMAND "${CMAKE_COMMAND}" -E make_directory "${MISTISLE_GENERATED_DIR}"
-  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/tools/generate_atlas_bounds.py"
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/tools/generate_atlas_bounds.py" --output "${MISTISLE_ATLAS_BOUNDS_HEADER}"
   DEPENDS
     "${CMAKE_SOURCE_DIR}/tools/generate_atlas_bounds.py"
     "${CMAKE_SOURCE_DIR}/assets/environment/flora_props_atlas_128.png"
