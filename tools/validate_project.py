@@ -409,7 +409,8 @@ require("g->weather=0; g->weatherFade=1.0f" in GAME and "g->weatherClock>38.0f" 
 require("if(area==AREA_GROVE)" in GAME and "g->weather=2;" in GAME and "else if(previousArea==AREA_GROVE)" in GAME,
         "entering Glowglade Grove automatically enables exclusive firefly weather and leaving restores clear weather")
 require("g->weather==3" in RENDER and "g->weather==4" in RENDER and "DrawCloudPuff" in RENDER and
-        "Broad, low fog banks drift across the foreground" in RENDER and ".20f+(float)(i%3)*.035f" in RENDER,
+        "Broad, low fog banks drift across the foreground" in RENDER and "(.22f+(i%3)*.035f)" in RENDER and
+        "Fade((Color){7,17,36,255},.82f*weatherAlpha)" in RENDER,
         "overcast and optional night fog have distinct moving cloud visuals and clearly visible layered fog banks")
 LIGHTHOUSE_MAP_TEXT=(ROOT/"maps/lighthouse_courtyard.tmx").read_text(encoding="utf-8")
 require('type="prop_676"' in LIGHTHOUSE_MAP_TEXT and LIGHTHOUSE_MAP_TEXT.count('type="prop_676"')==2 and
