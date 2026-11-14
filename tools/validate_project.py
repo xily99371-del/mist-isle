@@ -187,7 +187,7 @@ approved_assets = {
 if all((ROOT / p).exists() for p in approved_assets):
     for rel, expected in approved_assets.items():
         with Image.open(ROOT / rel) as im:
-            if rel.endswith("_portrait.jpg"):
+            if rel.endswith("_portrait.png"):
                 require(im.width >= 320 and im.height >= 427,
                         f"approved portrait {rel} retains at least the legacy portrait resolution")
             else:
@@ -205,9 +205,9 @@ if all((ROOT / p).exists() for p in approved_assets):
             "battle cards and party roster use high-resolution companion illustrations, not pixel idle sprites")
     require("DrawCoastalHouse" in RENDER and "coastal_keeper_house.png" in RENDER,
             "coastal keeper house uses the user's approved pixel-art building")
-    require("frame*48" in RENDER and "TEX_WATCHER_PIXEL" in RENDER,
+    require("frame*48" in RENDER and "TEX_WATCHER_PIXEL" in RENDER and "watcher_pixel_4x4_48x76.png" in RENDER,
             "Watcher world actor is a native 48x76 pixel RPG sprite frame, not a portrait crop")
-    require("DrawLighthouseGuardian((Vector2){880,454},g->time,1.5f,g->battleTurn!=0)" in RENDER and
+    require("bossPixelPath=\"assets/characters/boss/lighthouse_guardian_4x2.png\"" in RENDER and "TEX_GUARDIAN_APPROVED.width==192" in RENDER and\n        "DrawLighthouseGuardian((Vector2){880,454},g->time,1.5f,g->battleTurn!=0)" in RENDER and
             "else if(TEX_GUARDIAN_PORTRAIT.id)" not in RENDER,
             "boss exploration and battle scenes use the dedicated pixel animation; anime portrait is dialogue-only")
     require('SetDialogueAs(g,"沫尾兽"' in GAME and 'SetDialogueAs(g,"鸣晶蜥"' in GAME,
@@ -261,7 +261,11 @@ require("if type_id==32:" in MAP_BUILD and "collision[by][xx]=0" in MAP_BUILD,
         "Tiled bridge objects open a real walkable span through the water collision grid")
 require("Collision follows the visible object's ground footprint" in MAP_BUILD and "compact rear wall of the cottage" in MAP_BUILD,
         "Tiled buildings, tree trunks, walls, pillars and altar bases compile into gameplay collision")
-require("Pokémon-Center-style recovery service" in GAME and "SetDialogueAs(g,\"守望者\"" in GAME and "g->lumi.hp=g->lumi.maxHp" in GAME,\n        "Watcher heals the whole party before the overlapping campfire interaction");\nrequire("SetDialogueAs(g,\"旅人\",\"三种伙伴的力量" in GAME, "ruin seal-unlock dialogue uses the traveller portrait");\nrequire("nearest free, reachable tile" in GAME and "occupied" in GAME,
+require("Pokémon-Center-style recovery service" in GAME and "SetDialogueAs(g,\"守望者\"" in GAME and "g->lumi.hp=g->lumi.maxHp" in GAME,
+        "Watcher heals the whole party before the overlapping campfire interaction")
+require("SetDialogueAs(g,"旅人","三种伙伴的力量" in GAME,
+        "ruin seal-unlock dialogue uses the traveller portrait")
+require("nearest free, reachable tile" in GAME and "occupied" in GAME,
         "blocked or duplicate pickups are relocated to a distinct reachable ground tile")
 require("living stone arch" in RENDER and "beacon tower" in RENDER and "Return route keeps" in RENDER,
         "grove, ruins, lighthouse and return portals have distinct grounded visual identities")
