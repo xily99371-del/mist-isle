@@ -1,4 +1,6 @@
 #include "game.h"
+
+static Vector2 BuddyFollowOffset(int id,int facing);
 #include "area_maps.h"
 #include <stdio.h>
 #include <stdlib.h>
