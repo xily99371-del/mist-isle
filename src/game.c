@@ -643,7 +643,7 @@ void GameUpdate(Game *g,float dt) {
                 Burst(g,WorldScreen(g->player.pos),bossHeavy?C_GOLD:C_PINK,bossHeavy?22:10);
                 g->battleTurn=0;g->battleRound++;
                 if(g->player.hp<=0){g->player.hp=55;g->scene=SCENE_PLAY;Toast(g,"伙伴把你带回营地，恢复了体力。");}
-                else if(damped&&e->type==ENEMY_BOSS)Toast(g,TextFormat("潮湿打断灯塔核心共鸣！伤害降至 %.0f。",incoming));
+                else if(damped&&e->type==ENEMY_BOSS)Toast(g,TextFormat("CORE DISRUPTED! DAMAGE REDUCED TO %.0f.",incoming));
                 else if(bossHeavy)Toast(g,TextFormat("RESONANCE STRIKE! %.0f damage.",incoming));
                 else if(e->type==ENEMY_BOSS)Toast(g,TextFormat("LIGHTHOUSE GUARDIAN ATTACK! %.0f damage.",incoming));
                 else Toast(g,TextFormat("敌人发动攻击！受到 %.0f 点伤害。",incoming));
