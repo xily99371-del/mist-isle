@@ -62,6 +62,7 @@ jobs:
               'assets/characters/portraits/crystal_gecko_portrait.png',
               'assets/characters/hero/heroine_pixel_4x4_64x80.png',
               'assets/characters/npc/watcher_pixel_4x4_48x76.png',
+              'assets/characters/boss/lighthouse_guardian_4x2.png',
               'assets/environment/coastal_keeper_house.png'
             )
             $missing = $required | Where-Object { -not (Test-Path $_) }
