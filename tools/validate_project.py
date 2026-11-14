@@ -59,7 +59,7 @@ assets = {
     "assets/tiles/png/island_iso_tiles.png": (384, 32),
 }
 present = 0
-art_imported = (ROOT / "assets/environment/environment_props_96.png").exists()
+art_imported = (ROOT / "assets/characters/portraits/heroine_portrait.jpg").exists()
 if art_imported:
     for rel, expected in assets.items():
         path = ROOT / rel
