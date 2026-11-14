@@ -45,9 +45,6 @@ if not exist assets\characters\portraits\moss_lumi_portrait.jpg goto missing_art
 if not exist assets\characters\portraits\moatail_portrait.jpg goto missing_art
 if not exist assets\characters\portraits\crystal_gecko_portrait.jpg goto missing_art
 if not exist assets\environment\coastal_keeper_house.png goto missing_art
-if not exist assets\characters\png\heroine_portrait.png echo INFO: using the approved heroine pixel-sheet fallback for local dialogue.
-if not exist assets\characters\png\watcher_portrait.png echo INFO: using the generated Keeper pixel sprite for local dialogue.
-if not exist assets\characters\png\lighthouse_guardian_portrait.png echo INFO: using the approved guardian pixel-sheet fallback for local dialogue.
 python tools\generate_ground_atlas.py
 if errorlevel 1 goto failed
 python tools\build_kenney_runtime_atlas.py
