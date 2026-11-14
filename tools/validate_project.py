@@ -184,13 +184,17 @@ approved_assets = {
     "assets/characters/portraits/moatail_portrait.jpg": (320, 427),
     "assets/characters/portraits/crystal_gecko_portrait.jpg": (320, 427),
     "assets/characters/hero/heroine_pixel_4x4_64x80.png": (256, 320),
-    "assets/characters/npc/watcher_pixel_idle_64x80.png": (64, 80),
+    "assets/characters/npc/watcher_pixel_idle_64x80.png": (256, 320),
     "assets/environment/coastal_keeper_house.png": (360, 291),
 }
 if all((ROOT / p).exists() for p in approved_assets):
     for rel, expected in approved_assets.items():
         with Image.open(ROOT / rel) as im:
-            require(im.size == expected, f"approved user art {rel} has expected dimensions {expected}")
+            if rel.endswith("_portrait.jpg"):
+                require(im.width >= 320 and im.height >= 427,
+                        f"approved portrait {rel} retains at least the legacy portrait resolution")
+            else:
+                require(im.size == expected, f"approved user art {rel} has expected dimensions {expected}")
     require("TEX_HEROINE_PIXEL" in RENDER and "heroine_pixel_4x4_64x80.png" in RENDER and "TEX_WATCHER_PIXEL" in RENDER,
             "the exact user-approved 4x4 pixel sheet drives the playable heroine")
     require("assets/characters/portraits/heroine_portrait.jpg" in RENDER and
@@ -204,6 +208,18 @@ if all((ROOT / p).exists() for p in approved_assets):
             "battle cards and party roster use high-resolution companion illustrations, not pixel idle sprites")
     require("DrawCoastalHouse" in RENDER and "coastal_keeper_house.png" in RENDER,
             "coastal keeper house uses the user's approved pixel-art building")
+    require("Rectangle src={0,0,64,80}" in RENDER and "TEX_WATCHER_PIXEL" in RENDER,
+            "Watcher world actor is a native 64x80 pixel RPG sprite frame, not a portrait crop")
+    require("DrawLighthouseGuardian((Vector2){880,454},g->time,1.5f,g->battleTurn!=0)" in RENDER and
+            "else if(TEX_GUARDIAN_PORTRAIT.id)" not in RENDER,
+            "boss exploration and battle scenes use the dedicated pixel animation; anime portrait is dialogue-only")
+    require('SetDialogueAs(g,"沫尾兽"' in GAME and 'SetDialogueAs(g,"鸣晶蜥"' in GAME,
+            "water and crystal companion recruitment bind their own names and portrait IDs")
+    require("if(distance>6.0f&&foundTarget&&!Solid(g,target))" in GAME,
+            "companions teleport back to a safe formation slot after exceeding the hard leash distance")
+    require("DrawEllipse((int)p.x,(int)footY+3" not in RENDER and
+            "DrawEllipse((int)p.x,(int)p.y+4" not in RENDER,
+            "large buildings do not render detached oval ground shadows")
 else:
     print("INFO: MistIsle_ApprovedArt_v3.zip is not installed; user-approved runtime artwork is not yet available.")
 
