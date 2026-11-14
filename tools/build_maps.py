@@ -67,9 +67,9 @@ def parse(path):
             if 1000<=type_id<1003:
                 block_rect(cx,cy,cx,cy)                 # tree trunk
             elif type_id in (302,500,501):
-                block_rect(cx-2,cy-1,cx+2,cy-1)        # rear wall of the enlarged house
-                block_rect(cx-2,cy,cx-1,cy)            # left foundation; keep the doorway cell open
-                block_rect(cx+1,cy,cx+2,cy)            # right foundation; keep the doorway cell open
+                block_rect(cx-1,cy-1,cx+1,cy-1)        # compact rear wall of the cottage
+                block_rect(cx-1,cy,cx-1,cy)            # left foundation; keep the doorway cell open
+                block_rect(cx+1,cy,cx+1,cy)            # right foundation; keep the doorway cell open
             elif type_id==303:
                 block_rect(cx-1,cy-1,cx+1,cy)          # tent footprint
             elif type_id==304:
@@ -138,6 +138,28 @@ def parse(path):
         target=(int(round(mx)),int(round(my)))
         if target not in visited:
             fail(f"{path.name}: marker '{name}' is unreachable from spawn")
+
+    # Check the actual interaction approach cells as well as abstract markers.
+    # Several characters occupy a water-side or collision-protected tile; the
+    # player must still be able to stand within one orthogonal step to interact.
+    approaches={
+        "coastal_camp": ((7,7,"keeper"),(6,8,"Moss Lumi"),(6,7,"campfire")),
+        "glowglade_grove": ((14,7,"Moatail"),),
+        "tidal_ruins": ((13,8,"Crystal Gecko"),),
+        "lighthouse_courtyard": ((int(round(markers["boss"][0])),int(round(markers["boss"][1])),"guardian arena"),),
+    }
+    for ax,ay,label in approaches.get(path.stem,()):
+        candidates=((ax,ay),(ax-1,ay),(ax+1,ay),(ax,ay-1),(ax,ay+1))
+        if not any(0<=px<W and 0<=py<H and not collision[py][px] and (px,py) in visited
+                   for px,py in candidates):
+            fail(f"{path.name}: no reachable interaction approach for {label} at {(ax,ay)}")
+
+    materials={index//12 for index in ground}
+    if len(materials)<3:
+        fail(f"{path.name}: use at least three terrain materials to establish distinct spatial zones")
+    if len(visited)<70:
+        fail(f"{path.name}: walkable area is too constrained ({len(visited)} cells)")
+
     return ground,[v for row in collision for v in row],objects,markers,overlay
 
 def generate(out):

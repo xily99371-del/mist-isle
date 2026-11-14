@@ -17,17 +17,18 @@ if errorlevel 1 (
   pause
   exit /b 1
 )
-python -c "import PIL, cairosvg" >nul 2>nul
-if errorlevel 1 python -m pip install pillow cairosvg
+python -c "import PIL" >nul 2>nul
+if errorlevel 1 python -m pip install pillow
 if errorlevel 1 goto failed
 
 echo [2/3] Generating pixel-art assets...
 python tools\generate_pixel_assets.py
 if errorlevel 1 goto failed
-if not exist assets\characters\png\heroine_portrait.png powershell -NoProfile -ExecutionPolicy Bypass -File tools\fetch_portrait_assets.ps1
+python tools\generate_heroine_highres.py
 if errorlevel 1 goto failed
-if not exist assets\characters\png\watcher_portrait.png powershell -NoProfile -ExecutionPolicy Bypass -File tools\fetch_portrait_assets.ps1
-if errorlevel 1 goto failed
+if not exist assets\characters\png\heroine_portrait.png echo INFO: using the approved heroine pixel-sheet fallback for local dialogue.
+if not exist assets\characters\png\watcher_portrait.png echo INFO: using the generated Keeper pixel sprite for local dialogue.
+if not exist assets\characters\png\lighthouse_guardian_portrait.png echo INFO: using the approved guardian pixel-sheet fallback for local dialogue.
 python tools\generate_ground_atlas.py
 if errorlevel 1 goto failed
 python tools\build_kenney_runtime_atlas.py
@@ -53,11 +54,12 @@ if errorlevel 1 goto failed
 
 echo.
 echo Build complete.
-if exist "%~dp0assets\environment\environment_props_96.png" (
-  echo Approved art pack detected. Loading imported character and environment assets.
+if exist "%~dp0assets\characters\hero\heroine_approved_8x4.png" if exist "%~dp0assets\characters\boss\lighthouse_guardian_4x2.png" (
+  echo Approved heroine and lighthouse guardian sprite sheets detected.
 ) else (
-  echo NOTE: Approved art pack not found. The game will use fallback visuals.
-  echo Extract MistIsle_ArtIntegration_v2_1.zip into this folder to enable approved art.
+  echo NOTE: Approved character sheets are missing from this checkout.
+  echo For an older local copy, extract MistIsle_ApprovedArt_Import_v2.zip into this folder
+  echo and run MistIsle_ApprovedArt\IMPORT_APPROVED_ART.bat once.
 )
 if exist "%~dp0build\Release\mist_isle.exe" (
   start "" "%~dp0build\Release\mist_isle.exe"

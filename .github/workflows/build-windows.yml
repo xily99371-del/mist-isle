@@ -29,6 +29,10 @@ jobs:
           Copy-Item build-pi-artifact/assets/characters/png/heroine_portrait.png assets/characters/png/ -Force
           Copy-Item build-pi-artifact/assets/characters/png/watcher_portrait.png assets/characters/png/ -Force
           Copy-Item build-pi-artifact/assets/characters/png/lighthouse_guardian_portrait.png assets/characters/png/ -Force
+          Copy-Item build-pi-artifact/assets/characters/png/moss_lumi.png assets/characters/png/ -Force
+          Copy-Item build-pi-artifact/assets/characters/png/moatail.png assets/characters/png/ -Force
+          Copy-Item build-pi-artifact/assets/characters/png/crystal_gecko.png assets/characters/png/ -Force
+          Copy-Item build-pi-artifact/assets/characters/png/heroine_world_4x4_64x80.png assets/characters/png/ -Force
           python tools/preview_tiled_maps.py --output build/map-previews
           if (Test-Path third_party/kenney/rpg-base/KenneyRPGpack.zip) { python tools/preview_cc0_packs.py }
           python tools/validate_project.py
@@ -47,6 +51,10 @@ jobs:
           if (Test-Path assets/characters/hero) {
             New-Item -ItemType Directory -Force -Path dist/assets/characters/hero | Out-Null
             Copy-Item assets/characters/hero/* dist/assets/characters/hero/
+          }
+          if (Test-Path assets/characters/boss) {
+            New-Item -ItemType Directory -Force -Path dist/assets/characters/boss | Out-Null
+            Copy-Item assets/characters/boss/* dist/assets/characters/boss/
           }
           if (Test-Path assets/characters/companions) {
             New-Item -ItemType Directory -Force -Path dist/assets/characters/companions | Out-Null
@@ -105,6 +113,7 @@ jobs:
         run: |
           python -m pip install pillow cairosvg
           python tools/generate_pixel_assets.py
+          python tools/generate_heroine_highres.py
           python tools/rasterize_assets.py
           python tools/generate_ground_atlas.py
           python tools/preview_kenney_pack.py

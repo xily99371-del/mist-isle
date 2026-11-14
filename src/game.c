@@ -1,4 +1,6 @@
 #include "game.h"
+
+static Vector2 BuddyFollowOffset(int id,int facing);
 #include "area_maps.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -69,9 +71,11 @@ static int DialoguePortraitForSpeaker(const char *speaker) {
     if(!speaker)return 0;
     if(strcmp(speaker,"守望者")==0)return 1;
     if(strcmp(speaker,"灯塔守卫")==0)return 2;
-    // Story labels such as “旅人手记” still belong to the protagonist, not a companion.
+    if(strcmp(speaker,"苔灯灵")==0||strcmp(speaker,"苔藓灵")==0)return 3;
+    if(strcmp(speaker,"沫尾兽")==0||strcmp(speaker,"沫尾")==0)return 4;
+    if(strcmp(speaker,"鸣晶蜥")==0)return 5;
     if(strncmp(speaker,"旅人",strlen("旅人"))==0||strcmp(speaker,"主角")==0)return 0;
-    return 3;
+    return 0;
 }
 static void SetDialogueSequence(Game *g,const char *const *speakers,const char *const *lines,int count,bool startsBossBattle) {
     g->dialogueCount=count<4?count:4;
@@ -195,9 +199,9 @@ static void SwitchArea(Game *g,Area area) {
     g->player.pos=(area==AREA_CAMP)?g->world.returnPoint:g->world.camp;
     for(int i=0;i<g->world.pickupCount && i<MAX_PICKUPS;i++)g->world.pickups[i].taken=g->areaPickupTaken[(int)area][i]!=0;
     g->enemyCount=0;
-    g->lumi.pos=Vector2Add(g->player.pos,(Vector2){-1,.5f});
-    g->splash.pos=Vector2Add(g->player.pos,(Vector2){-1,1});
-    g->spark.pos=Vector2Add(g->player.pos,(Vector2){0,1});
+    g->lumi.pos=Vector2Add(g->player.pos,BuddyFollowOffset(0,g->player.facing));
+    g->splash.pos=Vector2Add(g->player.pos,BuddyFollowOffset(1,g->player.facing));
+    g->spark.pos=Vector2Add(g->player.pos,BuddyFollowOffset(2,g->player.facing));
     g->transition=.35f;
     SnapCameraToPlayer(g);
 }
@@ -289,9 +293,9 @@ bool GameLoad(Game *g) {
     g->lumi.level=s.lumiLevel;g->lumi.xp=s.lumiXp;g->splash.level=s.splashLevel;g->splash.xp=s.splashXp;g->spark.level=s.sparkLevel;g->spark.xp=s.sparkXp;
     for(int a=0;a<4;a++)for(int i=0;i<MAX_PICKUPS;i++)g->areaPickupTaken[a][i]=s.pickupTaken[a][i];
     for(int i=0;i<g->world.pickupCount && i<MAX_PICKUPS;i++)g->world.pickups[i].taken=g->areaPickupTaken[(int)g->area][i]!=0;
-    if(g->lumi.owned)g->lumi.pos=Vector2Add(g->player.pos,(Vector2){-.55f,.42f});
-    if(g->splash.owned)g->splash.pos=Vector2Add(g->player.pos,(Vector2){-.95f,.85f});
-    if(g->spark.owned)g->spark.pos=Vector2Add(g->player.pos,(Vector2){-.15f,.95f});
+    if(g->lumi.owned)g->lumi.pos=Vector2Add(g->player.pos,BuddyFollowOffset(0,g->player.facing));
+    if(g->splash.owned)g->splash.pos=Vector2Add(g->player.pos,BuddyFollowOffset(1,g->player.facing));
+    if(g->spark.owned)g->spark.pos=Vector2Add(g->player.pos,BuddyFollowOffset(2,g->player.facing));
     Toast(g,"已读取上次的旅程。"); return true;
 }
 void GameReset(Game *g,int seed) {
@@ -312,9 +316,9 @@ void GameStart(Game *g) {
         "靠近它，按 E 互动。WASD 移动，SHIFT 冲刺。");
 }
 static void AddBuddyFriend(Game *g,int id) {
-    if(id==0){g->lumi.owned=true;g->lumi.pos=Vector2Add(g->player.pos,(Vector2){-0.7f,0.4f});}
-    if(id==1){g->splash.owned=true;g->splash.pos=Vector2Add(g->player.pos,(Vector2){-0.7f,0.4f});}
-    if(id==2){g->spark.owned=true;g->spark.pos=Vector2Add(g->player.pos,(Vector2){-0.7f,0.4f});}
+    if(id==0){g->lumi.owned=true;g->lumi.pos=Vector2Add(g->player.pos,BuddyFollowOffset(0,g->player.facing));}
+    if(id==1){g->splash.owned=true;g->splash.pos=Vector2Add(g->player.pos,BuddyFollowOffset(1,g->player.facing));}
+    if(id==2){g->spark.owned=true;g->spark.pos=Vector2Add(g->player.pos,BuddyFollowOffset(2,g->player.facing));}
 }
 Buddy *CurrentBuddy(Game *g) {
     if(g->selectedBuddy==0 && g->lumi.owned)return &g->lumi;
@@ -330,6 +334,19 @@ static Buddy *BuddyById(Game *g,int id) {
     if(id==1)return &g->splash;
     if(id==2)return &g->spark;
     return NULL;
+}
+static Vector2 BuddyFollowOffset(int id,int facing) {
+    // Keep the party in a loose fan behind the traveller instead of stacking
+    // every companion on the same diagonal tile.
+    static const Vector2 formation[4][3]={
+        {{-.82f,-.92f},{0.0f,-1.30f},{.82f,-.92f}},   // facing down
+        {{1.05f,-.82f},{1.36f,0.0f},{1.05f,.82f}},    // facing left
+        {{-1.05f,-.82f},{-1.36f,0.0f},{-1.05f,.82f}}, // facing right
+        {{-.82f,.92f},{0.0f,1.30f},{.82f,.92f}}       // facing up
+    };
+    if(id<0||id>2)id=0;
+    if(facing<0||facing>3)facing=0;
+    return formation[facing][id];
 }
 static int OwnedBuddyIdAt(Game *g,int slot) {
     int count=0;
@@ -477,7 +494,7 @@ static void EnterBattle(Game *g,int idx) {
     g->battleMessage=0;
 }
 static void StartStoryBattle(Game *g) {
-    AddEnemy(g,ENEMY_GUARD,18,13,55);
+    AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,150);
     EnterBattle(g,g->enemyCount-1);
 }
 void GameUpdate(Game *g,float dt) {
@@ -617,11 +634,22 @@ void GameUpdate(Game *g,float dt) {
                     }
                 }
             } else {
-                float incoming=e->type==ENEMY_BOSS?16.0f:10.0f;
-                if(g->enemySoaked)incoming*=0.8f;
-                g->player.hp-=incoming;Burst(g,WorldScreen(g->player.pos),C_PINK,10);
+                int bossPhase=e->hp<=50.0f?3:(e->hp<=100.0f?2:1);
+                bool bossHeavy=e->type==ENEMY_BOSS &&
+                    (bossPhase==3?(g->battleRound%2==0):(g->battleRound%3==0));
+                float incoming=e->type==ENEMY_BOSS?(bossPhase==3?20.0f:(bossPhase==2?17.0f:14.0f)):10.0f;
+                if(bossHeavy)incoming+=(bossPhase==3?12.0f:9.0f);
+                // Wetting the guardian's core interrupts its resonance and softens the next blow.
+                bool damped=g->enemySoaked;
+                if(damped)incoming*=e->type==ENEMY_BOSS?0.65f:0.8f;
+                g->enemySoaked=false; // Wetness interrupts one incoming attack, then dissipates.
+                g->player.hp-=incoming;
+                Burst(g,WorldScreen(g->player.pos),bossHeavy?C_GOLD:C_PINK,bossHeavy?22:10);
                 g->battleTurn=0;g->battleRound++;
                 if(g->player.hp<=0){g->player.hp=55;g->scene=SCENE_PLAY;Toast(g,"伙伴把你带回营地，恢复了体力。");}
+                else if(damped&&e->type==ENEMY_BOSS)Toast(g,TextFormat("CORE DISRUPTED! DAMAGE REDUCED TO %.0f.",incoming));
+                else if(bossHeavy)Toast(g,TextFormat("RESONANCE STRIKE! %.0f damage.",incoming));
+                else if(e->type==ENEMY_BOSS)Toast(g,TextFormat("LIGHTHOUSE GUARDIAN ATTACK! %.0f damage.",incoming));
                 else Toast(g,TextFormat("敌人发动攻击！受到 %.0f 点伤害。",incoming));
             }
         }
@@ -656,13 +684,38 @@ void GameUpdate(Game *g,float dt) {
     for(int bi=0;bi<3;bi++) {
         Buddy *b=followers[bi];
         if(!b->owned) continue;
-        Vector2 offset = bi==0 ? (Vector2){-0.55f,0.42f} : bi==1 ? (Vector2){-0.95f,0.85f} : (Vector2){-0.15f,0.95f};
+        Vector2 offset=BuddyFollowOffset(bi,p->facing);
         Vector2 target=Vector2Add(p->pos,offset);
-        Vector2 next=Vector2Add(b->pos,Vector2Scale(Vector2Subtract(target,b->pos),fminf(1,dt*(4.2f+bi*.25f))));
-        if(!Solid(g,next))b->pos=next;
-        else {
-            Vector2 fallback=Vector2Add(p->pos,Vector2Scale(offset,0.55f));
-            if(!Solid(g,fallback))b->pos=fallback;
+        // If the preferred slot is occupied by scenery, choose the nearest free
+        // neighbouring slot so companions do not remain pinned against a wall.
+        if(Solid(g,target)) {
+            const Vector2 alternatives[6]={
+                {offset.x,offset.y-.48f},{offset.x,offset.y+.48f},
+                {offset.x-.48f,offset.y},{offset.x+.48f,offset.y},
+                {offset.x*.55f,offset.y*.55f},{offset.x*1.35f,offset.y*1.35f}
+            };
+            float best=1.0e9f;
+            for(int ai=0;ai<6;ai++) {
+                Vector2 candidate=Vector2Add(p->pos,alternatives[ai]);
+                if(Solid(g,candidate))continue;
+                float score=Dist(candidate,b->pos);
+                if(score<best){best=score;target=candidate;}
+            }
+        }
+        Vector2 delta=Vector2Subtract(target,b->pos);
+        float distance=Vector2Length(delta);
+        float speed=distance>3.8f?7.2f:4.4f+bi*.25f;
+        if(distance>.015f) {
+            Vector2 step=Vector2Scale(delta,fminf(1.0f,speed*dt/distance));
+            int substeps=(int)ceilf(Vector2Length(step)/.10f);
+            if(substeps<1)substeps=1;
+            Vector2 part=Vector2Scale(step,1.0f/(float)substeps);
+            for(int si=0;si<substeps;si++) {
+                Vector2 next=b->pos;
+                next.x+=part.x;if(!Solid(g,next))b->pos.x=next.x;
+                next=b->pos;
+                next.y+=part.y;if(!Solid(g,next))b->pos.y=next.y;
+            }
         }
         b->bob=sinf(g->time*(4.0f+bi*.5f)+bi)*0.12f;
         b->blink-=dt;if(b->blink<=0)b->blink=2.0f+(float)GetRandomValue(0,15)/10.0f;

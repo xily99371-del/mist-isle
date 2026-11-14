@@ -3,7 +3,7 @@
  <linearGradient id="hair" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#8b5a43"/><stop offset=".48" stop-color="#573a35"/><stop offset="1" stop-color="#332a30"/></linearGradient>
  <linearGradient id="hairHi" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d49a72"/><stop offset="1" stop-color="#8c5b49"/></linearGradient>
  <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffe4ce"/><stop offset="1" stop-color="#e8b69e"/></linearGradient>
- <linearGradient id="scarf" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f06c5e"/><stop offset="1" stop-color="#a9363c"/></linearGradient>
+ <linearGradient id="scarf" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#67c6ce"/><stop offset=".55" stop-color="#267f91"/><stop offset="1" stop-color="#174f69"/></linearGradient>
  <linearGradient id="leather" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#9b7457"/><stop offset="1" stop-color="#59463e"/></linearGradient>
  <linearGradient id="cloth" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff0db"/><stop offset="1" stop-color="#cbbca9"/></linearGradient>
  <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f5df9c"/><stop offset=".5" stop-color="#9e8060"/><stop offset="1" stop-color="#4c4a4d"/></linearGradient>

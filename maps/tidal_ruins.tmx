@@ -3,32 +3,33 @@
  <properties>
   <property name="level_id" value="tidal_ruins"/>
   <property name="layout_style" value="one_screen_handcrafted_topdown"/>
+  <property name="route_design" value="stone_processional_with_flanking_tidal_pools_and_central_shrine"/>
   <property name="map_review_revision" type="int" value="11"/>
   <property name="scene_description" value="Ancient stone processional; flanking shrines, broken arches, central keystone."/>
  </properties>
  <tileset firstgid="1" source="terrain.tsx"/>
  <layer id="1" name="Ground" width="18" height="12">
   <data encoding="csv">
-   2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1,
-   1, 1, 26, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 26, 25, 25, 1, 1,
-   1, 1, 25, 25, 26, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 26, 1, 1,
-   1, 1, 25, 25, 25, 25, 26, 25, 25, 25, 25, 25, 25, 25, 25, 25, 1, 2,
-   37, 37, 25, 25, 25, 25, 25, 25, 26, 25, 25, 25, 25, 25, 25, 25, 1, 1,
-   37, 37, 25, 25, 25, 25, 25, 25, 25, 25, 26, 25, 25, 25, 25, 25, 1, 1,
-   37, 38, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 26, 25, 25, 25, 1, 1,
-   1, 1, 25, 26, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 26, 25, 1, 1,
-   1, 1, 25, 25, 25, 26, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 2, 1,
-   1, 1, 13, 13, 13, 13, 13, 14, 13, 13, 13, 13, 13, 13, 1, 1, 1, 1,
-   1, 1, 1, 13, 13, 13, 13, 13, 13, 14, 13, 13, 13, 13, 1, 1, 1, 1,
-   2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1
-  </data>
+1,1,1,1,1,1,25,25,25,25,25,25,1,1,1,1,1,1,
+1,1,1,1,25,25,25,25,25,25,25,25,25,25,1,1,1,1,
+1,1,1,13,25,25,25,25,25,25,25,25,25,25,1,1,1,1,
+1,37,37,13,25,25,25,25,25,25,25,25,25,25,1,37,37,1,
+1,37,37,1,25,25,25,25,25,25,25,25,25,25,13,37,37,1,
+1,1,1,1,25,25,25,25,25,25,25,25,25,25,13,1,1,1,
+1,1,1,1,25,25,25,25,25,25,25,25,25,25,25,1,1,1,
+1,1,1,1,25,25,25,25,25,25,25,25,25,25,25,25,1,1,
+1,1,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,1,
+1,25,25,25,25,25,25,25,25,25,25,25,25,25,25,25,1,1,
+1,1,25,25,25,25,25,25,25,25,25,25,25,13,13,1,1,1,
+1,1,1,1,1,1,25,25,25,25,25,25,1,1,1,1,1,1
+</data>
  </layer>
  <objectgroup id="2" name="Collision" draworder="topdown"/>
  <objectgroup id="3" name="Objects" draworder="topdown">
   <object id="300" name="tree1" type="tree1" x="84.00" y="84.00"><properties><property name="scale" type="float" value="0.86"/></properties><point/></object>
   <object id="302" name="tree2" type="tree2" x="84.00" y="588.00"><properties><property name="scale" type="float" value="0.82"/></properties><point/></object>
-  <object id="304" name="西侧残缺拱门" type="prop_28" x="196.00" y="196.00"><properties><property name="scale" type="float" value="1.00"/></properties><point/></object>
-  <object id="305" name="东侧残缺拱门" type="prop_28" x="868.00" y="196.00"><properties><property name="scale" type="float" value="1.00"/></properties><point/></object>
+  <object id="304" name="西侧残缺拱门" type="prop_28" x="252.00" y="196.00"><properties><property name="scale" type="float" value="1.00"/></properties><point/></object>
+  <object id="305" name="东侧残缺拱门" type="prop_28" x="756.00" y="196.00"><properties><property name="scale" type="float" value="1.00"/></properties><point/></object>
   <object id="306" name="prop_29" type="prop_29" x="364.00" y="140.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
   <object id="307" name="prop_29" type="prop_29" x="700.00" y="140.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
   <object id="308" name="prop_29" type="prop_29" x="308.00" y="476.00"><properties><property name="scale" type="float" value="0.90"/></properties><point/></object>

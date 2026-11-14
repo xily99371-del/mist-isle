@@ -28,3 +28,17 @@ The environment board is a generated illustration atlas, not yet a fully separat
 
 ## Attribution and IP
 These are original generated assets created for this project using ChatGPT image generation. They are not extracted from Pokémon or Stardew Valley. Those games are style references only.
+
+
+## Approved heroine and lighthouse guardian revision
+
+The user approved the 8-column × 4-direction heroine concept and the four-view / four-action lighthouse guardian concept generated on 2026-11-14. Runtime import targets:
+- `assets/characters/hero/heroine_approved_8x4.png` — 8 frames × 4 directions, 24×32 source cells, front/left/right/back rows; boots share a fixed baseline.
+- `assets/characters/boss/lighthouse_guardian_4x2.png` — 4-view idle row and 4-action row, 48×64 source cells.
+
+The approved heroine has brown hair, a blue ribbon, teal scarf, cream adventurer coat, leather belt and brown boots. The guardian is a large ancient lighthouse sentinel in dark weathered armor, with a warm lantern core, heavy chains and a torn crimson mantle. It must never be presented as a police officer or ordinary uniformed NPC.
+
+
+## Boss encounter presentation
+
+The lighthouse guardian's idle view is kept front-facing in exploration. Its second sprite-sheet row is reserved for the four-frame attack sequence and is played only during the enemy turn. The battle scene switches to a darker slate-and-ember palette, uses a dedicated `BOSS` heading and displays the guardian's lantern core as its health bar. This keeps the guardian visually and mechanically distinct from the ordinary ruin sentry and from the camp watcher.
