@@ -209,7 +209,7 @@ if all((ROOT / p).exists() for p in approved_assets):
     require("DrawCoastalHouse" in RENDER and "coastal_keeper_house.png" in RENDER,
             "coastal keeper house uses the user's approved pixel-art building")
     require("Rectangle src={0,0,48,76}" in RENDER and "TEX_WATCHER_PIXEL" in RENDER,
-            "Watcher world actor is a native 64x80 pixel RPG sprite frame, not a portrait crop")
+            "Watcher world actor is a native 48x76 pixel RPG sprite frame, not a portrait crop")
     require("DrawLighthouseGuardian((Vector2){880,454},g->time,1.5f,g->battleTurn!=0)" in RENDER and
             "else if(TEX_GUARDIAN_PORTRAIT.id)" not in RENDER,
             "boss exploration and battle scenes use the dedicated pixel animation; anime portrait is dialogue-only")
