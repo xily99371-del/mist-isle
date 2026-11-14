@@ -1176,6 +1176,16 @@ static void RenderBattle(Game *g) {
     DrawRectangle(925,99,295,13,(Color){218,213,193,255});
     if(isBoss)DrawRectangleGradientH(925,99,(int)(295.0f*fmaxf(0.0f,e->hp/e->maxHp)),13,(Color){255,201,104,255},(Color){174,66,55,255});
     else DrawRectangle(925,99,(int)(295.0f*fmaxf(0.0f,e->hp/e->maxHp)),13,C_PINK);
+    if(isBoss) {
+        int phase=e->hp<=50.0f?3:(e->hp<=100.0f?2:1);
+        bool heavy=phase==3?(g->battleRound%2==0):(g->battleRound%3==0);
+        const char *phaseLabel=phase==3?"PHASE III  /  LAST LIGHT":(phase==2?"PHASE II  /  RESONANCE":"PHASE I  /  AWAKENING");
+        DrawRectangleRounded((Rectangle){742,148,510,42},.18f,8,(Color){12,24,35,224});
+        DrawRectangleRoundedLines((Rectangle){742,148,510,42},.18f,8,Fade((Color){255,198,113,255},.7f));
+        DrawUIText(phaseLabel,760,154,14,(Color){255,219,166,255});
+        DrawUIText(heavy?"CORE CHARGED  /  HEAVY STRIKE NEXT":"CORE STABLE  /  WET STATUS INTERRUPTS",930,154,12,
+                   heavy?(Color){255,170,117,255}:(Color){154,220,211,255});
+    }
 
     if(g->selectedBuddy==0 && g->lumi.owned)DrawLumi((Vector2){395,430},g->time,0);
     else if(g->selectedBuddy==1 && g->splash.owned)DrawMoatail((Vector2){395,430},g->time);

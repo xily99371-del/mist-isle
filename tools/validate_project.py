@@ -137,6 +137,10 @@ require("InRect" in GAME and "const float r=.37f" in GAME and "distance/0.08f" i
         "player collision checks authored prop footprints with dense substeps")
 require("RENDER_BOSS" in RENDER and "DrawLighthouseGuardian" in RENDER,
         "lighthouse guardian is visible in the world and battle scene")
+require("bossPhase==3?(g->battleRound%2==0):(g->battleRound%3==0)" in GAME and "bossHeavy" in GAME,
+        "lighthouse guardian escalates from measured attacks to a telegraphed resonance strike")
+require("incoming*=e->type==ENEMY_BOSS?0.65f:0.8f" in GAME and "CORE CHARGED  /  HEAVY STRIKE NEXT" in RENDER,
+        "wet status interrupts the guardian core and reduces its boss attack damage")
 require("attacking?((int)(t*8.0f)%4):0" in RENDER and "attacking?64.0f:0.0f" in RENDER,
         "lighthouse guardian uses its dedicated attack animation row during the enemy turn")
 require('DrawUIText(isBoss?"BOSS":"遭遇战"' in RENDER and "DrawRectangleGradientH" in RENDER,
