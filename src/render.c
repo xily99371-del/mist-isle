@@ -837,11 +837,13 @@ static void DrawCoastalCliffs(Game *g,int terrainKinds[MAPH][MAPW],int minX,int 
     }
 }
 #if defined(MISTISLE_PI_PROFILE)
-#define MISTISLE_RAIN_DROPS 56
-#define MISTISLE_RAIN_RIPPLES 6
+#define MISTISLE_RAIN_DROPS 64
+#define MISTISLE_RAIN_RIPPLES 8
+#define MISTISLE_FIREFLY_COUNT 30
 #else
-#define MISTISLE_RAIN_DROPS 190
-#define MISTISLE_RAIN_RIPPLES 22
+#define MISTISLE_RAIN_DROPS 230
+#define MISTISLE_RAIN_RIPPLES 28
+#define MISTISLE_FIREFLY_COUNT 58
 #endif
 static void BuildGroundCache(Game *g) {
     if(!TEX_GROUND_CACHE.id || CACHED_GROUND_AREA==(int)g->area)return;
@@ -1081,7 +1083,7 @@ static void RenderWorld(Game *g) {
             DrawCircleV((Vector2){x,y},1.2f+WeatherNoise(i,20)*1.8f,Fade((Color){255,232,169,255},.42f*weatherAlpha));
         }
     } else if(g->weather==1) {
-        DrawRectangle(0,0,SW,SH,Fade((Color){22,43,65,255},.27f*weatherAlpha));
+        DrawRectangle(0,0,SW,SH,Fade((Color){17,39,62,255},.34f*weatherAlpha));
         float gust=.58f+.42f*(.5f+.5f*sinf(g->time*.72f));
         int active=(int)((float)MISTISLE_RAIN_DROPS*(.52f+.48f*gust));
         for(int i=0;i<active;i++) {
@@ -1091,9 +1093,9 @@ static void RenderWorld(Game *g) {
             float y=fmodf(phase+g->time*speed,SH+100.0f)-50.0f;
             float lane=(float)(i%19)/19.0f;
             float x=fmodf(r3*SW+lane*SW*.38f+g->time*(48.0f+r2*115.0f)+sinf(g->time*.8f+i*.37f)*16.0f,SW+80.0f)-40.0f;
-            float length=13.0f+r2*25.0f;
-            float alpha=(.30f+r3*.42f)*weatherAlpha*(.72f+.28f*gust);
-            float width=.95f+r*1.05f;
+            float length=18.0f+r2*31.0f;
+            float alpha=(.48f+r3*.40f)*weatherAlpha*(.78f+.22f*gust);
+            float width=1.25f+r*1.10f;
             if(i%11==0)length*=1.45f;
             DrawLineEx((Vector2){x,y},(Vector2){x-5.0f-r2*8.0f,y+length},width,Fade((Color){190,218,232,255},alpha));
         }
@@ -1105,7 +1107,7 @@ static void RenderWorld(Game *g) {
             Vector2 world=WorldToScreen((float)x,(float)y);
             Vector2 screen=GetWorldToScreen2D(world,g->cam);
             float pulse=fmodf(g->time*(1.0f+(float)(h%7u)*.12f)+(float)(h%19u)*.11f,1.0f);
-            DrawCircleLines((int)screen.x,(int)screen.y,(int)(2.0f+pulse*7.0f),Fade((Color){211,238,245,255},.58f*(1.0f-pulse)*weatherAlpha));
+            DrawCircleLines((int)screen.x,(int)screen.y,(int)(2.0f+pulse*7.0f),Fade((Color){211,238,245,255},.78f*(1.0f-pulse)*weatherAlpha));
             rippleCount++;
         }
         for(int i=0;i<24;i++) {
@@ -1115,14 +1117,20 @@ static void RenderWorld(Game *g) {
             DrawCircleV((Vector2){x,y},1.3f+WeatherNoise(i,35)*1.4f,Fade((Color){208,231,237,255},(.34f+WeatherNoise(i,36)*.28f)*weatherAlpha));
         }
     } else if(g->weather==2) {
-        DrawRectangle(0,0,SW,SH,Fade((Color){29,43,54,255},.10f*weatherAlpha));
-        for(int i=0;i<44;i++) {
+        DrawRectangle(0,0,SW,SH,Fade((Color){29,43,54,255},.16f*weatherAlpha));
+        for(int i=0;i<MISTISLE_FIREFLY_COUNT;i++) {
             float phase=WeatherNoise(i,41);
-            float x=fmodf(phase*SW+sinf(g->time*.55f+i)*20.0f,SW);
-            float y=fmodf(WeatherNoise(i,42)*SH-g->time*(8.0f+WeatherNoise(i,43)*15.0f),SH);
-            float pulse=.35f+.65f*(.5f+.5f*sinf(g->time*2.4f+i*1.7f));
-            DrawCircleV((Vector2){x,y},1.4f+WeatherNoise(i,44)*2.2f,Fade((Color){255,218,125,255},pulse*.75f*weatherAlpha));
-            if(i%5==0)DrawCircleV((Vector2){x,y},5.0f,Fade((Color){255,202,92,255},pulse*.10f*weatherAlpha));
+            float x=fmodf(phase*SW+sinf(g->time*.55f+i)*25.0f,SW);
+            float y=fmodf(WeatherNoise(i,42)*SH-g->time*(9.0f+WeatherNoise(i,43)*18.0f),SH);
+            float pulse=.30f+.70f*(.5f+.5f*sinf(g->time*2.4f+i*1.7f));
+            Vector2 mote={x,y};
+            DrawCircleV(mote,9.0f+3.0f*pulse,Fade((Color){255,195,91,255},pulse*.16f*weatherAlpha));
+            DrawCircleV(mote,3.0f+1.4f*pulse,Fade((Color){255,220,132,255},pulse*.62f*weatherAlpha));
+            DrawCircleV(mote,1.35f,Fade((Color){255,249,208,255},.92f*weatherAlpha));
+            if(i%4==0) {
+                DrawLineEx((Vector2){x-4.5f,y},(Vector2){x+4.5f,y},1.0f,Fade((Color){255,229,163,255},pulse*.42f*weatherAlpha));
+                DrawLineEx((Vector2){x,y-4.5f},(Vector2){x,y+4.5f},1.0f,Fade((Color){255,229,163,255},pulse*.42f*weatherAlpha));
+            }
         }
     } else if(g->weather==3) {
         DrawRectangle(0,0,SW,SH,Fade((Color){51,65,78,255},.27f*weatherAlpha));
@@ -1134,22 +1142,22 @@ static void RenderWorld(Game *g) {
     } else if(g->weather==4) {
         /* Night fog should read as a moving layer in front of the whole island,
            not a barely visible blue tint. Keep the darkest value near the horizon. */
-        DrawRectangleGradientV(0,0,SW,SH,Fade((Color){9,22,43,255},.74f*weatherAlpha),Fade((Color){24,46,56,255},.58f*weatherAlpha));
+        DrawRectangleGradientV(0,0,SW,SH,Fade((Color){7,17,36,255},.82f*weatherAlpha),Fade((Color){18,39,52,255},.68f*weatherAlpha));
         DrawRectangle(0,SH*.34f,SW,SH*.42f,Fade((Color){130,157,157,255},.075f*weatherAlpha));
         for(int i=0;i<12;i++) {
             float x=fmodf((float)i*173.0f+g->time*(10.0f+(float)(i%4)*5.0f),SW+520.0f)-260.0f;
             float y=72.0f+(float)i*54.0f+sinf(g->time*.28f+i*1.4f)*30.0f;
             float puff=1.65f+(float)(i%4)*.42f;
-            DrawCloudPuff(x,y,puff,Fade((Color){176,198,194,255},(.20f+(float)(i%3)*.035f)*weatherAlpha));
-            DrawCloudPuff(x+115.0f,y+12.0f,puff*.78f,Fade((Color){144,174,176,255},.16f*weatherAlpha));
+            DrawCloudPuff(x,y,puff,Fade((Color){190,213,208,255},(.27f+(float)(i%3)*.045f)*weatherAlpha));
+            DrawCloudPuff(x+115.0f,y+12.0f,puff*.78f,Fade((Color){159,190,190,255},.23f*weatherAlpha));
         }
         /* Broad, low fog banks drift across the foreground in staggered layers. */
         for(int i=0;i<5;i++) {
             float x=fmodf((float)i*287.0f+g->time*(15.0f+(float)(i%2)*9.0f),SW+700.0f)-350.0f;
             float y=SH*.30f+(float)i*SH*.145f+sinf(g->time*.20f+i*1.7f)*18.0f;
             float w=260.0f+(float)(i%3)*85.0f;
-            DrawEllipse((int)x,(int)y,(int)w,(int)(24.0f+(i%2)*9.0f),Fade((Color){174,198,194,255},(.14f+(i%3)*.025f)*weatherAlpha));
-            DrawEllipse((int)(x+150.0f),(int)(y+5.0f),(int)(w*.72f),18,Fade((Color){123,157,163,255},.12f*weatherAlpha));
+            DrawEllipse((int)x,(int)y,(int)w,(int)(24.0f+(i%2)*9.0f),Fade((Color){190,211,207,255},(.22f+(i%3)*.035f)*weatherAlpha));
+            DrawEllipse((int)(x+150.0f),(int)(y+5.0f),(int)(w*.72f),18,Fade((Color){139,174,181,255},.19f*weatherAlpha));
         }
         for(int i=0;i<38;i++) {
             float x=fmodf(WeatherNoise(i,51)*SW+g->time*(2.5f+WeatherNoise(i,52)*7.0f),SW);
