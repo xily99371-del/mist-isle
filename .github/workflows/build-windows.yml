@@ -137,7 +137,9 @@ jobs:
           }
           if (Test-Path assets/environment) {
             New-Item -ItemType Directory -Force -Path dist/assets/environment | Out-Null
-            Copy-Item assets/environment/* dist/assets/environment/
+            Get-ChildItem assets/environment -Force |
+              Where-Object { $_.Name -ne 'generated' } |
+              Copy-Item -Destination dist/assets/environment/ -Recurse -Force
           }
           if (Test-Path assets/cinematics) {
             New-Item -ItemType Directory -Force -Path dist/assets/cinematics | Out-Null
