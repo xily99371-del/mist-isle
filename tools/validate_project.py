@@ -181,7 +181,7 @@ approved_assets = {
     "assets/characters/portraits/moatail_portrait.jpg": (320, 427),
     "assets/characters/portraits/crystal_gecko_portrait.jpg": (320, 427),
     "assets/characters/hero/heroine_pixel_4x4_64x80.png": (256, 320),
-    "assets/characters/npc/watcher_pixel_idle_64x80.png": (192, 304),
+    "assets/characters/npc/watcher_pixel_4x4_48x76.png": (192, 304),
     "assets/environment/coastal_keeper_house.png": (360, 291),
 }
 if all((ROOT / p).exists() for p in approved_assets):
