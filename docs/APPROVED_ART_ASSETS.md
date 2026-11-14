@@ -53,6 +53,7 @@ The latest user-provided references supersede earlier generated stand-ins for th
 - `moss_lumi_portrait.jpg`, `moatail_portrait.jpg`, `crystal_gecko_portrait.jpg`: high-resolution companion illustrations; dialogue/character-card portraits only. Never enlarge the small pixel idle sheets into portrait art.
 - `heroine_pixel_4x4_64x80.png`: the user's approved 4×4 directional pixel sprite sheet; rows are front, left, right, back, with four frames per row. This is the only preferred exploration sprite for the heroine.
 - `coastal_keeper_house.png`: the user's approved pixel-art coastal keeper house cutout.
+- `watcher_pixel_idle_64x80.png`: a compact pixel-world actor derived from the approved Watcher illustration; the high-resolution original remains the dialogue portrait.
 
 The bundle is distributed as `MistIsle_ApprovedArt_v3.zip`. Place it in the repository root; `RUN_WINDOWS.bat` and CMake extract it to the exact runtime paths. The Windows package must include `assets/characters/portraits/`, `assets/characters/hero/`, and `assets/environment/`.
 
