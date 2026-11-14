@@ -294,7 +294,7 @@ require("def build_overlay" in MAP_AUTOTILE and "DIRECTIONS" in MAP_AUTOTILE and
         "the four-direction shoreline autotile helper is present for clean Windows and ARM64 builds")
 require("if type_id==32:" in MAP_BUILD and "collision[by][xx]=0" in MAP_BUILD,
         "Tiled bridge objects open a real walkable span through the water collision grid")
-require("Collision follows the visible object's ground footprint" in MAP_BUILD and "compact rear wall of the cottage" in MAP_BUILD,
+require("Collision follows the visible object's ground footprint" in MAP_BUILD and "reduced rear-wall footprint" in MAP_BUILD,
         "Tiled buildings, tree trunks, walls, pillars and altar bases compile into gameplay collision")
 require("Pokémon-Center-style recovery service" in GAME and "SetDialogueAs(g,\"守望者\"" in GAME and "g->lumi.hp=g->lumi.maxHp" in GAME,
         "Watcher heals the whole party before the overlapping campfire interaction")
