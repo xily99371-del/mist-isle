@@ -64,8 +64,8 @@ def parse(path):
                 for by in range(max(0,top),min(H-1,bottom)+1):
                     for bx in range(max(0,left),min(W-1,right)+1):
                         collision[by][bx]=1
-            if 1000<=type_id<1003:
-                block_rect(cx,cy,cx,cy)                 # tree trunk
+            if 1000<=type_id<1003 or 600<=type_id<=603:
+                block_rect(cx,cy,cx,cy)                 # tree trunk; canopy remains walk-under
             elif type_id in (302,500,501):
                 block_rect(cx-1,cy-1,cx+1,cy-1)        # reduced rear-wall footprint; front approach remains walkable
             elif type_id==303:
@@ -86,8 +86,11 @@ def parse(path):
             elif type_id in (200,201,202,203,204,205,206,207,208,209,
                              217,218,219,220,221,222,224,225,227,228):
                 block_rect(cx,cy,cx,cy)                  # cliff bases, walls, fences and large edge structures
-            # 210-213 small stones and 229 low shrubs are decorative and never block movement.
-            # New generated map-art IDs (>=600) are visual-only by design.
+            # 210-213 small stones, 229 low shrubs, and all small generated flowers,
+            # grass, rocks and saplings remain decorative. Large generated trees above
+            # block only their single trunk cell; the grove supply shed blocks one base cell.
+            elif type_id==621:
+                block_rect(cx,cy,cx,cy)
             elif type_id==28:
                 block_rect(cx-1,cy,cx-1,cy)
                 block_rect(cx+1,cy,cx+1,cy)            # ruin arch supports
