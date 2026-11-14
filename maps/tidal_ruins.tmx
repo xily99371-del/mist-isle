@@ -54,6 +54,12 @@
   <object id="353" name="遗迹碎石" type="prop_212" x="812.00" y="476.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="354" name="石缝苔藓" type="prop_229" x="252.00" y="588.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="355" name="石缝苔藓" type="prop_229" x="812.00" y="532.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
+  <object id="640" name="西侧藤蔓残拱" type="prop_640" x="140.00" y="196.00"><properties><property name="scale" type="float" value="0.46"/></properties><point/></object>
+  <object id="642" name="断裂石柱" type="prop_642" x="140.00" y="364.00"><properties><property name="scale" type="float" value="0.48"/></properties><point/></object>
+  <object id="645" name="潮汐石台" type="prop_645" x="532.00" y="420.00"><properties><property name="scale" type="float" value="0.42"/></properties><point/></object>
+  <object id="648" name="海蚀巨石" type="prop_648" x="140.00" y="532.00"><properties><property name="scale" type="float" value="0.44"/></properties><point/></object>
+  <object id="650" name="浅潮池" type="prop_650" x="812.00" y="588.00"><properties><property name="scale" type="float" value="0.42"/></properties><point/></object>
+  <object id="653" name="古代符文碑" type="prop_653" x="868.00" y="140.00"><properties><property name="scale" type="float" value="0.40"/></properties><point/></object>
 </objectgroup>
  <objectgroup id="4" name="Markers" draworder="topdown">
   <object id="500" name="spawn" type="spawn" x="140.00" y="532.00"><point/></object>
