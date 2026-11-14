@@ -212,7 +212,7 @@ print("Extended grove prop atlas:", TILES/"environment_props.png")
 
 # Watcher world actor: a native pixel RPG sprite sheet, not a rasterized portrait.
 # Layout matches the traveller: 4 columns x 4 directions, 64x80 cells.
-WATCHER_OUT = ROOT / "assets/characters/npc/watcher_pixel_idle_64x80.png"
+WATCHER_OUT = ROOT / "assets/characters/npc/watcher_pixel_4x4_48x76.png"
 WATCHER_OUT.parent.mkdir(parents=True, exist_ok=True)
 WP = {
     "ink": (48, 39, 36, 255), "ink2": (74, 57, 47, 255),
