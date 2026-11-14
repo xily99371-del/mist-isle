@@ -204,7 +204,7 @@ require("living stone arch" in RENDER and "beacon tower" in RENDER and "Return r
         "grove, ruins, lighthouse and return portals have distinct grounded visual identities")
 require("finalCore" in RENDER and "DrawAreaProp(11,p,190,194)" in RENDER,
         "the Tidal Ruins keystone is a larger multi-ring final altar, distinct from ordinary shrines")
-require("DrawLighthouseGuardian(p,g->time,1.48f)" in RENDER and "static void DrawKeeper(Vector2 p,float t,float scale)" in RENDER and "TEX_WATCHER_PORTRAIT" in RENDER and "TEX_GUARDIAN_PORTRAIT" in RENDER,
+require("DrawLighthouseGuardian(p,g->time,1.48f,false)" in RENDER and "static void DrawKeeper(Vector2 p,float t,float scale)" in RENDER and "TEX_WATCHER_PORTRAIT" in RENDER and "TEX_GUARDIAN_PORTRAIT" in RENDER,
         "the lighthouse guardian and Watcher use authored world-scene portrait illustrations")
 require("DrawDialoguePortrait" in RENDER and "dialoguePortrait[page]" in RENDER and "DrawTexturePro(*art" in RENDER,
         "dialogue scenes render full-size portraits for the hero, Watcher and lighthouse guardian")
