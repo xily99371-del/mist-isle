@@ -402,8 +402,10 @@ require("g->weather==3" in RENDER and "g->weather==4" in RENDER and "DrawCloudPu
 LIGHTHOUSE_MAP_TEXT=(ROOT/"maps/lighthouse_courtyard.tmx").read_text(encoding="utf-8")
 require('type="prop_676"' in LIGHTHOUSE_MAP_TEXT and LIGHTHOUSE_MAP_TEXT.count('type="prop_676"')==2 and
         not any(f'type="tree{i}"' in LIGHTHOUSE_MAP_TEXT for i in range(3)) and
-        not any(f'type="prop_{i}"' in LIGHTHOUSE_MAP_TEXT for i in range(116,130)),
-        "Boss courtyard uses a unified generated ruin-art composition with two symmetrical blue braziers and no bright grove foliage")
+        not any(f'type="prop_{i}"' in LIGHTHOUSE_MAP_TEXT for i in range(116,130)) and
+        not any(f'type="prop_{i}"' in LIGHTHOUSE_MAP_TEXT for i in (29,30,34,200,201,202)) and
+        all(f'type="prop_{i}"' in LIGHTHOUSE_MAP_TEXT for i in (660,661,663,664,666,667,670,671,672,673,674)),
+        "Boss courtyard uses one coherent generated ruin-art family, mirrored blue braziers, unified stone floor and no mixed coastal/grove props")
 require("DrawCoastalCliffs(g,terrainKinds,minX,minY,maxX,maxY)" in RENDER and "AREA_GROUND" in GAME,
         "shoreline and all four ground layouts are sourced from Tiled maps")
 require("GetVisibleTileBounds" in RENDER and "screen.x<-180.0f" in RENDER,
