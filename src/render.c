@@ -447,7 +447,7 @@ static void DrawGecko(Vector2 p,float t) {
         DrawTexturePro(TEX_GECKO_ILLUSTRATION,src,dst,(Vector2){0,0},0,WHITE);
     }
 }
-static void DrawLighthouseGuardian(Vector2 p,float t,float scale) {
+static void DrawLighthouseGuardian(Vector2 p,float t,float scale,bool attacking) {
     float bob=sinf(t*1.35f)*1.6f*scale;
     float pulse=.5f+.5f*sinf(t*2.2f);
     DrawEllipse((int)p.x,(int)(p.y+7*scale),(int)(58*scale),(int)(15*scale),(Color){13,20,27,178});
@@ -455,8 +455,8 @@ static void DrawLighthouseGuardian(Vector2 p,float t,float scale) {
     DrawCircleLines((int)p.x,(int)(p.y-72*scale),(int)(54*scale),Fade((Color){255,190,91,255},.20f+.12f*pulse));
     DrawCircleLines((int)p.x,(int)(p.y-72*scale),(int)(67*scale),Fade((Color){113,204,211,255},.12f));
     if(TEX_GUARDIAN_APPROVED.id) {
-        int frame=0; // fixed frontal idle view; action row is reserved for attack-state animation
-        Rectangle src={(float)(frame*48),0,48,64};
+        int frame=attacking?((int)(t*8.0f)%4):0;
+        Rectangle src={(float)(frame*48),attacking?64.0f:0.0f,48,64};
         float w=164.0f*scale,h=218.0f*scale;
         Rectangle dst={p.x-w*.5f,p.y-h+bob,w,h};
         DrawTexturePro(TEX_GUARDIAN_APPROVED,src,dst,(Vector2){0,0},0,WHITE);
@@ -1136,11 +1136,25 @@ static void RenderDialogue(Game *g) {
     DrawUIText("按 E / Enter / 鼠标左键继续",886,650,14,(Color){112,124,103,255});
 }
 static void RenderBattle(Game *g) {
-    DrawRectangleGradientV(0,0,SW,SH,(Color){48,66,79,255},(Color){91,119,112,255});
+    Enemy *e=&g->enemies[g->battleEnemy];
+    bool isBoss=e->type==ENEMY_BOSS;
+    DrawRectangleGradientV(0,0,SW,SH,
+        isBoss?(Color){20,26,38,255}:(Color){48,66,79,255},
+        isBoss?(Color){67,53,54,255}:(Color){91,119,112,255});
     for(int i=0;i<8;i++) {
         int x=70+i*165;
-        DrawCircle(x,180+(i%3)*24,55,(Color){77,111,102,80});
-        DrawCircle(x+42,190+(i%2)*20,38,(Color){119,145,111,65});
+        Color haze=isBoss?(Color){175,105,64,48}:(Color){77,111,102,80};
+        DrawCircle(x,180+(i%3)*24,55,haze);
+        DrawCircle(x+42,190+(i%2)*20,38,isBoss?(Color){255,191,102,24}:(Color){119,145,111,65});
+    }
+    if(isBoss) {
+        // The guardian battle is a distinct, darker set-piece rather than a reskinned wild encounter.
+        DrawCircle(880,390,220,Fade((Color){255,166,74,255},.055f));
+        DrawCircle(880,390,150,Fade((Color){255,194,104,255},.07f));
+        for(int i=0;i<7;i++) {
+            float x=250.0f+i*210.0f;
+            DrawLineEx((Vector2){x,70},(Vector2){880.0f+(x-880.0f)*.16f,370},2.0f,Fade((Color){255,190,108,255},.10f));
+        }
     }
     DrawEllipse(640,435,470,118,(Color){35,55,57,100});
     DrawEllipse(640,422,420,92,(Color){120,150,128,255});
@@ -1148,10 +1162,9 @@ static void RenderBattle(Game *g) {
     DrawEllipse(395,455,78,20,(Color){37,54,56,130});
     DrawEllipse(880,455,100,25,(Color){37,54,56,130});
 
-    Enemy *e=&g->enemies[g->battleEnemy];
     const char *enemyName=e->type==ENEMY_MOTE?"林地微光兽":e->type==ENEMY_BOSS?"灯塔守卫":"遗迹守卫";
     Panel((Rectangle){28,22,350,112});
-    DrawUIText("遭遇战",50,34,25,C_INK);
+    DrawUIText(isBoss?"首领战":"遭遇战",50,34,25,isBoss?(Color){255,220,168,255}:C_INK);
     DrawUIText(TextFormat("第 %d 回合",g->battleRound),50,68,15,(Color){104,119,93,255});
     DrawUIText(TextFormat("旅人生命  %d / %d",(int)g->player.hp,(int)g->player.maxHp),50,94,15,C_INK);
     DrawRectangle(210,97,142,12,(Color){218,213,193,255});
@@ -1159,9 +1172,10 @@ static void RenderBattle(Game *g) {
 
     Panel((Rectangle){902,22,350,112});
     DrawUIText(enemyName,925,35,22,C_INK);
-    DrawUIText(TextFormat("生命  %d / %d",(int)fmaxf(0,e->hp),(int)e->maxHp),925,72,15,(Color){104,119,93,255});
+    DrawUIText(TextFormat("%s  %d / %d",isBoss?"核心耐久":"生命",(int)fmaxf(0,e->hp),(int)e->maxHp),925,72,15,isBoss?(Color){235,197,143,255}:(Color){104,119,93,255});
     DrawRectangle(925,99,295,13,(Color){218,213,193,255});
-    DrawRectangle(925,99,(int)(295.0f*fmaxf(0.0f,e->hp/e->maxHp)),13,C_PINK);
+    if(isBoss)DrawRectangleGradientH(925,99,(int)(295.0f*fmaxf(0.0f,e->hp/e->maxHp)),13,(Color){255,201,104,255},(Color){174,66,55,255});
+    else DrawRectangle(925,99,(int)(295.0f*fmaxf(0.0f,e->hp/e->maxHp)),13,C_PINK);
 
     if(g->selectedBuddy==0 && g->lumi.owned)DrawLumi((Vector2){395,430},g->time,0);
     else if(g->selectedBuddy==1 && g->splash.owned)DrawMoatail((Vector2){395,430},g->time);
@@ -1171,7 +1185,7 @@ static void RenderBattle(Game *g) {
     if(e->type==ENEMY_MOTE) {
         DrawMote((Vector2){880,385},g->time);
     } else if(e->type==ENEMY_BOSS) {
-        DrawLighthouseGuardian((Vector2){880,454},g->time,1.72f);
+        DrawLighthouseGuardian((Vector2){880,454},g->time,1.72f,g->battleTurn!=0);
         DrawCircleLines(880,395,126,Fade(C_GOLD,.35f));
         DrawCircleLines(880,395,142,Fade(C_BLUE,.22f));
     } else {
