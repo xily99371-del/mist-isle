@@ -329,7 +329,7 @@ static void DrawKeeper(Vector2 p,float t,float scale) {
     // Four-frame native pixel NPC sheet, never a pixelated portrait crop.
     if(TEX_WATCHER_PIXEL.id) {
         int frame=(int)(t*2.2f)%4;
-        Rectangle src={(float)(frame*48),0,48,76};
+        Rectangle src={(float)(frame*64),0,64,80};
         float w=44.0f*scale,h=70.0f*scale;
         Rectangle dst={roundf(p.x-w*.5f),roundf(footY-h),w,h};
         DrawTexturePro(TEX_WATCHER_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
@@ -393,17 +393,17 @@ static void DrawPlayer(Vector2 p,float t,bool moving,int facing) {
     if(TEX_HEROINE_PIXEL.id) {
         int frame=moving?((int)(t*8.0f)%4):0;
         Rectangle src={(float)(frame*64),(float)(facing*80),64,80};
-        Rectangle dst={roundf(p.x-21.0f),roundf(footY-66.0f-bob),42.0f,66.0f};
+        Rectangle dst={roundf(p.x-19.0f),roundf(footY-60.0f-bob),38.0f,60.0f};
         DrawTexturePro(TEX_HEROINE_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_HEROINE_APPROVED.id) {
         int frame=moving?((int)(t*10.0f)%8):0;
         Rectangle src={(float)(frame*24),(float)(facing*32),24,32};
-        Rectangle dst={roundf(p.x-21.0f),roundf(footY-56.0f-bob),42.0f,56.0f};
+        Rectangle dst={roundf(p.x-19.0f),roundf(footY-52.0f-bob),38.0f,52.0f};
         DrawTexturePro(TEX_HEROINE_APPROVED,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_HERO_WALK.id) {
         int frame=moving?((int)(t*8.0f)%4):0;
         Rectangle src={(float)(frame*32),(float)(facing*32),32,32};
-        Rectangle dst={roundf(p.x-21.0f),roundf(footY-44.0f-bob),42.0f,44.0f};
+        Rectangle dst={roundf(p.x-19.0f),roundf(footY-40.0f-bob),38.0f,40.0f};
         DrawTexturePro(TEX_HERO_WALK,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_HERO_PORTRAIT.id) {
         Rectangle src={0,0,(float)TEX_HERO_PORTRAIT.width,(float)TEX_HERO_PORTRAIT.height};
@@ -1513,8 +1513,8 @@ void RenderInit(void) {
         if(TEX_HEROINE_PIXEL.id)SetTextureFilter(TEX_HEROINE_PIXEL,TEXTURE_FILTER_POINT);
         else TraceLog(LOG_ERROR,"Mist Isle: approved heroine pixel sheet failed to load.");
     } else TraceLog(LOG_ERROR,"Mist Isle: approved heroine pixel sheet missing; refusing silent generated-hero fallback.");
-    if(FileExists("assets/characters/npc/watcher_pixel_4x4_48x76.png")) {
-        TEX_WATCHER_PIXEL=LoadTexture("assets/characters/npc/watcher_pixel_4x4_48x76.png");
+    if(FileExists("assets/characters/npc/watcher_pixel_4x4_64x80.png")) {
+        TEX_WATCHER_PIXEL=LoadTexture("assets/characters/npc/watcher_pixel_4x4_64x80.png");
         if(TEX_WATCHER_PIXEL.id) {
             SetTextureFilter(TEX_WATCHER_PIXEL,TEXTURE_FILTER_POINT);
             TraceLog(LOG_INFO,"Mist Isle: native pixel Watcher loaded (%dx%d).",TEX_WATCHER_PIXEL.width,TEX_WATCHER_PIXEL.height);
