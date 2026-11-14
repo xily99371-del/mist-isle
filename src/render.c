@@ -88,6 +88,11 @@ static void DrawPortrait(Texture2D tex, Vector2 p, float w, float h, float bob) 
     Rectangle dst={p.x-w*0.5f,p.y-h-bob,w,h};
     DrawTexturePro(tex,src,dst,(Vector2){0,0},0,WHITE);
 }
+static void DrawIllustratedPortrait(Texture2D tex,Rectangle dst) {
+    if(!tex.id)return;
+    Rectangle src={0,0,(float)tex.width,(float)tex.height};
+    DrawTexturePro(tex,src,dst,(Vector2){0,0},0,WHITE);
+}
 static Vector2 WorldToScreen(float x,float y) { return (Vector2){(x+0.5f)*TILE_SIZE,(y+0.5f)*TILE_SIZE}; }
 static unsigned int TileHash(int x,int y,int salt) {
     unsigned int n=(unsigned int)(x*374761393u+y*668265263u+salt*2246822519u);
@@ -1310,17 +1315,17 @@ static void RenderBattle(Game *g) {
         DrawRectangleRoundedLines(card,.12f,12,slot==g->battleChoice?(Color){201,157,82,255}:(Color){220,214,188,255});
         DrawUIText(TextFormat("%d",slot+1),(int)card.x+12,(int)card.y+10,15,(Color){127,145,111,255});
         if(id==0) {
-            DrawLumi((Vector2){card.x+43,card.y+78},g->time,0);
+            DrawIllustratedPortrait(TEX_LUMI_ILLUSTRATION,(Rectangle){card.x+15,card.y+14,48,78});
             DrawUIText("苔灯灵",(int)card.x+78,(int)card.y+22,17,C_INK);
             DrawUIText("星光治愈",(int)card.x+78,(int)card.y+50,14,(Color){104,119,93,255});
             DrawUIText("回复生命",(int)card.x+78,(int)card.y+73,13,(Color){104,119,93,255});
         } else if(id==1) {
-            DrawMoatail((Vector2){card.x+43,card.y+78},g->time);
+            DrawIllustratedPortrait(TEX_MOATAIL_ILLUSTRATION,(Rectangle){card.x+15,card.y+14,48,78});
             DrawUIText("沫尾兽",(int)card.x+78,(int)card.y+22,17,C_INK);
             DrawUIText("泡泡水流",(int)card.x+78,(int)card.y+50,14,(Color){104,119,93,255});
             DrawUIText("施加潮湿",(int)card.x+78,(int)card.y+73,13,(Color){104,119,93,255});
         } else if(id==2) {
-            DrawGecko((Vector2){card.x+43,card.y+78},g->time);
+            DrawIllustratedPortrait(TEX_GECKO_ILLUSTRATION,(Rectangle){card.x+15,card.y+14,48,78});
             DrawUIText("鸣晶蜥",(int)card.x+78,(int)card.y+22,17,C_INK);
             DrawUIText("晶弧放电",(int)card.x+78,(int)card.y+50,14,(Color){104,119,93,255});
             DrawUIText("克制潮湿",(int)card.x+78,(int)card.y+73,13,(Color){104,119,93,255});
@@ -1412,9 +1417,9 @@ static void RenderEnd(Game *g) {
     DrawUITextWrapped("伙伴们的光，照亮了回家的路。",34,265,214,16,3,(Color){195,211,210,255});
     DrawUIText("同行伙伴",SW-250,76,17,(Color){224,183,105,255});
     int row=0;
-    if(g->lumi.owned){DrawLumi((Vector2){SW-226,166},t,0);DrawUIText("苔灯灵",SW-184,152,17,(Color){244,239,217,255});row++;}
-    if(g->splash.owned){DrawMoatail((Vector2){SW-226,166+row*76},t);DrawUIText("沫尾兽",SW-184,152+row*76,17,(Color){244,239,217,255});row++;}
-    if(g->spark.owned){DrawGecko((Vector2){SW-226,166+row*76},t);DrawUIText("鸣晶蜥",SW-184,152+row*76,17,(Color){244,239,217,255});row++;}
+    if(g->lumi.owned){DrawIllustratedPortrait(TEX_LUMI_ILLUSTRATION,(Rectangle){SW-248,158,48,64});DrawUIText("苔灯灵",SW-192,174,17,(Color){244,239,217,255});row++;}
+    if(g->splash.owned){DrawIllustratedPortrait(TEX_MOATAIL_ILLUSTRATION,(Rectangle){SW-248,158+row*76,48,64});DrawUIText("沫尾兽",SW-192,174+row*76,17,(Color){244,239,217,255});row++;}
+    if(g->spark.owned){DrawIllustratedPortrait(TEX_GECKO_ILLUSTRATION,(Rectangle){SW-248,158+row*76,48,64});DrawUIText("鸣晶蜥",SW-192,174+row*76,17,(Color){244,239,217,255});row++;}
     DrawLineEx((Vector2){SW-250,420},(Vector2){SW-34,420},1.5f,Fade(C_GOLD,.42f));
     DrawUITextWrapped("一座灯塔，一段旅程。",SW-250,450,216,16,2,(Color){220,226,207,255});
     DrawUITextWrapped("新的故事还在岛屿深处等待。",SW-250,506,216,15,3,(Color){188,207,203,255});
