@@ -36,7 +36,7 @@
   <object id="309" name="补给营帐" type="prop_303" x="252.00" y="252.00"><properties><property name="scale" type="float" value="0.96"/></properties><point/></object>
   <object id="310" name="旧木码头" type="prop_20" x="196.00" y="532.00"><properties><property name="scale" type="float" value="1.00"/></properties><point/></object>
   <object id="311" name="停泊的小船" type="prop_21" x="140.00" y="588.00"><properties><property name="scale" type="float" value="0.92"/></properties><point/></object>
-  <object id="312" name="营火" type="campfire" x="420.00" y="476.00"><properties><property name="scale" type="float" value="1.00"/></properties><point/></object>
+  <object id="312" name="营火" type="campfire" x="420.00" y="532.00"><properties><property name="scale" type="float" value="1.00"/></properties><point/></object>
   <object id="314" name="庭院灌木" type="prop_27" x="812.00" y="476.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="315" name="海岸灌木" type="prop_27" x="812.00" y="532.00"><properties><property name="scale" type="float" value="0.72"/></properties><point/></object>
   <object id="316" name="prop_116" type="prop_116" x="308.00" y="308.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
