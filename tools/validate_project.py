@@ -35,7 +35,7 @@ def require(condition, message):
 assets = {
     "assets/characters/hero/hero_walk_4dir_64.png": (128, 128),
     "assets/characters/hero/heroine_approved_8x4.png": (192, 128),
-    "assets/characters/boss/lighthouse_guardian_4x2.png": (192, 128),
+    "assets/characters/boss/lighthouse_guardian_4x2.png": (256, 160),
     "assets/characters/png/heroine_portrait.png": (512, 640),
     "assets/characters/png/heroine_world_4x4_64x80.png": (256, 320),
     "assets/characters/png/watcher_portrait.png": (512, 640),
@@ -71,7 +71,7 @@ else:
 # checkouts, but its exact cell geometry is checked as soon as it is installed.
 for rel, expected in {
     "assets/characters/hero/heroine_approved_8x4.png": (192, 128),
-    "assets/characters/boss/lighthouse_guardian_4x2.png": (192, 128),
+    "assets/characters/boss/lighthouse_guardian_4x2.png": (256, 160),
 }.items():
     path = ROOT / rel
     if path.exists():
@@ -207,7 +207,7 @@ if all((ROOT / p).exists() for p in approved_assets):
             "coastal keeper house uses the user's approved pixel-art building")
     require("frame*64" in RENDER and "TEX_WATCHER_PIXEL" in RENDER and "watcher_pixel_4x4_64x80.png" in RENDER,
             "Watcher world actor is a portrait-matched native 64x80 pixel RPG sprite frame, not a portrait crop")
-    require('bossPixelPath="assets/characters/boss/lighthouse_guardian_4x2.png"' in RENDER and "TEX_GUARDIAN_APPROVED.width==192" in RENDER and
+    require('bossPixelPath="assets/characters/boss/lighthouse_guardian_4x2.png"' in RENDER and "TEX_GUARDIAN_APPROVED.width==256" in RENDER and
         "DrawLighthouseGuardian((Vector2){880,454},g->time,1.5f,g->battleTurn!=0)" in RENDER and
             "else if(TEX_GUARDIAN_PORTRAIT.id)" not in RENDER,
             "boss exploration and battle scenes use the dedicated pixel animation; anime portrait is dialogue-only")
