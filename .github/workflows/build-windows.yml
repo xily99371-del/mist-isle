@@ -18,6 +18,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Extract generated map art bundle when supplied
+        shell: pwsh
+        run: |
+          if (Test-Path MistIsle_MapArt_v8.zip) {
+            Expand-Archive -LiteralPath MistIsle_MapArt_v8.zip -DestinationPath . -Force
+          }
       - name: Extract approved art bundle when supplied
         shell: pwsh
         run: |
@@ -159,6 +165,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential cmake git pkg-config libx11-dev libxext-dev libxcursor-dev libxinerama-dev libxrandr-dev libxi-dev libasound2-dev libgl1-mesa-dev libwayland-dev libxkbcommon-dev wayland-protocols
+      - name: Extract generated map art bundle when supplied
+        run: |
+          if [ -f MistIsle_MapArt_v8.zip ]; then unzip -o MistIsle_MapArt_v8.zip -d .; fi
       - name: Extract approved art bundle when supplied
         run: |
           if [ -f MistIsle_ApprovedArt_v7.zip ]; then unzip -o MistIsle_ApprovedArt_v7.zip -d .; elif [ -f MistIsle_ApprovedArt_v6.zip ]; then unzip -o MistIsle_ApprovedArt_v6.zip -d .; elif [ -f MistIsle_ApprovedArt_v4.zip ]; then unzip -o MistIsle_ApprovedArt_v4.zip -d .; elif [ -f MistIsle_ApprovedArt_v3.zip ]; then unzip -o MistIsle_ApprovedArt_v3.zip -d .; fi
