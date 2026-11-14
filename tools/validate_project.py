@@ -287,13 +287,13 @@ require("PushRenderItem(items,&count,RENDER_KEEPER,0,(Vector2){7.0f,7.0f}" in RE
 
 require('name=="campfire": type_id=2000' in MAP_BUILD and "obj->type==2000" in RENDER,
         "the campfire remains an animated Tiled-authored scene object")
-require('name="营火" type="campfire" x="420.00" y="504.00"' in (ROOT / "maps/coastal_camp.tmx").read_text(encoding="utf-8"),
+require('name="营火" type="campfire" x="420.00" y="448.00"' in (ROOT / "maps/coastal_camp.tmx").read_text(encoding="utf-8"),
         "campfire is placed in the foreground below the Watcher")
 require('"进入辉光林地 · 萤火微光浮现"' in GAME,
         "Glowglade arrival explicitly announces its exclusive firefly weather")
 require("MISTISLE_FIREFLY_COUNT 120" in RENDER and "pulse*(nearLayer?.78f:.64f)*weatherAlpha" in RENDER,
         "firefly weather has bright multi-layer motes and a desktop-dense field")
-require("Fade((Color){7,17,36,255},.82f*weatherAlpha)" in RENDER,
+require("Fade((Color){14,27,47,255},.72f*weatherAlpha)" in RENDER,
         "night fog is a clearly visible layered atmosphere")
 require("Fade((Color){17,39,62,255},.34f*weatherAlpha)" in RENDER,
         "rain uses a stronger cool atmospheric grade")
@@ -411,7 +411,7 @@ require("g->weather=0; g->weatherFade=1.0f" in GAME and "g->weatherClock>38.0f" 
 require("if(area==AREA_GROVE) g->weather=2" in GAME and "else if(area==AREA_RUINS) g->weather=1" in GAME and "else if(area==AREA_LIGHTHOUSE) g->weather=4" in GAME and "g->area==AREA_GROVE || g->area==AREA_RUINS || g->area==AREA_LIGHTHOUSE" in GAME,
         "Grove, Ruins and Lighthouse lock to fireflies, rain and fog respectively; only the hub rotates clear, rain and overcast weather")
 require("g->weather==3" in RENDER and "g->weather==4" in RENDER and "DrawCloudPuff" in RENDER and
-        "Broad, low fog banks drift across the foreground" in RENDER and "(.22f+(i%3)*.035f)" in RENDER and
+        "Broad, low fog banks drift across the foreground" in RENDER and "(.19f+(i%3)*.030f)" in RENDER and
         "Fade((Color){7,17,36,255},.82f*weatherAlpha)" in RENDER,
         "overcast and optional night fog have distinct moving cloud visuals and clearly visible layered fog banks")
 LIGHTHOUSE_MAP_TEXT=(ROOT/"maps/lighthouse_courtyard.tmx").read_text(encoding="utf-8")
