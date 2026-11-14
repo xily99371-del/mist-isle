@@ -135,6 +135,12 @@ require("InRect" in GAME and "const float r=.37f" in GAME and "distance/0.08f" i
         "player collision checks authored prop footprints with dense substeps")
 require("RENDER_BOSS" in RENDER and "DrawLighthouseGuardian" in RENDER,
         "lighthouse guardian is visible in the world and battle scene")
+require("attacking?((int)(t*8.0f)%4):0" in RENDER and "attacking?64.0f:0.0f" in RENDER,
+        "lighthouse guardian uses its dedicated attack animation row during the enemy turn")
+require('DrawUIText(isBoss?"首领战":"遭遇战"' in RENDER and "DrawRectangleGradientH" in RENDER,
+        "boss encounter has a distinct dark arena, boss title and lantern-core health bar")
+require("AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,150)" in GAME,
+        "story lighthouse encounter creates the dedicated boss enemy type")
 require("DrawUITextWrapped" in RENDER and "UI_CODEPOINTS" in RENDER,
         "Chinese UI includes the complete source glyph set and wrapped objective text")
 require("endingTime" in GAME and "static void RenderEnd" in RENDER,
