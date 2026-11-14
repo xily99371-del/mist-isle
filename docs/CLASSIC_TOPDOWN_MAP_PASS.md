@@ -1,26 +1,17 @@
-# Classic top-down RPG map pass — visual revision 2
+# Classic top-down RPG map pass — revision 3
 
-This revision responds to in-game screenshots from the first playable pass.
+This pass responds to in-game scale and navigation feedback.
 
-## Problems identified from the screenshots
+## Character and prop scale
+- The heroine is rendered at 48×68 logical pixels, rather than occupying nearly two full tile heights. The 32×48 source sprite remains point-sampled; it is not enlarged to compensate for insufficient pixel detail.
+- Companion sprites use a 44×48 logical footprint with proportionally smaller ground shadows.
+- Large house and shelter props have been reduced so they read as landmarks without consuming the playable clearing.
+- Tree canopies and minor flora have been reduced. They frame routes and clearings instead of forming walls across them.
 
-- The grove felt empty because the forest canopy was confined to the map perimeter, with too few large foreground/midground trees.
-- Grove trails and clearings occupied too much yellow ground, creating disconnected blocky patches rather than a readable route.
-- The ruins used broad sand bands and large water patches that competed with the stone architecture.
-- Arches, columns and small environmental props were underscaled relative to the player and the map.
+## Route-first terrain layout
+- Coastal Camp now has one continuous sand path from the southern spawn into the campfire clearing, with deliberate branches to the western beach and eastern exits.
+- Glowglade Grove uses a single winding trail from the western entrance to the creek crossing, with a short spur to the eastern discovery area. The cottage and shelter sit in separate grass clearings.
+- Tidal Ruins uses a broad, connected stone processional, a central shrine court and two small reflecting pools. Sand is limited to intentional worn edges.
+- Lighthouse Courtyard uses a continuous central stone forecourt from the southern entrance to the lighthouse and guardian arena. Garden beds remain at the perimeter.
 
-## Revision
-
-- Narrowed the grove path to a single-tile winding trail. Exploration clearings remain grass rather than becoming large dirt rectangles.
-- Increased tree sprite display size from 100×112 to 138×152 logical pixels, and placed additional overlapping canopy groups around the route while keeping required paths and story points open.
-- Added a prominent luminous flowering tree, crystal landmark, and denser flower/mushroom clusters to give Glowglade Grove a distinct identity.
-- Removed bridge-dependent map composition. Current Chapter 1 maps do not place prop_32 bridges.
-- Rebuilt Tidal Ruins as a continuous stone floor with only small isolated reflecting pools and a few deliberate erosion marks. Sand is no longer used as a broad route or perimeter stripe.
-- Increased the display scale of arches, pillars, broken walls, docks, boats, tents, luminous trees and rune fountains. The map preview renderer uses the same display sizes as the runtime renderer.
-- Retained the existing map dimensions, tile size, story marker coordinates and save/progression model.
-
-## Validation
-
-All six required story markers remain reachable from the authored spawn on each map when checking tree blockers and water cells. The grove remains within the 64-object map compiler limit.
-
-The previous CI run validated the earlier map pass. The enlarged renderer and latest decorative placements require a fresh Windows and Raspberry Pi 5 build before they should be treated as release-ready.
+The four maps remain 18×12 cells at 56px per cell. Story markers, entrances, exits and interaction coordinates are retained. Tiled remains the source of truth; generated C map data must be rebuilt from the edited TMX files.

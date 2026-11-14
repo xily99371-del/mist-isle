@@ -350,15 +350,15 @@ static void DrawLumi(Vector2 p,float t,float bob) {
     (void)bob;
     const float footY=p.y+8.0f;
     float floatY=sinf(t*4.4f)*2.0f;
-    DrawEllipse((int)p.x,(int)footY,19,7,(Color){48,66,57,82});
+    DrawEllipse((int)p.x,(int)footY,12,4,(Color){48,66,57,82});
     if(TEX_LUMI_PIXEL.id) {
         int frame=(int)(t*5.2f)%4;
         Rectangle src={(float)(frame*32),0,32,32};
-        Rectangle dst={p.x-35.0f,footY-70.0f-floatY,70.0f,70.0f};
+        Rectangle dst={p.x-22.0f,footY-48.0f-floatY,44.0f,48.0f};
         DrawTexturePro(TEX_LUMI_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_LUMI_ILLUSTRATION.id) {
         Rectangle src={0,0,(float)TEX_LUMI_ILLUSTRATION.width,(float)TEX_LUMI_ILLUSTRATION.height};
-        Rectangle dst={p.x-35.0f,footY-70.0f-floatY,70.0f,70.0f};
+        Rectangle dst={p.x-22.0f,footY-48.0f-floatY,44.0f,48.0f};
         DrawTexturePro(TEX_LUMI_ILLUSTRATION,src,dst,(Vector2){0,0},0,WHITE);
     }
 }
@@ -370,21 +370,21 @@ static void DrawPlayer(Vector2 p,float t,bool moving,int facing) {
     if(TEX_HEROINE_WORLD.id) {
         int frame=moving?((int)(t*8.0f)%4):0;
         Rectangle src={(float)(frame*32),(float)(facing*48),32,48};
-        Rectangle dst={p.x-42.0f,footY-112.0f-bob,84.0f,112.0f};
+        Rectangle dst={p.x-24.0f,footY-68.0f-bob,48.0f,68.0f};
         DrawTexturePro(TEX_HEROINE_WORLD,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_HEROINE_APPROVED.id) {
         int frame=moving?((int)(t*10.0f)%8):0;
         Rectangle src={(float)(frame*24),(float)(facing*32),24,32};
-        Rectangle dst={p.x-40.0f,footY-108.0f-bob,80.0f,108.0f};
+        Rectangle dst={p.x-24.0f,footY-64.0f-bob,48.0f,64.0f};
         DrawTexturePro(TEX_HEROINE_APPROVED,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_HERO_WALK.id) {
         int frame=moving?((int)(t*8.0f)%4):0;
         Rectangle src={(float)(frame*32),(float)(facing*32),32,32};
-        Rectangle dst={p.x-33.0f,footY-66.0f-bob,66.0f,66.0f};
+        Rectangle dst={p.x-23.0f,footY-48.0f-bob,46.0f,48.0f};
         DrawTexturePro(TEX_HERO_WALK,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_HERO_PORTRAIT.id) {
         Rectangle src={0,0,(float)TEX_HERO_PORTRAIT.width,(float)TEX_HERO_PORTRAIT.height};
-        Rectangle dst={p.x-43.0f,footY-108.0f-bob,86.0f,108.0f};
+        Rectangle dst={p.x-24.0f,footY-64.0f-bob,48.0f,64.0f};
         DrawTexturePro(TEX_HERO_PORTRAIT,src,dst,(Vector2){0,0},0,WHITE);
     }
 }
@@ -457,15 +457,15 @@ static void PushRenderItem(RenderItem *items,int *count,RenderKind kind,int inde
 static void DrawMoatail(Vector2 p,float t) {
     const float footY=p.y+8.0f;
     float bob=sinf(t*3.8f+1.2f)*2.2f;
-    DrawEllipse((int)p.x,(int)footY,19,6,(Color){48,66,57,82});
+    DrawEllipse((int)p.x,(int)footY,12,4,(Color){48,66,57,82});
     if(TEX_MOATAIL_PIXEL.id) {
         int frame=(int)(t*4.4f+1.0f)%4;
         Rectangle src={(float)(frame*32),0,32,32};
-        Rectangle dst={p.x-35.0f,footY-70.0f-bob,70.0f,70.0f};
+        Rectangle dst={p.x-22.0f,footY-48.0f-floatY,44.0f,48.0f};
         DrawTexturePro(TEX_MOATAIL_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_MOATAIL_ILLUSTRATION.id) {
         Rectangle src={0,0,(float)TEX_MOATAIL_ILLUSTRATION.width,(float)TEX_MOATAIL_ILLUSTRATION.height};
-        Rectangle dst={p.x-35.0f,footY-70.0f-bob,70.0f,70.0f};
+        Rectangle dst={p.x-22.0f,footY-48.0f-floatY,44.0f,48.0f};
         DrawTexturePro(TEX_MOATAIL_ILLUSTRATION,src,dst,(Vector2){0,0},0,WHITE);
     }
 }
@@ -476,11 +476,11 @@ static void DrawGecko(Vector2 p,float t) {
     if(TEX_GECKO_PIXEL.id) {
         int frame=(int)(t*5.0f+2.0f)%4;
         Rectangle src={(float)(frame*32),0,32,32};
-        Rectangle dst={p.x-35.0f,footY-70.0f-bob,70.0f,70.0f};
+        Rectangle dst={p.x-22.0f,footY-48.0f-floatY,44.0f,48.0f};
         DrawTexturePro(TEX_GECKO_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_GECKO_ILLUSTRATION.id) {
         Rectangle src={0,0,(float)TEX_GECKO_ILLUSTRATION.width,(float)TEX_GECKO_ILLUSTRATION.height};
-        Rectangle dst={p.x-35.0f,footY-70.0f-bob,70.0f,70.0f};
+        Rectangle dst={p.x-22.0f,footY-48.0f-floatY,44.0f,48.0f};
         DrawTexturePro(TEX_GECKO_ILLUSTRATION,src,dst,(Vector2){0,0},0,WHITE);
     }
 }
@@ -876,7 +876,7 @@ static void RenderWorld(Game *g) {
         Vector2 screen=GetWorldToScreen2D(p,g->cam);
         if(screen.x<-180.0f||screen.x>SW+180.0f||screen.y<-180.0f||screen.y>SH+180.0f)continue;
         switch(it->kind) {
-            case RENDER_TREE: p.y+=8.0f; DrawEllipse((int)p.x,(int)p.y+7,(int)(34*it->scale),(int)(8*it->scale),(Color){35,67,49,72}); DrawEllipse((int)p.x,(int)p.y+5,(int)(25*it->scale),(int)(5*it->scale),(Color){71,111,70,48}); DrawFloraProp(8+(it->index%3),p,138*it->scale,152*it->scale); break;
+            case RENDER_TREE: p.y+=8.0f; DrawEllipse((int)p.x,(int)p.y+7,(int)(34*it->scale),(int)(8*it->scale),(Color){35,67,49,72}); DrawEllipse((int)p.x,(int)p.y+5,(int)(25*it->scale),(int)(5*it->scale),(Color){71,111,70,48}); DrawFloraProp(8+(it->index%3),p,108*it->scale,120*it->scale); break;
             case RENDER_PROP:
                 p.y+=7.0f;
                 if(it->index==4)DrawProp(4,p,72,68);
@@ -896,7 +896,7 @@ static void RenderWorld(Game *g) {
                 else if(it->index==33)DrawAreaPropTint(13,p,150*it->scale,190*it->scale,(Color){145,160,176,255});
                 else if(it->index==20)DrawAreaProp(0,p,164*it->scale,112*it->scale);
                 else if(it->index==21)DrawAreaProp(1,p,126*it->scale,112*it->scale);
-                else if(it->index==22)DrawAreaProp(2,p,220*it->scale,176*it->scale);
+                else if(it->index==22)DrawAreaProp(2,p,144*it->scale,116*it->scale);
                 else if(it->index==24)DrawAreaProp(4,p,150*it->scale,158*it->scale);
                 else if(it->index==25)DrawAreaProp(5,p,126*it->scale,126*it->scale);
                 else if(it->index==26)DrawAreaProp(6,p,102*it->scale,94*it->scale);
@@ -908,14 +908,14 @@ static void RenderWorld(Game *g) {
                 else if(it->index==32)DrawAreaProp(12,p,130*it->scale,100*it->scale);
                 else if(it->index==34)DrawAreaProp(14,p,110*it->scale,118*it->scale);
                 else if(it->index==35)DrawAreaProp(15,p,112*it->scale,116*it->scale);
-                else if(it->index>=20&&it->index<=35)DrawAreaProp(it->index-20,p,100*it->scale,108*it->scale);
-                else if(it->index>=100&&it->index<200)DrawFloraProp(it->index-100,p,100*it->scale,108*it->scale);
-                else if(it->index>=200&&it->index<300)DrawCliffProp(it->index-200,p,112*it->scale,112*it->scale);
-                else if(it->index==302)DrawStructureProp(2,p,330*it->scale,260*it->scale);
-                else if(it->index==303)DrawStructureProp(3,p,176*it->scale,154*it->scale);
+                else if(it->index>=20&&it->index<=35)DrawAreaProp(it->index-20,p,76*it->scale,82*it->scale);
+                else if(it->index>=100&&it->index<200)DrawFloraProp(it->index-100,p,72*it->scale,78*it->scale);
+                else if(it->index>=200&&it->index<300)DrawCliffProp(it->index-200,p,88*it->scale,88*it->scale);
+                else if(it->index==302)DrawStructureProp(2,p,196*it->scale,156*it->scale);
+                else if(it->index==303)DrawStructureProp(3,p,132*it->scale,116*it->scale);
                 else if(it->index==304)DrawStructureProp(4,p,166*it->scale,180*it->scale);
                 else if(it->index==305)DrawStructureProp(5,p,168*it->scale,152*it->scale);
-                else if(it->index>=300&&it->index<400)DrawStructureProp(it->index-300,p,150*it->scale,140*it->scale);
+                else if(it->index>=300&&it->index<400)DrawStructureProp(it->index-300,p,112*it->scale,104*it->scale);
                 else if(it->index>=400&&it->index<416)DrawOriginalProp(it->index-400,p,92*it->scale,92*it->scale);
                 else if(it->index==500&&TEX_GROVE_COTTAGE.id)DrawGroveCottage(p,it->scale);
                 else if(it->index>=500&&it->index<504)DrawKenneyBuilding(it->index-500,p,it->scale);
