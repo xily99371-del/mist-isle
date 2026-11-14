@@ -617,11 +617,19 @@ void GameUpdate(Game *g,float dt) {
                     }
                 }
             } else {
-                float incoming=e->type==ENEMY_BOSS?16.0f:10.0f;
-                if(g->enemySoaked)incoming*=0.8f;
-                g->player.hp-=incoming;Burst(g,WorldScreen(g->player.pos),C_PINK,10);
+                int bossPhase=e->hp<=50.0f?3:(e->hp<=100.0f?2:1);
+                bool bossHeavy=e->type==ENEMY_BOSS &&
+                    (bossPhase==3?(g->battleRound%2==0):(g->battleRound%3==0));
+                float incoming=e->type==ENEMY_BOSS?(bossPhase==3?20.0f:(bossPhase==2?17.0f:14.0f)):10.0f;
+                if(bossHeavy)incoming+=(bossPhase==3?12.0f:9.0f);
+                // Wetting the guardian's core interrupts its resonance and softens the next blow.
+                if(g->enemySoaked)incoming*=e->type==ENEMY_BOSS?0.65f:0.8f;
+                g->player.hp-=incoming;
+                Burst(g,WorldScreen(g->player.pos),bossHeavy?C_GOLD:C_PINK,bossHeavy?22:10);
                 g->battleTurn=0;g->battleRound++;
                 if(g->player.hp<=0){g->player.hp=55;g->scene=SCENE_PLAY;Toast(g,"伙伴把你带回营地，恢复了体力。");}
+                else if(bossHeavy)Toast(g,TextFormat("RESONANCE STRIKE! %.0f damage.",incoming));
+                else if(e->type==ENEMY_BOSS)Toast(g,TextFormat("LIGHTHOUSE GUARDIAN ATTACK! %.0f damage.",incoming));
                 else Toast(g,TextFormat("敌人发动攻击！受到 %.0f 点伤害。",incoming));
             }
         }
