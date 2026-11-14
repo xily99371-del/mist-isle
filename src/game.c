@@ -686,24 +686,45 @@ void GameUpdate(Game *g,float dt) {
         if(!b->owned) continue;
         Vector2 offset=BuddyFollowOffset(bi,p->facing);
         Vector2 target=Vector2Add(p->pos,offset);
-        // If the preferred slot is occupied by scenery, choose the nearest free
-        // neighbouring slot so companions do not remain pinned against a wall.
-        if(Solid(g,target)) {
-            const Vector2 alternatives[6]={
-                {offset.x,offset.y-.48f},{offset.x,offset.y+.48f},
-                {offset.x-.48f,offset.y},{offset.x+.48f,offset.y},
-                {offset.x*.55f,offset.y*.55f},{offset.x*1.35f,offset.y*1.35f}
-            };
-            float best=1.0e9f;
-            for(int ai=0;ai<6;ai++) {
-                Vector2 candidate=Vector2Add(p->pos,alternatives[ai]);
-                if(Solid(g,candidate))continue;
-                float score=Dist(candidate,b->pos);
-                if(score<best){best=score;target=candidate;}
+        // Pick an unoccupied walkable formation slot. If scenery blocks the
+        // preferred slot, search nearby offsets and then a wider recovery ring.
+        bool foundTarget=!Solid(g,target);
+        const Vector2 alternatives[6]={
+            {offset.x,offset.y-.48f},{offset.x,offset.y+.48f},
+            {offset.x-.48f,offset.y},{offset.x+.48f,offset.y},
+            {offset.x*.55f,offset.y*.55f},{offset.x*1.35f,offset.y*1.35f}
+        };
+        float best=1.0e9f;
+        for(int ai=0;ai<6;ai++) {
+            Vector2 candidate=Vector2Add(p->pos,alternatives[ai]);
+            if(Solid(g,candidate))continue;
+            bool occupied=false;
+            for(int oi=0;oi<3;oi++)if(oi!=bi&&followers[oi]->owned&&Dist(candidate,followers[oi]->pos)<.62f)occupied=true;
+            if(occupied)continue;
+            float score=Dist(candidate,b->pos);
+            if(!foundTarget||score<best){best=score;target=candidate;foundTarget=true;}
+        }
+        if(!foundTarget) {
+            for(int radius=1;radius<=3&&!foundTarget;radius++) {
+                for(int ai=0;ai<8;ai++) {
+                    float a=(float)ai*PI2/8.0f;
+                    Vector2 candidate=Vector2Add(p->pos,(Vector2){cosf(a)*(1.25f+.42f*radius),sinf(a)*(1.25f+.42f*radius)});
+                    if(Solid(g,candidate))continue;
+                    bool occupied=false;
+                    for(int oi=0;oi<3;oi++)if(oi!=bi&&followers[oi]->owned&&Dist(candidate,followers[oi]->pos)<.62f)occupied=true;
+                    if(!occupied){target=candidate;foundTarget=true;break;}
+                }
             }
         }
         Vector2 delta=Vector2Subtract(target,b->pos);
         float distance=Vector2Length(delta);
+        // Hard leash: a follower that falls far behind is repositioned instantly
+        // into its safe formation slot instead of visibly running across the map.
+        if(distance>6.0f&&foundTarget&&!Solid(g,target)) {
+            b->pos=target;
+            distance=0.0f;
+            delta=(Vector2){0,0};
+        }
         float speed=distance>3.8f?7.2f:4.4f+bi*.25f;
         if(distance>.015f) {
             Vector2 step=Vector2Scale(delta,fminf(1.0f,speed*dt/distance));
@@ -810,13 +831,13 @@ void GameUpdate(Game *g,float dt) {
         }
         // Water companion encounter.
         if(g->area==AREA_GROVE&&!g->splash.owned&&Dist(p->pos,(Vector2){14,7})<1.6f) {
-            if(p->berries>=1){p->berries--;AddBuddyFriend(g,1);GameSave(g);SetDialogue(g,"沫尾兽被果实吸引，开心地绕着你转了一圈。","它可以喷水清理蒸汽，也能让遗迹机关显形。","按 TAB 切换伙伴。");}
+            if(p->berries>=1){p->berries--;AddBuddyFriend(g,1);GameSave(g);SetDialogueAs(g,"沫尾兽","沫尾兽被果实吸引，开心地绕着你转了一圈。","它可以喷水清理蒸汽，也能让遗迹机关显形。","按 TAB 切换伙伴。");}
             else Toast(g,"沫尾兽想吃一颗岛屿果实。");
             return;
         }
         // Crystal companion encounter.
         if(g->area==AREA_RUINS&&!g->spark.owned&&Dist(p->pos,(Vector2){13,8})<1.6f) {
-            if(p->crystals>=1){p->crystals--;AddBuddyFriend(g,2);GameSave(g);SetDialogue(g,"鸣晶蜥吸收了星晶，背上的宝石依次亮起。","它能为古代装置供能，也能在战斗中放电。","按 TAB 切换伙伴。");}
+            if(p->crystals>=1){p->crystals--;AddBuddyFriend(g,2);GameSave(g);SetDialogueAs(g,"鸣晶蜥","鸣晶蜥吸收了星晶，背上的宝石依次亮起。","它能为古代装置供能，也能在战斗中放电。","按 TAB 切换伙伴。");}
             else Toast(g,"鸣晶蜥需要一枚星晶才愿意同行。");
             return;
         }
