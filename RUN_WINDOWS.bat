@@ -2,8 +2,12 @@
 setlocal
 cd /d "%~dp0"
 
-if exist "%~dp0MistIsle_ApprovedArt_v3.zip" (
-  echo Installing the approved high-resolution portraits, heroine sprite sheet and coastal house...
+if exist "%~dp0MistIsle_ApprovedArt_v4.zip" (
+  echo Installing full-resolution approved portraits and native pixel art...
+  powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_ApprovedArt_v4.zip' -DestinationPath '%~dp0' -Force"
+  if errorlevel 1 goto failed
+) else if exist "%~dp0MistIsle_ApprovedArt_v3.zip" (
+  echo Installing the previous approved art bundle...
   powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_ApprovedArt_v3.zip' -DestinationPath '%~dp0' -Force"
   if errorlevel 1 goto failed
 )
