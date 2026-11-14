@@ -58,7 +58,7 @@ jobs:
           )
           $missing = $required | Where-Object { -not (Test-Path $_) }
           if ($missing.Count -gt 0) {
-            Write-Warning ("Approved art bundle not installed: " + ($missing -join ', ') + ". The local playtest must install MistIsle_ApprovedArt_v3.zip before it can be considered visually validated.")
+            Write-Error ("Approved art bundle not installed: " + ($missing -join ', ') + ". The local playtest must install MistIsle_ApprovedArt_v3.zip before it can be considered visually validated.")
           }
       - name: Configure
         run: cmake -S . -B build -A x64
