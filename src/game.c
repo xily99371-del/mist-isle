@@ -575,7 +575,7 @@ void GameUpdate(Game *g,float dt) {
         if(IsKeyPressed(KEY_F7)) {
             if(g->area==AREA_GROVE) {
                 g->weather=2;
-                Toast(g,"辉光林地：萤火萦绕着林间。");
+                Toast(g,"辉光林地：萤火微光在林间浮现。");
             } else {
                 static const int roamingWeather[4]={0,1,3,4};
                 int current=-1;
