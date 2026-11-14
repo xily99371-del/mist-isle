@@ -195,7 +195,18 @@ static void BuildAreaWorld(Game *g,Area area) {
     }
 }
 static void SwitchArea(Game *g,Area area) {
+    Area previousArea=g->area;
     BuildAreaWorld(g,area);
+    /* Firefly weather belongs exclusively to Glowglade Grove. */
+    if(area==AREA_GROVE) {
+        g->weather=2;
+        g->weatherClock=0.0f;
+        g->weatherFade=0.0f;
+    } else if(previousArea==AREA_GROVE) {
+        g->weather=0;
+        g->weatherClock=0.0f;
+        g->weatherFade=0.0f;
+    }
     g->player.pos=(area==AREA_CAMP)?g->world.returnPoint:g->world.camp;
     for(int i=0;i<g->world.pickupCount && i<MAX_PICKUPS;i++)g->world.pickups[i].taken=g->areaPickupTaken[(int)area][i]!=0;
     g->enemyCount=0;
@@ -235,8 +246,8 @@ static bool SolidPoint(Game *g,Vector2 p) {
 }
 static bool Solid(Game *g,Vector2 p) {
     // Eight perimeter samples approximate the full body footprint and prevent diagonal corner clipping.
-    const float r=.37f;
-    const float d=.262f;
+    const float r=.31f;
+    const float d=.219f;
     return SolidPoint(g,p) ||
         SolidPoint(g,(Vector2){p.x-r,p.y}) ||
         SolidPoint(g,(Vector2){p.x+r,p.y}) ||
@@ -268,21 +279,35 @@ static void AddEnemy(Game *g,EnemyType t,float x,float y,float hp) {
 void GameReset(Game *g,int seed);
 void GameSave(Game *g) {
     SaveData s={0};
-    s.magic=0x4D495354; s.version=4; s.seed=g->lastSeed; s.area=(int)g->area;
+    s.magic=0x4D495354; s.version=5; s.seed=g->lastSeed; s.area=(int)g->area;
     s.px=g->player.pos.x; s.py=g->player.pos.y; s.hp=g->player.hp;
     s.berries=g->player.berries; s.shells=g->player.shells; s.crystals=g->player.crystals;
     s.lumi=g->lumi.owned; s.splash=g->splash.owned; s.spark=g->spark.owned; s.selected=g->selectedBuddy;
     s.shrineSolved=g->shrineSolved; s.bossDefeated=g->bossDefeated;
     s.fireflyDiscovered=g->fireflyDiscovered; s.leaflingFed=g->leaflingFed; s.groveMoteDefeated=g->groveMoteDefeated;
     s.lumiLevel=g->lumi.level;s.lumiXp=g->lumi.xp;s.splashLevel=g->splash.level;s.splashXp=g->splash.xp;s.sparkLevel=g->spark.level;s.sparkXp=g->spark.xp;
+    s.lumiHp=g->lumi.hp;s.splashHp=g->splash.hp;s.sparkHp=g->spark.hp;
     for(int a=0;a<4;a++)for(int i=0;i<MAX_PICKUPS;i++)s.pickupTaken[a][i]=g->areaPickupTaken[a][i];
     if(!SaveFileData("mist_isle_save.dat",&s,(int)sizeof(s)))Toast(g,"保存失败：无法写入存档文件。");
 }
 bool GameLoad(Game *g) {
     int size=0; unsigned char *raw=LoadFileData("mist_isle_save.dat",&size);
-    if(!raw || size!=(int)sizeof(SaveData)){if(raw)UnloadFileData(raw);Toast(g,"没有找到有效存档。");return false;}
-    SaveData s; memcpy(&s,raw,sizeof(s)); UnloadFileData(raw);
-    if(s.magic!=0x4D495354 || s.version!=4){Toast(g,"存档版本不兼容。");return false;}
+    if(!raw){Toast(g,"没有找到有效存档。");return false;}
+    SaveData s={0};
+    if(size==(int)sizeof(SaveData)) memcpy(&s,raw,sizeof(s));
+    else if(size==(int)sizeof(SaveDataV4)) {
+        SaveDataV4 old;memcpy(&old,raw,sizeof(old));
+        s.magic=old.magic;s.version=old.version;s.seed=old.seed;s.area=old.area;
+        s.px=old.px;s.py=old.py;s.hp=old.hp;s.berries=old.berries;s.shells=old.shells;s.crystals=old.crystals;
+        s.lumi=old.lumi;s.splash=old.splash;s.spark=old.spark;s.selected=old.selected;
+        s.shrineSolved=old.shrineSolved;s.bossDefeated=old.bossDefeated;s.fireflyDiscovered=old.fireflyDiscovered;
+        s.leaflingFed=old.leaflingFed;s.groveMoteDefeated=old.groveMoteDefeated;
+        s.lumiLevel=old.lumiLevel;s.lumiXp=old.lumiXp;s.splashLevel=old.splashLevel;s.splashXp=old.splashXp;s.sparkLevel=old.sparkLevel;s.sparkXp=old.sparkXp;
+        memcpy(s.pickupTaken,old.pickupTaken,sizeof(s.pickupTaken));
+        s.lumiHp=s.splashHp=s.sparkHp=100.0f;
+    } else {UnloadFileData(raw);Toast(g,"存档文件长度不正确。");return false;}
+    UnloadFileData(raw);
+    if(s.magic!=0x4D495354 || (s.version!=4&&s.version!=5)){Toast(g,"存档版本不兼容。");return false;}
     GameReset(g,s.seed);
     SwitchArea(g,(Area)Clamp(s.area,AREA_CAMP,AREA_LIGHTHOUSE));
     g->scene=SCENE_PLAY; g->player.pos=(Vector2){s.px,s.py};SnapCameraToPlayer(g);g->player.hp=fmaxf(1.0f,fminf(100.0f,s.hp));
@@ -291,6 +316,7 @@ bool GameLoad(Game *g) {
     g->shrineSolved=s.shrineSolved!=0;g->bossDefeated=s.bossDefeated!=0;
     g->fireflyDiscovered=s.fireflyDiscovered!=0;g->leaflingFed=s.leaflingFed!=0;g->groveMoteDefeated=s.groveMoteDefeated!=0;
     g->lumi.level=s.lumiLevel;g->lumi.xp=s.lumiXp;g->splash.level=s.splashLevel;g->splash.xp=s.splashXp;g->spark.level=s.sparkLevel;g->spark.xp=s.sparkXp;
+    g->lumi.hp=fmaxf(0,fminf(g->lumi.maxHp,s.lumiHp));g->splash.hp=fmaxf(0,fminf(g->splash.maxHp,s.splashHp));g->spark.hp=fmaxf(0,fminf(g->spark.maxHp,s.sparkHp));
     for(int a=0;a<4;a++)for(int i=0;i<MAX_PICKUPS;i++)g->areaPickupTaken[a][i]=s.pickupTaken[a][i];
     for(int i=0;i<g->world.pickupCount && i<MAX_PICKUPS;i++)g->world.pickups[i].taken=g->areaPickupTaken[(int)g->area][i]!=0;
     if(g->lumi.owned)g->lumi.pos=Vector2Add(g->player.pos,BuddyFollowOffset(0,g->player.facing));
@@ -302,11 +328,11 @@ void GameReset(Game *g,int seed) {
     memset(g,0,sizeof(*g)); g->scene=SCENE_TITLE; g->area=AREA_CAMP;
     g->lastSeed=seed; memset(&g->world,0,sizeof(g->world));
     g->player.pos=(Vector2){4,13}; g->player.hp=g->player.maxHp=100; g->player.stamina=100;
-    g->lumi=(Buddy){.pos={2.3f,12.4f},.owned=false,.level=1};
-    g->splash=(Buddy){.pos={8,7},.owned=false,.level=1};
-    g->spark=(Buddy){.pos={15,8},.owned=false,.level=1};
+    g->lumi=(Buddy){.pos={2.3f,12.4f},.hp=100,.maxHp=100,.owned=false,.level=1};
+    g->splash=(Buddy){.pos={8,7},.hp=100,.maxHp=100,.owned=false,.level=1};
+    g->spark=(Buddy){.pos={15,8},.hp=100,.maxHp=100,.owned=false,.level=1};
     g->cam.offset=(Vector2){SW/2.0f,SH/2.0f}; g->cam.zoom=1.10f;
-    g->fireflyPhase=0; g->dayClock=0.28f; g->weatherClock=0; g->weather=0; g->journalOpen=false; g->inventoryOpen=false; g->mapOpen=false;
+    g->fireflyPhase=0; g->dayClock=0.02f; g->weatherClock=0; g->weather=0; g->weatherFade=1.0f; g->journalOpen=false; g->inventoryOpen=false; g->mapOpen=false;
     g->fireflyDiscovered=false; g->leaflingFed=false; g->groveMoteDefeated=false; g->enemySoaked=false; g->battleRound=0; g->defeatedGuards=0;
 }
 void GameStart(Game *g) {
@@ -316,9 +342,9 @@ void GameStart(Game *g) {
         "靠近它，按 E 互动。WASD 移动，SHIFT 冲刺。");
 }
 static void AddBuddyFriend(Game *g,int id) {
-    if(id==0){g->lumi.owned=true;g->lumi.pos=Vector2Add(g->player.pos,BuddyFollowOffset(0,g->player.facing));}
-    if(id==1){g->splash.owned=true;g->splash.pos=Vector2Add(g->player.pos,BuddyFollowOffset(1,g->player.facing));}
-    if(id==2){g->spark.owned=true;g->spark.pos=Vector2Add(g->player.pos,BuddyFollowOffset(2,g->player.facing));}
+    if(id==0){g->lumi.owned=true;g->lumi.hp=g->lumi.maxHp;g->lumi.pos=Vector2Add(g->player.pos,BuddyFollowOffset(0,g->player.facing));}
+    if(id==1){g->splash.owned=true;g->splash.hp=g->splash.maxHp;g->splash.pos=Vector2Add(g->player.pos,BuddyFollowOffset(1,g->player.facing));}
+    if(id==2){g->spark.owned=true;g->spark.hp=g->spark.maxHp;g->spark.pos=Vector2Add(g->player.pos,BuddyFollowOffset(2,g->player.facing));}
 }
 Buddy *CurrentBuddy(Game *g) {
     if(g->selectedBuddy==0 && g->lumi.owned)return &g->lumi;
@@ -352,7 +378,7 @@ static int OwnedBuddyIdAt(Game *g,int slot) {
     int count=0;
     for(int id=0;id<3;id++) {
         Buddy *b=BuddyById(g,id);
-        if(b&&b->owned) {
+        if(b&&b->owned&&b->hp>0.0f) {
             if(count==slot)return id;
             count++;
         }
@@ -360,7 +386,7 @@ static int OwnedBuddyIdAt(Game *g,int slot) {
     return -1;
 }
 static int OwnedBuddyCount(Game *g) {
-    return (g->lumi.owned?1:0)+(g->splash.owned?1:0)+(g->spark.owned?1:0);
+    return (g->lumi.owned&&g->lumi.hp>0?1:0)+(g->splash.owned&&g->splash.hp>0?1:0)+(g->spark.owned&&g->spark.hp>0?1:0);
 }
 static bool FindNearestPickup(Game *g,int kindA,int kindB,Vector2 *out) {
     float best=1.0e9f;
@@ -514,8 +540,29 @@ void GameUpdate(Game *g,float dt) {
     if(g->toastTimer>0)g->toastTimer-=dt;
     g->fireflyPhase+=dt;
     g->dayClock=fmodf(g->dayClock+dt/420.0f,1.0f);
-    g->weatherClock+=dt;
-    if(g->weatherClock>95.0f){g->weatherClock=0;g->weather=GetRandomValue(0,3);Toast(g,g->weather==0?"海风轻轻吹过。":g->weather==1?"林间飘起了细雨。":g->weather==2?"萤火虫开始活跃。":"云层散开，阳光洒进林地。");}
+    g->weatherFade=fminf(1.0f,g->weatherFade+dt*0.32f);
+    if(g->area==AREA_GROVE) {
+        /* The grove always carries its signature firefly ambience. */
+        if(g->weather!=2) {
+            g->weather=2;
+            g->weatherClock=0.0f;
+            g->weatherFade=0.0f;
+        }
+    } else {
+        g->weatherClock+=dt;
+        if(g->weather==2)g->weather=0; /* Never leak grove-only fireflies into other maps. */
+        if(g->weatherClock>38.0f) {
+            static const int roamingWeather[4]={0,1,3,4};
+            int pick=GetRandomValue(0,3);
+            int nextWeather=roamingWeather[pick];
+            if(nextWeather==g->weather)nextWeather=roamingWeather[(pick+1+GetRandomValue(0,2))%4];
+            g->weather=nextWeather;
+            g->weatherClock=0.0f;
+            g->weatherFade=0.0f;
+            const char *weatherNotice[5]={"天气转晴，暖光穿过云层。","林间阵雨聚拢，风势渐强。","萤火微光在林间浮现。","云层压低，海风转冷。","夜雾漫过岛屿，灯火逐渐显现。"};
+            Toast(g,weatherNotice[g->weather]);
+        }
+    }
     if(g->scene==SCENE_PLAY) {
         if(IsKeyPressed(KEY_O))g->objectiveCollapsed=!g->objectiveCollapsed;
         if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -526,8 +573,20 @@ void GameUpdate(Game *g,float dt) {
             if(CheckCollisionPointRec(mouse,objectiveToggle))g->objectiveCollapsed=!g->objectiveCollapsed;
         }
         if(IsKeyPressed(KEY_F7)) {
-            g->weather=(g->weather+1)%4;
-            Toast(g,g->weather==0?"天气：海风晴朗":g->weather==1?"天气：持续降雨":g->weather==2?"天气：萤火微光":"天气：云开见日");
+            if(g->area==AREA_GROVE) {
+                g->weather=2;
+                Toast(g,"辉光林地：萤火微光在林间浮现。");
+            } else {
+                static const int roamingWeather[4]={0,1,3,4};
+                int current=-1;
+                for(int i=0;i<4;i++)if(roamingWeather[i]==g->weather)current=i;
+                int next=roamingWeather[(current+1)%4];
+                g->weather=next;
+                g->weatherClock=0.0f;
+                g->weatherFade=0.0f;
+                const char *weatherNotice[5]={"天气：晴朗","天气：阵雨","天气：萤火","天气：阴云","天气：夜雾"};
+                Toast(g,weatherNotice[g->weather]);
+            }
         }
     }
     if(g->journalOpen || g->inventoryOpen || g->mapOpen) {
@@ -643,10 +702,14 @@ void GameUpdate(Game *g,float dt) {
                 bool damped=g->enemySoaked;
                 if(damped)incoming*=e->type==ENEMY_BOSS?0.65f:0.8f;
                 g->enemySoaked=false; // Wetness interrupts one incoming attack, then dissipates.
-                g->player.hp-=incoming;
-                Burst(g,WorldScreen(g->player.pos),bossHeavy?C_GOLD:C_PINK,bossHeavy?22:10);
+                Buddy *defender=BuddyById(g,g->selectedBuddy);
+                bool buddyTookHit=defender&&defender->owned&&defender->hp>0.0f;
+                if(buddyTookHit)defender->hp=fmaxf(0.0f,defender->hp-incoming);
+                else g->player.hp-=incoming;
+                Burst(g,WorldScreen(buddyTookHit?defender->pos:g->player.pos),bossHeavy?C_GOLD:C_PINK,bossHeavy?22:10);
                 g->battleTurn=0;g->battleRound++;
-                if(g->player.hp<=0){g->player.hp=55;g->scene=SCENE_PLAY;Toast(g,"伙伴把你带回营地，恢复了体力。");}
+                if(!buddyTookHit&&g->player.hp<=0){g->player.hp=55;g->scene=SCENE_PLAY;Toast(g,"伙伴把你带回营地，恢复了体力。");}
+                else if(buddyTookHit&&defender->hp<=0)Toast(g,TextFormat("%s体力耗尽！回到守望者处可以恢复。",g->selectedBuddy==0?"苔灯灵":g->selectedBuddy==1?"沫尾兽":"鸣晶蜥"));
                 else if(damped&&e->type==ENEMY_BOSS)Toast(g,TextFormat("CORE DISRUPTED! DAMAGE REDUCED TO %.0f.",incoming));
                 else if(bossHeavy)Toast(g,TextFormat("RESONANCE STRIKE! %.0f damage.",incoming));
                 else if(e->type==ENEMY_BOSS)Toast(g,TextFormat("LIGHTHOUSE GUARDIAN ATTACK! %.0f damage.",incoming));
@@ -686,24 +749,45 @@ void GameUpdate(Game *g,float dt) {
         if(!b->owned) continue;
         Vector2 offset=BuddyFollowOffset(bi,p->facing);
         Vector2 target=Vector2Add(p->pos,offset);
-        // If the preferred slot is occupied by scenery, choose the nearest free
-        // neighbouring slot so companions do not remain pinned against a wall.
-        if(Solid(g,target)) {
-            const Vector2 alternatives[6]={
-                {offset.x,offset.y-.48f},{offset.x,offset.y+.48f},
-                {offset.x-.48f,offset.y},{offset.x+.48f,offset.y},
-                {offset.x*.55f,offset.y*.55f},{offset.x*1.35f,offset.y*1.35f}
-            };
-            float best=1.0e9f;
-            for(int ai=0;ai<6;ai++) {
-                Vector2 candidate=Vector2Add(p->pos,alternatives[ai]);
-                if(Solid(g,candidate))continue;
-                float score=Dist(candidate,b->pos);
-                if(score<best){best=score;target=candidate;}
+        // Pick an unoccupied walkable formation slot. If scenery blocks the
+        // preferred slot, search nearby offsets and then a wider recovery ring.
+        bool foundTarget=!Solid(g,target);
+        const Vector2 alternatives[6]={
+            {offset.x,offset.y-.48f},{offset.x,offset.y+.48f},
+            {offset.x-.48f,offset.y},{offset.x+.48f,offset.y},
+            {offset.x*.55f,offset.y*.55f},{offset.x*1.35f,offset.y*1.35f}
+        };
+        float best=foundTarget?Dist(target,b->pos):1.0e9f;
+        for(int ai=0;ai<6;ai++) {
+            Vector2 candidate=Vector2Add(p->pos,alternatives[ai]);
+            if(Solid(g,candidate))continue;
+            bool occupied=false;
+            for(int oi=0;oi<3;oi++)if(oi!=bi&&followers[oi]->owned&&Dist(candidate,followers[oi]->pos)<.62f)occupied=true;
+            if(occupied)continue;
+            float score=Dist(candidate,b->pos);
+            if(!foundTarget||score<best){best=score;target=candidate;foundTarget=true;}
+        }
+        if(!foundTarget) {
+            for(int radius=1;radius<=3&&!foundTarget;radius++) {
+                for(int ai=0;ai<8;ai++) {
+                    float a=(float)ai*PI2/8.0f;
+                    Vector2 candidate=Vector2Add(p->pos,(Vector2){cosf(a)*(1.25f+.42f*radius),sinf(a)*(1.25f+.42f*radius)});
+                    if(Solid(g,candidate))continue;
+                    bool occupied=false;
+                    for(int oi=0;oi<3;oi++)if(oi!=bi&&followers[oi]->owned&&Dist(candidate,followers[oi]->pos)<.62f)occupied=true;
+                    if(!occupied){target=candidate;foundTarget=true;break;}
+                }
             }
         }
         Vector2 delta=Vector2Subtract(target,b->pos);
         float distance=Vector2Length(delta);
+        // Hard leash: a follower that falls far behind is repositioned instantly
+        // into its safe formation slot instead of visibly running across the map.
+        if(distance>6.0f&&foundTarget&&!Solid(g,target)) {
+            b->pos=target;
+            distance=0.0f;
+            delta=(Vector2){0,0};
+        }
         float speed=distance>3.8f?7.2f:4.4f+bi*.25f;
         if(distance>.015f) {
             Vector2 step=Vector2Scale(delta,fminf(1.0f,speed*dt/distance));
@@ -746,7 +830,7 @@ void GameUpdate(Game *g,float dt) {
             return;
         }
         if(g->area==AREA_CAMP) {
-            if(Dist(p->pos,g->world.groveGate)<1.4f){SwitchArea(g,AREA_GROVE);GameSave(g);Toast(g,"进入辉光林地");return;}
+            if(Dist(p->pos,g->world.groveGate)<1.4f){SwitchArea(g,AREA_GROVE);GameSave(g);Toast(g,"进入辉光林地 · 萤火微光浮现");return;}
             if(Dist(p->pos,g->world.ruinGate)<1.4f){
                 if(!(g->lumi.owned&&g->splash.owned)){Toast(g,"先让苔灯灵和沫尾兽加入队伍，便可进入遗迹寻找鸣晶蜥。");return;}
                 SwitchArea(g,AREA_RUINS);GameSave(g);Toast(g,"进入潮汐遗迹");return;
@@ -767,6 +851,18 @@ void GameUpdate(Game *g,float dt) {
             SetDialogue(g,"苔灯灵抬起头，灯囊重新亮了起来。",
                 "它决定跟着你。靠近暗处时，它会照亮隐藏的纹路。",
                 "按 TAB 可以切换已获得的伙伴。");
+            return;
+        }
+        // The Watcher runs the island's Pokémon-Center-style recovery service.
+        // This check precedes the campfire and pickup checks because their ranges overlap.
+        if(g->area==AREA_CAMP&&Dist(p->pos,(Vector2){7.0f,7.0f})<2.0f) {
+            p->hp=p->maxHp;
+            if(g->lumi.owned)g->lumi.hp=g->lumi.maxHp;
+            if(g->splash.owned)g->splash.hp=g->splash.maxHp;
+            if(g->spark.owned)g->spark.hp=g->spark.maxHp;
+            GameSave(g);
+            SetDialogueAs(g,"守望者","欢迎回来。让我检查一下大家的状态。","伙伴们已经恢复到最佳状态，随时可以继续探索。","旅途累了就回来休息，我会一直守着营地。");
+            Burst(g,WorldScreen((Vector2){7.0f,7.0f}),C_GREEN,16);
             return;
         }
         // Pickups.
@@ -810,21 +906,14 @@ void GameUpdate(Game *g,float dt) {
         }
         // Water companion encounter.
         if(g->area==AREA_GROVE&&!g->splash.owned&&Dist(p->pos,(Vector2){14,7})<1.6f) {
-            if(p->berries>=1){p->berries--;AddBuddyFriend(g,1);GameSave(g);SetDialogue(g,"沫尾兽被果实吸引，开心地绕着你转了一圈。","它可以喷水清理蒸汽，也能让遗迹机关显形。","按 TAB 切换伙伴。");}
+            if(p->berries>=1){p->berries--;AddBuddyFriend(g,1);GameSave(g);SetDialogueAs(g,"沫尾兽","沫尾兽被果实吸引，开心地绕着你转了一圈。","它可以喷水清理蒸汽，也能让遗迹机关显形。","按 TAB 切换伙伴。");}
             else Toast(g,"沫尾兽想吃一颗岛屿果实。");
             return;
         }
         // Crystal companion encounter.
         if(g->area==AREA_RUINS&&!g->spark.owned&&Dist(p->pos,(Vector2){13,8})<1.6f) {
-            if(p->crystals>=1){p->crystals--;AddBuddyFriend(g,2);GameSave(g);SetDialogue(g,"鸣晶蜥吸收了星晶，背上的宝石依次亮起。","它能为古代装置供能，也能在战斗中放电。","按 TAB 切换伙伴。");}
+            if(p->crystals>=1){p->crystals--;AddBuddyFriend(g,2);GameSave(g);SetDialogueAs(g,"鸣晶蜥","鸣晶蜥吸收了星晶，背上的宝石依次亮起。","它能为古代装置供能，也能在战斗中放电。","按 TAB 切换伙伴。");}
             else Toast(g,"鸣晶蜥需要一枚星晶才愿意同行。");
-            return;
-        }
-        // Rest beside the campfire after rescuing the first companion.
-        if(g->area==AREA_CAMP&&g->lumi.owned && Dist(p->pos,(Vector2){6.8f,6.7f})<1.25f) {
-            p->hp=fminf(p->maxHp,p->hp+22.0f);
-            Toast(g,"在营火旁休息了一会儿，恢复了生命。");
-            Burst(g,WorldScreen((Vector2){6.1f,8.5f}),C_GOLD,10);
             return;
         }
         // Ruin puzzle.
@@ -832,7 +921,7 @@ void GameUpdate(Game *g,float dt) {
             if(g->lumi.owned&&g->splash.owned&&g->spark.owned&&p->shells>=1) {
                 g->shrineSolved=true;p->shells--;GameSave(g);
                 Burst(g,WorldScreen(g->world.shrine),C_GOLD,40);
-                SetDialogue(g,"三种伙伴的力量在遗迹中央交汇。","水纹显现了线路，星光照亮符文，晶弧重新接通能源。","灯塔庭院的封印解除了。");
+                SetDialogueAs(g,"旅人","三种伙伴的力量在遗迹中央交汇。","水纹显现了线路，星光照亮符文，晶弧重新接通能源。","灯塔庭院的封印解除了。");
             } else Toast(g,"遗迹需要三位伙伴协力，并带来一枚潮汐贝壳。");
             return;
         }

@@ -2,6 +2,36 @@
 setlocal
 cd /d "%~dp0"
 
+if exist "%~dp0MistIsle_ApprovedArt_v7.zip" (
+  echo Installing final Watcher and repaired Lighthouse Guardian pixel sheets...
+  powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_ApprovedArt_v7.zip' -DestinationPath '%~dp0' -Force"
+  if errorlevel 1 goto failed
+)
+if exist "%~dp0MistIsle_MapArt_v8.zip" (
+  echo Installing generated four-area map art...
+  powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_MapArt_v8.zip' -DestinationPath '%~dp0' -Force"
+  if errorlevel 1 goto failed
+)
+if not exist "%~dp0MistIsle_ApprovedArt_v7.zip" (
+  if exist "%~dp0MistIsle_ApprovedArt_v6.zip" (
+    echo Installing portrait-matched Watcher pixel sprites and lossless portraits...
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_ApprovedArt_v6.zip' -DestinationPath '%~dp0' -Force"
+    if errorlevel 1 goto failed
+  ) else if exist "%~dp0MistIsle_ApprovedArt_v5.zip" (
+    echo Installing lossless high-resolution portraits and approved pixel sprites...
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_ApprovedArt_v5.zip' -DestinationPath '%~dp0' -Force"
+    if errorlevel 1 goto failed
+  ) else if exist "%~dp0MistIsle_ApprovedArt_v4.zip" (
+    echo Installing the previous approved art bundle...
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_ApprovedArt_v4.zip' -DestinationPath '%~dp0' -Force"
+    if errorlevel 1 goto failed
+  ) else if exist "%~dp0MistIsle_ApprovedArt_v3.zip" (
+    echo Installing the previous approved art bundle...
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_ApprovedArt_v3.zip' -DestinationPath '%~dp0' -Force"
+    if errorlevel 1 goto failed
+  )
+)
+
 rem A packaged playtest contains the executable at the package root.
 rem Launch it directly instead of trying to rebuild a source tree that is not included.
 if exist "%~dp0mist_isle.exe" (
@@ -24,11 +54,26 @@ if errorlevel 1 goto failed
 echo [2/3] Generating pixel-art assets...
 python tools\generate_pixel_assets.py
 if errorlevel 1 goto failed
-python tools\generate_heroine_highres.py
-if errorlevel 1 goto failed
-if not exist assets\characters\png\heroine_portrait.png echo INFO: using the approved heroine pixel-sheet fallback for local dialogue.
-if not exist assets\characters\png\watcher_portrait.png echo INFO: using the generated Keeper pixel sprite for local dialogue.
-if not exist assets\characters\png\lighthouse_guardian_portrait.png echo INFO: using the approved guardian pixel-sheet fallback for local dialogue.
+
+if not exist assets\characters\portraits\watcher_portrait.png goto missing_art
+if not exist assets\characters\portraits\guardian_portrait.png goto missing_art
+if not exist assets\environment\generated\nature_props_sheet.png goto missing_art
+if not exist assets\environment\generated\glowglade_props_sheet.png goto missing_art
+if not exist assets\environment\generated\tidal_ruins_props_sheet.png goto missing_art
+if not exist assets\environment\generated\lighthouse_ruins_props_sheet.png goto missing_art
+if not exist assets\characters\portraits\heroine_portrait.png (
+  echo.
+  echo Approved artwork is missing. Download MistIsle_ApprovedArt_v7.zip from this chat,
+  echo place it beside RUN_WINDOWS.bat, then run this file again.
+  goto failed
+)
+if not exist assets\characters\hero\heroine_pixel_4x4_64x80.png goto missing_art
+if not exist assets\characters\npc\watcher_pixel_4x4_64x80.png goto missing_art
+if not exist assets\characters\boss\lighthouse_guardian_4x2.png goto missing_art
+if not exist assets\characters\portraits\moss_lumi_portrait.png goto missing_art
+if not exist assets\characters\portraits\moatail_portrait.png goto missing_art
+if not exist assets\characters\portraits\crystal_gecko_portrait.png goto missing_art
+if not exist assets\environment\coastal_keeper_house.png goto missing_art
 python tools\generate_ground_atlas.py
 if errorlevel 1 goto failed
 python tools\build_kenney_runtime_atlas.py
@@ -70,6 +115,10 @@ if exist "%~dp0build\mist_isle.exe" (
   exit /b 0
 )
 echo Could not locate mist_isle.exe after build.
+goto failed
+
+:missing_art
+echo Approved art bundle is incomplete. Re-extract MistIsle_ApprovedArt_v7.zip into this folder.
 goto failed
 
 :failed

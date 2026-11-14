@@ -1,9 +1,9 @@
 name: Windows and Raspberry Pi builds
 on:
   push:
-    branches: [main]
+    branches: [main, fix/approved-art-and-grounding]
   pull_request:
-    branches: [main, feature/scene-interaction-polish]
+    branches: [main, feature/scene-interaction-polish, polish/full-game-character-art]
 jobs:
   build-windows:
     needs: build-raspberry-pi5
@@ -18,6 +18,26 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Extract generated map art bundle when supplied
+        shell: pwsh
+        run: |
+          if (Test-Path MistIsle_MapArt_v8.zip) {
+            Expand-Archive -LiteralPath MistIsle_MapArt_v8.zip -DestinationPath . -Force
+          }
+      - name: Extract approved art bundle when supplied
+        shell: pwsh
+        run: |
+          if (Test-Path MistIsle_ApprovedArt_v7.zip) {
+            Expand-Archive -LiteralPath MistIsle_ApprovedArt_v7.zip -DestinationPath . -Force
+          } elseif (Test-Path MistIsle_ApprovedArt_v6.zip) {
+            Expand-Archive -LiteralPath MistIsle_ApprovedArt_v6.zip -DestinationPath . -Force
+          } elseif (Test-Path MistIsle_ApprovedArt_v5.zip) {
+            Expand-Archive -LiteralPath MistIsle_ApprovedArt_v5.zip -DestinationPath . -Force
+          } elseif (Test-Path MistIsle_ApprovedArt_v4.zip) {
+            Expand-Archive -LiteralPath MistIsle_ApprovedArt_v4.zip -DestinationPath . -Force
+          } elseif (Test-Path MistIsle_ApprovedArt_v3.zip) {
+            Expand-Archive -LiteralPath MistIsle_ApprovedArt_v3.zip -DestinationPath . -Force
+          }
       - name: Generate pixel assets
         run: |
           python -m pip install pillow
@@ -33,9 +53,52 @@ jobs:
           Copy-Item build-pi-artifact/assets/characters/png/moatail.png assets/characters/png/ -Force
           Copy-Item build-pi-artifact/assets/characters/png/crystal_gecko.png assets/characters/png/ -Force
           Copy-Item build-pi-artifact/assets/characters/png/heroine_world_4x4_64x80.png assets/characters/png/ -Force
+          if (Test-Path build-pi-artifact/assets/environment/generated) {
+            New-Item -ItemType Directory -Force -Path assets/environment/generated | Out-Null
+            Copy-Item build-pi-artifact/assets/environment/generated/* assets/environment/generated/ -Force
+          }
           python tools/preview_tiled_maps.py --output build/map-previews
           if (Test-Path third_party/kenney/rpg-base/KenneyRPGpack.zip) { python tools/preview_cc0_packs.py }
           python tools/validate_project.py
+      - name: Verify generated map art integration
+        shell: pwsh
+        run: |
+          if (Test-Path MistIsle_MapArt_v8.zip) {
+            $mapArt = @(
+              'assets/environment/generated/nature_props_sheet.png',
+              'assets/environment/generated/glowglade_props_sheet.png',
+              'assets/environment/generated/tidal_ruins_props_sheet.png',
+              'assets/environment/generated/lighthouse_ruins_props_sheet.png'
+            )
+            $missingMapArt = $mapArt | Where-Object { -not (Test-Path $_) }
+            if ($missingMapArt.Count -gt 0) { Write-Error ("Map art bundle incomplete: " + ($missingMapArt -join ', ')) }
+          } elseif (-not (Test-Path build-pi-artifact/assets/environment/generated)) {
+            Write-Warning "Generated map art bundle is not present; this run validates source and builds but not final map-art visuals."
+          }
+      - name: Verify approved art integration
+        shell: pwsh
+        run: |
+          $bundle = (Test-Path MistIsle_ApprovedArt_v7.zip) -or (Test-Path MistIsle_ApprovedArt_v6.zip) -or (Test-Path MistIsle_ApprovedArt_v5.zip) -or (Test-Path MistIsle_ApprovedArt_v4.zip) -or (Test-Path MistIsle_ApprovedArt_v3.zip)
+          if (-not $bundle) {
+            Write-Warning "Approved art bundle is not committed to this checkout. Source/compile checks will continue, but this run is not a visual-art release validation."
+          } else {
+            $required = @(
+              'assets/characters/portraits/heroine_portrait.png',
+              'assets/characters/portraits/watcher_portrait.png',
+              'assets/characters/portraits/guardian_portrait.png',
+              'assets/characters/portraits/moss_lumi_portrait.png',
+              'assets/characters/portraits/moatail_portrait.png',
+              'assets/characters/portraits/crystal_gecko_portrait.png',
+              'assets/characters/hero/heroine_pixel_4x4_64x80.png',
+              'assets/characters/npc/watcher_pixel_4x4_64x80.png',
+              'assets/characters/boss/lighthouse_guardian_4x2.png',
+              'assets/environment/coastal_keeper_house.png'
+            )
+            $missing = $required | Where-Object { -not (Test-Path $_) }
+            if ($missing.Count -gt 0) {
+              Write-Error ("Approved art bundle is incomplete: " + ($missing -join ', '))
+            }
+          }
       - name: Configure
         run: cmake -S . -B build -A x64
       - name: Build
@@ -51,6 +114,18 @@ jobs:
           if (Test-Path assets/characters/hero) {
             New-Item -ItemType Directory -Force -Path dist/assets/characters/hero | Out-Null
             Copy-Item assets/characters/hero/* dist/assets/characters/hero/
+          }
+          if (Test-Path assets/environment/generated) {
+            New-Item -ItemType Directory -Force -Path dist/assets/environment/generated | Out-Null
+            Copy-Item assets/environment/generated/* dist/assets/environment/generated/
+          }
+          if (Test-Path assets/characters/portraits) {
+            New-Item -ItemType Directory -Force -Path dist/assets/characters/portraits | Out-Null
+            Copy-Item assets/characters/portraits/* dist/assets/characters/portraits/
+          }
+          if (Test-Path assets/characters/npc) {
+            New-Item -ItemType Directory -Force -Path dist/assets/characters/npc | Out-Null
+            Copy-Item assets/characters/npc/* dist/assets/characters/npc/
           }
           if (Test-Path assets/characters/boss) {
             New-Item -ItemType Directory -Force -Path dist/assets/characters/boss | Out-Null
@@ -94,7 +169,7 @@ jobs:
       - name: Upload playable Windows build
         uses: actions/upload-artifact@v4
         with:
-          name: MistIsle-Windows-Playtest-v1
+          name: MistIsle-Windows-Playtest-v2
           path: dist/
           if-no-files-found: error
 
@@ -109,6 +184,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential cmake git pkg-config libx11-dev libxext-dev libxcursor-dev libxinerama-dev libxrandr-dev libxi-dev libasound2-dev libgl1-mesa-dev libwayland-dev libxkbcommon-dev wayland-protocols
+      - name: Extract generated map art bundle when supplied
+        run: |
+          if [ -f MistIsle_MapArt_v8.zip ]; then unzip -o MistIsle_MapArt_v8.zip -d .; fi
+      - name: Extract approved art bundle when supplied
+        run: |
+          if [ -f MistIsle_ApprovedArt_v7.zip ]; then unzip -o MistIsle_ApprovedArt_v7.zip -d .; elif [ -f MistIsle_ApprovedArt_v6.zip ]; then unzip -o MistIsle_ApprovedArt_v6.zip -d .; elif [ -f MistIsle_ApprovedArt_v4.zip ]; then unzip -o MistIsle_ApprovedArt_v4.zip -d .; elif [ -f MistIsle_ApprovedArt_v3.zip ]; then unzip -o MistIsle_ApprovedArt_v3.zip -d .; fi
       - name: Generate art and validate Tiled maps
         run: |
           python -m pip install pillow cairosvg

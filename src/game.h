@@ -33,6 +33,16 @@ typedef struct {
     int shrineSolved, bossDefeated, fireflyDiscovered, leaflingFed, groveMoteDefeated;
     int lumiLevel,lumiXp,splashLevel,splashXp,sparkLevel,sparkXp;
     unsigned char pickupTaken[4][MAX_PICKUPS];
+} SaveDataV4;
+typedef struct {
+    int magic, version, seed, area;
+    float px, py, hp;
+    int berries, shells, crystals;
+    int lumi, splash, spark, selected;
+    int shrineSolved, bossDefeated, fireflyDiscovered, leaflingFed, groveMoteDefeated;
+    int lumiLevel,lumiXp,splashLevel,splashXp,sparkLevel,sparkXp;
+    unsigned char pickupTaken[4][MAX_PICKUPS];
+    float lumiHp, splashHp, sparkHp;
 } SaveData;
 typedef struct { Vector2 tile; int kind; bool taken; float phase; } Pickup;
 typedef struct {
@@ -45,6 +55,7 @@ typedef struct {
 typedef struct {
     Vector2 pos;
     float bob, mood, blink;
+    float hp, maxHp;
     int level, xp;
     bool owned;
 } Buddy;
@@ -114,7 +125,8 @@ typedef struct {
     float fireflyPhase;
     float dayClock;
     float weatherClock;
-    int weather;
+    float weatherFade;
+    int weather; // 0 sunny, 1 rain, 2 fireflies, 3 overcast, 4 night fog
 } Game;
 extern Color C_BG,C_INK,C_PAPER,C_GREEN,C_DARKGREEN,C_GOLD,C_BLUE,C_LILAC,C_PINK,C_RED;
 void GameReset(Game *g,int seed);

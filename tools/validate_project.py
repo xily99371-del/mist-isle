@@ -21,6 +21,7 @@ MAP_PREVIEW = (ROOT / "tools/preview_tiled_maps.py").read_text(encoding="utf-8")
 WATER_PREVIEW = MAP_PREVIEW
 RASTERIZER = (ROOT / "tools/rasterize_assets.py").read_text(encoding="utf-8")
 GROVE_MAP = (ROOT / "maps/glowglade_grove.tmx").read_text(encoding="utf-8")
+MAPS = "\\n".join((ROOT / "maps" / name).read_text(encoding="utf-8") for name in ("coastal_camp.tmx","glowglade_grove.tmx","tidal_ruins.tmx","lighthouse_courtyard.tmx"))
 MAP_FILES = [ROOT / "maps" / name for name in (
     "terrain.tsx", "coastal_camp.tmx", "glowglade_grove.tmx",
     "tidal_ruins.tmx", "lighthouse_courtyard.tmx"
@@ -35,14 +36,10 @@ def require(condition, message):
 assets = {
     "assets/characters/hero/hero_walk_4dir_64.png": (128, 128),
     "assets/characters/hero/heroine_approved_8x4.png": (192, 128),
-    "assets/characters/boss/lighthouse_guardian_4x2.png": (192, 128),
     "assets/characters/png/heroine_portrait.png": (512, 640),
     "assets/characters/png/heroine_world_4x4_64x80.png": (256, 320),
     "assets/characters/png/watcher_portrait.png": (512, 640),
     "assets/characters/png/lighthouse_guardian_portrait.png": (512, 640),
-    "assets/characters/png/moss_lumi.png": (256, 256),
-    "assets/characters/png/moatail.png": (256, 256),
-    "assets/characters/png/crystal_gecko.png": (256, 256),
     "assets/characters/companions/moss_lumi_idle_64.png": (128, 32),
     "assets/characters/companions/moatail_idle_64.png": (128, 32),
     "assets/characters/companions/crystal_gecko_idle_64.png": (128, 32),
@@ -59,7 +56,7 @@ assets = {
     "assets/tiles/png/island_iso_tiles.png": (384, 32),
 }
 present = 0
-art_imported = (ROOT / "assets/environment/environment_props_96.png").exists()
+art_imported = (ROOT / "assets/characters/portraits/heroine_portrait.png").exists()
 if art_imported:
     for rel, expected in assets.items():
         path = ROOT / rel
@@ -74,7 +71,6 @@ else:
 # checkouts, but its exact cell geometry is checked as soon as it is installed.
 for rel, expected in {
     "assets/characters/hero/heroine_approved_8x4.png": (192, 128),
-    "assets/characters/boss/lighthouse_guardian_4x2.png": (192, 128),
 }.items():
     path = ROOT / rel
     if path.exists():
@@ -82,10 +78,22 @@ for rel, expected in {
             require(im.size == expected, f"{rel} dimensions {im.size} == {expected}")
     else:
         print(f"INFO: optional approved sprite sheet not imported yet: {rel}")
+
+# The repaired Lighthouse Guardian sheet is shipped in art bundle v7. Older
+# tracked builds contain a damaged 192x128 indexed PNG, so only validate the
+# new 256x160 sheet when v7 has actually been installed.
+boss_sheet = ROOT / "assets/characters/boss/lighthouse_guardian_4x2.png"
+if (ROOT / "MistIsle_ApprovedArt_v7.zip").exists():
+    require(boss_sheet.exists(), "v7 Lighthouse Guardian pixel sheet is present")
+    with Image.open(boss_sheet) as im:
+        im.load()
+        require(im.size == (256, 160), f"Boss sprite sheet dimensions {im.size} == (256, 160)")
+else:
+    print("INFO: v7 Boss sprite sheet not installed in this checkout; visual Boss validation is deferred.")
 require("if(TEX_HEROINE_APPROVED.id)" in RENDER and "if(TEX_GUARDIAN_APPROVED.id)" in RENDER,
         "approved directional heroine and guardian sprite sheets take priority over portrait fallbacks")
-require("TEX_KEEPER.id" in RENDER and "DrawTexturePro(TEX_KEEPER" in RENDER and "TEX_GUARDIAN_APPROVED.id" in RENDER,
-        "local source builds have authored pixel-sprite fallbacks for Keeper and guardian dialogue portraits")
+require("TEX_WATCHER_PIXEL.id" in RENDER and "TEX_GUARDIAN_APPROVED.id" in RENDER,
+        "world Watcher and guardian actors use dedicated pixel sprite sheets, never illustrated portrait fallbacks")
 
 
 # Renderer source rectangles must match the approved sheet cell dimensions.
@@ -136,7 +144,7 @@ require("g->world.objectCount" in RENDER and "RENDER_TREE" in RENDER and "AREA_O
         "Tiled-authored scene objects drive tree and prop placement")
 require("MoveTowardsConstant" in GAME and "680.0f*dt" in GAME,
         "camera uses direct constant-speed follow without an easing dead zone")
-require("InRect" in GAME and "const float r=.37f" in GAME and "distance/0.08f" in GAME,
+require("InRect" in GAME and "const float r=.31f" in GAME and "distance/0.08f" in GAME,
         "player collision checks authored prop footprints with dense substeps")
 require("RENDER_BOSS" in RENDER and "DrawLighthouseGuardian" in RENDER,
         "lighthouse guardian is visible in the world and battle scene")
@@ -152,7 +160,7 @@ require("BuddyFollowOffset" in GAME and "static const Vector2 formation[4][3]" i
         "companions follow in a facing-aware fan formation with collision-aware catch-up movement")
 require("当前位置" in RENDER and "DrawCircleLines((int)pts[i].x,(int)pts[i].y,41" in RENDER,
         "island map shows an explicit current-area marker and readable legend")
-require("attacking?((int)(t*8.0f)%4):0" in RENDER and "attacking?64.0f:0.0f" in RENDER,
+require("attacking?((int)(t*8.0f)%4):((int)(t*2.0f)%4)" in RENDER and "attacking?80.0f:0.0f" in RENDER,
         "lighthouse guardian uses its dedicated attack animation row during the enemy turn")
 require('DrawUIText(isBoss?"首领战":"遭遇战"' in RENDER and "核心耐久" in RENDER,
         "boss encounter has a distinct dark arena, boss title and lantern-core health bar")
@@ -174,6 +182,62 @@ require("!g->splash.owned" in RENDER and "!g->spark.owned" in RENDER,
         "unrecruited water and crystal companions are visible as world encounters")
 require("RenderInit(void)" in RENDER and "RenderClose(void)" in RENDER,
         "renderer owns texture load and release lifecycle")
+
+# The user's approved high-resolution portraits and pixel sheet are a separate import bundle.
+approved_assets = {
+    "assets/characters/portraits/heroine_portrait.png": (1086, 1448),
+    "assets/characters/portraits/watcher_portrait.png": (1086, 1448),
+    "assets/characters/portraits/guardian_portrait.png": (1086, 1448),
+    "assets/characters/portraits/moss_lumi_portrait.png": (1086, 1448),
+    "assets/characters/portraits/moatail_portrait.png": (1086, 1448),
+    "assets/characters/portraits/crystal_gecko_portrait.png": (1086, 1448),
+    "assets/characters/hero/heroine_pixel_4x4_64x80.png": (256, 320),
+    "assets/characters/npc/watcher_pixel_4x4_64x80.png": (256, 320),
+    "assets/environment/coastal_keeper_house.png": (360, 291),
+}
+if all((ROOT / p).exists() for p in approved_assets):
+    for rel, expected in approved_assets.items():
+        with Image.open(ROOT / rel) as im:
+            if rel.endswith("_portrait.png"):
+                require(im.width >= 320 and im.height >= 427,
+                        f"approved portrait {rel} retains at least the legacy portrait resolution")
+            else:
+                require(im.size == expected, f"approved user art {rel} has expected dimensions {expected}")
+    require("TEX_HEROINE_PIXEL" in RENDER and "heroine_pixel_4x4_64x80.png" in RENDER and "TEX_WATCHER_PIXEL" in RENDER,
+            "the exact user-approved 4x4 pixel sheet drives the playable heroine")
+    require("assets/characters/portraits/heroine_portrait.png" in RENDER and
+            "assets/characters/portraits/moss_lumi_portrait.png" in RENDER and
+            "assets/characters/portraits/moatail_portrait.png" in RENDER and
+            "assets/characters/portraits/crystal_gecko_portrait.png" in RENDER,
+            "dialogue portrait paths use the user's high-resolution anime illustrations")
+    require("DrawIllustratedPortrait(TEX_LUMI_ILLUSTRATION" in RENDER and
+            "DrawIllustratedPortrait(TEX_MOATAIL_ILLUSTRATION" in RENDER and
+            "DrawIllustratedPortrait(TEX_GECKO_ILLUSTRATION" in RENDER,
+            "battle cards and party roster use high-resolution companion illustrations, not pixel idle sprites")
+    require("DrawCoastalHouse" in RENDER and "coastal_keeper_house.png" in RENDER,
+            "coastal keeper house uses the user's approved pixel-art building")
+    require("frame*64" in RENDER and "TEX_WATCHER_PIXEL" in RENDER and "watcher_pixel_4x4_64x80.png" in RENDER,
+            "Watcher world actor is a portrait-matched native 64x80 pixel RPG sprite frame, not a portrait crop")
+    require('bossPixelPath="assets/characters/boss/lighthouse_guardian_4x2.png"' in RENDER and "TEX_GUARDIAN_APPROVED.width==256" in RENDER and
+        "DrawLighthouseGuardian((Vector2){880,454},g->time,1.5f,g->battleTurn!=0)" in RENDER and
+            "else if(TEX_GUARDIAN_PORTRAIT.id)" not in RENDER,
+            "boss exploration and battle scenes use the dedicated pixel animation; anime portrait is dialogue-only")
+    require('SetDialogueAs(g,"沫尾兽"' in GAME and 'SetDialogueAs(g,"鸣晶蜥"' in GAME,
+            "water and crystal companion recruitment bind their own names and portrait IDs")
+    require("if(distance>6.0f&&foundTarget&&!Solid(g,target))" in GAME,
+            "companions teleport back to a safe formation slot after exceeding the hard leash distance")
+    require("case RENDER_TREE: p.y+=8.0f; DrawFloraProp" in RENDER and
+            "DrawEllipse((int)p.x,(int)p.y+5,15*s" not in RENDER and
+            "DrawEllipse((int)p.x,(int)p.y+8,34,10" not in RENDER,
+            "trees and shrine decorations do not render detached circular ground shadows")
+else:
+    print("INFO: MistIsle_ApprovedArt_v7.zip is not installed; user-approved runtime artwork is not yet available.")
+
+require("type_id in (29,31,33)" in MAP_BUILD and "210-213 small stones" in MAP_BUILD and "type_id==229" not in MAP_BUILD,
+        "small stones, low shrubs and flowering props are non-blocking while structural bases remain solid")
+require("block_rect(cx-1,cy-1,cx+1,cy-1)" in MAP_BUILD and "compact one-row tent base" in MAP_BUILD,
+        "house and tent collision footprints are reduced to compact rear/base rows")
+
 require(all((ROOT / f"assets/characters/svg/{name}.svg").exists() for name in ("heroine_portrait","watcher_portrait","lighthouse_guardian_portrait")),
         "three authored static character portrait source illustrations are present")
 require("cairosvg" in RASTERIZER and all(name in RASTERIZER for name in ("heroine_portrait.svg","watcher_portrait.svg","lighthouse_guardian_portrait.svg")),
@@ -192,6 +256,26 @@ require("MISTISLE_PI_PROFILE" in CMAKE and 'set(OPENGL_VERSION "2.1"' in CMAKE a
 require("find_package(Python3 REQUIRED COMPONENTS Interpreter)" in CMAKE and "tools/build_maps.py" in CMAKE,
         "Python is required only at build time to compile Tiled maps")
 require(all(path.exists() for path in MAP_FILES), "all four Tiled maps and the terrain tileset are present")
+map_art_paths = [
+    "assets/environment/generated/nature_props_sheet.png",
+    "assets/environment/generated/glowglade_props_sheet.png",
+    "assets/environment/generated/tidal_ruins_props_sheet.png",
+    "assets/environment/generated/lighthouse_ruins_props_sheet.png",
+]
+if all((ROOT / p).exists() for p in map_art_paths):
+    for rel in map_art_paths:
+        with Image.open(ROOT / rel) as im:
+            require(im.mode == "RGBA" and im.width >= 1200 and im.height >= 1200,
+                    f"generated area art {rel} is a full-resolution transparent sheet")
+    require("DrawGeneratedMapAsset" in RENDER and "TEX_NATURE_SHEET" in RENDER and
+            "TEX_GROVE_SHEET" in RENDER and "TEX_RUINS_SHEET" in RENDER and "TEX_LIGHTHOUSE_SHEET" in RENDER,
+            "four generated art sheets are wired to the runtime area-specific prop renderer")
+    require(all(f"prop_{n}" in MAPS for n in (600, 500, 640, 660)) and
+            all(f'type="prop_{n}"' in MAPS for n in (601,603,605,606,608,609,610,612,613,614,616,617,618,619,
+                                                       625,627,629,641,643,644,646,647,649,651,652,654,
+                                                       664,667,669,670,672,674,676)),
+            "generated environment sheets are actually populated across all four Tiled maps, including both blue-fire braziers")
+
 require("#define MAPW 18" in HEADER and "#define MAPH 12" in HEADER and "W,H,T,MAX_OBJECTS=18,12,56,64" in MAP_BUILD and "WIDTH, HEIGHT = 18, 12" in MAP_AUTOTILE and "W,H,T=18,12,56" in MAP_PREVIEW,
         "all four maps, runtime arrays, autotile masks and Tiled previews use compact 18×12 one-screen dimensions")
 require(all(f'width="18" height="12"' in path.read_text(encoding="utf-8") for path in MAP_FILES if path.suffix==".tmx"),
@@ -203,6 +287,20 @@ require("PushRenderItem(items,&count,RENDER_KEEPER,0,(Vector2){7.0f,7.0f}" in RE
 
 require('name=="campfire": type_id=2000' in MAP_BUILD and "obj->type==2000" in RENDER,
         "the campfire remains an animated Tiled-authored scene object")
+require('name="营火" type="campfire" x="420.00" y="532.00"' in (ROOT / "maps/coastal_camp.tmx").read_text(encoding="utf-8"),
+        "campfire is placed in the foreground below the Watcher")
+require('"进入辉光林地 · 萤火微光浮现"' in GAME,
+        "Glowglade arrival explicitly announces its exclusive firefly weather")
+require("MISTISLE_FIREFLY_COUNT 58" in RENDER and "pulse*.62f*weatherAlpha" in RENDER,
+        "firefly weather has bright multi-layer motes and a desktop-dense field")
+require("Fade((Color){7,17,36,255},.82f*weatherAlpha)" in RENDER,
+        "night fog is a clearly visible layered atmosphere")
+require("Fade((Color){17,39,62,255},.34f*weatherAlpha)" in RENDER,
+        "rain uses a stronger cool atmospheric grade")
+LIGHTHOUSE_GROUND_EARLY=(ROOT / "maps/lighthouse_courtyard.tmx").read_text(encoding="utf-8").split('<data encoding="csv">',1)[1].split("</data>",1)[0].strip().splitlines()
+LIGHTHOUSE_ROWS_EARLY=[[int(value) for value in line.split(",") if value] for line in LIGHTHOUSE_GROUND_EARLY]
+require(all(LIGHTHOUSE_ROWS_EARLY[y][x]!=37 for y in range(2,5) for x in (1,2,15,16)),
+        "lighthouse boss courtyard has no distracting sea/grass corner patches")
 require("generate_ground_atlas.py" in CMAKE and "topdown_terrain_atlas_v1.png" in CMAKE,
         "CMake regenerates the same seamless ground atlas for desktop and Raspberry Pi")
 require("AREA_GROUND" in MAP_BUILD and "AREA_COLLISION" in MAP_BUILD and "AREA_MARKERS" in MAP_BUILD and "AREA_OBJECTS" in MAP_BUILD,
@@ -213,16 +311,20 @@ require("def build_overlay" in MAP_AUTOTILE and "DIRECTIONS" in MAP_AUTOTILE and
         "the four-direction shoreline autotile helper is present for clean Windows and ARM64 builds")
 require("if type_id==32:" in MAP_BUILD and "collision[by][xx]=0" in MAP_BUILD,
         "Tiled bridge objects open a real walkable span through the water collision grid")
-require("Collision follows the visible object's ground footprint" in MAP_BUILD and "compact rear wall of the cottage" in MAP_BUILD,
+require("Collision follows the visible object's ground footprint" in MAP_BUILD and "reduced rear-wall footprint" in MAP_BUILD,
         "Tiled buildings, tree trunks, walls, pillars and altar bases compile into gameplay collision")
+require("Pokémon-Center-style recovery service" in GAME and "SetDialogueAs(g,\"守望者\"" in GAME and "g->lumi.hp=g->lumi.maxHp" in GAME,
+        "Watcher heals the whole party before the overlapping campfire interaction")
+require('SetDialogueAs(g,"旅人","三种伙伴的力量' in GAME,
+        "ruin seal-unlock dialogue uses the traveller portrait")
 require("nearest free, reachable tile" in GAME and "occupied" in GAME,
         "blocked or duplicate pickups are relocated to a distinct reachable ground tile")
 require("living stone arch" in RENDER and "beacon tower" in RENDER and "Return route keeps" in RENDER,
         "grove, ruins, lighthouse and return portals have distinct grounded visual identities")
 require("finalCore" in RENDER and "DrawAreaProp(11,p,190,194)" in RENDER,
         "the Tidal Ruins keystone is a larger multi-ring final altar, distinct from ordinary shrines")
-require("DrawLighthouseGuardian(p,g->time,1.48f,false)" in RENDER and "static void DrawKeeper(Vector2 p,float t,float scale)" in RENDER and "TEX_WATCHER_PORTRAIT" in RENDER and "TEX_GUARDIAN_PORTRAIT" in RENDER,
-        "the lighthouse guardian and Watcher use authored world-scene portrait illustrations")
+require("DrawLighthouseGuardian(p,g->time,1.0f,false)" in RENDER and "static void DrawKeeper(Vector2 p,float t,float scale)" in RENDER and "TEX_WATCHER_PORTRAIT" in RENDER and "TEX_WATCHER_PIXEL" in RENDER and "TEX_GUARDIAN_PORTRAIT" in RENDER,
+        "the lighthouse guardian and Watcher use authored pixel world actors with separate dialogue portraits")
 require("DrawDialoguePortrait" in RENDER and "dialoguePortrait[page]" in RENDER and "DrawTexturePro(*fallback" in RENDER,
         "dialogue scenes render full-size portraits for the hero, Watcher and lighthouse guardian")
 require('strncmp(speaker,"旅人",strlen("旅人"))==0' in GAME,
@@ -235,9 +337,9 @@ require("SetDialogueSequence(g,speakers,lines,3,false)" in GAME and "胸口的�
         "the boss encounter ends with a dedicated character dialogue scene")
 require("nearest free, reachable tile" in GAME and "visual footprint of tall structures" in GAME,
         "collectibles avoid both collision footprints and visually occluding large props")
-require("196*it->scale,156*it->scale" in RENDER and "302:(196,156)" in MAP_PREVIEW,
-        "the coastal and forest cottages are enlarged consistently in runtime and map previews")
-require("DrawGroveCottage" in RENDER and "compact rear wall of the cottage" in MAP_BUILD,
+require("DrawCoastalHouse" in RENDER and "252.0f*scale,h=204.0f*scale" in RENDER and "252*scale,204*scale" in MAP_PREVIEW,
+        "the approved coastal house uses matching grounded dimensions in runtime and map previews")
+require("DrawGroveCottage" in RENDER and "reduced rear-wall footprint" in MAP_BUILD,
         "large cottage structures use the structure atlas with matching collision foundations")
 require('#include "area_maps.h"' in RENDER and "AREA_OVERLAY[(int)g->area][direction][y][x]" in RENDER and "direction*90" in RENDER,
         "renderer draws every directional shoreline mask from the generated Tiled map header")
@@ -269,7 +371,7 @@ require("#define MAX_PARTICLES 160" in HEADER and "#define MAX_PARTICLES 300" in
         "Raspberry Pi uses a bounded particle pool while desktop keeps the full pool")
 require("Safe fallback if the target GPU cannot allocate the single-area ground cache" in RENDER,
         "terrain still renders if a Raspberry Pi GPU cannot allocate the cache")
-require("#define MISTISLE_RAIN_DROPS 56" in RENDER and "#define MISTISLE_RAIN_RIPPLES 6" in RENDER,
+require("#define MISTISLE_RAIN_DROPS 64" in RENDER and "#define MISTISLE_RAIN_RIPPLES 8" in RENDER and "#define MISTISLE_RAIN_DROPS 230" in RENDER,
         "Raspberry Pi profile reduces weather overdraw")
 require("Static grass, sand and stone detail is baked into the ground cache" in RENDER,
         "Raspberry Pi avoids redrawing static terrain accents every frame")
@@ -300,15 +402,35 @@ require("IsKeyPressed(KEY_O)" in GAME and "objectiveToggle" in GAME,
         "objective tracker supports keyboard and mouse toggles")
 require("Rectangle panel={SW-350.0f,18.0f,330.0f,116.0f}" in RENDER,
         "expanded objective tracker is narrower and shorter than the previous HUD panel")
-require("MISTISLE_RAIN_DROPS 56" in RENDER and "MISTISLE_RAIN_DROPS 190" in RENDER and "g->weather==1" in RENDER,
-        "rain has multiple visible streak depths, surface impacts and water ripples")
-require("IsKeyPressed(KEY_F7)" in GAME and "weather=(g->weather+1)%4" in GAME,
-        "weather can be cycled on demand for reliable demonstration")
+require("MISTISLE_RAIN_DROPS 64" in RENDER and "MISTISLE_RAIN_DROPS 230" in RENDER and "WeatherNoise" in RENDER and "float gust=" in RENDER and
+        "(.48f+r3*.40f)" in RENDER and "length=18.0f+r2*31.0f" in RENDER and "MISTISLE_RAIN_RIPPLES 28" in RENDER,
+        "rain uses denser, brighter staggered streaks, gust-driven density and stronger water impacts")
+require("g->weather=0; g->weatherFade=1.0f" in GAME and "g->weatherClock>38.0f" in GAME and
+        "static const int roamingWeather[4]={0,1,3,4}" in GAME,
+        "clear sunny weather is the default and world weather rotation excludes grove-only fireflies") 
+require("if(area==AREA_GROVE)" in GAME and "g->weather=2;" in GAME and "else if(previousArea==AREA_GROVE)" in GAME,
+        "entering Glowglade Grove automatically enables exclusive firefly weather and leaving restores clear weather")
+require("g->weather==3" in RENDER and "g->weather==4" in RENDER and "DrawCloudPuff" in RENDER and
+        "Broad, low fog banks drift across the foreground" in RENDER and "(.22f+(i%3)*.035f)" in RENDER and
+        "Fade((Color){7,17,36,255},.82f*weatherAlpha)" in RENDER,
+        "overcast and optional night fog have distinct moving cloud visuals and clearly visible layered fog banks")
+LIGHTHOUSE_MAP_TEXT=(ROOT/"maps/lighthouse_courtyard.tmx").read_text(encoding="utf-8")
+LIGHTHOUSE_GROUND=LIGHTHOUSE_MAP_TEXT.split('<data encoding="csv">',1)[1].split("</data>",1)[0].strip().splitlines()
+LIGHTHOUSE_GROUND_ROWS=[[int(value) for value in line.split(",") if value] for line in LIGHTHOUSE_GROUND]
+require("terrain_zone_design" in LIGHTHOUSE_MAP_TEXT and len({(gid-1)//12 for row in LIGHTHOUSE_GROUND_ROWS for gid in row})>=3 and
+        all(row[0]==37 and row[17]==37 for row in LIGHTHOUSE_GROUND_ROWS[3:]),
+        "lighthouse courtyard uses stone, worn sand and narrow sea-edge water bands without grass corners")
+require('type="prop_676"' in LIGHTHOUSE_MAP_TEXT and LIGHTHOUSE_MAP_TEXT.count('type="prop_676"')==2 and
+        not any(f'type="tree{i}"' in LIGHTHOUSE_MAP_TEXT for i in range(3)) and
+        not any(f'type="prop_{i}"' in LIGHTHOUSE_MAP_TEXT for i in range(116,130)) and
+        not any(f'type="prop_{i}"' in LIGHTHOUSE_MAP_TEXT for i in (29,30,34,200,201,202)) and
+        all(f'type="prop_{i}"' in LIGHTHOUSE_MAP_TEXT for i in (660,661,663,664,666,667,670,671,672,673,674)),
+        "Boss courtyard uses one coherent generated ruin-art family, mirrored blue braziers, unified stone floor and no mixed coastal/grove props")
 require("DrawCoastalCliffs(g,terrainKinds,minX,minY,maxX,maxY)" in RENDER and "AREA_GROUND" in GAME,
         "shoreline and all four ground layouts are sourced from Tiled maps")
 require("GetVisibleTileBounds" in RENDER and "screen.x<-180.0f" in RENDER,
         "terrain and scene objects outside the camera view are culled")
-require("MISTISLE_RAIN_DROPS 56" in RENDER and "MISTISLE_RAIN_RIPPLES 6" in RENDER,
+require("MISTISLE_RAIN_DROPS 64" in RENDER and "MISTISLE_RAIN_RIPPLES 8" in RENDER and "MISTISLE_FIREFLY_COUNT 30" in RENDER,
         "Raspberry Pi profile reduces weather draw calls")
 require("DrawPlayer((Vector2){420,620}" in RENDER,
         "finale character lineup stays clear of the bottom caption")
@@ -330,7 +452,7 @@ with Image.open(io.BytesIO(base64.b64decode(cg_data, validate=True))) as cg:
     require(cg.size == (448, 448), "lighthouse finale illustration is a 448px square scene")
 require("assets/cinematics" in WORKFLOW and "Copy-Item assets/cinematics/*" in WORKFLOW,
         "Windows playtest package includes the cinematic asset")
-require("footY-68.0f" in RENDER and "48.0f,68.0f" in RENDER,
+require("footY-60.0f-bob" in RENDER and "38.0f,60.0f" in RENDER and "44.0f,48.0f" in RENDER,
         "player and companion sprites use enlarged world-space dimensions")
 require("unsigned char solid[MAPH][MAPW]" in HEADER and "w->solid[y][x]=AREA_COLLISION" in GAME and "g->world.solid[y][x]" in GAME,
         "Tiled collision layer is shared with gameplay collision")
@@ -345,16 +467,19 @@ require("if(g->bossDefeated&&Dist(p->pos,g->world.shrine)<1.05f)" not in GAME,
 require(GAME.find("if(g->scene==SCENE_END)") < GAME.find("if(g->journalOpen || g->inventoryOpen || g->mapOpen)"),
         "finale update is processed before modal UI early returns")
 
-require("fetch_portrait_assets.ps1" not in (ROOT / "RUN_WINDOWS.bat").read_text(encoding="utf-8") and "TEX_KEEPER.id" in RENDER,
-        "Windows source build no longer downloads GitHub Actions artifacts and has local portrait fallbacks")
+require("fetch_portrait_assets.ps1" not in (ROOT / "RUN_WINDOWS.bat").read_text(encoding="utf-8") and
+        "TEX_WATCHER_PIXEL.id" in RENDER and "tools/generate_pixel_assets.py" in CMAKE,
+        "Windows source build generates its native pixel Watcher locally and does not download GitHub Actions artifacts")
 
 require('strcmp(speaker,"沫尾兽")==0' in GAME and 'strcmp(speaker,"沫尾")==0' in GAME and 'strcmp(speaker,"鸣晶蜥")==0)return 5' in GAME,
         "each recruited companion resolves to its own portrait ID")
-require("TEX_CHARACTER_PORTRAITS" in RENDER and "portrait>=0&&portrait<=2" in RENDER and "TEX_MOATAIL_ILLUSTRATION" in RENDER,
-        "high-resolution character portrait atlas is used for dialogue and the boss battle")
+require("TEX_CHARACTER_PORTRAITS" in RENDER and "portrait>=0&&portrait<=2" in RENDER and
+        "TEX_MOATAIL_ILLUSTRATION" in RENDER and "TEX_GUARDIAN_APPROVED" in RENDER and
+        "DrawLighthouseGuardian((Vector2){880,454},g->time,1.5f,g->battleTurn!=0)" in RENDER,
+        "high-resolution character portraits are dialogue-only while the boss battle uses its pixel sprite sheet")
 require("核心耐久" in RENDER and "阶段三" in RENDER and "核心蓄能" in RENDER and "PHASE III" not in RENDER,
         "boss phase and core status are displayed in Chinese in a non-overlapping panel")
-require("TEX_HEROINE_WORLD" in RENDER and "frame*64" in RENDER and "facing*80" in RENDER and "48.0f,68.0f" in RENDER,
+require("TEX_HEROINE_PIXEL" in RENDER and "frame*64" in RENDER and "facing*80" in RENDER and "38.0f,60.0f" in RENDER,
         "heroine uses crisp four-frame directional pixel art at a larger in-world scale")
 require("TEX_GROVE_COTTAGE" in RENDER and "DrawGroveCottage" in RENDER,
         "grove house uses the approved handcrafted cottage asset")
@@ -399,10 +524,10 @@ tree_case_start = RENDER.find("case RENDER_TREE:")
 tree_case_end = RENDER.find("case RENDER_PROP:", tree_case_start)
 tree_case = RENDER[tree_case_start:tree_case_end]
 require(tree_case_start >= 0 and tree_case_end > tree_case_start and
-        "DrawEllipse" in tree_case and "DrawFloraProp(8+(it->index%3),p,108*it->scale,120*it->scale)" in tree_case,
-        "large tree canopies have layered ground shadows and retain the authored 128px flora sprites")
-require('draw.ellipse((x-35*scale,y+1*scale,x+35*scale,y+15*scale)' in WATER_PREVIEW,
-        "map review previews reproduce the runtime tree grounding shadows")
+        "DrawEllipse" not in tree_case and "DrawFloraProp(8+(it->index%3),p,108*it->scale,120*it->scale)" in tree_case,
+        "large tree canopies retain authored flora sprites without detached circular shadows")
+require('draw.ellipse((x-35*scale,y+1*scale,x+35*scale,y+15*scale)' not in WATER_PREVIEW,
+        "map review previews follow the no-detached-tree-shadow rule")
 
 
 # World characters must come from authored illustrations/sprite sheets, never primitive stand-ins.
@@ -414,8 +539,8 @@ require(all(token in RENDER for token in ("TEX_LUMI_ILLUSTRATION", "TEX_MOATAIL_
         "heroine, Watcher, guardian and all three recruited companions have authored illustration textures")
 for signature, forbidden, label in [
     ("static void DrawPlayer(", ("DrawTriangle(", "DrawCircleV("), "heroine world renderer has no geometric body fallback"),
-    ("static void DrawKeeper(", ("DrawTriangle(", "DrawCircleV("), "Watcher world renderer uses the authored portrait illustration"),
-    ("static void DrawLighthouseGuardian(", ("DrawTriangle(", "DrawCircleV("), "guardian world renderer uses the authored portrait illustration"),
+    ("static void DrawKeeper(", ("DrawTriangle(", "DrawCircleV("), "Watcher world renderer uses a native pixel RPG actor"),
+    ("static void DrawLighthouseGuardian(", ("DrawTriangle(", "DrawCircleV("), "guardian world renderer uses the dedicated pixel boss sheet"),
     ("static void DrawLumi(", ("DrawTriangle(", "DrawCircleV("), "Moss Lumi world renderer uses the authored illustration"),
     ("static void DrawMoatail(", ("DrawTriangle(", "DrawCircleV("), "Moatail world renderer uses the authored illustration"),
     ("static void DrawGecko(", ("DrawTriangle(", "DrawCircleV("), "Crystal Gecko world renderer uses the authored illustration"),
@@ -433,10 +558,10 @@ for signature, forbidden, label in [
                 break
     body = RENDER[start:end] if start >= 0 and end > start else ""
     require(bool(body) and all(token not in body for token in forbidden), label)
-require('"assets/characters/png/moss_lumi.png"' in RENDER and
-        '"assets/characters/png/moatail.png"' in RENDER and
-        '"assets/characters/png/crystal_gecko.png"' in RENDER and
+require('"assets/characters/portraits/moss_lumi_portrait.png"' in RENDER and
+        '"assets/characters/portraits/moatail_portrait.png"' in RENDER and
+        '"assets/characters/portraits/crystal_gecko_portrait.png"' in RENDER and
         "for(int i=0;i<29;i++)" in RENDER,
-        "illustration texture load/unload lifecycle is complete")
+        "high-resolution companion portrait texture load/unload lifecycle is complete")
 
 print(f"Validation complete. Imported art sheets checked: {present}/{len(assets)}.")

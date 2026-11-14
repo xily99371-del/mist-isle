@@ -1,11 +1,12 @@
 #include "game.h"
 #include "area_maps.h"
+#include "atlas_bounds.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 static Font UI_FONT={0};
-static const int UI_CODEPOINTS[]={32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,183,8211,8212,8230,8592,8594,12289,12290,19968,19977,19978,19981,19982,19990,19996,20004,20013,20026,20027,20046,20063,20102,20107,20110,20113,20114,20132,20142,20154,20173,20174,20195,20197,20204,20214,20219,20237,20241,20249,20250,20260,20276,20284,20301,20307,20316,20320,20351,20379,20381,20391,20415,20445,20572,20799,20808,20809,20811,20837,20840,20849,20851,20860,20861,20877,20889,20914,20915,20986,20987,20999,21040,21046,21050,21069,21147,21152,21153,21160,21161,21191,21215,21253,21306,21319,21327,21335,21345,21355,21360,21457,21462,21463,21464,21475,21476,21482,21487,21488,21494,21507,21508,21512,21516,21518,21543,21560,21561,21629,21644,21709,21796,21890,21916,21943,22218,22238,22242,22270,22280,22312,22320,22495,22522,22612,22771,22788,22797,22806,22810,22825,22830,22833,22836,22987,23384,23427,23432,23433,23436,23450,23453,23454,23475,23478,23481,23494,23547,23548,23553,23558,23567,23578,23601,23614,23618,23637,23679,23707,23736,24038,24050,24102,24110,24182,24212,24231,24237,24320,24341,24359,24403,24405,24418,24448,24452,24453,24456,24471,24494,24515,24577,24674,24687,24819,24840,24847,24895,25104,25110,25112,25163,25165,25171,25214,25216,25226,25260,25307,25320,25321,25345,25353,25361,25377,25442,25506,25509,25552,25805,25910,25915,25918,25925,25928,25932,25937,25955,25972,25991,26007,26032,26041,26045,26049,26053,26080,26085,26087,26102,26143,26159,26174,26222,26228,26230,26263,26356,26368,26377,26391,26395,26410,26412,26426,26469,26519,26522,26524,26530,26597,26631,26639,26723,27425,27426,27491,27573,27668,27700,27719,27728,27773,27785,27809,27819,27835,27839,27861,27873,27922,27963,27969,27973,28014,28023,28145,28165,28287,28304,28418,28526,28608,28779,28781,28783,28784,28789,28857,29031,29060,29255,29256,29289,29366,29616,29702,29983,29992,30005,30028,30041,30333,30340,30446,30475,30528,30561,30707,30784,30830,30865,31181,31192,31227,31243,31456,31526,31532,31561,32034,32418,32441,32445,32447,32454,32456,32463,32469,32473,32487,32493,32622,32769,32773,32852,32972,33016,33021,33394,33410,33469,33487,33492,33719,33828,33829,33853,33976,34067,34255,34276,34411,34597,34892,34987,35013,35199,35201,35265,35299,35748,35753,35760,35835,35848,36125,36133,36164,36208,36215,36234,36291,36319,36335,36454,36530,36716,36731,36745,36793,36807,36817,36820,36824,36825,36827,36828,36857,36864,36873,36890,36896,36935,36947,36951,36973,37117,37266,37319,37324,37325,37327,38145,38190,38271,38378,38381,38388,38395,38431,38451,38459,38477,38498,38500,38505,38544,38598,38632,38654,38656,38706,38752,38754,39063,39064,39069,39118,39128,39295,39321,39564,40483,40736,65281,65292,65306,65307,35282,28796,30171,21407,25105,30452,24517,29420,33258,26463,21435,20303,19979,22826,20037,20309,35302,30896,22842,26366,25252,21534,21517,23383,37027,39318,39046,26680,32784,38454,22686,24378,20302,33988,31283,26029,20108,34259};;;
+static const int UI_CODEPOINTS[]={32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,183,8211,8212,8230,8592,8594,12289,12290,19968,19977,19978,19981,19982,19990,19996,20004,20013,20026,20027,20046,20063,20102,20107,20110,20113,20114,20132,20142,20154,20173,20174,20195,20197,20204,20214,20219,20237,20241,20249,20250,20260,20276,20284,20301,20307,20316,20320,20351,20379,20381,20391,20415,20445,20572,20799,20808,20809,20811,20837,20840,20849,20851,20860,20861,20877,20889,20914,20915,20986,20987,20999,21040,21046,21050,21069,21147,21152,21153,21160,21161,21191,21215,21253,21306,21319,21327,21335,21345,21355,21360,21457,21462,21463,21464,21475,21476,21482,21487,21488,21494,21507,21508,21512,21516,21518,21543,21560,21561,21629,21644,21709,21796,21890,21916,21943,22218,22238,22242,22270,22280,22312,22320,22495,22522,22612,22771,22788,22797,22806,22810,22825,22830,22833,22836,22987,23384,23427,23432,23433,23436,23450,23453,23454,23475,23478,23481,23494,23547,23548,23553,23558,23567,23578,23601,23614,23618,23637,23679,23707,23736,24038,24050,24102,24110,24182,24212,24231,24237,24320,24341,24359,24403,24405,24418,24448,24452,24453,24456,24471,24494,24515,24577,24674,24687,24819,24840,24847,24895,25104,25110,25112,25163,25165,25171,25214,25216,25226,25260,25307,25320,25321,25345,25353,25361,25377,25442,25506,25509,25552,25805,25910,25915,25918,25925,25928,25932,25937,25955,25972,25991,26007,26032,26041,26045,26049,26053,26080,26085,26087,26102,26143,26159,26174,26222,26228,26230,26263,26356,26368,26377,26391,26395,26410,26412,26426,26469,26519,26522,26524,26530,26597,26631,26639,26723,27425,27426,27491,27573,27668,27700,27719,27728,27773,27785,27809,27819,27835,27839,27861,27873,27922,27963,27969,27973,28014,28023,28145,28165,28287,28304,28418,28526,28608,28779,28781,28783,28784,28789,28857,29031,29060,29255,29256,29289,29366,29616,29702,29983,29992,30005,30028,30041,30333,30340,30446,30475,30528,30561,30707,30784,30830,30865,31181,31192,31227,31243,31456,31526,31532,31561,32034,32418,32441,32445,32447,32454,32456,32463,32469,32473,32487,32493,32622,32769,32773,32852,32972,33016,33021,33394,33410,33469,33487,33492,33719,33828,33829,33853,33976,34067,34255,34276,34411,34597,34892,34987,35013,35199,35201,35265,35299,35748,35753,35760,35835,35848,36125,36133,36164,36208,36215,36234,36291,36319,36335,36454,36530,36716,36731,36745,36793,36807,36817,36820,36824,36825,36827,36828,36857,36864,36873,36890,36896,36935,36947,36951,36973,37117,37266,37319,37324,37325,37327,38145,38190,38271,38378,38381,38388,38395,38431,38451,38459,38477,38498,38500,38505,38544,38598,38632,38654,38656,38706,38752,38754,39063,39064,39069,39118,39128,39295,39321,39564,40483,40736,65281,65292,65306,65307,35282,28796,30171,21407,25105,30452,24517,29420,33258,26463,21435,20303,19979,22826,20037,20309,35302,30896,22842,26366,25252,21534,21517,23383,37027,39318,39046,26680,32784,38454,22686,24378,20302,33988,31283,26029,20108,34259,20339,22823,23613,24230,26816,32047,32791,36814,36884,38543,26262,31359,38453,32858,25314,21183,28176,21387,20919,22812,28459,36880,38452};;;
 static bool UIFontHasRequiredGlyphs(Font f) {
     for(int i=0;i<(int)(sizeof(UI_CODEPOINTS)/sizeof(UI_CODEPOINTS[0]));i++) {
         int cp=UI_CODEPOINTS[i];
@@ -74,16 +75,23 @@ static void DrawUITextWrapped(const char *text,int x,int y,int maxWidth,int size
 static Texture2D TEX_HERO={0}, TEX_LUMI={0}, TEX_MOATAIL={0}, TEX_GECKO={0}, TEX_KEEPER={0};
 static Texture2D TEX_HERO_PORTRAIT={0}, TEX_WATCHER_PORTRAIT={0}, TEX_GUARDIAN_PORTRAIT={0};
 static Texture2D TEX_HEROINE_APPROVED={0}, TEX_GUARDIAN_APPROVED={0};
+static Texture2D TEX_HEROINE_PIXEL={0}, TEX_WATCHER_PIXEL={0}, TEX_COASTAL_HOUSE={0};
 static Texture2D TEX_CHARACTER_PORTRAITS={0}, TEX_HEROINE_WORLD={0}, TEX_WATCHER_WORLD={0}, TEX_GROVE_COTTAGE={0};
 static Texture2D TEX_LUMI_ILLUSTRATION={0}, TEX_MOATAIL_ILLUSTRATION={0}, TEX_GECKO_ILLUSTRATION={0};
 static Texture2D TEX_HERO_PIXEL={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, TEX_GECKO_PIXEL={0}, TEX_TILES={0}, TEX_PROPS={0};
 static Texture2D TEX_ISO_TILES={0}, TEX_HERO_WALK={0}, TEX_ENV_PROPS={0}, TEX_LEAFLING={0}, TEX_GROVE_MOTE={0}, TEX_AREA_PROPS={0}, TEX_TOPDOWN_TILES={0}, TEX_FLORA_ATLAS={0}, TEX_CLIFF_ATLAS={0}, TEX_STRUCTURE_ATLAS={0}, TEX_ORIGINAL_PROPS={0}, TEX_KENNEY_BUILDINGS={0}, TEX_ENDING_CG={0};
+static Texture2D TEX_NATURE_SHEET={0}, TEX_GROVE_SHEET={0}, TEX_RUINS_SHEET={0}, TEX_LIGHTHOUSE_SHEET={0};
 static RenderTexture2D TEX_GROUND_CACHE={0};
 static int CACHED_GROUND_AREA=-1;
 static void DrawPortrait(Texture2D tex, Vector2 p, float w, float h, float bob) {
     if (tex.id == 0) return;
     Rectangle src={0,0,(float)tex.width,(float)tex.height};
     Rectangle dst={p.x-w*0.5f,p.y-h-bob,w,h};
+    DrawTexturePro(tex,src,dst,(Vector2){0,0},0,WHITE);
+}
+static void DrawIllustratedPortrait(Texture2D tex,Rectangle dst) {
+    if(!tex.id)return;
+    Rectangle src={0,0,(float)tex.width,(float)tex.height};
     DrawTexturePro(tex,src,dst,(Vector2){0,0},0,WHITE);
 }
 static Vector2 WorldToScreen(float x,float y) { return (Vector2){(x+0.5f)*TILE_SIZE,(y+0.5f)*TILE_SIZE}; }
@@ -226,16 +234,25 @@ static void DrawTerrainAccent(int x,int y,Area area,int kind,float time) {
         DrawCircleV((Vector2){p.x+ox,p.y+oy},1.8f,(Color){160,146,118,210});
     }
 }
-static void DrawAtlasSprite(Texture2D tex,int index,int columns,int cell,Vector2 p,float w,float h) {
+static void DrawAtlasSprite(Texture2D tex,int index,int columns,int cell,Vector2 p,float w,float h,const MistAtlasBounds *bounds) {
     if(!tex.id)return;
     Rectangle src={(float)((index%columns)*cell),(float)((index/columns)*cell),(float)cell,(float)cell};
     Rectangle dst={p.x-w*.5f,p.y-h,w,h};
+    // Trim transparent padding from the source cell and anchor the visible pixels
+    // to the actual ground-contact point. This prevents floating props and cut-off feet.
+    if(bounds && bounds->w>0 && bounds->h>0) {
+        src.x+=(float)bounds->x; src.y+=(float)bounds->y;
+        src.width=(float)bounds->w; src.height=(float)bounds->h;
+        float dw=w*(float)bounds->w/(float)cell;
+        float dh=h*(float)bounds->h/(float)cell;
+        dst=(Rectangle){p.x-dw*.5f,p.y-dh,dw,dh};
+    }
     DrawTexturePro(tex,src,dst,(Vector2){0,0},0,WHITE);
 }
-static void DrawFloraProp(int index,Vector2 p,float w,float h) { DrawAtlasSprite(TEX_FLORA_ATLAS,index,8,128,p,w,h); }
-static void DrawCliffProp(int index,Vector2 p,float w,float h) { DrawAtlasSprite(TEX_CLIFF_ATLAS,index,8,128,p,w,h); }
-static void DrawStructureProp(int index,Vector2 p,float w,float h) { DrawAtlasSprite(TEX_STRUCTURE_ATLAS,index,8,128,p,w,h); }
-static void DrawOriginalProp(int index,Vector2 p,float w,float h) { DrawAtlasSprite(TEX_ORIGINAL_PROPS,index,4,32,p,w,h); }
+static void DrawFloraProp(int index,Vector2 p,float w,float h) { if(index>=0&&index<48)DrawAtlasSprite(TEX_FLORA_ATLAS,index,8,128,p,w,h,&FLORA_ATLAS_BOUNDS[index]); }
+static void DrawCliffProp(int index,Vector2 p,float w,float h) { if(index>=0&&index<32)DrawAtlasSprite(TEX_CLIFF_ATLAS,index,8,128,p,w,h,&CLIFF_ATLAS_BOUNDS[index]); }
+static void DrawStructureProp(int index,Vector2 p,float w,float h) { if(index>=0&&index<16)DrawAtlasSprite(TEX_STRUCTURE_ATLAS,index,8,128,p,w,h,&STRUCTURE_ATLAS_BOUNDS[index]); }
+static void DrawOriginalProp(int index,Vector2 p,float w,float h) { if(index>=0&&index<16)DrawAtlasSprite(TEX_ORIGINAL_PROPS,index,4,32,p,w,h,&ORIGINAL_PROPS_BOUNDS[index]); }
 static void DrawKenneyBuilding(int index,Vector2 p,float scale) {
     if(!TEX_KENNEY_BUILDINGS.id)return;
     Rectangle src,dst;
@@ -252,23 +269,35 @@ static void DrawKenneyBuilding(int index,Vector2 p,float scale) {
     DrawTexturePro(TEX_KENNEY_BUILDINGS,src,dst,(Vector2){0,0},0,WHITE);
 }
 static void DrawAreaPropTint(int index,Vector2 p,float w,float h,Color tint) {
-    if(!TEX_AREA_PROPS.id)return;
-    Rectangle src={(float)(index*96),0,96,96};
-    Rectangle dst={p.x-w*.5f,p.y-h,w,h};
+    if(!TEX_AREA_PROPS.id||index<0||index>=16)return;
+    const MistAtlasBounds *b=&AREA_PROPS_BOUNDS[index];
+    Rectangle src={(float)(index*96+b->x),(float)b->y,(float)b->w,(float)b->h};
+    float dw=w*(float)b->w/96.0f,dh=h*(float)b->h/96.0f;
+    Rectangle dst={p.x-dw*.5f,p.y-dh,dw,dh};
     DrawTexturePro(TEX_AREA_PROPS,src,dst,(Vector2){0,0},0,tint);
 }
 static void DrawAreaProp(int index,Vector2 p,float w,float h) {
     DrawAreaPropTint(index,p,w,h,WHITE);
 }
 static void DrawEnvProp(int index,Vector2 p,float w,float h) {
-    if(!TEX_ENV_PROPS.id)return;
-    Rectangle src={(float)(index*96),0,96,96};
-    Rectangle dst={p.x-w*.5f,p.y-h,w,h};
+    if(!TEX_ENV_PROPS.id||index<0||index>=12)return;
+    const MistAtlasBounds *b=&ENV_PROPS_BOUNDS[index];
+    Rectangle src={(float)(index*96+b->x),(float)b->y,(float)b->w,(float)b->h};
+    float dw=w*(float)b->w/96.0f,dh=h*(float)b->h/96.0f;
+    Rectangle dst={p.x-dw*.5f,p.y-dh,dw,dh};
     DrawTexturePro(TEX_ENV_PROPS,src,dst,(Vector2){0,0},0,WHITE);
+}
+static void DrawCoastalHouse(Vector2 p,float scale) {
+    if(!TEX_COASTAL_HOUSE.id)return;
+    const float footY=p.y+7.0f;
+    const float w=252.0f*scale,h=204.0f*scale;
+    /* Buildings use authored foundations and contact edges, not detached oval shadows. */
+    Rectangle src={0,0,(float)TEX_COASTAL_HOUSE.width,(float)TEX_COASTAL_HOUSE.height};
+    Rectangle dst={p.x-w*.5f,footY-h,w,h};
+    DrawTexturePro(TEX_COASTAL_HOUSE,src,dst,(Vector2){0,0},0,WHITE);
 }
 static void DrawGroveCottage(Vector2 p,float scale) {
     if(!TEX_GROVE_COTTAGE.id)return;
-    DrawEllipse((int)p.x,(int)p.y+4,(int)(88*scale),(int)(12*scale),(Color){34,53,45,105});
     Rectangle src={0,0,(float)TEX_GROVE_COTTAGE.width,(float)TEX_GROVE_COTTAGE.height};
     float w=176.0f*scale,h=144.0f*scale;
     Rectangle dst={p.x-w*.5f,p.y-h,w,h};
@@ -280,38 +309,119 @@ static void DrawTree(Vector2 p,float s,float t) {
         DrawEnvProp(variant,p,82*s,92*s);
         return;
     }
-    DrawEllipse((int)p.x,(int)p.y+5,15*s,5*s,(Color){67,101,76,75});
     DrawRectangle((int)(p.x-3*s),(int)(p.y-24*s),(int)(6*s),(int)(28*s),(Color){153,113,77,255});
     DrawCircleV((Vector2){p.x,p.y-36*s},16*s,(Color){99,163,109,255});
     DrawCircleV((Vector2){p.x-9*s,p.y-42*s},11*s,(Color){126,186,126,255});
     DrawCircleV((Vector2){p.x+9*s,p.y-42*s},11*s,(Color){112,177,119,255});
     DrawCircleV((Vector2){p.x+4*s,p.y-49*s},4*s,Fade(C_GOLD,.3f+.1f*sinf(t+p.x)));
 }
-static void DrawProp(int index,Vector2 p,float w,float h) {
-    if(!TEX_PROPS.id)return;
-    Rectangle src={(float)(index*64),0,64,64};
+
+static void DrawGeneratedMapAsset(int index,Vector2 p,float scale) {
+    Texture2D tex={0}; Rectangle src={0};
+    switch(index) {
+        /* Main island: flowering trees, shrubs, low flowers, stones, saplings, glow plants. */
+        case 600: tex=TEX_NATURE_SHEET;src=(Rectangle){18,86,275,276};break;
+        case 601: tex=TEX_NATURE_SHEET;src=(Rectangle){324,87,258,276};break;
+        case 602: tex=TEX_NATURE_SHEET;src=(Rectangle){631,82,269,282};break;
+        case 603: tex=TEX_NATURE_SHEET;src=(Rectangle){939,86,295,280};break;
+        case 604: tex=TEX_NATURE_SHEET;src=(Rectangle){20,444,201,154};break;
+        case 605: tex=TEX_NATURE_SHEET;src=(Rectangle){233,448,183,150};break;
+        case 606: tex=TEX_NATURE_SHEET;src=(Rectangle){434,453,188,144};break;
+        case 607: tex=TEX_NATURE_SHEET;src=(Rectangle){673,473,114,105};break;
+        case 608: tex=TEX_NATURE_SHEET;src=(Rectangle){964,483,120,96};break;
+        case 609: tex=TEX_NATURE_SHEET;src=(Rectangle){1110,485,121,93};break;
+        case 610: tex=TEX_NATURE_SHEET;src=(Rectangle){820,502,119,76};break;
+        case 611: tex=TEX_NATURE_SHEET;src=(Rectangle){41,702,182,109};break;
+        case 612: tex=TEX_NATURE_SHEET;src=(Rectangle){269,732,135,71};break;
+        case 613: tex=TEX_NATURE_SHEET;src=(Rectangle){463,739,95,58};break;
+        case 614: tex=TEX_NATURE_SHEET;src=(Rectangle){615,745,121,57};break;
+        case 615: tex=TEX_NATURE_SHEET;src=(Rectangle){814,679,113,128};break;
+        case 616: tex=TEX_NATURE_SHEET;src=(Rectangle){1120,693,95,110};break;
+        case 617: tex=TEX_NATURE_SHEET;src=(Rectangle){971,717,92,86};break;
+        case 618: tex=TEX_NATURE_SHEET;src=(Rectangle){36,900,231,233};break;
+        case 619: tex=TEX_NATURE_SHEET;src=(Rectangle){348,907,225,220};break;
+        /* Glowglade: its own cottage and woodland flora. */
+        case 620: tex=TEX_GROVE_SHEET;src=(Rectangle){48,68,753,501};break;
+        case 621: tex=TEX_GROVE_SHEET;src=(Rectangle){834,247,382,296};break;
+        case 622: tex=TEX_GROVE_SHEET;src=(Rectangle){53,614,250,210};break;
+        case 623: tex=TEX_GROVE_SHEET;src=(Rectangle){349,629,232,196};break;
+        case 624: tex=TEX_GROVE_SHEET;src=(Rectangle){630,605,285,230};break;
+        case 625: tex=TEX_GROVE_SHEET;src=(Rectangle){967,603,243,228};break;
+        case 626: tex=TEX_GROVE_SHEET;src=(Rectangle){24,871,380,307};break;
+        case 627: tex=TEX_GROVE_SHEET;src=(Rectangle){425,885,354,289};break;
+        case 628: tex=TEX_GROVE_SHEET;src=(Rectangle){816,894,172,278};break;
+        case 629: tex=TEX_GROVE_SHEET;src=(Rectangle){1023,908,191,256};break;
+        /* Tidal ruins: broken arches, columns, plinths, tide pools and tablets. */
+        case 640: tex=TEX_RUINS_SHEET;src=(Rectangle){42,59,321,316};break;
+        case 641: tex=TEX_RUINS_SHEET;src=(Rectangle){394,73,299,294};break;
+        case 642: tex=TEX_RUINS_SHEET;src=(Rectangle){723,107,140,254};break;
+        case 643: tex=TEX_RUINS_SHEET;src=(Rectangle){895,189,132,175};break;
+        case 644: tex=TEX_RUINS_SHEET;src=(Rectangle){1047,267,176,96};break;
+        case 645: tex=TEX_RUINS_SHEET;src=(Rectangle){58,433,353,186};break;
+        case 646: tex=TEX_RUINS_SHEET;src=(Rectangle){474,449,327,171};break;
+        case 647: tex=TEX_RUINS_SHEET;src=(Rectangle){856,449,334,153};break;
+        case 648: tex=TEX_RUINS_SHEET;src=(Rectangle){31,660,255,225};break;
+        case 649: tex=TEX_RUINS_SHEET;src=(Rectangle){319,711,273,162};break;
+        case 650: tex=TEX_RUINS_SHEET;src=(Rectangle){625,738,289,144};break;
+        case 651: tex=TEX_RUINS_SHEET;src=(Rectangle){920,975,274,190};break;
+        case 652: tex=TEX_RUINS_SHEET;src=(Rectangle){69,1002,214,131};break;
+        case 653: tex=TEX_RUINS_SHEET;src=(Rectangle){611,944,275,232};break;
+        case 654: tex=TEX_RUINS_SHEET;src=(Rectangle){356,1065,204,73};break;
+        /* Lighthouse courtyard: dead trees, ruined pillars, altar, rubble, thorn and lanterns. */
+        case 660: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){49,15,406,347};break;
+        case 661: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){449,49,369,312};break;
+        case 662: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){842,100,328,261};break;
+        case 663: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){21,398,212,247};break;
+        case 664: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){262,422,209,211};break;
+        case 665: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){486,411,192,219};break;
+        case 666: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){702,446,256,195};break;
+        case 667: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){977,398,268,243};break;
+        case 668: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){13,732,256,170};break;
+        case 669: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){286,736,202,172};break;
+        case 670: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){513,702,208,205};break;
+        case 671: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){751,742,211,161};break;
+        case 672: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){989,707,250,199};break;
+        case 673: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){27,1020,369,189};break;
+        case 674: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){420,1018,319,185};break;
+        case 675: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){764,983,172,227};break;
+        case 676: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){998,957,228,261};break;
+        default:return;
+    }
+    if(!tex.id||src.width<=0||src.height<=0)return;
+    float w=src.width*scale,h=src.height*scale;
     Rectangle dst={p.x-w*.5f,p.y-h,w,h};
+    DrawTexturePro(tex,src,dst,(Vector2){0,0},0,WHITE);
+    if(index==676) {
+        /* The blue brazier is a focal light source, not just a static rubble prop. */
+        float pulse=.5f+.5f*sinf((float)GetTime()*2.4f+p.x*.013f);
+        Vector2 flame={p.x,p.y-h*.72f};
+        DrawCircleV(flame,30.0f+5.0f*pulse,Fade((Color){57,153,255,255},.15f+.08f*pulse));
+        DrawCircleV(flame,15.0f+3.0f*pulse,Fade((Color){112,201,255,255},.20f+.12f*pulse));
+    }
+}
+static float WeatherNoise(int i,int salt) {
+    float v=sinf((float)(i*127+salt*311)*12.9898f)*43758.5453f;
+    return v-floorf(v);
+}
+static void DrawProp(int index,Vector2 p,float w,float h) {
+    if(!TEX_PROPS.id||index<0||index>=12)return;
+    const MistAtlasBounds *b=&PIXEL_PROPS_BOUNDS[index];
+    Rectangle src={(float)(index*64+b->x),(float)b->y,(float)b->w,(float)b->h};
+    float dw=w*(float)b->w/64.0f,dh=h*(float)b->h/64.0f;
+    Rectangle dst={p.x-dw*.5f,p.y-dh,dw,dh};
     DrawTexturePro(TEX_PROPS,src,dst,(Vector2){0,0},0,WHITE);
 }
 static void DrawKeeper(Vector2 p,float t,float scale) {
-    (void)t;
-    const float footY=p.y+8.0f*scale;
-    DrawEllipse((int)p.x,(int)footY,(int)(29*scale),(int)(8*scale),(Color){35,49,45,105});
-    if(TEX_WATCHER_WORLD.id) {
-        Rectangle src={0,0,(float)TEX_WATCHER_WORLD.width,(float)TEX_WATCHER_WORLD.height};
-        float w=104.0f*scale,h=148.0f*scale;
-        Rectangle dst={p.x-w*.5f,footY-h,w,h};
-        DrawTexturePro(TEX_WATCHER_WORLD,src,dst,(Vector2){0,0},0,WHITE);
-    } else if(TEX_WATCHER_PORTRAIT.id) {
-        Rectangle src={0,0,(float)TEX_WATCHER_PORTRAIT.width,(float)TEX_WATCHER_PORTRAIT.height};
-        float w=104.0f*scale,h=130.0f*scale;
-        Rectangle dst={p.x-w*.5f,footY-h,w,h};
-        DrawTexturePro(TEX_WATCHER_PORTRAIT,src,dst,(Vector2){0,0},0,WHITE);
-    } else if(TEX_KEEPER.id) {
-        Rectangle src={0,0,(float)TEX_KEEPER.width,(float)TEX_KEEPER.height};
-        float w=86.0f*scale,h=112.0f*scale;
-        Rectangle dst={p.x-w*.5f,footY-h,w,h};
-        DrawTexturePro(TEX_KEEPER,src,dst,(Vector2){0,0},0,WHITE);
+    const float footY=p.y+7.0f*scale;
+    // Four-frame native pixel NPC sheet, never a pixelated portrait crop.
+    if(TEX_WATCHER_PIXEL.id) {
+        int frame=(int)(t*2.2f)%4;
+        Rectangle src={(float)(frame*64),0,64,80};
+        float w=42.0f*scale,h=68.0f*scale;
+        Rectangle dst={roundf(p.x-w*.5f),roundf(footY-h),w,h};
+        DrawTexturePro(TEX_WATCHER_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
+    } else {
+        TraceLog(LOG_ERROR,"Mist Isle: native pixel Watcher actor missing; no portrait or low-resolution fallback will be displayed.");
     }
 }
 static void DrawFirefly(Vector2 p,float t) {
@@ -367,20 +477,20 @@ static void DrawPlayer(Vector2 p,float t,bool moving,int facing) {
     float bob=moving?fabsf(sinf(t*13.0f))*1.0f:0.0f;
     DrawEllipse((int)p.x,(int)footY,18,5,(Color){42,48,52,112});
     if(facing<0||facing>3)facing=0;
-    if(TEX_HEROINE_WORLD.id) {
+    if(TEX_HEROINE_PIXEL.id) {
         int frame=moving?((int)(t*8.0f)%4):0;
         Rectangle src={(float)(frame*64),(float)(facing*80),64,80};
-        Rectangle dst={p.x-24.0f,footY-68.0f-bob,48.0f,68.0f};
-        DrawTexturePro(TEX_HEROINE_WORLD,src,dst,(Vector2){0,0},0,WHITE);
+        Rectangle dst={roundf(p.x-19.0f),roundf(footY-60.0f-bob),38.0f,60.0f};
+        DrawTexturePro(TEX_HEROINE_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_HEROINE_APPROVED.id) {
         int frame=moving?((int)(t*10.0f)%8):0;
         Rectangle src={(float)(frame*24),(float)(facing*32),24,32};
-        Rectangle dst={p.x-24.0f,footY-64.0f-bob,48.0f,64.0f};
+        Rectangle dst={roundf(p.x-19.0f),roundf(footY-52.0f-bob),38.0f,52.0f};
         DrawTexturePro(TEX_HEROINE_APPROVED,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_HERO_WALK.id) {
         int frame=moving?((int)(t*8.0f)%4):0;
         Rectangle src={(float)(frame*32),(float)(facing*32),32,32};
-        Rectangle dst={p.x-23.0f,footY-48.0f-bob,46.0f,48.0f};
+        Rectangle dst={roundf(p.x-19.0f),roundf(footY-40.0f-bob),38.0f,40.0f};
         DrawTexturePro(TEX_HERO_WALK,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_HERO_PORTRAIT.id) {
         Rectangle src={0,0,(float)TEX_HERO_PORTRAIT.width,(float)TEX_HERO_PORTRAIT.height};
@@ -392,7 +502,6 @@ static void DrawShrine(Vector2 p,float t,bool solved,bool finalCore) {
     Color c=solved?C_GOLD:(Color){158,185,166,255};
     if(finalCore) {
         // The Tidal Ruins keystone is the chapter's central mechanism, not another small shrine.
-        DrawEllipse((int)p.x,(int)p.y+13,104,25,(Color){35,57,61,145});
         DrawCircleLines((int)p.x,(int)p.y+7,91,Fade((Color){93,169,174,255},.38f));
         DrawCircleLines((int)p.x,(int)p.y+7,74,Fade((Color){218,192,128,255},.55f));
         DrawCircleLines((int)p.x,(int)p.y+7,58,Fade((Color){93,169,174,255},.32f));
@@ -422,7 +531,6 @@ static void DrawShrine(Vector2 p,float t,bool solved,bool finalCore) {
         }
         return;
     }
-    DrawEllipse((int)p.x,(int)p.y+8,34,10,(Color){66,95,85,95});
     if(TEX_AREA_PROPS.id) DrawAreaProp(11,p,104,108);
     else if(TEX_ENV_PROPS.id) DrawEnvProp(4,p,82,82);
     else {
@@ -492,16 +600,13 @@ static void DrawLighthouseGuardian(Vector2 p,float t,float scale,bool attacking)
     DrawCircleLines((int)p.x,(int)(p.y-72*scale),(int)(54*scale),Fade((Color){255,190,91,255},.20f+.12f*pulse));
     DrawCircleLines((int)p.x,(int)(p.y-72*scale),(int)(67*scale),Fade((Color){113,204,211,255},.12f));
     if(TEX_GUARDIAN_APPROVED.id) {
-        int frame=attacking?((int)(t*8.0f)%4):0;
-        Rectangle src={(float)(frame*48),attacking?64.0f:0.0f,48,64};
-        float w=164.0f*scale,h=218.0f*scale;
+        int frame=attacking?((int)(t*8.0f)%4):((int)(t*2.0f)%4);
+        Rectangle src={(float)(frame*64),attacking?80.0f:0.0f,64,80};
+        float w=112.0f*scale,h=140.0f*scale;
         Rectangle dst={p.x-w*.5f,p.y-h+bob,w,h};
         DrawTexturePro(TEX_GUARDIAN_APPROVED,src,dst,(Vector2){0,0},0,WHITE);
-    } else if(TEX_GUARDIAN_PORTRAIT.id) {
-        Rectangle src={0,0,(float)TEX_GUARDIAN_PORTRAIT.width,(float)TEX_GUARDIAN_PORTRAIT.height};
-        float w=148.0f*scale,h=184.0f*scale;
-        Rectangle dst={p.x-w*.5f,p.y-h+bob,w,h};
-        DrawTexturePro(TEX_GUARDIAN_PORTRAIT,src,dst,(Vector2){0,0},0,WHITE);
+    } else {
+        TraceLog(LOG_ERROR,"Mist Isle: pixel guardian sheet is missing; refusing to display the anime portrait as a world actor.");
     }
 }
 static void DrawCloudPuff(float x,float y,float s,Color color) {
@@ -639,9 +744,7 @@ static void DrawGateMarker(Game *g,int gateId,Vector2 grid) {
     float pulse=.5f+.5f*sinf(g->time*2.8f+gateId);
     // A grounded masonry plinth connects each portal to the path and removes the floating-object look.
     // Irregular embedded stone threshold: no floating rectangular slab.
-    DrawEllipse((int)p.x,(int)p.y+12,66,17,(Color){24,43,42,135});
-    DrawEllipse((int)p.x,(int)p.y+7,57,12,(Color){91,100,82,255});
-    DrawEllipseLines((int)p.x,(int)p.y+7,57,12,(Color){169,158,119,230});
+    /* No detached oval shadow under portals; the arch art carries its own base. */
     for(int i=0;i<7;i++) {
         float a=(float)i*PI2/7.0f+.18f;
         Vector2 shard={p.x+cosf(a)*47.0f,p.y+7.0f+sinf(a)*10.0f};
@@ -734,11 +837,13 @@ static void DrawCoastalCliffs(Game *g,int terrainKinds[MAPH][MAPW],int minX,int 
     }
 }
 #if defined(MISTISLE_PI_PROFILE)
-#define MISTISLE_RAIN_DROPS 56
-#define MISTISLE_RAIN_RIPPLES 6
+#define MISTISLE_RAIN_DROPS 64
+#define MISTISLE_RAIN_RIPPLES 8
+#define MISTISLE_FIREFLY_COUNT 30
 #else
-#define MISTISLE_RAIN_DROPS 190
-#define MISTISLE_RAIN_RIPPLES 22
+#define MISTISLE_RAIN_DROPS 230
+#define MISTISLE_RAIN_RIPPLES 28
+#define MISTISLE_FIREFLY_COUNT 58
 #endif
 static void BuildGroundCache(Game *g) {
     if(!TEX_GROUND_CACHE.id || CACHED_GROUND_AREA==(int)g->area)return;
@@ -876,7 +981,7 @@ static void RenderWorld(Game *g) {
         Vector2 screen=GetWorldToScreen2D(p,g->cam);
         if(screen.x<-180.0f||screen.x>SW+180.0f||screen.y<-180.0f||screen.y>SH+180.0f)continue;
         switch(it->kind) {
-            case RENDER_TREE: p.y+=8.0f; DrawEllipse((int)p.x,(int)p.y+7,(int)(34*it->scale),(int)(8*it->scale),(Color){35,67,49,72}); DrawEllipse((int)p.x,(int)p.y+5,(int)(25*it->scale),(int)(5*it->scale),(Color){71,111,70,48}); DrawFloraProp(8+(it->index%3),p,108*it->scale,120*it->scale); break;
+            case RENDER_TREE: p.y+=8.0f; DrawFloraProp(8+(it->index%3),p,108*it->scale,120*it->scale); break;
             case RENDER_PROP:
                 p.y+=7.0f;
                 if(it->index==4)DrawProp(4,p,72,68);
@@ -911,14 +1016,15 @@ static void RenderWorld(Game *g) {
                 else if(it->index>=20&&it->index<=35)DrawAreaProp(it->index-20,p,76*it->scale,82*it->scale);
                 else if(it->index>=100&&it->index<200)DrawFloraProp(it->index-100,p,72*it->scale,78*it->scale);
                 else if(it->index>=200&&it->index<300)DrawCliffProp(it->index-200,p,88*it->scale,88*it->scale);
-                else if(it->index==302)DrawStructureProp(2,p,196*it->scale,156*it->scale);
+                else if(it->index==302)DrawCoastalHouse(p,it->scale);
                 else if(it->index==303)DrawStructureProp(3,p,132*it->scale,116*it->scale);
                 else if(it->index==304)DrawStructureProp(4,p,166*it->scale,180*it->scale);
                 else if(it->index==305)DrawStructureProp(5,p,168*it->scale,152*it->scale);
                 else if(it->index>=300&&it->index<400)DrawStructureProp(it->index-300,p,112*it->scale,104*it->scale);
                 else if(it->index>=400&&it->index<416)DrawOriginalProp(it->index-400,p,92*it->scale,92*it->scale);
-                else if(it->index==500&&TEX_GROVE_COTTAGE.id)DrawGroveCottage(p,it->scale);
+                else if(it->index==500)DrawGeneratedMapAsset(620,p,it->scale*.35f);
                 else if(it->index>=500&&it->index<504)DrawKenneyBuilding(it->index-500,p,it->scale);
+                else if(it->index>=600&&it->index<=676)DrawGeneratedMapAsset(it->index,p,it->scale);
                 break;
             case RENDER_FIRE: DrawCampfire(p,g->time); break;
             case RENDER_PICKUP: DrawPickup(&g->world.pickups[it->index]); break;
@@ -943,13 +1049,10 @@ static void RenderWorld(Game *g) {
             case RENDER_LEAFLING: DrawLeafling(p,g->time); break;
             case RENDER_MOTE: DrawMote(p,g->time); break;
             case RENDER_BOSS:
-                DrawEllipse((int)p.x,(int)p.y+5,72,18,(Color){24,38,46,145});
-                DrawCircleLines((int)p.x,(int)p.y+3,61,Fade((Color){117,203,220,255},.42f));
-                DrawCircleLines((int)p.x,(int)p.y+3,48,Fade((Color){255,205,115,255},.28f));
-                DrawLighthouseGuardian(p,g->time,1.48f,false);
-                DrawRectangleRounded((Rectangle){p.x-52,p.y-154,104,22},.25f,5,(Color){8,24,38,230});
-                DrawRectangleRoundedLinesEx((Rectangle){p.x-52,p.y-154,104,22},.25f,5,1.5f,(Color){255,205,115,220});
-                DrawUIText("灯塔守卫",(int)p.x-28,(int)p.y-150,13,(Color){255,232,170,255});
+                DrawLighthouseGuardian(p,g->time,1.0f,false);
+                DrawRectangleRounded((Rectangle){p.x-52,p.y-168,104,22},.25f,5,(Color){8,24,38,230});
+                DrawRectangleRoundedLinesEx((Rectangle){p.x-52,p.y-168,104,22},.25f,5,1.5f,(Color){255,205,115,220});
+                DrawUIText("灯塔守卫",(int)p.x-28,(int)p.y-164,13,(Color){255,232,170,255});
                 break;
             case RENDER_GATE: DrawGateMarker(g,it->index,it->grid); break;
             case RENDER_PLAYER: DrawPlayer(p,g->time,Vector2Length(g->player.vel)>.1f,g->player.facing); break;
@@ -966,40 +1069,101 @@ static void RenderWorld(Game *g) {
     }
     EndMode2D();
     float night=0.5f+0.5f*cosf(g->dayClock*PI2);
-    if(night>0.62f)DrawRectangle(0,0,SW,SH,Fade((Color){43,59,99,255},(night-0.62f)*0.22f));
-    if(g->weather==1) {
-        // Cool overcast tint, three rain depths and visible impacts on water surfaces.
-        DrawRectangle(0,0,SW,SH,Fade((Color){34,57,75,255},.105f));
-        for(int i=0;i<MISTISLE_RAIN_DROPS;i++) {
-            float speed=285.0f+(float)(i%5)*72.0f;
-            float travel=fmodf(g->time*speed+(float)(i*83),SH+70.0f);
-            float x=fmodf((float)(i*149)+g->time*(125.0f+(float)(i%4)*19.0f),SW+90.0f)-45.0f;
-            float y=travel-35.0f;
-            float length=12.0f+(float)(i%4)*4.5f;
-            float alpha=.28f+(float)(i%4)*.075f;
-            float width=(i%7==0)?1.8f:1.0f;
-            DrawLineEx((Vector2){x,y},(Vector2){x-8.0f,y+length},width,Fade((Color){197,222,232,255},alpha));
+    if(night>0.62f)DrawRectangle(0,0,SW,SH,Fade((Color){25,39,68,255},(night-0.62f)*.30f));
+    float weatherAlpha=fminf(1.0f,g->weatherFade);
+    /* Area-specific grading: a hushed blue-green forest and a colder, oppressive boss court. */
+    if(g->area==AREA_GROVE)DrawRectangle(0,0,SW,SH,Fade((Color){20,43,48,255},.20f));
+    else if(g->area==AREA_LIGHTHOUSE)DrawRectangle(0,0,SW,SH,Fade((Color){20,24,35,255},.24f));
+    if(g->weather==0) {
+        DrawRectangle(0,0,SW,SH,Fade((Color){255,221,157,255},.055f*weatherAlpha));
+        for(int i=0;i<30;i++) {
+            float phase=WeatherNoise(i,17);
+            float x=fmodf(phase*SW+g->time*(5.0f+WeatherNoise(i,18)*9.0f),SW);
+            float y=fmodf(WeatherNoise(i,19)*SH+ sinf(g->time*.42f+i)*22.0f,SH);
+            DrawCircleV((Vector2){x,y},1.2f+WeatherNoise(i,20)*1.8f,Fade((Color){255,232,169,255},.42f*weatherAlpha));
         }
-        for(int i=0;i<MISTISLE_RAIN_RIPPLES;i++) {
-            float x=fmodf((float)(i*97)+g->time*31.0f,SW);
-            float y=fmodf((float)(i*61)+g->time*19.0f,SH);
-            float pulse=fmodf(g->time*1.8f+(float)i*.37f,1.0f);
-            DrawCircleLines((int)x,(int)y,(int)(2.0f+pulse*4.0f),Fade((Color){196,225,231,255},.38f*(1.0f-pulse)));
+    } else if(g->weather==1) {
+        DrawRectangle(0,0,SW,SH,Fade((Color){17,39,62,255},.34f*weatherAlpha));
+        float gust=.58f+.42f*(.5f+.5f*sinf(g->time*.72f));
+        int active=(int)((float)MISTISLE_RAIN_DROPS*(.52f+.48f*gust));
+        for(int i=0;i<active;i++) {
+            float r=WeatherNoise(i,1),r2=WeatherNoise(i,2),r3=WeatherNoise(i,3);
+            float speed=210.0f+r2*310.0f;
+            float phase=r*(SH+100.0f);
+            float y=fmodf(phase+g->time*speed,SH+100.0f)-50.0f;
+            float lane=(float)(i%19)/19.0f;
+            float x=fmodf(r3*SW+lane*SW*.38f+g->time*(48.0f+r2*115.0f)+sinf(g->time*.8f+i*.37f)*16.0f,SW+80.0f)-40.0f;
+            float length=18.0f+r2*31.0f;
+            float alpha=(.48f+r3*.40f)*weatherAlpha*(.78f+.22f*gust);
+            float width=1.25f+r*1.10f;
+            if(i%11==0)length*=1.45f;
+            DrawLineEx((Vector2){x,y},(Vector2){x-5.0f-r2*8.0f,y+length},width,Fade((Color){190,218,232,255},alpha));
         }
-        // Ripples stay attached to the visible water tiles as the camera moves.
         int rippleCount=0;
         for(int y=minY;y<=maxY&&rippleCount<MISTISLE_RAIN_RIPPLES;y++)for(int x=minX;x<=maxX&&rippleCount<MISTISLE_RAIN_RIPPLES;x++) {
             if(terrainKinds[y][x]!=4)continue;
             unsigned int h=TileHash(x,y,91);
-            if(h%23u!=0u)continue;
+            if(h%17u!=0u)continue;
             Vector2 world=WorldToScreen((float)x,(float)y);
             Vector2 screen=GetWorldToScreen2D(world,g->cam);
-            float pulse=fmodf(g->time*1.4f+(float)(h%19u)*.11f,1.0f);
-            DrawCircleLines((int)screen.x,(int)screen.y,(int)(2.0f+pulse*5.0f),Fade((Color){204,231,231,255},.40f*(1.0f-pulse)));
+            float pulse=fmodf(g->time*(1.0f+(float)(h%7u)*.12f)+(float)(h%19u)*.11f,1.0f);
+            DrawCircleLines((int)screen.x,(int)screen.y,(int)(2.0f+pulse*7.0f),Fade((Color){211,238,245,255},.78f*(1.0f-pulse)*weatherAlpha));
             rippleCount++;
         }
+        for(int i=0;i<24;i++) {
+            float phase=WeatherNoise(i,33);
+            float x=fmodf(phase*SW+g->time*(18.0f+i*3.0f),SW);
+            float y=fmodf(WeatherNoise(i,34)*SH+g->time*(34.0f+i*4.0f),SH);
+            DrawCircleV((Vector2){x,y},1.3f+WeatherNoise(i,35)*1.4f,Fade((Color){208,231,237,255},(.34f+WeatherNoise(i,36)*.28f)*weatherAlpha));
+        }
     } else if(g->weather==2) {
-        for(int i=0;i<24;i++){int x=(i*97+(int)(sinf(g->time+i)*18)+SW)%SW;int y=(i*53+(int)(cosf(g->time*.7f+i)*12)+SH)%SH;DrawCircle(x,y,2,Fade(C_GOLD,.6f));}
+        DrawRectangle(0,0,SW,SH,Fade((Color){29,43,54,255},.16f*weatherAlpha));
+        for(int i=0;i<MISTISLE_FIREFLY_COUNT;i++) {
+            float phase=WeatherNoise(i,41);
+            float x=fmodf(phase*SW+sinf(g->time*.55f+i)*25.0f,SW);
+            float y=fmodf(WeatherNoise(i,42)*SH-g->time*(9.0f+WeatherNoise(i,43)*18.0f),SH);
+            float pulse=.30f+.70f*(.5f+.5f*sinf(g->time*2.4f+i*1.7f));
+            Vector2 mote={x,y};
+            DrawCircleV(mote,9.0f+3.0f*pulse,Fade((Color){255,195,91,255},pulse*.16f*weatherAlpha));
+            DrawCircleV(mote,3.0f+1.4f*pulse,Fade((Color){255,220,132,255},pulse*.62f*weatherAlpha));
+            DrawCircleV(mote,1.35f,Fade((Color){255,249,208,255},.92f*weatherAlpha));
+            if(i%4==0) {
+                DrawLineEx((Vector2){x-4.5f,y},(Vector2){x+4.5f,y},1.0f,Fade((Color){255,229,163,255},pulse*.42f*weatherAlpha));
+                DrawLineEx((Vector2){x,y-4.5f},(Vector2){x,y+4.5f},1.0f,Fade((Color){255,229,163,255},pulse*.42f*weatherAlpha));
+            }
+        }
+    } else if(g->weather==3) {
+        DrawRectangle(0,0,SW,SH,Fade((Color){51,65,78,255},.27f*weatherAlpha));
+        for(int i=0;i<5;i++) {
+            float x=fmodf((float)i*310.0f+g->time*(13.0f+i*2.0f),SW+420.0f)-210.0f;
+            float y=70.0f+(float)i*118.0f+sinf(g->time*.18f+i)*18.0f;
+            DrawCloudPuff(x,y,1.2f+(float)(i%3)*.32f,Fade((Color){137,153,164,255},.10f*weatherAlpha));
+        }
+    } else if(g->weather==4) {
+        /* Night fog should read as a moving layer in front of the whole island,
+           not a barely visible blue tint. Keep the darkest value near the horizon. */
+        DrawRectangleGradientV(0,0,SW,SH,Fade((Color){7,17,36,255},.82f*weatherAlpha),Fade((Color){18,39,52,255},.68f*weatherAlpha));
+        DrawRectangle(0,SH*.34f,SW,SH*.42f,Fade((Color){130,157,157,255},.075f*weatherAlpha));
+        for(int i=0;i<12;i++) {
+            float x=fmodf((float)i*173.0f+g->time*(10.0f+(float)(i%4)*5.0f),SW+520.0f)-260.0f;
+            float y=72.0f+(float)i*54.0f+sinf(g->time*.28f+i*1.4f)*30.0f;
+            float puff=1.65f+(float)(i%4)*.42f;
+            DrawCloudPuff(x,y,puff,Fade((Color){190,213,208,255},(.27f+(float)(i%3)*.045f)*weatherAlpha));
+            DrawCloudPuff(x+115.0f,y+12.0f,puff*.78f,Fade((Color){159,190,190,255},.23f*weatherAlpha));
+        }
+        /* Broad, low fog banks drift across the foreground in staggered layers. */
+        for(int i=0;i<5;i++) {
+            float x=fmodf((float)i*287.0f+g->time*(15.0f+(float)(i%2)*9.0f),SW+700.0f)-350.0f;
+            float y=SH*.30f+(float)i*SH*.145f+sinf(g->time*.20f+i*1.7f)*18.0f;
+            float w=260.0f+(float)(i%3)*85.0f;
+            DrawEllipse((int)x,(int)y,(int)w,(int)(24.0f+(i%2)*9.0f),Fade((Color){190,211,207,255},(.22f+(i%3)*.035f)*weatherAlpha));
+            DrawEllipse((int)(x+150.0f),(int)(y+5.0f),(int)(w*.72f),18,Fade((Color){139,174,181,255},.19f*weatherAlpha));
+        }
+        for(int i=0;i<38;i++) {
+            float x=fmodf(WeatherNoise(i,51)*SW+g->time*(2.5f+WeatherNoise(i,52)*7.0f),SW);
+            float y=fmodf(WeatherNoise(i,53)*SH+cosf(g->time*.22f+i)*15.0f,SH);
+            DrawCircleV((Vector2){x,y},1.2f+WeatherNoise(i,54)*1.8f,Fade((Color){186,225,220,255},(.40f+WeatherNoise(i,55)*.25f)*weatherAlpha));
+        }
     }
 }
 static void Panel(Rectangle r) {
@@ -1152,29 +1316,29 @@ static void RenderMap(Game *g) {
     DrawUIText("按 M / ESC 关闭",800,580,16,(Color){132,137,111,255});
 }
 static void DrawDialoguePortrait(Game *g,int portrait,const char *speaker) {
-    Rectangle card={34,372,220,314};
+    Rectangle card={22,372,246,314};
     DrawRectangleRounded(card,.10f,10,(Color){11,31,43,245});
     DrawRectangleRoundedLinesEx(card,.10f,10,2.0f,(Color){208,177,111,255});
-    DrawRectangleGradientV(48,386,192,286,(Color){62,83,86,255},(Color){22,43,54,255});
+    DrawRectangleGradientV(38,382,214,286,(Color){62,83,86,255},(Color){22,43,54,255});
     Texture2D *fallback=portrait==0?&TEX_HERO_PORTRAIT:
         portrait==1?&TEX_WATCHER_PORTRAIT:
         portrait==2?&TEX_GUARDIAN_PORTRAIT:
         portrait==3?&TEX_LUMI_ILLUSTRATION:
         portrait==4?&TEX_MOATAIL_ILLUSTRATION:
         portrait==5?&TEX_GECKO_ILLUSTRATION:&TEX_HERO_PORTRAIT;
-    Rectangle dst={48,386,192,256};
-    // The shared portrait atlas contains only the three human characters.
-    // Companions use their own dedicated high-resolution illustrations.
-    if(portrait>=0&&portrait<=2&&TEX_CHARACTER_PORTRAITS.id) {
-        Rectangle src={(float)(portrait*128),0,128,170};
-        DrawTexturePro(TEX_CHARACTER_PORTRAITS,src,dst,(Vector2){0,0},0,WHITE);
-    } else if(fallback->id) {
+    Rectangle dst={38,382,214,285};
+    // Dedicated high-resolution illustrations always take priority over the old
+    // low-detail portrait atlas. Pixel walk sheets are never used as dialogue portraits.
+    if(fallback->id) {
         Rectangle src={0,0,(float)fallback->width,(float)fallback->height};
         DrawTexturePro(*fallback,src,dst,(Vector2){0,0},0,WHITE);
+    } else if(portrait>=0&&portrait<=2&&TEX_CHARACTER_PORTRAITS.id) {
+        Rectangle src={(float)(portrait*128),0,128,170};
+        DrawTexturePro(TEX_CHARACTER_PORTRAITS,src,dst,(Vector2){0,0},0,WHITE);
     }
     const char *label=(speaker&&speaker[0])?speaker:"旅人";
-    DrawRectangleRounded((Rectangle){52,647,184,27},.2f,5,(Color){8,25,36,225});
-    DrawUIText(label,62,651,13,(Color){255,231,178,255});
+    DrawRectangleRounded((Rectangle){42,670,206,25},.2f,5,(Color){8,25,36,225});
+    DrawUIText(label,52,674,13,(Color){255,231,178,255});
 }
 static void RenderDialogue(Game *g) {
     DrawRectangle(0,0,SW,SH,Fade((Color){22,39,48,255},.46f));
@@ -1255,13 +1419,8 @@ static void RenderBattle(Game *g) {
     if(e->type==ENEMY_MOTE) {
         DrawMote((Vector2){880,385},g->time);
     } else if(e->type==ENEMY_BOSS) {
-        if(TEX_GUARDIAN_PORTRAIT.id) {
-            Rectangle src={0,0,(float)TEX_GUARDIAN_PORTRAIT.width,(float)TEX_GUARDIAN_PORTRAIT.height};
-            Rectangle dst={690,145,410,500};
-            DrawTexturePro(TEX_GUARDIAN_PORTRAIT,src,dst,(Vector2){0,0},0,WHITE);
-        } else DrawLighthouseGuardian((Vector2){880,454},g->time,1.95f,g->battleTurn!=0);
-        DrawCircleLines(880,395,126,Fade(C_GOLD,.35f));
-        DrawCircleLines(880,395,142,Fade(C_BLUE,.22f));
+        /* Boss arena uses the dedicated 64x80 pixel boss sheet, not the dialogue poster. */
+        DrawLighthouseGuardian((Vector2){880,454},g->time,1.5f,g->battleTurn!=0);
     } else {
         DrawCircleV((Vector2){880,380},62,Fade(C_LILAC,.18f));
         DrawEllipse(880,395,61,48,(Color){163,139,160,255});
@@ -1275,7 +1434,7 @@ static void RenderBattle(Game *g) {
     DrawUIText("选择出战伙伴",50,520,20,C_INK);
     DrawUIText(g->battleTurn==0?"选择技能并按 Enter 确认":"敌方正在行动，按 Enter 继续",830,520,16,(Color){104,119,93,255});
     int ids[3]={0,1,2};
-    bool owned[3]={g->lumi.owned,g->splash.owned,g->spark.owned};
+    bool owned[3]={g->lumi.owned&&g->lumi.hp>0.0f,g->splash.owned&&g->splash.hp>0.0f,g->spark.owned&&g->spark.hp>0.0f};
     int count=0;
     for(int i=0;i<3;i++)if(owned[i])ids[count++]=i;
     int optionCount=count>0?count:1;
@@ -1288,25 +1447,32 @@ static void RenderBattle(Game *g) {
         DrawRectangleRoundedLines(card,.12f,12,slot==g->battleChoice?(Color){201,157,82,255}:(Color){220,214,188,255});
         DrawUIText(TextFormat("%d",slot+1),(int)card.x+12,(int)card.y+10,15,(Color){127,145,111,255});
         if(id==0) {
-            DrawLumi((Vector2){card.x+43,card.y+78},g->time,0);
+            DrawIllustratedPortrait(TEX_LUMI_ILLUSTRATION,(Rectangle){card.x+10,card.y+17,56,75});
             DrawUIText("苔灯灵",(int)card.x+78,(int)card.y+22,17,C_INK);
-            DrawUIText("星光治愈",(int)card.x+78,(int)card.y+50,14,(Color){104,119,93,255});
-            DrawUIText("回复生命",(int)card.x+78,(int)card.y+73,13,(Color){104,119,93,255});
+            DrawUIText("星光治愈",(int)card.x+78,(int)card.y+45,14,(Color){104,119,93,255});
+            DrawUIText("回复生命",(int)card.x+78,(int)card.y+63,13,(Color){104,119,93,255});
         } else if(id==1) {
-            DrawMoatail((Vector2){card.x+43,card.y+78},g->time);
+            DrawIllustratedPortrait(TEX_MOATAIL_ILLUSTRATION,(Rectangle){card.x+15,card.y+14,48,78});
             DrawUIText("沫尾兽",(int)card.x+78,(int)card.y+22,17,C_INK);
-            DrawUIText("泡泡水流",(int)card.x+78,(int)card.y+50,14,(Color){104,119,93,255});
-            DrawUIText("施加潮湿",(int)card.x+78,(int)card.y+73,13,(Color){104,119,93,255});
+            DrawUIText("泡泡水流",(int)card.x+78,(int)card.y+45,14,(Color){104,119,93,255});
+            DrawUIText("施加潮湿",(int)card.x+78,(int)card.y+63,13,(Color){104,119,93,255});
         } else if(id==2) {
-            DrawGecko((Vector2){card.x+43,card.y+78},g->time);
+            DrawIllustratedPortrait(TEX_GECKO_ILLUSTRATION,(Rectangle){card.x+15,card.y+14,48,78});
             DrawUIText("鸣晶蜥",(int)card.x+78,(int)card.y+22,17,C_INK);
-            DrawUIText("晶弧放电",(int)card.x+78,(int)card.y+50,14,(Color){104,119,93,255});
-            DrawUIText("克制潮湿",(int)card.x+78,(int)card.y+73,13,(Color){104,119,93,255});
+            DrawUIText("晶弧放电",(int)card.x+78,(int)card.y+45,14,(Color){104,119,93,255});
+            DrawUIText("克制潮湿",(int)card.x+78,(int)card.y+63,13,(Color){104,119,93,255});
         } else {
             DrawPlayer((Vector2){card.x+43,card.y+78},g->time,false,0);
             DrawUIText("旅人",(int)card.x+78,(int)card.y+22,17,C_INK);
-            DrawUIText("基础攻击",(int)card.x+78,(int)card.y+50,14,(Color){104,119,93,255});
-            DrawUIText("造成普通伤害",(int)card.x+78,(int)card.y+73,13,(Color){104,119,93,255});
+            DrawUIText("基础攻击",(int)card.x+78,(int)card.y+45,14,(Color){104,119,93,255});
+            DrawUIText("造成普通伤害",(int)card.x+78,(int)card.y+63,13,(Color){104,119,93,255});
+        }
+        if(id>=0) {
+            Buddy *buddy=id==0?&g->lumi:(id==1?&g->splash:&g->spark);
+            DrawUIText(TextFormat("体力 %d/%d",(int)buddy->hp,(int)buddy->maxHp),(int)card.x+78,(int)card.y+81,11,(Color){104,119,93,255});
+            DrawRectangle((int)card.x+78,(int)card.y+98,132,6,(Color){215,211,193,255});
+            DrawRectangle((int)card.x+78,(int)card.y+98,(int)(132.0f*fmaxf(0.0f,buddy->hp/buddy->maxHp)),6,
+                          buddy->hp>35.0f?(Color){111,174,112,255}:(Color){205,112,91,255});
         }
     }
     Panel((Rectangle){815,555,410,112});
@@ -1390,9 +1556,9 @@ static void RenderEnd(Game *g) {
     DrawUITextWrapped("伙伴们的光，照亮了回家的路。",34,265,214,16,3,(Color){195,211,210,255});
     DrawUIText("同行伙伴",SW-250,76,17,(Color){224,183,105,255});
     int row=0;
-    if(g->lumi.owned){DrawLumi((Vector2){SW-226,166},t,0);DrawUIText("苔灯灵",SW-184,152,17,(Color){244,239,217,255});row++;}
-    if(g->splash.owned){DrawMoatail((Vector2){SW-226,166+row*76},t);DrawUIText("沫尾兽",SW-184,152+row*76,17,(Color){244,239,217,255});row++;}
-    if(g->spark.owned){DrawGecko((Vector2){SW-226,166+row*76},t);DrawUIText("鸣晶蜥",SW-184,152+row*76,17,(Color){244,239,217,255});row++;}
+    if(g->lumi.owned){DrawIllustratedPortrait(TEX_LUMI_ILLUSTRATION,(Rectangle){SW-248,158,48,64});DrawUIText("苔灯灵",SW-192,174,17,(Color){244,239,217,255});row++;}
+    if(g->splash.owned){DrawIllustratedPortrait(TEX_MOATAIL_ILLUSTRATION,(Rectangle){SW-248,158+row*76,48,64});DrawUIText("沫尾兽",SW-192,174+row*76,17,(Color){244,239,217,255});row++;}
+    if(g->spark.owned){DrawIllustratedPortrait(TEX_GECKO_ILLUSTRATION,(Rectangle){SW-248,158+row*76,48,64});DrawUIText("鸣晶蜥",SW-192,174+row*76,17,(Color){244,239,217,255});row++;}
     DrawLineEx((Vector2){SW-250,420},(Vector2){SW-34,420},1.5f,Fade(C_GOLD,.42f));
     DrawUITextWrapped("一座灯塔，一段旅程。",SW-250,450,216,16,2,(Color){220,226,207,255});
     DrawUITextWrapped("新的故事还在岛屿深处等待。",SW-250,506,216,15,3,(Color){188,207,203,255});
@@ -1460,12 +1626,12 @@ void RenderInit(void) {
         "assets/characters/png/camp_keeper.png",
         "assets/tiles/png/island_iso_tiles.png",
         "assets/tiles/png/environment_props.png",
-        "assets/characters/png/heroine_portrait.png",
-        "assets/characters/png/watcher_portrait.png",
-        "assets/characters/png/lighthouse_guardian_portrait.png",
-        "assets/characters/png/moss_lumi.png",
-        "assets/characters/png/moatail.png",
-        "assets/characters/png/crystal_gecko.png",
+        "assets/characters/portraits/heroine_portrait.png",
+        "assets/characters/portraits/watcher_portrait.png",
+        "assets/characters/portraits/guardian_portrait.png",
+        "assets/characters/portraits/moss_lumi_portrait.png",
+        "assets/characters/portraits/moatail_portrait.png",
+        "assets/characters/portraits/crystal_gecko_portrait.png",
         "assets/characters/hero/heroine_approved_8x4.png",
         "assets/characters/boss/lighthouse_guardian_4x2.png",
         "assets/characters/portraits/character_portraits_atlas.jpg",
@@ -1484,14 +1650,69 @@ void RenderInit(void) {
             } else TraceLog(LOG_WARNING,"Mist Isle asset failed to load: %s",paths[i]);
         } else TraceLog(LOG_WARNING,"Mist Isle asset missing: %s",paths[i]);
     }
+    const char *mapArtPaths[]={
+        "assets/environment/generated/nature_props_sheet.png",
+        "assets/environment/generated/glowglade_props_sheet.png",
+        "assets/environment/generated/tidal_ruins_props_sheet.png",
+        "assets/environment/generated/lighthouse_ruins_props_sheet.png"
+    };
+    Texture2D *mapArtTargets[]={&TEX_NATURE_SHEET,&TEX_GROVE_SHEET,&TEX_RUINS_SHEET,&TEX_LIGHTHOUSE_SHEET};
+    for(int i=0;i<4;i++) {
+        if(FileExists(mapArtPaths[i])) {
+            *mapArtTargets[i]=LoadTexture(mapArtPaths[i]);
+            if(mapArtTargets[i]->id) {
+                SetTextureFilter(*mapArtTargets[i],TEXTURE_FILTER_BILINEAR);
+                TraceLog(LOG_INFO,"Mist Isle map art loaded: %s (%dx%d)",mapArtPaths[i],mapArtTargets[i]->width,mapArtTargets[i]->height);
+            } else TraceLog(LOG_ERROR,"Mist Isle map art decode failed: %s",mapArtPaths[i]);
+        } else TraceLog(LOG_WARNING,"Mist Isle map art missing: %s",mapArtPaths[i]);
+    }
+    if(FileExists("assets/characters/hero/heroine_pixel_4x4_64x80.png")) {
+        TEX_HEROINE_PIXEL=LoadTexture("assets/characters/hero/heroine_pixel_4x4_64x80.png");
+        if(TEX_HEROINE_PIXEL.id)SetTextureFilter(TEX_HEROINE_PIXEL,TEXTURE_FILTER_POINT);
+        else TraceLog(LOG_ERROR,"Mist Isle: approved heroine pixel sheet failed to load.");
+    } else TraceLog(LOG_ERROR,"Mist Isle: approved heroine pixel sheet missing; refusing silent generated-hero fallback.");
+    if(FileExists("assets/characters/npc/watcher_pixel_4x4_64x80.png")) {
+        TEX_WATCHER_PIXEL=LoadTexture("assets/characters/npc/watcher_pixel_4x4_64x80.png");
+        if(TEX_WATCHER_PIXEL.id) {
+            SetTextureFilter(TEX_WATCHER_PIXEL,TEXTURE_FILTER_POINT);
+            TraceLog(LOG_INFO,"Mist Isle: native pixel Watcher loaded (%dx%d).",TEX_WATCHER_PIXEL.width,TEX_WATCHER_PIXEL.height);
+        } else TraceLog(LOG_ERROR,"Mist Isle: Watcher sheet exists but texture creation failed.");
+    } else TraceLog(LOG_ERROR,"Mist Isle: Watcher pixel sheet missing; run the asset generator.");
+    if(FileExists("assets/environment/coastal_keeper_house.png")) {
+        TEX_COASTAL_HOUSE=LoadTexture("assets/environment/coastal_keeper_house.png");
+        if(TEX_COASTAL_HOUSE.id)SetTextureFilter(TEX_COASTAL_HOUSE,TEXTURE_FILTER_POINT);
+    } else TraceLog(LOG_ERROR,"Mist Isle: approved coastal keeper house asset missing.");
+    /* Explicitly reload and validate the dedicated 4x2 pixel Boss sheet.
+       Do not silently rely on the generic texture-array index for this critical asset. */
+    if(TEX_GUARDIAN_APPROVED.id)UnloadTexture(TEX_GUARDIAN_APPROVED);
+    TEX_GUARDIAN_APPROVED=(Texture2D){0};
+    const char *bossPixelPath="assets/characters/boss/lighthouse_guardian_4x2.png";
+    if(FileExists(bossPixelPath)) {
+        TEX_GUARDIAN_APPROVED=LoadTexture(bossPixelPath);
+        if(TEX_GUARDIAN_APPROVED.id) {
+            SetTextureFilter(TEX_GUARDIAN_APPROVED,TEXTURE_FILTER_POINT);
+            if(TEX_GUARDIAN_APPROVED.width==256&&TEX_GUARDIAN_APPROVED.height==160) {
+                TraceLog(LOG_INFO,"Mist Isle: dedicated 4x2 pixel Boss sheet loaded (256x160; 64x80 cells).");
+            } else {
+                TraceLog(LOG_ERROR,"Mist Isle: Boss sheet dimensions are %dx%d; expected 256x160. Disabling invalid Boss texture.",TEX_GUARDIAN_APPROVED.width,TEX_GUARDIAN_APPROVED.height);
+                UnloadTexture(TEX_GUARDIAN_APPROVED);
+                TEX_GUARDIAN_APPROVED=(Texture2D){0};
+            }
+        } else TraceLog(LOG_ERROR,"Mist Isle: Boss sheet exists but LoadTexture failed.");
+    } else TraceLog(LOG_ERROR,"Mist Isle: Boss pixel sheet missing at %s.",bossPixelPath);
     TEX_GROUND_CACHE=LoadRenderTexture((int)WORLD_PIXEL_W,(int)WORLD_PIXEL_H);
     if(TEX_GROUND_CACHE.id)SetTextureFilter(TEX_GROUND_CACHE.texture,TEXTURE_FILTER_POINT);
     CACHED_GROUND_AREA=-1;
     LoadEndingCG();
 }
 void RenderClose(void) {
+    if(TEX_HEROINE_PIXEL.id)UnloadTexture(TEX_HEROINE_PIXEL);
+    if(TEX_WATCHER_PIXEL.id)UnloadTexture(TEX_WATCHER_PIXEL);
+    if(TEX_COASTAL_HOUSE.id)UnloadTexture(TEX_COASTAL_HOUSE);
     if(TEX_GROUND_CACHE.id)UnloadRenderTexture(TEX_GROUND_CACHE);
     TEX_GROUND_CACHE=(RenderTexture2D){0};
+    Texture2D *mapArt[]={&TEX_NATURE_SHEET,&TEX_GROVE_SHEET,&TEX_RUINS_SHEET,&TEX_LIGHTHOUSE_SHEET};
+    for(int i=0;i<4;i++)if(mapArt[i]->id)UnloadTexture(*mapArt[i]);
     CACHED_GROUND_AREA=-1;
     UnloadUIFont();
     Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS,&TEX_HERO_PORTRAIT,&TEX_WATCHER_PORTRAIT,&TEX_GUARDIAN_PORTRAIT,&TEX_LUMI_ILLUSTRATION,&TEX_MOATAIL_ILLUSTRATION,&TEX_GECKO_ILLUSTRATION,&TEX_HEROINE_APPROVED,&TEX_GUARDIAN_APPROVED,&TEX_CHARACTER_PORTRAITS,&TEX_HEROINE_WORLD,&TEX_WATCHER_WORLD,&TEX_GROVE_COTTAGE};

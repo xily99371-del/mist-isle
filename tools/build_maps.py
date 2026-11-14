@@ -64,30 +64,33 @@ def parse(path):
                 for by in range(max(0,top),min(H-1,bottom)+1):
                     for bx in range(max(0,left),min(W-1,right)+1):
                         collision[by][bx]=1
-            if 1000<=type_id<1003:
-                block_rect(cx,cy,cx,cy)                 # tree trunk
+            if 1000<=type_id<1003 or 600<=type_id<=603:
+                block_rect(cx,cy,cx,cy)                 # tree trunk; canopy remains walk-under
             elif type_id in (302,500,501):
-                block_rect(cx-1,cy-1,cx+1,cy-1)        # compact rear wall of the cottage
-                block_rect(cx-1,cy,cx-1,cy)            # left foundation; keep the doorway cell open
-                block_rect(cx+1,cy,cx+1,cy)            # right foundation; keep the doorway cell open
+                block_rect(cx-1,cy-1,cx+1,cy-1)        # reduced rear-wall footprint; front approach remains walkable
             elif type_id==303:
-                block_rect(cx-1,cy-1,cx+1,cy)          # tent footprint
+                block_rect(cx-1,cy,cx+1,cy)            # compact one-row tent base
             elif type_id==304:
                 block_rect(cx-1,cy,cx-1,cy)
                 block_rect(cx+1,cy,cx+1,cy)            # arch posts; keep doorway open
             elif type_id==305:
                 block_rect(cx-1,cy-1,cx+1,cy)          # fountain plinth
-            elif type_id in (24,25,26,27,29,31,33):
-                block_rect(cx,cy,cx,cy)                 # flowering trees, crystal, pillar, altar, lighthouse base
+            elif type_id in (29,31,33):
+                block_rect(cx,cy,cx,cy)                 # structural pillar, altar and lighthouse base
             elif type_id==20:
                 block_rect(cx-1,cy,cx+1,cy)              # dock deck; approach from its shore-facing edge
             elif type_id==21:
                 block_rect(cx-1,cy,cx+1,cy)              # boat hull
             elif type_id==22:
                 block_rect(cx-1,cy-1,cx+1,cy)            # woodland shelter canvas footprint
-            elif type_id in (200,201,202,203,204,205,206,207,208,209,210,211,212,213,
-                             217,218,219,220,221,222,224,225,227,228,229):
-                block_rect(cx,cy,cx,cy)                  # cliff bases, boulders, fences and dense edge shrubs
+            elif type_id in (200,201,202,203,204,205,206,207,208,209,
+                             217,218,219,220,221,222,224,225,227,228):
+                block_rect(cx,cy,cx,cy)                  # cliff bases, walls, fences and large edge structures
+            # 210-213 small stones, 229 low shrubs, and all small generated flowers,
+            # grass, rocks and saplings remain decorative. Large generated trees above
+            # block only their single trunk cell; the grove supply shed blocks one base cell.
+            elif type_id==621:
+                block_rect(cx,cy,cx,cy)
             elif type_id==28:
                 block_rect(cx-1,cy,cx-1,cy)
                 block_rect(cx+1,cy,cx+1,cy)            # ruin arch supports
@@ -143,7 +146,7 @@ def parse(path):
     # Several characters occupy a water-side or collision-protected tile; the
     # player must still be able to stand within one orthogonal step to interact.
     approaches={
-        "coastal_camp": ((7,7,"keeper"),(6,8,"Moss Lumi"),(6,7,"campfire")),
+        "coastal_camp": ((7,7,"keeper"),(6,8,"Moss Lumi"),(7,8,"campfire")),
         "glowglade_grove": ((14,7,"Moatail"),),
         "tidal_ruins": ((13,8,"Crystal Gecko"),),
         "lighthouse_courtyard": ((int(round(markers["boss"][0])),int(round(markers["boss"][1])),"guardian arena"),),
