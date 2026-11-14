@@ -198,6 +198,10 @@ if all((ROOT / p).exists() for p in approved_assets):
             "assets/characters/portraits/moatail_portrait.jpg" in RENDER and
             "assets/characters/portraits/crystal_gecko_portrait.jpg" in RENDER,
             "dialogue portrait paths use the user's high-resolution anime illustrations")
+    require("DrawIllustratedPortrait(TEX_LUMI_ILLUSTRATION" in RENDER and
+            "DrawIllustratedPortrait(TEX_MOATAIL_ILLUSTRATION" in RENDER and
+            "DrawIllustratedPortrait(TEX_GECKO_ILLUSTRATION" in RENDER,
+            "battle cards and party roster use high-resolution companion illustrations, not pixel idle sprites")
     require("DrawCoastalHouse" in RENDER and "coastal_keeper_house.png" in RENDER,
             "coastal keeper house uses the user's approved pixel-art building")
 else:
