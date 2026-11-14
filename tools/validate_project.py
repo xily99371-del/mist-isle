@@ -485,10 +485,10 @@ for signature, forbidden, label in [
                 break
     body = RENDER[start:end] if start >= 0 and end > start else ""
     require(bool(body) and all(token not in body for token in forbidden), label)
-require('"assets/characters/png/moss_lumi.png"' in RENDER and
-        '"assets/characters/png/moatail.png"' in RENDER and
-        '"assets/characters/png/crystal_gecko.png"' in RENDER and
+require('"assets/characters/portraits/moss_lumi_portrait.jpg"' in RENDER and
+        '"assets/characters/portraits/moatail_portrait.jpg"' in RENDER and
+        '"assets/characters/portraits/crystal_gecko_portrait.jpg"' in RENDER and
         "for(int i=0;i<29;i++)" in RENDER,
-        "illustration texture load/unload lifecycle is complete")
+        "high-resolution companion portrait texture load/unload lifecycle is complete")
 
 print(f"Validation complete. Imported art sheets checked: {present}/{len(assets)}.")
