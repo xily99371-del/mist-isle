@@ -67,27 +67,27 @@ def parse(path):
             if 1000<=type_id<1003:
                 block_rect(cx,cy,cx,cy)                 # tree trunk
             elif type_id in (302,500,501):
-                block_rect(cx-1,cy-1,cx+1,cy-1)        # compact rear wall of the cottage
-                block_rect(cx-1,cy,cx-1,cy)            # left foundation; keep the doorway cell open
-                block_rect(cx+1,cy,cx+1,cy)            # right foundation; keep the doorway cell open
+                block_rect(cx-1,cy-1,cx+1,cy-1)        # reduced rear-wall footprint; front approach remains walkable
             elif type_id==303:
-                block_rect(cx-1,cy-1,cx+1,cy)          # tent footprint
+                block_rect(cx-1,cy,cx+1,cy)            # compact one-row tent base
             elif type_id==304:
                 block_rect(cx-1,cy,cx-1,cy)
                 block_rect(cx+1,cy,cx+1,cy)            # arch posts; keep doorway open
             elif type_id==305:
                 block_rect(cx-1,cy-1,cx+1,cy)          # fountain plinth
-            elif type_id in (24,25,26,27,29,31,33):
-                block_rect(cx,cy,cx,cy)                 # flowering trees, crystal, pillar, altar, lighthouse base
+            elif type_id in (29,31,33):
+                block_rect(cx,cy,cx,cy)                 # structural pillar, altar and lighthouse base
             elif type_id==20:
                 block_rect(cx-1,cy,cx+1,cy)              # dock deck; approach from its shore-facing edge
             elif type_id==21:
                 block_rect(cx-1,cy,cx+1,cy)              # boat hull
             elif type_id==22:
                 block_rect(cx-1,cy-1,cx+1,cy)            # woodland shelter canvas footprint
-            elif type_id in (200,201,202,203,204,205,206,207,208,209,210,211,212,213,
-                             217,218,219,220,221,222,224,225,227,228,229):
-                block_rect(cx,cy,cx,cy)                  # cliff bases, boulders, fences and dense edge shrubs
+            elif type_id in (200,201,202,203,204,205,206,207,208,209,
+                             217,218,219,220,221,222,224,225,227,228):
+                block_rect(cx,cy,cx,cy)                  # cliff bases, walls, fences and large edge structures
+            # 210-213 small stones and 229 low shrubs are decorative and never block movement.
+            # New generated map-art IDs (>=600) are visual-only by design.
             elif type_id==28:
                 block_rect(cx-1,cy,cx-1,cy)
                 block_rect(cx+1,cy,cx+1,cy)            # ruin arch supports
