@@ -1156,23 +1156,21 @@ static void DrawDialoguePortrait(Game *g,int portrait,const char *speaker) {
     DrawRectangleRounded(card,.10f,10,(Color){11,31,43,245});
     DrawRectangleRoundedLinesEx(card,.10f,10,2.0f,(Color){208,177,111,255});
     DrawRectangleGradientV(48,386,192,286,(Color){62,83,86,255},(Color){22,43,54,255});
-    if(TEX_CHARACTER_PORTRAITS.id) {
-        int index=portrait<0||portrait>5?0:portrait;
-        Rectangle src={(float)((index%3)*128),(float)((index/3)*170),128,170};
-        Rectangle dst={48,386,192,256};
+    Texture2D *fallback=portrait==0?&TEX_HERO_PORTRAIT:
+        portrait==1?&TEX_WATCHER_PORTRAIT:
+        portrait==2?&TEX_GUARDIAN_PORTRAIT:
+        portrait==3?&TEX_LUMI_ILLUSTRATION:
+        portrait==4?&TEX_MOATAIL_ILLUSTRATION:
+        portrait==5?&TEX_GECKO_ILLUSTRATION:&TEX_HERO_PORTRAIT;
+    Rectangle dst={48,386,192,256};
+    // The shared portrait atlas contains only the three human characters.
+    // Companions use their own dedicated high-resolution illustrations.
+    if(portrait>=0&&portrait<=2&&TEX_CHARACTER_PORTRAITS.id) {
+        Rectangle src={(float)(portrait*128),0,128,170};
         DrawTexturePro(TEX_CHARACTER_PORTRAITS,src,dst,(Vector2){0,0},0,WHITE);
-    } else {
-        Texture2D *fallback=portrait==0?&TEX_HERO_PORTRAIT:
-            portrait==1?&TEX_WATCHER_PORTRAIT:
-            portrait==2?&TEX_GUARDIAN_PORTRAIT:
-            portrait==3?&TEX_LUMI_ILLUSTRATION:
-            portrait==4?&TEX_MOATAIL_ILLUSTRATION:
-            portrait==5?&TEX_GECKO_ILLUSTRATION:&TEX_HERO_PORTRAIT;
-        if(fallback->id) {
-            Rectangle src={0,0,(float)fallback->width,(float)fallback->height};
-            Rectangle dst={48,386,192,256};
-            DrawTexturePro(*fallback,src,dst,(Vector2){0,0},0,WHITE);
-        }
+    } else if(fallback->id) {
+        Rectangle src={0,0,(float)fallback->width,(float)fallback->height};
+        DrawTexturePro(*fallback,src,dst,(Vector2){0,0},0,WHITE);
     }
     const char *label=(speaker&&speaker[0])?speaker:"旅人";
     DrawRectangleRounded((Rectangle){52,647,184,27},.2f,5,(Color){8,25,36,225});
@@ -1257,10 +1255,10 @@ static void RenderBattle(Game *g) {
     if(e->type==ENEMY_MOTE) {
         DrawMote((Vector2){880,385},g->time);
     } else if(e->type==ENEMY_BOSS) {
-        if(TEX_CHARACTER_PORTRAITS.id) {
-            Rectangle src={0,170,128,170};
-            Rectangle dst={650,165,500,455};
-            DrawTexturePro(TEX_CHARACTER_PORTRAITS,src,dst,(Vector2){0,0},0,WHITE);
+        if(TEX_GUARDIAN_PORTRAIT.id) {
+            Rectangle src={0,0,(float)TEX_GUARDIAN_PORTRAIT.width,(float)TEX_GUARDIAN_PORTRAIT.height};
+            Rectangle dst={690,145,410,500};
+            DrawTexturePro(TEX_GUARDIAN_PORTRAIT,src,dst,(Vector2){0,0},0,WHITE);
         } else DrawLighthouseGuardian((Vector2){880,454},g->time,1.95f,g->battleTurn!=0);
         DrawCircleLines(880,395,126,Fade(C_GOLD,.35f));
         DrawCircleLines(880,395,142,Fade(C_BLUE,.22f));

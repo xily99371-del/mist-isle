@@ -179,7 +179,7 @@ require("cairosvg" in RASTERIZER and all(name in RASTERIZER for name in ("heroin
         "portrait artwork is rasterized from editable high-resolution SVG source assets")
 require("python tools/rasterize_assets.py" in WORKFLOW and "cairosvg" in WORKFLOW,
         "Windows and Raspberry Pi CI generate the static portrait PNGs before packaging")
-require(all(name in RENDER for name in ("TEX_HERO_PORTRAIT","TEX_WATCHER_PORTRAIT","TEX_GUARDIAN_PORTRAIT")) and "DrawTexturePro(*art" in RENDER,
+require(all(name in RENDER for name in ("TEX_HERO_PORTRAIT","TEX_WATCHER_PORTRAIT","TEX_GUARDIAN_PORTRAIT")) and "DrawTexturePro(*fallback" in RENDER,
         "dialogue displays dedicated illustrated portraits instead of enlarged walking sprites or geometric stand-ins")
 
 require("FLAG_WINDOW_RESIZABLE" in MAIN and "1600,900" in MAIN and "LoadRenderTexture(SW,SH)" in MAIN,
@@ -349,7 +349,7 @@ require("fetch_portrait_assets.ps1" not in (ROOT / "RUN_WINDOWS.bat").read_text(
 
 require('strcmp(speaker,"沫尾兽")==0)return 4' in GAME and 'strcmp(speaker,"鸣晶蜥")==0)return 5' in GAME,
         "each recruited companion resolves to its own portrait ID")
-require("TEX_CHARACTER_PORTRAITS" in RENDER and "DrawTexturePro(TEX_CHARACTER_PORTRAITS" in RENDER,
+require("TEX_CHARACTER_PORTRAITS" in RENDER and "portrait>=0&&portrait<=2" in RENDER and "TEX_MOATAIL_ILLUSTRATION" in RENDER,
         "high-resolution character portrait atlas is used for dialogue and the boss battle")
 require("核心耐久" in RENDER and "阶段三" in RENDER and "核心蓄能" in RENDER and "PHASE III" not in RENDER,
         "boss phase and core status are displayed in Chinese in a non-overlapping panel")
