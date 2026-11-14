@@ -290,7 +290,7 @@ with Image.open(io.BytesIO(base64.b64decode(cg_data, validate=True))) as cg:
     require(cg.size == (448, 448), "lighthouse finale illustration is a 448px square scene")
 require("assets/cinematics" in WORKFLOW and "Copy-Item assets/cinematics/*" in WORKFLOW,
         "Windows playtest package includes the cinematic asset")
-require("footY-66" in RENDER and "66,66" in RENDER,
+require("footY-91.0f" in RENDER and "70.0f,93.0f" in RENDER,
         "player and companion sprites use enlarged world-space dimensions")
 require("unsigned char solid[MAPH][MAPW]" in HEADER and "w->solid[y][x]=AREA_COLLISION" in GAME and "g->world.solid[y][x]" in GAME,
         "Tiled collision layer is shared with gameplay collision")

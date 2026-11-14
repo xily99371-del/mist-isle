@@ -455,7 +455,7 @@ static void DrawLighthouseGuardian(Vector2 p,float t,float scale) {
     DrawCircleLines((int)p.x,(int)(p.y-72*scale),(int)(54*scale),Fade((Color){255,190,91,255},.20f+.12f*pulse));
     DrawCircleLines((int)p.x,(int)(p.y-72*scale),(int)(67*scale),Fade((Color){113,204,211,255},.12f));
     if(TEX_GUARDIAN_APPROVED.id) {
-        int frame=(int)(t*1.8f)%4;
+        int frame=0; // fixed frontal idle view; action row is reserved for attack-state animation
         Rectangle src={(float)(frame*48),0,48,64};
         float w=164.0f*scale,h=218.0f*scale;
         Rectangle dst={p.x-w*.5f,p.y-h+bob,w,h};
