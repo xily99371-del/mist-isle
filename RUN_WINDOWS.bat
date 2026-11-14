@@ -38,6 +38,7 @@ if not exist assets\characters\portraits\heroine_portrait.jpg (
   goto failed
 )
 if not exist assets\characters\hero\heroine_pixel_4x4_64x80.png goto missing_art
+if not exist assets\characters\npc\watcher_pixel_idle_64x80.png goto missing_art
 if not exist assets\characters\portraits\moss_lumi_portrait.jpg goto missing_art
 if not exist assets\characters\portraits\moatail_portrait.jpg goto missing_art
 if not exist assets\characters\portraits\crystal_gecko_portrait.jpg goto missing_art
