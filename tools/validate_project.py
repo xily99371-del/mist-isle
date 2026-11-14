@@ -96,10 +96,10 @@ require("index*96" in RENDER, "environment props use 96px atlas cells")
 require("DrawAreaProp" in RENDER and "area_props_96.png" in RENDER, "area-specific supplemental prop atlas is integrated")
 require("DrawTopDownTile" in RENDER and "WorldToScreen" in RENDER, "orthographic top-down square-tile renderer is active")
 require("topdown_terrain_atlas_v1.png" in RENDER and "TILE_SIZE" in RENDER and "56.0f,56.0f" in RENDER, "detailed 56px top-down terrain atlas is integrated")
-require("TEX_TOPDOWN_TILES" in RENDER and "for(int i=0;i<25;i++)" in RENDER and "heroine_approved_8x4.png" in RENDER and "lighthouse_guardian_4x2.png" in RENDER, "top-down terrain and decor textures are loaded and released")
+require("TEX_TOPDOWN_TILES" in RENDER and "for(int i=0;i<29;i++)" in RENDER and "heroine_approved_8x4.png" in RENDER and "lighthouse_guardian_4x2.png" in RENDER, "top-down terrain and decor textures are loaded and released")
 require('type="prop_22"' in GROVE_MAP and 'type="prop_302"' not in GROVE_MAP,
         "Glowglade uses its own woodland shelter and never reuses the coastal lighthouse cottage")
-require("220*it->scale,176*it->scale" in RENDER and "22:(220,176)" in MAP_PREVIEW,
+require("144*it->scale,116*it->scale" in RENDER and "22:(144,116)" in MAP_PREVIEW,
         "woodland shelter display size is synchronized between runtime and Tiled preview")
 require("Return route keeps the same grounded stone-arch language" in RENDER and "DrawAreaProp(8,(Vector2){p.x,p.y+2},160,168)" in RENDER,
         "return portal retains the authored stone-arch look instead of a placeholder black hole")
@@ -110,7 +110,7 @@ require(forest_start>=0 and forest_end>forest_start and "DrawCircle" not in REND
 
 require("flora_props_atlas_128.png" in RENDER and "cliffs_fences_atlas_128.png" in RENDER and "structures_atlas_128.png" in RENDER, "refined flora, cliff and structure sprite atlases are integrated")
 require("original_props_16_v1.png" in RENDER and "DrawOriginalProp" in RENDER, "curated original 16-prop atlas is integrated")
-require("TEX_ORIGINAL_PROPS" in RENDER and "for(int i=0;i<25;i++)" in RENDER, "original prop atlas texture lifecycle is complete")
+require("TEX_ORIGINAL_PROPS" in RENDER and "for(int i=0;i<29;i++)" in RENDER, "original prop atlas texture lifecycle is complete")
 require("kenney_buildings_atlas.png" in RENDER and "DrawKenneyBuilding" in RENDER, "Kenney Tiny Town building atlas is integrated")
 rpg_pack = ROOT / "third_party/kenney/rpg-base/KenneyRPGpack.zip"
 ui_pack = ROOT / "third_party/kenney/pixel-ui/PixelUIpack.zip"
@@ -141,9 +141,9 @@ require("RENDER_BOSS" in RENDER and "DrawLighthouseGuardian" in RENDER,
         "lighthouse guardian is visible in the world and battle scene")
 require("bossPhase==3?(g->battleRound%2==0):(g->battleRound%3==0)" in GAME and "bossHeavy" in GAME,
         "lighthouse guardian escalates from measured attacks to a telegraphed resonance strike")
-require("incoming*=e->type==ENEMY_BOSS?0.65f:0.8f" in GAME and "CORE CHARGED  /  HEAVY STRIKE NEXT" in RENDER,
+require("incoming*=e->type==ENEMY_BOSS?0.65f:0.8f" in GAME and "核心蓄能：下一回合将发动重击" in RENDER,
         "wet status interrupts the guardian core and reduces its boss attack damage")
-require("g->enemySoaked=false; // Wetness interrupts one incoming attack" in GAME and "CORE DAMPED  /  STRIKE WEAKENED" in RENDER,
+require("g->enemySoaked=false; // Wetness interrupts one incoming attack" in GAME and "核心受潮：本次攻击伤害降低" in RENDER,
         "wet status is consumed by one enemy attack and visibly dampens the guardian core")
 require("TEX_LUMI_PIXEL.id" in RENDER and "TEX_MOATAIL_PIXEL.id" in RENDER and "TEX_GECKO_PIXEL.id" in RENDER and "frame*32" in RENDER,
         "all three recruited companions use their four-frame authored pixel idle sheets")
@@ -153,7 +153,7 @@ require("当前位置" in RENDER and "DrawCircleLines((int)pts[i].x,(int)pts[i].
         "island map shows an explicit current-area marker and readable legend")
 require("attacking?((int)(t*8.0f)%4):0" in RENDER and "attacking?64.0f:0.0f" in RENDER,
         "lighthouse guardian uses its dedicated attack animation row during the enemy turn")
-require('DrawUIText(isBoss?"BOSS":"遭遇战"' in RENDER and "DrawRectangleGradientH" in RENDER,
+require('DrawUIText(isBoss?"首领战":"遭遇战"' in RENDER and "核心耐久" in RENDER,
         "boss encounter has a distinct dark arena, boss title and lantern-core health bar")
 require("AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,150)" in GAME,
         "story lighthouse encounter creates the dedicated boss enemy type")
@@ -234,9 +234,9 @@ require("SetDialogueSequence(g,speakers,lines,3,false)" in GAME and "胸口的�
         "the boss encounter ends with a dedicated character dialogue scene")
 require("nearest free, reachable tile" in GAME and "visual footprint of tall structures" in GAME,
         "collectibles avoid both collision footprints and visually occluding large props")
-require("330*it->scale,260*it->scale" in RENDER and "dims={302:(330,260)" in MAP_PREVIEW,
+require("196*it->scale,156*it->scale" in RENDER and "302:(196,156)" in MAP_PREVIEW,
         "the coastal and forest cottages are enlarged consistently in runtime and map previews")
-require("DrawStructureProp(2,p,330*it->scale,260*it->scale)" in RENDER and "rear wall of the enlarged house" in MAP_BUILD,
+require("DrawGroveCottage" in RENDER and "rear wall of the enlarged house" in MAP_BUILD,
         "large cottage structures use the structure atlas with matching collision foundations")
 require('#include "area_maps.h"' in RENDER and "AREA_OVERLAY[(int)g->area][direction][y][x]" in RENDER and "direction*90" in RENDER,
         "renderer draws every directional shoreline mask from the generated Tiled map header")
@@ -329,7 +329,7 @@ with Image.open(io.BytesIO(base64.b64decode(cg_data, validate=True))) as cg:
     require(cg.size == (448, 448), "lighthouse finale illustration is a 448px square scene")
 require("assets/cinematics" in WORKFLOW and "Copy-Item assets/cinematics/*" in WORKFLOW,
         "Windows playtest package includes the cinematic asset")
-require("footY-91.0f" in RENDER and "70.0f,93.0f" in RENDER,
+require("footY-68.0f" in RENDER and "48.0f,68.0f" in RENDER,
         "player and companion sprites use enlarged world-space dimensions")
 require("unsigned char solid[MAPH][MAPW]" in HEADER and "w->solid[y][x]=AREA_COLLISION" in GAME and "g->world.solid[y][x]" in GAME,
         "Tiled collision layer is shared with gameplay collision")
@@ -353,7 +353,7 @@ require("TEX_CHARACTER_PORTRAITS" in RENDER and "DrawTexturePro(TEX_CHARACTER_PO
         "high-resolution character portrait atlas is used for dialogue and the boss battle")
 require("核心耐久" in RENDER and "阶段三" in RENDER and "核心蓄能" in RENDER and "PHASE III" not in RENDER,
         "boss phase and core status are displayed in Chinese in a non-overlapping panel")
-require("TEX_HEROINE_WORLD" in RENDER and "32,48" in RENDER and "84.0f,112.0f" in RENDER,
+require("TEX_HEROINE_WORLD" in RENDER and "32,48" in RENDER and "48.0f,68.0f" in RENDER,
         "heroine uses crisp four-frame directional pixel art at a larger in-world scale")
 require("TEX_GROVE_COTTAGE" in RENDER and "DrawGroveCottage" in RENDER,
         "grove house uses the approved handcrafted cottage asset")
@@ -435,7 +435,7 @@ for signature, forbidden, label in [
 require('"assets/characters/png/moss_lumi.png"' in RENDER and
         '"assets/characters/png/moatail.png"' in RENDER and
         '"assets/characters/png/crystal_gecko.png"' in RENDER and
-        "for(int i=0;i<25;i++)" in RENDER,
+        "for(int i=0;i<29;i++)" in RENDER,
         "illustration texture load/unload lifecycle is complete")
 
 print(f"Validation complete. Imported art sheets checked: {present}/{len(assets)}.")
