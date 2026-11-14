@@ -46,7 +46,7 @@ def paste_anchor(dst,sprite,cx,foot_y,width,height):
     bbox=sprite.getchannel("A").getbbox()
     if bbox is None:return
     sprite=sprite.crop(bbox)
-    sprite=sprite.resize((max(1,int(width)),max(1,int(height))),Image.Resampling.LANCZOS)
+    sprite=sprite.resize((max(1,int(width)),max(1,int(height))),Image.Resampling.NEAREST)
     dst.alpha_composite(sprite,(int(cx-width/2),int(foot_y-height)))
 
 
