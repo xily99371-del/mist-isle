@@ -29,6 +29,9 @@ jobs:
           Copy-Item build-pi-artifact/assets/characters/png/heroine_portrait.png assets/characters/png/ -Force
           Copy-Item build-pi-artifact/assets/characters/png/watcher_portrait.png assets/characters/png/ -Force
           Copy-Item build-pi-artifact/assets/characters/png/lighthouse_guardian_portrait.png assets/characters/png/ -Force
+          Copy-Item build-pi-artifact/assets/characters/png/moss_lumi.png assets/characters/png/ -Force
+          Copy-Item build-pi-artifact/assets/characters/png/moatail.png assets/characters/png/ -Force
+          Copy-Item build-pi-artifact/assets/characters/png/crystal_gecko.png assets/characters/png/ -Force
           python tools/preview_tiled_maps.py --output build/map-previews
           if (Test-Path third_party/kenney/rpg-base/KenneyRPGpack.zip) { python tools/preview_cc0_packs.py }
           python tools/validate_project.py
