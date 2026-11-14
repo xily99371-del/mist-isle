@@ -235,8 +235,8 @@ static bool SolidPoint(Game *g,Vector2 p) {
 }
 static bool Solid(Game *g,Vector2 p) {
     // Eight perimeter samples approximate the full body footprint and prevent diagonal corner clipping.
-    const float r=.37f;
-    const float d=.262f;
+    const float r=.31f;
+    const float d=.219f;
     return SolidPoint(g,p) ||
         SolidPoint(g,(Vector2){p.x-r,p.y}) ||
         SolidPoint(g,(Vector2){p.x+r,p.y}) ||
@@ -321,7 +321,7 @@ void GameReset(Game *g,int seed) {
     g->splash=(Buddy){.pos={8,7},.hp=100,.maxHp=100,.owned=false,.level=1};
     g->spark=(Buddy){.pos={15,8},.hp=100,.maxHp=100,.owned=false,.level=1};
     g->cam.offset=(Vector2){SW/2.0f,SH/2.0f}; g->cam.zoom=1.10f;
-    g->fireflyPhase=0; g->dayClock=0.28f; g->weatherClock=0; g->weather=0; g->journalOpen=false; g->inventoryOpen=false; g->mapOpen=false;
+    g->fireflyPhase=0; g->dayClock=0.02f; g->weatherClock=0; g->weather=4; g->weatherFade=1.0f; g->journalOpen=false; g->inventoryOpen=false; g->mapOpen=false;
     g->fireflyDiscovered=false; g->leaflingFed=false; g->groveMoteDefeated=false; g->enemySoaked=false; g->battleRound=0; g->defeatedGuards=0;
 }
 void GameStart(Game *g) {
@@ -530,7 +530,16 @@ void GameUpdate(Game *g,float dt) {
     g->fireflyPhase+=dt;
     g->dayClock=fmodf(g->dayClock+dt/420.0f,1.0f);
     g->weatherClock+=dt;
-    if(g->weatherClock>95.0f){g->weatherClock=0;g->weather=GetRandomValue(0,3);Toast(g,g->weather==0?"海风轻轻吹过。":g->weather==1?"林间飘起了细雨。":g->weather==2?"萤火虫开始活跃。":"云层散开，阳光洒进林地。");}
+    g->weatherFade=fminf(1.0f,g->weatherFade+dt*0.32f);
+    if(g->weatherClock>38.0f) {
+        g->weatherClock=0;
+        int nextWeather=GetRandomValue(0,4);
+        if(nextWeather==g->weather)nextWeather=(nextWeather+1+GetRandomValue(0,3))%5;
+        g->weather=nextWeather;
+        g->weatherFade=0.0f;
+        const char *weatherNotice[5]={"天气转晴，暖光穿过云层。","林间阵雨聚拢，风势渐强。","萤火微光在林间浮现。","云层压低，海风转冷。","夜雾漫过岛屿，灯火逐渐显现。"};
+        Toast(g,weatherNotice[g->weather]);
+    }
     if(g->scene==SCENE_PLAY) {
         if(IsKeyPressed(KEY_O))g->objectiveCollapsed=!g->objectiveCollapsed;
         if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -541,8 +550,11 @@ void GameUpdate(Game *g,float dt) {
             if(CheckCollisionPointRec(mouse,objectiveToggle))g->objectiveCollapsed=!g->objectiveCollapsed;
         }
         if(IsKeyPressed(KEY_F7)) {
-            g->weather=(g->weather+1)%4;
-            Toast(g,g->weather==0?"天气：海风晴朗":g->weather==1?"天气：持续降雨":g->weather==2?"天气：萤火微光":"天气：云开见日");
+            g->weather=(g->weather+1)%5;
+            g->weatherClock=0.0f;
+            g->weatherFade=0.0f;
+            const char *weatherNotice[5]={"天气：晴朗","天气：阵雨","天气：萤火","天气：阴云","天气：夜雾"};
+            Toast(g,weatherNotice[g->weather]);
         }
     }
     if(g->journalOpen || g->inventoryOpen || g->mapOpen) {
