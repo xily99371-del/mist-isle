@@ -21,7 +21,9 @@ jobs:
       - name: Extract approved art bundle when supplied
         shell: pwsh
         run: |
-          if (Test-Path MistIsle_ApprovedArt_v3.zip) {
+          if (Test-Path MistIsle_ApprovedArt_v4.zip) {
+            Expand-Archive -LiteralPath MistIsle_ApprovedArt_v4.zip -DestinationPath . -Force
+          } elseif (Test-Path MistIsle_ApprovedArt_v3.zip) {
             Expand-Archive -LiteralPath MistIsle_ApprovedArt_v3.zip -DestinationPath . -Force
           }
       - name: Generate pixel assets
@@ -58,7 +60,7 @@ jobs:
           )
           $missing = $required | Where-Object { -not (Test-Path $_) }
           if ($missing.Count -gt 0) {
-            Write-Error ("Approved art bundle not installed: " + ($missing -join ', ') + ". The local playtest must install MistIsle_ApprovedArt_v3.zip before it can be considered visually validated.")
+            Write-Error ("Approved art bundle not installed: " + ($missing -join ', ') + ". Install MistIsle_ApprovedArt_v4.zip (or v3 for legacy portrait resolution) before visual validation.")
           }
       - name: Configure
         run: cmake -S . -B build -A x64
@@ -143,7 +145,7 @@ jobs:
           sudo apt-get install -y build-essential cmake git pkg-config libx11-dev libxext-dev libxcursor-dev libxinerama-dev libxrandr-dev libxi-dev libasound2-dev libgl1-mesa-dev libwayland-dev libxkbcommon-dev wayland-protocols
       - name: Extract approved art bundle when supplied
         run: |
-          if [ -f MistIsle_ApprovedArt_v3.zip ]; then unzip -o MistIsle_ApprovedArt_v3.zip -d .; fi
+          if [ -f MistIsle_ApprovedArt_v4.zip ]; then unzip -o MistIsle_ApprovedArt_v4.zip -d .; elif [ -f MistIsle_ApprovedArt_v3.zip ]; then unzip -o MistIsle_ApprovedArt_v3.zip -d .; fi
       - name: Generate art and validate Tiled maps
         run: |
           python -m pip install pillow cairosvg
