@@ -207,7 +207,8 @@ if all((ROOT / p).exists() for p in approved_assets):
             "coastal keeper house uses the user's approved pixel-art building")
     require("frame*48" in RENDER and "TEX_WATCHER_PIXEL" in RENDER and "watcher_pixel_4x4_48x76.png" in RENDER,
             "Watcher world actor is a native 48x76 pixel RPG sprite frame, not a portrait crop")
-    require("bossPixelPath=\"assets/characters/boss/lighthouse_guardian_4x2.png\"" in RENDER and "TEX_GUARDIAN_APPROVED.width==192" in RENDER and\n        "DrawLighthouseGuardian((Vector2){880,454},g->time,1.5f,g->battleTurn!=0)" in RENDER and
+    require('bossPixelPath="assets/characters/boss/lighthouse_guardian_4x2.png"' in RENDER and "TEX_GUARDIAN_APPROVED.width==192" in RENDER and
+        "DrawLighthouseGuardian((Vector2){880,454},g->time,1.5f,g->battleTurn!=0)" in RENDER and
             "else if(TEX_GUARDIAN_PORTRAIT.id)" not in RENDER,
             "boss exploration and battle scenes use the dedicated pixel animation; anime portrait is dialogue-only")
     require('SetDialogueAs(g,"沫尾兽"' in GAME and 'SetDialogueAs(g,"鸣晶蜥"' in GAME,
@@ -263,7 +264,7 @@ require("Collision follows the visible object's ground footprint" in MAP_BUILD a
         "Tiled buildings, tree trunks, walls, pillars and altar bases compile into gameplay collision")
 require("Pokémon-Center-style recovery service" in GAME and "SetDialogueAs(g,\"守望者\"" in GAME and "g->lumi.hp=g->lumi.maxHp" in GAME,
         "Watcher heals the whole party before the overlapping campfire interaction")
-require("SetDialogueAs(g,"旅人","三种伙伴的力量" in GAME,
+require('SetDialogueAs(g,"旅人","三种伙伴的力量' in GAME,
         "ruin seal-unlock dialogue uses the traveller portrait")
 require("nearest free, reachable tile" in GAME and "occupied" in GAME,
         "blocked or duplicate pickups are relocated to a distinct reachable ground tile")
