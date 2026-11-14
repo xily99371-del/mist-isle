@@ -412,7 +412,7 @@ require("if(area==AREA_GROVE) g->weather=2" in GAME and "else if(area==AREA_RUIN
         "Grove, Ruins and Lighthouse lock to fireflies, rain and fog respectively; only the hub rotates clear, rain and overcast weather")
 require("g->weather==3" in RENDER and "g->weather==4" in RENDER and "DrawCloudPuff" in RENDER and
         "Broad, low fog banks drift across the foreground" in RENDER and "(.19f+(i%3)*.030f)" in RENDER and
-        "Fade((Color){7,17,36,255},.82f*weatherAlpha)" in RENDER,
+        "Fade((Color){14,27,47,255},.72f*weatherAlpha)" in RENDER,
         "overcast and optional night fog have distinct moving cloud visuals and clearly visible layered fog banks")
 LIGHTHOUSE_MAP_TEXT=(ROOT/"maps/lighthouse_courtyard.tmx").read_text(encoding="utf-8")
 LIGHTHOUSE_GROUND=LIGHTHOUSE_MAP_TEXT.split('<data encoding="csv">',1)[1].split("</data>",1)[0].strip().splitlines()
