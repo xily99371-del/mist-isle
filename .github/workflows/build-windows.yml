@@ -21,7 +21,11 @@ jobs:
       - name: Extract approved art bundle when supplied
         shell: pwsh
         run: |
-          if (Test-Path MistIsle_ApprovedArt_v5.zip) {
+          if (Test-Path MistIsle_ApprovedArt_v7.zip) {
+            Expand-Archive -LiteralPath MistIsle_ApprovedArt_v7.zip -DestinationPath . -Force
+          } elseif (Test-Path MistIsle_ApprovedArt_v6.zip) {
+            Expand-Archive -LiteralPath MistIsle_ApprovedArt_v6.zip -DestinationPath . -Force
+          } elseif (Test-Path MistIsle_ApprovedArt_v5.zip) {
             Expand-Archive -LiteralPath MistIsle_ApprovedArt_v5.zip -DestinationPath . -Force
           } elseif (Test-Path MistIsle_ApprovedArt_v4.zip) {
             Expand-Archive -LiteralPath MistIsle_ApprovedArt_v4.zip -DestinationPath . -Force
@@ -49,7 +53,7 @@ jobs:
       - name: Verify approved art integration
         shell: pwsh
         run: |
-          $bundle = (Test-Path MistIsle_ApprovedArt_v5.zip) -or (Test-Path MistIsle_ApprovedArt_v4.zip) -or (Test-Path MistIsle_ApprovedArt_v3.zip)
+          $bundle = (Test-Path MistIsle_ApprovedArt_v7.zip) -or (Test-Path MistIsle_ApprovedArt_v6.zip) -or (Test-Path MistIsle_ApprovedArt_v5.zip) -or (Test-Path MistIsle_ApprovedArt_v4.zip) -or (Test-Path MistIsle_ApprovedArt_v3.zip)
           if (-not $bundle) {
             Write-Warning "Approved art bundle is not committed to this checkout. Source/compile checks will continue, but this run is not a visual-art release validation."
           } else {
@@ -61,7 +65,7 @@ jobs:
               'assets/characters/portraits/moatail_portrait.png',
               'assets/characters/portraits/crystal_gecko_portrait.png',
               'assets/characters/hero/heroine_pixel_4x4_64x80.png',
-              'assets/characters/npc/watcher_pixel_4x4_48x76.png',
+              'assets/characters/npc/watcher_pixel_4x4_64x80.png',
               'assets/characters/boss/lighthouse_guardian_4x2.png',
               'assets/environment/coastal_keeper_house.png'
             )
@@ -153,7 +157,7 @@ jobs:
           sudo apt-get install -y build-essential cmake git pkg-config libx11-dev libxext-dev libxcursor-dev libxinerama-dev libxrandr-dev libxi-dev libasound2-dev libgl1-mesa-dev libwayland-dev libxkbcommon-dev wayland-protocols
       - name: Extract approved art bundle when supplied
         run: |
-          if [ -f MistIsle_ApprovedArt_v4.zip ]; then unzip -o MistIsle_ApprovedArt_v4.zip -d .; elif [ -f MistIsle_ApprovedArt_v3.zip ]; then unzip -o MistIsle_ApprovedArt_v3.zip -d .; fi
+          if [ -f MistIsle_ApprovedArt_v7.zip ]; then unzip -o MistIsle_ApprovedArt_v7.zip -d .; elif [ -f MistIsle_ApprovedArt_v6.zip ]; then unzip -o MistIsle_ApprovedArt_v6.zip -d .; elif [ -f MistIsle_ApprovedArt_v4.zip ]; then unzip -o MistIsle_ApprovedArt_v4.zip -d .; elif [ -f MistIsle_ApprovedArt_v3.zip ]; then unzip -o MistIsle_ApprovedArt_v3.zip -d .; fi
       - name: Generate art and validate Tiled maps
         run: |
           python -m pip install pillow cairosvg
