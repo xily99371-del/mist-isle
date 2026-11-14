@@ -324,15 +324,14 @@ static void DrawProp(int index,Vector2 p,float w,float h) {
     DrawTexturePro(TEX_PROPS,src,dst,(Vector2){0,0},0,WHITE);
 }
 static void DrawKeeper(Vector2 p,float t,float scale) {
-    (void)t;
     const float footY=p.y+7.0f*scale;
-    DrawEllipse((int)p.x,(int)footY,(int)(12*scale),(int)(3*scale),(Color){35,49,45,85});
-    // Native 64x80 pixel RPG actor sheet; this is a sprite character, never a
-    // pixelated crop of the high-resolution Watcher portrait.
+    DrawEllipse((int)p.x,(int)footY,(int)(10*scale),(int)(3*scale),(Color){35,49,45,75});
+    // Four-frame native pixel NPC sheet, never a pixelated portrait crop.
     if(TEX_WATCHER_PIXEL.id) {
-        Rectangle src={0,0,48,76}; /* front idle frame, native display resolution */
-        float w=48.0f*scale,h=76.0f*scale;
-        Rectangle dst={p.x-w*.5f,footY-h,w,h};
+        int frame=(int)(t*2.2f)%4;
+        Rectangle src={(float)(frame*48),0,48,76};
+        float w=44.0f*scale,h=70.0f*scale;
+        Rectangle dst={roundf(p.x-w*.5f),roundf(footY-h),w,h};
         DrawTexturePro(TEX_WATCHER_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
     } else {
         TraceLog(LOG_ERROR,"Mist Isle: native pixel Watcher actor missing; no portrait or low-resolution fallback will be displayed.");
@@ -394,17 +393,17 @@ static void DrawPlayer(Vector2 p,float t,bool moving,int facing) {
     if(TEX_HEROINE_PIXEL.id) {
         int frame=moving?((int)(t*8.0f)%4):0;
         Rectangle src={(float)(frame*64),(float)(facing*80),64,80};
-        Rectangle dst={p.x-24.0f,footY-76.0f-bob,48.0f,76.0f};
+        Rectangle dst={roundf(p.x-21.0f),roundf(footY-66.0f-bob),42.0f,66.0f};
         DrawTexturePro(TEX_HEROINE_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_HEROINE_APPROVED.id) {
         int frame=moving?((int)(t*10.0f)%8):0;
         Rectangle src={(float)(frame*24),(float)(facing*32),24,32};
-        Rectangle dst={p.x-24.0f,footY-64.0f-bob,48.0f,64.0f};
+        Rectangle dst={roundf(p.x-21.0f),roundf(footY-56.0f-bob),42.0f,56.0f};
         DrawTexturePro(TEX_HEROINE_APPROVED,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_HERO_WALK.id) {
         int frame=moving?((int)(t*8.0f)%4):0;
         Rectangle src={(float)(frame*32),(float)(facing*32),32,32};
-        Rectangle dst={p.x-23.0f,footY-48.0f-bob,46.0f,48.0f};
+        Rectangle dst={roundf(p.x-21.0f),roundf(footY-44.0f-bob),42.0f,44.0f};
         DrawTexturePro(TEX_HERO_WALK,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_HERO_PORTRAIT.id) {
         Rectangle src={0,0,(float)TEX_HERO_PORTRAIT.width,(float)TEX_HERO_PORTRAIT.height};
@@ -516,7 +515,7 @@ static void DrawLighthouseGuardian(Vector2 p,float t,float scale,bool attacking)
     DrawCircleLines((int)p.x,(int)(p.y-72*scale),(int)(54*scale),Fade((Color){255,190,91,255},.20f+.12f*pulse));
     DrawCircleLines((int)p.x,(int)(p.y-72*scale),(int)(67*scale),Fade((Color){113,204,211,255},.12f));
     if(TEX_GUARDIAN_APPROVED.id) {
-        int frame=attacking?((int)(t*8.0f)%4):0;
+        int frame=attacking?((int)(t*8.0f)%4):((int)(t*2.0f)%4);
         Rectangle src={(float)(frame*48),attacking?64.0f:0.0f,48,64};
         float w=96.0f*scale,h=128.0f*scale;
         Rectangle dst={p.x-w*.5f,p.y-h+bob,w,h};
@@ -1293,7 +1292,7 @@ static void RenderBattle(Game *g) {
     DrawUIText("选择出战伙伴",50,520,20,C_INK);
     DrawUIText(g->battleTurn==0?"选择技能并按 Enter 确认":"敌方正在行动，按 Enter 继续",830,520,16,(Color){104,119,93,255});
     int ids[3]={0,1,2};
-    bool owned[3]={g->lumi.owned,g->splash.owned,g->spark.owned};
+    bool owned[3]={g->lumi.owned&&g->lumi.hp>0.0f,g->splash.owned&&g->splash.hp>0.0f,g->spark.owned&&g->spark.hp>0.0f};
     int count=0;
     for(int i=0;i<3;i++)if(owned[i])ids[count++]=i;
     int optionCount=count>0?count:1;
@@ -1325,6 +1324,13 @@ static void RenderBattle(Game *g) {
             DrawUIText("旅人",(int)card.x+78,(int)card.y+22,17,C_INK);
             DrawUIText("基础攻击",(int)card.x+78,(int)card.y+50,14,(Color){104,119,93,255});
             DrawUIText("造成普通伤害",(int)card.x+78,(int)card.y+73,13,(Color){104,119,93,255});
+        }
+        if(id>=0) {
+            Buddy *buddy=id==0?&g->lumi:(id==1?&g->splash:&g->spark);
+            DrawUIText(TextFormat("体力 %d/%d",(int)buddy->hp,(int)buddy->maxHp),(int)card.x+78,(int)card.y+78,11,(Color){104,119,93,255});
+            DrawRectangle((int)card.x+78,(int)card.y+96,132,6,(Color){215,211,193,255});
+            DrawRectangle((int)card.x+78,(int)card.y+96,(int)(132.0f*fmaxf(0.0f,buddy->hp/buddy->maxHp)),6,
+                          buddy->hp>35.0f?(Color){111,174,112,255}:(Color){205,112,91,255});
         }
     }
     Panel((Rectangle){815,555,410,112});
@@ -1478,12 +1484,12 @@ void RenderInit(void) {
         "assets/characters/png/camp_keeper.png",
         "assets/tiles/png/island_iso_tiles.png",
         "assets/tiles/png/environment_props.png",
-        "assets/characters/portraits/heroine_portrait.jpg",
-        "assets/characters/portraits/watcher_portrait.jpg",
-        "assets/characters/portraits/guardian_portrait.jpg",
-        "assets/characters/portraits/moss_lumi_portrait.jpg",
-        "assets/characters/portraits/moatail_portrait.jpg",
-        "assets/characters/portraits/crystal_gecko_portrait.jpg",
+        "assets/characters/portraits/heroine_portrait.png",
+        "assets/characters/portraits/watcher_portrait.png",
+        "assets/characters/portraits/guardian_portrait.png",
+        "assets/characters/portraits/moss_lumi_portrait.png",
+        "assets/characters/portraits/moatail_portrait.png",
+        "assets/characters/portraits/crystal_gecko_portrait.png",
         "assets/characters/hero/heroine_approved_8x4.png",
         "assets/characters/boss/lighthouse_guardian_4x2.png",
         "assets/characters/portraits/character_portraits_atlas.jpg",
@@ -1508,13 +1514,30 @@ void RenderInit(void) {
         else TraceLog(LOG_ERROR,"Mist Isle: approved heroine pixel sheet failed to load.");
     } else TraceLog(LOG_ERROR,"Mist Isle: approved heroine pixel sheet missing; refusing silent generated-hero fallback.");
     if(FileExists("assets/characters/npc/watcher_pixel_4x4_48x76.png")) {
-        TEX_WATCHER_PIXEL=LoadTexture("assets/characters/npc/watcher_pixel_idle_64x80.png");
-        if(TEX_WATCHER_PIXEL.id)SetTextureFilter(TEX_WATCHER_PIXEL,TEXTURE_FILTER_POINT);
-    } else TraceLog(LOG_ERROR,"Mist Isle: approved Watcher pixel actor missing.");
+        TEX_WATCHER_PIXEL=LoadTexture("assets/characters/npc/watcher_pixel_4x4_48x76.png");
+        if(TEX_WATCHER_PIXEL.id) {
+            SetTextureFilter(TEX_WATCHER_PIXEL,TEXTURE_FILTER_POINT);
+            TraceLog(LOG_INFO,"Mist Isle: native pixel Watcher loaded (%dx%d).",TEX_WATCHER_PIXEL.width,TEX_WATCHER_PIXEL.height);
+        } else TraceLog(LOG_ERROR,"Mist Isle: Watcher sheet exists but texture creation failed.");
+    } else TraceLog(LOG_ERROR,"Mist Isle: Watcher pixel sheet missing; run the asset generator.");
     if(FileExists("assets/environment/coastal_keeper_house.png")) {
         TEX_COASTAL_HOUSE=LoadTexture("assets/environment/coastal_keeper_house.png");
         if(TEX_COASTAL_HOUSE.id)SetTextureFilter(TEX_COASTAL_HOUSE,TEXTURE_FILTER_POINT);
     } else TraceLog(LOG_ERROR,"Mist Isle: approved coastal keeper house asset missing.");
+    /* Explicitly reload and validate the dedicated 4x2 pixel Boss sheet.
+       Do not silently rely on the generic texture-array index for this critical asset. */
+    if(TEX_GUARDIAN_APPROVED.id)UnloadTexture(TEX_GUARDIAN_APPROVED);
+    TEX_GUARDIAN_APPROVED=(Texture2D){0};
+    const char *bossPixelPath="assets/characters/boss/lighthouse_guardian_4x2.png";
+    if(FileExists(bossPixelPath)) {
+        TEX_GUARDIAN_APPROVED=LoadTexture(bossPixelPath);
+        if(TEX_GUARDIAN_APPROVED.id) {
+            SetTextureFilter(TEX_GUARDIAN_APPROVED,TEXTURE_FILTER_POINT);
+            if(TEX_GUARDIAN_APPROVED.width==192&&TEX_GUARDIAN_APPROVED.height==128)
+                TraceLog(LOG_INFO,"Mist Isle: dedicated 4x2 pixel Boss sheet loaded (192x128).");
+            else TraceLog(LOG_ERROR,"Mist Isle: Boss sheet dimensions are %dx%d; expected 192x128.",TEX_GUARDIAN_APPROVED.width,TEX_GUARDIAN_APPROVED.height);
+        } else TraceLog(LOG_ERROR,"Mist Isle: Boss sheet exists but LoadTexture failed.");
+    } else TraceLog(LOG_ERROR,"Mist Isle: Boss pixel sheet missing at %s.",bossPixelPath);
     TEX_GROUND_CACHE=LoadRenderTexture((int)WORLD_PIXEL_W,(int)WORLD_PIXEL_H);
     if(TEX_GROUND_CACHE.id)SetTextureFilter(TEX_GROUND_CACHE.texture,TEXTURE_FILTER_POINT);
     CACHED_GROUND_AREA=-1;
