@@ -18,6 +18,7 @@ STRUCTURES=ROOT/"assets/environment/structures_atlas_128.png"
 CLIFFS=ROOT/"assets/environment/cliffs_fences_atlas_128.png"
 ORIGINAL=ROOT/"assets/environment/original_props_16_v1.png"
 KENNEY=ROOT/"assets/environment/kenney_buildings_atlas.png"
+COTTAGE=ROOT/"assets/environment/glowglade_cottage_cutout.png"
 PICKUPS={
     "coastal_camp":[(8,8),(12,8),(14,6),(5,9),(5,10),(12,9)],
     "glowglade_grove":[(6,7),(12,6),(12,7),(4,10),(10,10)],
@@ -125,8 +126,10 @@ def draw_object(image,obj,sheets):
         elif 400<=index<416:
             sprite=crop_cell(sheets["original"],index-400,4,32)
             paste_anchor(image,sprite,x,y+7,92*scale,92*scale)
+        elif index==500 and sheets["cottage"] is not None:
+            paste_anchor(image,sheets["cottage"],x,y+7,176*scale,144*scale)
         elif 500<=index<504 and sheets["kenney"] is not None:
-            if index in (500,501):
+            if index in (501,):
                 sx=(index-500)*192+24
                 sprite=sheets["kenney"].crop((sx,0,sx+144,192))
                 paste_anchor(image,sprite,x,y+7,144*scale,192*scale)
@@ -145,7 +148,7 @@ def render_map(name,out_dir):
     sheets={
         "flora":load(FLORA),"area":load(AREA),"env":load(ENV),
         "structures":load(STRUCTURES),"cliffs":load(CLIFFS),
-        "original":load(ORIGINAL),"kenney":load(KENNEY),
+        "original":load(ORIGINAL),"kenney":load(KENNEY),"cottage":load(COTTAGE),
     }
     layer=root.find("./layer[@name='Ground']/data")
     gids=[int(v.strip()) for v in (layer.text or "").replace("\n","").split(",") if v.strip()]

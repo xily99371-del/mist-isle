@@ -268,9 +268,9 @@ static void DrawEnvProp(int index,Vector2 p,float w,float h) {
 }
 static void DrawGroveCottage(Vector2 p,float scale) {
     if(!TEX_GROVE_COTTAGE.id)return;
-    DrawEllipse((int)p.x,(int)p.y+5,(int)(132*scale),(int)(18*scale),(Color){34,53,45,105});
+    DrawEllipse((int)p.x,(int)p.y+4,(int)(88*scale),(int)(12*scale),(Color){34,53,45,105});
     Rectangle src={0,0,(float)TEX_GROVE_COTTAGE.width,(float)TEX_GROVE_COTTAGE.height};
-    float w=276.0f*scale,h=226.0f*scale;
+    float w=176.0f*scale,h=144.0f*scale;
     Rectangle dst={p.x-w*.5f,p.y-h,w,h};
     DrawTexturePro(TEX_GROVE_COTTAGE,src,dst,(Vector2){0,0},0,WHITE);
 }
