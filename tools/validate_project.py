@@ -230,12 +230,13 @@ if all((ROOT / p).exists() for p in approved_assets):
             "DrawEllipse((int)p.x,(int)p.y+5,15*s" not in RENDER and
             "DrawEllipse((int)p.x,(int)p.y+8,34,10" not in RENDER,
             "trees and shrine decorations do not render detached circular ground shadows")
-require("type_id in (29,31,33)" in MAP_BUILD and "210-213 small stones" in MAP_BUILD and "type_id==229" not in MAP_BUILD,
-            "small stones, low shrubs and flowering props are non-blocking while structural bases remain solid")
-require("block_rect(cx-1,cy-1,cx+1,cy-1)" in MAP_BUILD and "compact one-row tent base" in MAP_BUILD,
-            "house and tent collision footprints are reduced to compact rear/base rows")
 else:
-    print("INFO: MistIsle_ApprovedArt_v3.zip is not installed; user-approved runtime artwork is not yet available.")
+    print("INFO: MistIsle_ApprovedArt_v7.zip is not installed; user-approved runtime artwork is not yet available.")
+
+require("type_id in (29,31,33)" in MAP_BUILD and "210-213 small stones" in MAP_BUILD and "type_id==229" not in MAP_BUILD,
+        "small stones, low shrubs and flowering props are non-blocking while structural bases remain solid")
+require("block_rect(cx-1,cy-1,cx+1,cy-1)" in MAP_BUILD and "compact one-row tent base" in MAP_BUILD,
+        "house and tent collision footprints are reduced to compact rear/base rows")
 
 require(all((ROOT / f"assets/characters/svg/{name}.svg").exists() for name in ("heroine_portrait","watcher_portrait","lighthouse_guardian_portrait")),
         "three authored static character portrait source illustrations are present")
