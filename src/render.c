@@ -75,7 +75,7 @@ static void DrawUITextWrapped(const char *text,int x,int y,int maxWidth,int size
 static Texture2D TEX_HERO={0}, TEX_LUMI={0}, TEX_MOATAIL={0}, TEX_GECKO={0}, TEX_KEEPER={0};
 static Texture2D TEX_HERO_PORTRAIT={0}, TEX_WATCHER_PORTRAIT={0}, TEX_GUARDIAN_PORTRAIT={0};
 static Texture2D TEX_HEROINE_APPROVED={0}, TEX_GUARDIAN_APPROVED={0};
-static Texture2D TEX_HEROINE_PIXEL={0}, TEX_COASTAL_HOUSE={0};
+static Texture2D TEX_HEROINE_PIXEL={0}, TEX_WATCHER_PIXEL={0}, TEX_COASTAL_HOUSE={0};
 static Texture2D TEX_CHARACTER_PORTRAITS={0}, TEX_HEROINE_WORLD={0}, TEX_WATCHER_WORLD={0}, TEX_GROVE_COTTAGE={0};
 static Texture2D TEX_LUMI_ILLUSTRATION={0}, TEX_MOATAIL_ILLUSTRATION={0}, TEX_GECKO_ILLUSTRATION={0};
 static Texture2D TEX_HERO_PIXEL={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, TEX_GECKO_PIXEL={0}, TEX_TILES={0}, TEX_PROPS={0};
@@ -324,7 +324,12 @@ static void DrawKeeper(Vector2 p,float t,float scale) {
     const float footY=p.y+7.0f*scale;
     DrawEllipse((int)p.x,(int)footY,(int)(13*scale),(int)(4*scale),(Color){35,49,45,105});
     // The Watcher portrait is dialogue-only. The world actor uses a compact pixel NPC.
-    if(TEX_KEEPER.id) {
+    if(TEX_WATCHER_PIXEL.id) {
+        Rectangle src={0,0,(float)TEX_WATCHER_PIXEL.width,(float)TEX_WATCHER_PIXEL.height};
+        float w=48.0f*scale,h=76.0f*scale;
+        Rectangle dst={p.x-w*.5f,footY-h,w,h};
+        DrawTexturePro(TEX_WATCHER_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
+    } else if(TEX_KEEPER.id) {
         Rectangle src={0,0,(float)TEX_KEEPER.width,(float)TEX_KEEPER.height};
         float w=36.0f*scale,h=40.0f*scale;
         Rectangle dst={p.x-w*.5f,footY-h,w,h};
@@ -1506,6 +1511,10 @@ void RenderInit(void) {
         if(TEX_HEROINE_PIXEL.id)SetTextureFilter(TEX_HEROINE_PIXEL,TEXTURE_FILTER_POINT);
         else TraceLog(LOG_ERROR,"Mist Isle: approved heroine pixel sheet failed to load.");
     } else TraceLog(LOG_ERROR,"Mist Isle: approved heroine pixel sheet missing; refusing silent generated-hero fallback.");
+    if(FileExists("assets/characters/npc/watcher_pixel_idle_64x80.png")) {
+        TEX_WATCHER_PIXEL=LoadTexture("assets/characters/npc/watcher_pixel_idle_64x80.png");
+        if(TEX_WATCHER_PIXEL.id)SetTextureFilter(TEX_WATCHER_PIXEL,TEXTURE_FILTER_POINT);
+    } else TraceLog(LOG_ERROR,"Mist Isle: approved Watcher pixel actor missing.");
     if(FileExists("assets/environment/coastal_keeper_house.png")) {
         TEX_COASTAL_HOUSE=LoadTexture("assets/environment/coastal_keeper_house.png");
         if(TEX_COASTAL_HOUSE.id)SetTextureFilter(TEX_COASTAL_HOUSE,TEXTURE_FILTER_POINT);
@@ -1517,6 +1526,7 @@ void RenderInit(void) {
 }
 void RenderClose(void) {
     if(TEX_HEROINE_PIXEL.id)UnloadTexture(TEX_HEROINE_PIXEL);
+    if(TEX_WATCHER_PIXEL.id)UnloadTexture(TEX_WATCHER_PIXEL);
     if(TEX_COASTAL_HOUSE.id)UnloadTexture(TEX_COASTAL_HOUSE);
     if(TEX_GROUND_CACHE.id)UnloadRenderTexture(TEX_GROUND_CACHE);
     TEX_GROUND_CACHE=(RenderTexture2D){0};
