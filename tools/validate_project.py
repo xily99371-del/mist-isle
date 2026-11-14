@@ -400,8 +400,8 @@ require("IsKeyPressed(KEY_O)" in GAME and "objectiveToggle" in GAME,
         "objective tracker supports keyboard and mouse toggles")
 require("Rectangle panel={SW-350.0f,18.0f,330.0f,116.0f}" in RENDER,
         "expanded objective tracker is narrower and shorter than the previous HUD panel")
-require("MISTISLE_RAIN_DROPS 56" in RENDER and "MISTISLE_RAIN_DROPS 190" in RENDER and "WeatherNoise" in RENDER and "float gust=" in RENDER and
-        "(.30f+r3*.42f)" in RENDER and "length=13.0f+r2*25.0f" in RENDER,
+require("MISTISLE_RAIN_DROPS 64" in RENDER and "MISTISLE_RAIN_DROPS 230" in RENDER and "WeatherNoise" in RENDER and "float gust=" in RENDER and
+        "(.48f+r3*.40f)" in RENDER and "length=18.0f+r2*31.0f" in RENDER and "MISTISLE_RAIN_RIPPLES 28" in RENDER,
         "rain uses denser, brighter staggered streaks, gust-driven density and stronger water impacts")
 require("g->weather=0; g->weatherFade=1.0f" in GAME and "g->weatherClock>38.0f" in GAME and
         "static const int roamingWeather[4]={0,1,3,4}" in GAME,
