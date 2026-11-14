@@ -28,9 +28,12 @@ FetchContent_MakeAvailable(raylib)
 set(MISTISLE_GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
 # The approved art bundle is distributed separately from source code. If present,
 # extract it into the project tree before configuring runtime asset paths.
-set(MISTISLE_APPROVED_ART_BUNDLE "${CMAKE_SOURCE_DIR}/MistIsle_ApprovedArt_v3.zip")
-if(EXISTS "${MISTISLE_APPROVED_ART_BUNDLE}")
-  file(ARCHIVE_EXTRACT INPUT "${MISTISLE_APPROVED_ART_BUNDLE}" DESTINATION "${CMAKE_SOURCE_DIR}")
+set(MISTISLE_APPROVED_ART_BUNDLE_V4 "${CMAKE_SOURCE_DIR}/MistIsle_ApprovedArt_v4.zip")
+set(MISTISLE_APPROVED_ART_BUNDLE_V3 "${CMAKE_SOURCE_DIR}/MistIsle_ApprovedArt_v3.zip")
+if(EXISTS "${MISTISLE_APPROVED_ART_BUNDLE_V4}")
+  file(ARCHIVE_EXTRACT INPUT "${MISTISLE_APPROVED_ART_BUNDLE_V4}" DESTINATION "${CMAKE_SOURCE_DIR}")
+elseif(EXISTS "${MISTISLE_APPROVED_ART_BUNDLE_V3}")
+  file(ARCHIVE_EXTRACT INPUT "${MISTISLE_APPROVED_ART_BUNDLE_V3}" DESTINATION "${CMAKE_SOURCE_DIR}")
 endif()
 set(MISTISLE_PIXEL_ASSET_STAMP "${MISTISLE_GENERATED_DIR}/pixel_assets.stamp")
 add_custom_command(
