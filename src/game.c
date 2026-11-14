@@ -195,7 +195,18 @@ static void BuildAreaWorld(Game *g,Area area) {
     }
 }
 static void SwitchArea(Game *g,Area area) {
+    Area previousArea=g->area;
     BuildAreaWorld(g,area);
+    /* Firefly weather belongs exclusively to Glowglade Grove. */
+    if(area==AREA_GROVE) {
+        g->weather=2;
+        g->weatherClock=0.0f;
+        g->weatherFade=0.0f;
+    } else if(previousArea==AREA_GROVE) {
+        g->weather=0;
+        g->weatherClock=0.0f;
+        g->weatherFade=0.0f;
+    }
     g->player.pos=(area==AREA_CAMP)?g->world.returnPoint:g->world.camp;
     for(int i=0;i<g->world.pickupCount && i<MAX_PICKUPS;i++)g->world.pickups[i].taken=g->areaPickupTaken[(int)area][i]!=0;
     g->enemyCount=0;
@@ -321,7 +332,7 @@ void GameReset(Game *g,int seed) {
     g->splash=(Buddy){.pos={8,7},.hp=100,.maxHp=100,.owned=false,.level=1};
     g->spark=(Buddy){.pos={15,8},.hp=100,.maxHp=100,.owned=false,.level=1};
     g->cam.offset=(Vector2){SW/2.0f,SH/2.0f}; g->cam.zoom=1.10f;
-    g->fireflyPhase=0; g->dayClock=0.02f; g->weatherClock=0; g->weather=4; g->weatherFade=1.0f; g->journalOpen=false; g->inventoryOpen=false; g->mapOpen=false;
+    g->fireflyPhase=0; g->dayClock=0.02f; g->weatherClock=0; g->weather=0; g->weatherFade=1.0f; g->journalOpen=false; g->inventoryOpen=false; g->mapOpen=false;
     g->fireflyDiscovered=false; g->leaflingFed=false; g->groveMoteDefeated=false; g->enemySoaked=false; g->battleRound=0; g->defeatedGuards=0;
 }
 void GameStart(Game *g) {
@@ -529,16 +540,28 @@ void GameUpdate(Game *g,float dt) {
     if(g->toastTimer>0)g->toastTimer-=dt;
     g->fireflyPhase+=dt;
     g->dayClock=fmodf(g->dayClock+dt/420.0f,1.0f);
-    g->weatherClock+=dt;
     g->weatherFade=fminf(1.0f,g->weatherFade+dt*0.32f);
-    if(g->weatherClock>38.0f) {
-        g->weatherClock=0;
-        int nextWeather=GetRandomValue(0,4);
-        if(nextWeather==g->weather)nextWeather=(nextWeather+1+GetRandomValue(0,3))%5;
-        g->weather=nextWeather;
-        g->weatherFade=0.0f;
-        const char *weatherNotice[5]={"天气转晴，暖光穿过云层。","林间阵雨聚拢，风势渐强。","萤火微光在林间浮现。","云层压低，海风转冷。","夜雾漫过岛屿，灯火逐渐显现。"};
-        Toast(g,weatherNotice[g->weather]);
+    if(g->area==AREA_GROVE) {
+        /* The grove always carries its signature firefly ambience. */
+        if(g->weather!=2) {
+            g->weather=2;
+            g->weatherClock=0.0f;
+            g->weatherFade=0.0f;
+        }
+    } else {
+        g->weatherClock+=dt;
+        if(g->weather==2)g->weather=0; /* Never leak grove-only fireflies into other maps. */
+        if(g->weatherClock>38.0f) {
+            static const int roamingWeather[4]={0,1,3,4};
+            int pick=GetRandomValue(0,3);
+            int nextWeather=roamingWeather[pick];
+            if(nextWeather==g->weather)nextWeather=roamingWeather[(pick+1+GetRandomValue(0,2))%4];
+            g->weather=nextWeather;
+            g->weatherClock=0.0f;
+            g->weatherFade=0.0f;
+            const char *weatherNotice[5]={"天气转晴，暖光穿过云层。","林间阵雨聚拢，风势渐强。","萤火微光在林间浮现。","云层压低，海风转冷。","夜雾漫过岛屿，灯火逐渐显现。"};
+            Toast(g,weatherNotice[g->weather]);
+        }
     }
     if(g->scene==SCENE_PLAY) {
         if(IsKeyPressed(KEY_O))g->objectiveCollapsed=!g->objectiveCollapsed;
@@ -550,11 +573,20 @@ void GameUpdate(Game *g,float dt) {
             if(CheckCollisionPointRec(mouse,objectiveToggle))g->objectiveCollapsed=!g->objectiveCollapsed;
         }
         if(IsKeyPressed(KEY_F7)) {
-            g->weather=(g->weather+1)%5;
-            g->weatherClock=0.0f;
-            g->weatherFade=0.0f;
-            const char *weatherNotice[5]={"天气：晴朗","天气：阵雨","天气：萤火","天气：阴云","天气：夜雾"};
-            Toast(g,weatherNotice[g->weather]);
+            if(g->area==AREA_GROVE) {
+                g->weather=2;
+                Toast(g,"辉光林地：萤火萦绕着林间。");
+            } else {
+                static const int roamingWeather[4]={0,1,3,4};
+                int current=-1;
+                for(int i=0;i<4;i++)if(roamingWeather[i]==g->weather)current=i;
+                int next=roamingWeather[(current+1)%4];
+                g->weather=next;
+                g->weatherClock=0.0f;
+                g->weatherFade=0.0f;
+                const char *weatherNotice[5]={"天气：晴朗","天气：阵雨","天气：萤火","天气：阴云","天气：夜雾"};
+                Toast(g,weatherNotice[g->weather]);
+            }
         }
     }
     if(g->journalOpen || g->inventoryOpen || g->mapOpen) {
