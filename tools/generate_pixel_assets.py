@@ -210,9 +210,9 @@ grove.save(TILES/"environment_props.png")
 print("Extended grove prop atlas:", TILES/"environment_props.png")
 
 
-# Watcher world actor: a native pixel RPG sprite sheet, not a rasterized portrait.
-# Layout matches the traveller: 4 columns x 4 directions, 64x80 cells.
-WATCHER_OUT = ROOT / "assets/characters/npc/watcher_pixel_4x4_48x76.png"
+# Watcher world actor: preserve the user's final 4x4 art sheet from ApprovedArt_v7.
+# Fallback generation uses the renderer's exact 64x80 cell contract.
+WATCHER_OUT = ROOT / "assets/characters/npc/watcher_pixel_4x4_64x80.png"
 WATCHER_OUT.parent.mkdir(parents=True, exist_ok=True)
 WP = {
     "ink": (48, 39, 36, 255), "ink2": (74, 57, 47, 255),
@@ -320,23 +320,23 @@ def watcher_frame(direction, frame):
         d.rectangle((12, 54, 15, 56), fill=WP["gold"])
     return im
 
-watcher_sheet = Image.new("RGBA", (192, 304), (0, 0, 0, 0))
+watcher_sheet = Image.new("RGBA", (256, 320), (0, 0, 0, 0))
 for row, direction in enumerate(("front", "left", "right", "back")):
     for col in range(4):
-        frame = watcher_frame(direction, col).resize((48, 76), Image.Resampling.NEAREST)
-        watcher_sheet.alpha_composite(frame, (col * 48, row * 76))
-# Preserve the separately art-directed, approved pixel sheet imported from bundle v5.
-# Generate the code-authored fallback only when no correctly sized approved sheet exists.
+        frame = watcher_frame(direction, col)
+        watcher_sheet.alpha_composite(frame, (col * 64, row * 80))
+# The user's approved v7 sprite sheet takes precedence. Only create a fallback
+# when that exact runtime asset is absent; never write the obsolete 48x76 sheet.
 if WATCHER_OUT.exists():
     try:
         with Image.open(WATCHER_OUT) as existing:
-            keep_approved = existing.size == (192, 304)
+            keep_approved = existing.size == (256, 320)
     except Exception:
         keep_approved = False
 else:
     keep_approved = False
 if not keep_approved:
     watcher_sheet.save(WATCHER_OUT, optimize=True)
-    print(f"Generated fallback pixel Watcher sprite sheet: {WATCHER_OUT} (192x304)")
+    print(f"Generated fallback pixel Watcher sprite sheet: {WATCHER_OUT} (256x320)")
 else:
-    print(f"Preserved approved Watcher pixel sprite sheet: {WATCHER_OUT} (192x304)")
+    print(f"Preserved final approved Watcher pixel sprite sheet: {WATCHER_OUT} (256x320)")
