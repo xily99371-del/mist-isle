@@ -91,6 +91,42 @@ def draw_water_detail(image,indices,name):
                 draw.line([(left+2,fy),(left+3,fy+5)],fill=(236,245,222,125),width=1)
 
 
+GENERATED_ASSETS = {
+    500: ("grove_generated",(48,68,801,569),.35),
+    600: ("nature_generated",(18,86,293,362),1), 601: ("nature_generated",(324,87,582,363),1),
+    602: ("nature_generated",(631,82,900,364),1), 603: ("nature_generated",(939,86,1234,366),1),
+    604: ("nature_generated",(20,444,221,598),1), 605: ("nature_generated",(233,448,416,598),1),
+    606: ("nature_generated",(434,453,622,597),1), 607: ("nature_generated",(673,473,787,578),1),
+    608: ("nature_generated",(964,483,1084,579),1), 609: ("nature_generated",(1110,485,1231,578),1),
+    610: ("nature_generated",(820,502,939,578),1), 611: ("nature_generated",(41,702,223,811),1),
+    612: ("nature_generated",(269,732,404,803),1), 613: ("nature_generated",(463,739,558,797),1),
+    614: ("nature_generated",(615,745,736,802),1), 615: ("nature_generated",(814,679,927,807),1),
+    616: ("nature_generated",(1120,693,1215,803),1), 617: ("nature_generated",(971,717,1063,803),1),
+    618: ("nature_generated",(36,900,267,1133),1), 619: ("nature_generated",(348,907,573,1127),1),
+    621: ("grove_generated",(834,247,1216,543),1), 622: ("grove_generated",(53,614,303,824),1),
+    623: ("grove_generated",(349,629,581,825),1), 624: ("grove_generated",(630,605,915,835),1),
+    625: ("grove_generated",(967,603,1210,831),1), 626: ("grove_generated",(24,871,404,1178),1),
+    627: ("grove_generated",(425,885,779,1174),1), 628: ("grove_generated",(816,894,988,1172),1),
+    629: ("grove_generated",(1023,908,1214,1164),1),
+    640: ("ruins_generated",(42,59,363,375),1), 641: ("ruins_generated",(394,73,693,367),1),
+    642: ("ruins_generated",(723,107,863,361),1), 643: ("ruins_generated",(895,189,1027,364),1),
+    644: ("ruins_generated",(1047,267,1223,363),1), 645: ("ruins_generated",(58,433,411,619),1),
+    646: ("ruins_generated",(474,449,801,620),1), 647: ("ruins_generated",(856,449,1190,602),1),
+    648: ("ruins_generated",(31,660,286,885),1), 649: ("ruins_generated",(319,711,592,873),1),
+    650: ("ruins_generated",(625,738,914,882),1), 651: ("ruins_generated",(920,975,1194,1165),1),
+    652: ("ruins_generated",(69,1002,283,1133),1), 653: ("ruins_generated",(611,944,886,1176),1),
+    654: ("ruins_generated",(356,1065,560,1138),1),
+    660: ("lighthouse_generated",(49,15,455,362),1), 661: ("lighthouse_generated",(449,49,818,361),1),
+    662: ("lighthouse_generated",(842,100,1170,361),1), 663: ("lighthouse_generated",(21,398,233,645),1),
+    664: ("lighthouse_generated",(262,422,471,633),1), 665: ("lighthouse_generated",(486,411,678,630),1),
+    666: ("lighthouse_generated",(702,446,958,641),1), 667: ("lighthouse_generated",(977,398,1245,641),1),
+    668: ("lighthouse_generated",(13,732,269,902),1), 669: ("lighthouse_generated",(286,736,488,908),1),
+    670: ("lighthouse_generated",(513,702,721,907),1), 671: ("lighthouse_generated",(751,742,962,903),1),
+    672: ("lighthouse_generated",(989,707,1239,906),1), 673: ("lighthouse_generated",(27,1020,396,1209),1),
+    674: ("lighthouse_generated",(420,1018,739,1203),1), 675: ("lighthouse_generated",(764,983,936,1210),1),
+    676: ("lighthouse_generated",(998,957,1226,1218),1),
+}
+
 def draw_object(image,obj,sheets):
     kind=obj.get("class") or obj.get("type") or obj.get("name") or ""
     x,y=float(obj.get("x","0")),float(obj.get("y","0"))
@@ -98,9 +134,6 @@ def draw_object(image,obj,sheets):
     for prop in obj.findall("./properties/property"):
         if prop.get("name")=="scale":scale=float(prop.get("value","1"))
     if kind.startswith("tree") and kind[-1:] in ("0","1","2"):
-        draw=ImageDraw.Draw(image,"RGBA")
-        draw.ellipse((x-35*scale,y+1*scale,x+35*scale,y+15*scale),fill=(35,67,49,72))
-        draw.ellipse((x-26*scale,y+3*scale,x+26*scale,y+11*scale),fill=(71,111,70,48))
         sprite=crop_cell(sheets["flora"],8+int(kind[-1]),8,128)
         paste_anchor(image,sprite,x,y+8,108*scale,120*scale)
     elif kind=="campfire":
@@ -133,8 +166,13 @@ def draw_object(image,obj,sheets):
         elif 400<=index<416:
             sprite=crop_cell(sheets["original"],index-400,4,32)
             paste_anchor(image,sprite,x,y+7,92*scale,92*scale)
-        elif index==500 and sheets["cottage"] is not None:
-            paste_anchor(image,sheets["cottage"],x,y+7,176*scale,144*scale)
+        elif index in GENERATED_ASSETS:
+            sheet_key,box,factor=GENERATED_ASSETS[index]
+            sheet=sheets.get(sheet_key)
+            if sheet is not None:
+                sprite=sheet.crop(box)
+                factor_scale=scale*factor
+                paste_anchor(image,sprite,x,y+7,(box[2]-box[0])*factor_scale,(box[3]-box[1])*factor_scale)
         elif 500<=index<504 and sheets["kenney"] is not None:
             if index in (501,):
                 sx=(index-500)*192+24
@@ -157,6 +195,10 @@ def render_map(name,out_dir):
         "structures":load(STRUCTURES),"cliffs":load(CLIFFS),
         "original":load(ORIGINAL),"kenney":load(KENNEY),"cottage":load(COTTAGE),
         "coastal_house":load(ROOT/"assets/environment/coastal_keeper_house.png"),
+        "nature_generated":load(ROOT/"assets/environment/generated/nature_props_sheet.png"),
+        "grove_generated":load(ROOT/"assets/environment/generated/glowglade_props_sheet.png"),
+        "ruins_generated":load(ROOT/"assets/environment/generated/tidal_ruins_props_sheet.png"),
+        "lighthouse_generated":load(ROOT/"assets/environment/generated/lighthouse_ruins_props_sheet.png"),
     }
     layer=root.find("./layer[@name='Ground']/data")
     gids=[int(v.strip()) for v in (layer.text or "").replace("\n","").split(",") if v.strip()]
