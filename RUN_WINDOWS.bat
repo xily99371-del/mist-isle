@@ -52,7 +52,7 @@ if not exist assets\characters\portraits\heroine_portrait.png (
   goto failed
 )
 if not exist assets\characters\hero\heroine_pixel_4x4_64x80.png goto missing_art
-if not exist assets\characters\npc\watcher_pixel_4x4_48x76.png goto missing_art
+if not exist assets\characters\npc\watcher_pixel_4x4_64x80.png goto missing_art
 if not exist assets\characters\boss\lighthouse_guardian_4x2.png goto missing_art
 if not exist assets\characters\portraits\moss_lumi_portrait.png goto missing_art
 if not exist assets\characters\portraits\moatail_portrait.png goto missing_art
@@ -102,7 +102,7 @@ echo Could not locate mist_isle.exe after build.
 goto failed
 
 :missing_art
-echo Approved art bundle is incomplete. Re-extract MistIsle_ApprovedArt_v4.zip into this folder.
+echo Approved art bundle is incomplete. Re-extract MistIsle_ApprovedArt_v6.zip into this folder.
 goto failed
 
 :failed
