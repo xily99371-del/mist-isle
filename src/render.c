@@ -1315,7 +1315,7 @@ static void RenderBattle(Game *g) {
         DrawRectangleRoundedLines(card,.12f,12,slot==g->battleChoice?(Color){201,157,82,255}:(Color){220,214,188,255});
         DrawUIText(TextFormat("%d",slot+1),(int)card.x+12,(int)card.y+10,15,(Color){127,145,111,255});
         if(id==0) {
-            DrawIllustratedPortrait(TEX_LUMI_ILLUSTRATION,(Rectangle){card.x+15,card.y+14,48,78});
+            DrawIllustratedPortrait(TEX_LUMI_ILLUSTRATION,(Rectangle){card.x+10,card.y+17,56,75});
             DrawUIText("苔灯灵",(int)card.x+78,(int)card.y+22,17,C_INK);
             DrawUIText("星光治愈",(int)card.x+78,(int)card.y+50,14,(Color){104,119,93,255});
             DrawUIText("回复生命",(int)card.x+78,(int)card.y+73,13,(Color){104,119,93,255});
