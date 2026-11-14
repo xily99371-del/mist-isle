@@ -287,11 +287,11 @@ require("PushRenderItem(items,&count,RENDER_KEEPER,0,(Vector2){7.0f,7.0f}" in RE
 
 require('name=="campfire": type_id=2000' in MAP_BUILD and "obj->type==2000" in RENDER,
         "the campfire remains an animated Tiled-authored scene object")
-require('name="营火" type="campfire" x="420.00" y="532.00"' in (ROOT / "maps/coastal_camp.tmx").read_text(encoding="utf-8"),
+require('name="营火" type="campfire" x="420.00" y="504.00"' in (ROOT / "maps/coastal_camp.tmx").read_text(encoding="utf-8"),
         "campfire is placed in the foreground below the Watcher")
 require('"进入辉光林地 · 萤火微光浮现"' in GAME,
         "Glowglade arrival explicitly announces its exclusive firefly weather")
-require("MISTISLE_FIREFLY_COUNT 58" in RENDER and "pulse*.62f*weatherAlpha" in RENDER,
+require("MISTISLE_FIREFLY_COUNT 120" in RENDER and "pulse*(nearLayer?.78f:.64f)*weatherAlpha" in RENDER,
         "firefly weather has bright multi-layer motes and a desktop-dense field")
 require("Fade((Color){7,17,36,255},.82f*weatherAlpha)" in RENDER,
         "night fog is a clearly visible layered atmosphere")
@@ -321,7 +321,7 @@ require("nearest free, reachable tile" in GAME and "occupied" in GAME,
         "blocked or duplicate pickups are relocated to a distinct reachable ground tile")
 require("living stone arch" in RENDER and "beacon tower" in RENDER and "Return route keeps" in RENDER,
         "grove, ruins, lighthouse and return portals have distinct grounded visual identities")
-require("finalCore" in RENDER and "DrawAreaProp(11,p,190,194)" in RENDER,
+require("finalCore" in RENDER and "DrawAreaProp(11,p,190,194)" in RENDER and "lighthouseCore" in RENDER and "DrawGeneratedMapAsset(666,p,.78f)" in RENDER,
         "the Tidal Ruins keystone is a larger multi-ring final altar, distinct from ordinary shrines")
 require("DrawLighthouseGuardian(p,g->time,1.0f,false)" in RENDER and "static void DrawKeeper(Vector2 p,float t,float scale)" in RENDER and "TEX_WATCHER_PORTRAIT" in RENDER and "TEX_WATCHER_PIXEL" in RENDER and "TEX_GUARDIAN_PORTRAIT" in RENDER,
         "the lighthouse guardian and Watcher use authored pixel world actors with separate dialogue portraits")
@@ -406,10 +406,10 @@ require("MISTISLE_RAIN_DROPS 64" in RENDER and "MISTISLE_RAIN_DROPS 230" in REND
         "(.48f+r3*.40f)" in RENDER and "length=18.0f+r2*31.0f" in RENDER and "MISTISLE_RAIN_RIPPLES 28" in RENDER,
         "rain uses denser, brighter staggered streaks, gust-driven density and stronger water impacts")
 require("g->weather=0; g->weatherFade=1.0f" in GAME and "g->weatherClock>38.0f" in GAME and
-        "static const int roamingWeather[4]={0,1,3,4}" in GAME,
+        "static const int roamingWeather[3]={0,1,3}" in GAME,
         "clear sunny weather is the default and world weather rotation excludes grove-only fireflies") 
-require("if(area==AREA_GROVE)" in GAME and "g->weather=2;" in GAME and "else if(previousArea==AREA_GROVE)" in GAME,
-        "entering Glowglade Grove automatically enables exclusive firefly weather and leaving restores clear weather")
+require("if(area==AREA_GROVE) g->weather=2" in GAME and "else if(area==AREA_RUINS) g->weather=1" in GAME and "else if(area==AREA_LIGHTHOUSE) g->weather=4" in GAME and "g->area==AREA_GROVE || g->area==AREA_RUINS || g->area==AREA_LIGHTHOUSE" in GAME,
+        "Grove, Ruins and Lighthouse lock to fireflies, rain and fog respectively; only the hub rotates clear, rain and overcast weather")
 require("g->weather==3" in RENDER and "g->weather==4" in RENDER and "DrawCloudPuff" in RENDER and
         "Broad, low fog banks drift across the foreground" in RENDER and "(.22f+(i%3)*.035f)" in RENDER and
         "Fade((Color){7,17,36,255},.82f*weatherAlpha)" in RENDER,
@@ -420,17 +420,17 @@ LIGHTHOUSE_GROUND_ROWS=[[int(value) for value in line.split(",") if value] for l
 require("terrain_zone_design" in LIGHTHOUSE_MAP_TEXT and len({(gid-1)//12 for row in LIGHTHOUSE_GROUND_ROWS for gid in row})>=3 and
         all(row[0]==37 and row[17]==37 for row in LIGHTHOUSE_GROUND_ROWS[3:]),
         "lighthouse courtyard uses stone, worn sand and narrow sea-edge water bands without grass corners")
-require('type="prop_676"' in LIGHTHOUSE_MAP_TEXT and LIGHTHOUSE_MAP_TEXT.count('type="prop_676"')==2 and
+require('type="prop_676"' in LIGHTHOUSE_MAP_TEXT and LIGHTHOUSE_MAP_TEXT.count('type="prop_676"')==6 and
         not any(f'type="tree{i}"' in LIGHTHOUSE_MAP_TEXT for i in range(3)) and
         not any(f'type="prop_{i}"' in LIGHTHOUSE_MAP_TEXT for i in range(116,130)) and
         not any(f'type="prop_{i}"' in LIGHTHOUSE_MAP_TEXT for i in (29,30,34,200,201,202)) and
-        all(f'type="prop_{i}"' in LIGHTHOUSE_MAP_TEXT for i in (660,661,663,664,666,667,670,671,672,673,674)),
+        all(f'type="prop_{i}"' in LIGHTHOUSE_MAP_TEXT for i in (660,661,663,664,666,667,670,671,672,673,674,675)) and LIGHTHOUSE_MAP_TEXT.count('type="prop_675"')==4,
         "Boss courtyard uses one coherent generated ruin-art family, mirrored blue braziers, unified stone floor and no mixed coastal/grove props")
 require("DrawCoastalCliffs(g,terrainKinds,minX,minY,maxX,maxY)" in RENDER and "AREA_GROUND" in GAME,
         "shoreline and all four ground layouts are sourced from Tiled maps")
 require("GetVisibleTileBounds" in RENDER and "screen.x<-180.0f" in RENDER,
         "terrain and scene objects outside the camera view are culled")
-require("MISTISLE_RAIN_DROPS 64" in RENDER and "MISTISLE_RAIN_RIPPLES 8" in RENDER and "MISTISLE_FIREFLY_COUNT 30" in RENDER,
+require("MISTISLE_RAIN_DROPS 64" in RENDER and "MISTISLE_RAIN_RIPPLES 8" in RENDER and "MISTISLE_FIREFLY_COUNT 56" in RENDER,
         "Raspberry Pi profile reduces weather draw calls")
 require("DrawPlayer((Vector2){420,620}" in RENDER,
         "finale character lineup stays clear of the bottom caption")
