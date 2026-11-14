@@ -394,8 +394,9 @@ require("if(g->bossDefeated&&Dist(p->pos,g->world.shrine)<1.05f)" not in GAME,
 require(GAME.find("if(g->scene==SCENE_END)") < GAME.find("if(g->journalOpen || g->inventoryOpen || g->mapOpen)"),
         "finale update is processed before modal UI early returns")
 
-require("fetch_portrait_assets.ps1" not in (ROOT / "RUN_WINDOWS.bat").read_text(encoding="utf-8") and "TEX_KEEPER.id" in RENDER,
-        "Windows source build no longer downloads GitHub Actions artifacts and has local portrait fallbacks")
+require("fetch_portrait_assets.ps1" not in (ROOT / "RUN_WINDOWS.bat").read_text(encoding="utf-8") and
+        "TEX_WATCHER_PIXEL.id" in RENDER and "tools/generate_pixel_assets.py" in CMAKE,
+        "Windows source build generates its native pixel Watcher locally and does not download GitHub Actions artifacts")
 
 require('strcmp(speaker,"沫尾兽")==0' in GAME and 'strcmp(speaker,"沫尾")==0' in GAME and 'strcmp(speaker,"鸣晶蜥")==0)return 5' in GAME,
         "each recruited companion resolves to its own portrait ID")
