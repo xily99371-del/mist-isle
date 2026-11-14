@@ -181,7 +181,7 @@ approved_assets = {
     "assets/characters/portraits/moatail_portrait.png": (1086, 1448),
     "assets/characters/portraits/crystal_gecko_portrait.png": (1086, 1448),
     "assets/characters/hero/heroine_pixel_4x4_64x80.png": (256, 320),
-    "assets/characters/npc/watcher_pixel_4x4_48x76.png": (192, 304),
+    "assets/characters/npc/watcher_pixel_4x4_64x80.png": (256, 320),
     "assets/environment/coastal_keeper_house.png": (360, 291),
 }
 if all((ROOT / p).exists() for p in approved_assets):
@@ -205,8 +205,8 @@ if all((ROOT / p).exists() for p in approved_assets):
             "battle cards and party roster use high-resolution companion illustrations, not pixel idle sprites")
     require("DrawCoastalHouse" in RENDER and "coastal_keeper_house.png" in RENDER,
             "coastal keeper house uses the user's approved pixel-art building")
-    require("frame*48" in RENDER and "TEX_WATCHER_PIXEL" in RENDER and "watcher_pixel_4x4_48x76.png" in RENDER,
-            "Watcher world actor is a native 48x76 pixel RPG sprite frame, not a portrait crop")
+    require("frame*64" in RENDER and "TEX_WATCHER_PIXEL" in RENDER and "watcher_pixel_4x4_64x80.png" in RENDER,
+            "Watcher world actor is a portrait-matched native 64x80 pixel RPG sprite frame, not a portrait crop")
     require('bossPixelPath="assets/characters/boss/lighthouse_guardian_4x2.png"' in RENDER and "TEX_GUARDIAN_APPROVED.width==192" in RENDER and
         "DrawLighthouseGuardian((Vector2){880,454},g->time,1.5f,g->battleTurn!=0)" in RENDER and
             "else if(TEX_GUARDIAN_PORTRAIT.id)" not in RENDER,
