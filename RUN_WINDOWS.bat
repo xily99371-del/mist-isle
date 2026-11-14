@@ -6,7 +6,12 @@ if exist "%~dp0MistIsle_ApprovedArt_v7.zip" (
   echo Installing final Watcher and repaired Lighthouse Guardian pixel sheets...
   powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_ApprovedArt_v7.zip' -DestinationPath '%~dp0' -Force"
   if errorlevel 1 goto failed
-) else if exist "%~dp0MistIsle_ApprovedArt_v6.zip" (
+) else if exist "%~dp0MistIsle_MapArt_v8.zip" (
+  echo Installing generated four-area map art...
+  powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_MapArt_v8.zip' -DestinationPath '%~dp0' -Force"
+  if errorlevel 1 goto failed
+)
+if exist "%~dp0MistIsle_ApprovedArt_v6.zip" (
   echo Installing portrait-matched Watcher pixel sprites and lossless portraits...
   powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_ApprovedArt_v6.zip' -DestinationPath '%~dp0' -Force"
   if errorlevel 1 goto failed
@@ -49,6 +54,10 @@ if errorlevel 1 goto failed
 
 if not exist assets\characters\portraits\watcher_portrait.png goto missing_art
 if not exist assets\characters\portraits\guardian_portrait.png goto missing_art
+if not exist assets\environment\generated\nature_props_sheet.png goto missing_art
+if not exist assets\environment\generated\glowglade_props_sheet.png goto missing_art
+if not exist assets\environment\generated\tidal_ruins_props_sheet.png goto missing_art
+if not exist assets\environment\generated\lighthouse_ruins_props_sheet.png goto missing_art
 if not exist assets\characters\portraits\heroine_portrait.png (
   echo.
   echo Approved artwork is missing. Download MistIsle_ApprovedArt_v7.zip from this chat,
