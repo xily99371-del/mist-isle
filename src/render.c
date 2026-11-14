@@ -1164,7 +1164,7 @@ static void RenderBattle(Game *g) {
 
     const char *enemyName=e->type==ENEMY_MOTE?"林地微光兽":e->type==ENEMY_BOSS?"灯塔守卫":"遗迹守卫";
     Panel((Rectangle){28,22,350,112});
-    DrawUIText(isBoss?"首领战":"遭遇战",50,34,25,isBoss?(Color){255,220,168,255}:C_INK);
+    DrawUIText(isBoss?"BOSS":"遭遇战",50,34,25,isBoss?(Color){255,220,168,255}:C_INK);
     DrawUIText(TextFormat("第 %d 回合",g->battleRound),50,68,15,(Color){104,119,93,255});
     DrawUIText(TextFormat("旅人生命  %d / %d",(int)g->player.hp,(int)g->player.maxHp),50,94,15,C_INK);
     DrawRectangle(210,97,142,12,(Color){218,213,193,255});
@@ -1172,7 +1172,7 @@ static void RenderBattle(Game *g) {
 
     Panel((Rectangle){902,22,350,112});
     DrawUIText(enemyName,925,35,22,C_INK);
-    DrawUIText(TextFormat("%s  %d / %d",isBoss?"核心耐久":"生命",(int)fmaxf(0,e->hp),(int)e->maxHp),925,72,15,isBoss?(Color){235,197,143,255}:(Color){104,119,93,255});
+    DrawUIText(TextFormat("%s  %d / %d",isBoss?"CORE":"生命",(int)fmaxf(0,e->hp),(int)e->maxHp),925,72,15,isBoss?(Color){235,197,143,255}:(Color){104,119,93,255});
     DrawRectangle(925,99,295,13,(Color){218,213,193,255});
     if(isBoss)DrawRectangleGradientH(925,99,(int)(295.0f*fmaxf(0.0f,e->hp/e->maxHp)),13,(Color){255,201,104,255},(Color){174,66,55,255});
     else DrawRectangle(925,99,(int)(295.0f*fmaxf(0.0f,e->hp/e->maxHp)),13,C_PINK);
