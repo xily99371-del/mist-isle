@@ -24,6 +24,8 @@ if errorlevel 1 goto failed
 echo [2/3] Generating pixel-art assets...
 python tools\generate_pixel_assets.py
 if errorlevel 1 goto failed
+python tools\generate_heroine_highres.py
+if errorlevel 1 goto failed
 if not exist assets\characters\png\heroine_portrait.png echo INFO: using the approved heroine pixel-sheet fallback for local dialogue.
 if not exist assets\characters\png\watcher_portrait.png echo INFO: using the generated Keeper pixel sprite for local dialogue.
 if not exist assets\characters\png\lighthouse_guardian_portrait.png echo INFO: using the approved guardian pixel-sheet fallback for local dialogue.
