@@ -67,6 +67,21 @@ if art_imported:
 else:
     print("INFO: approved art archive not present in clean CI checkout; fallback art will be packaged.")
 
+# The separately supplied approved sprite-sheet import is optional for clean CI
+# checkouts, but its exact cell geometry is checked as soon as it is installed.
+for rel, expected in {
+    "assets/characters/hero/heroine_approved_8x4.png": (192, 128),
+    "assets/characters/boss/lighthouse_guardian_4x2.png": (192, 128),
+}.items():
+    path = ROOT / rel
+    if path.exists():
+        with Image.open(path) as im:
+            require(im.size == expected, f"{rel} dimensions {im.size} == {expected}")
+    else:
+        print(f"INFO: optional approved sprite sheet not imported yet: {rel}")
+require("if(TEX_HEROINE_APPROVED.id)" in RENDER and "if(TEX_GUARDIAN_APPROVED.id)" in RENDER,
+        "approved directional heroine and guardian sprite sheets take priority over portrait fallbacks")
+
 
 # Renderer source rectangles must match the approved sheet cell dimensions.
 require("frame*32" in RENDER and "facing*32" in RENDER,
