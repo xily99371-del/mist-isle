@@ -208,3 +208,121 @@ for px,py,col in [(x+15,30,(242,178,198,255)),(x+31,20,(255,220,130,255)),(x+47,
     gd.ellipse((px-2,py+1,px+2,py+5),fill=(255,238,170,255))
 grove.save(TILES/"environment_props.png")
 print("Extended grove prop atlas:", TILES/"environment_props.png")
+
+
+# Watcher world actor: a native pixel RPG sprite sheet, not a rasterized portrait.
+# Layout matches the traveller: 4 columns x 4 directions, 64x80 cells.
+WATCHER_OUT = ROOT / "assets/characters/npc/watcher_pixel_idle_64x80.png"
+WATCHER_OUT.parent.mkdir(parents=True, exist_ok=True)
+WP = {
+    "ink": (48, 39, 36, 255), "ink2": (74, 57, 47, 255),
+    "skin": (226, 178, 139, 255), "skin_hi": (247, 207, 169, 255),
+    "hair": (179, 132, 91, 255), "hair_hi": (220, 174, 119, 255),
+    "cap": (91, 105, 62, 255), "cap_hi": (139, 151, 87, 255),
+    "leaf": (133, 163, 81, 255), "cream": (238, 224, 194, 255),
+    "cream_hi": (255, 242, 215, 255), "cream_sh": (190, 169, 137, 255),
+    "vest": (104, 69, 48, 255), "vest_hi": (151, 103, 67, 255),
+    "leather": (91, 60, 45, 255), "leather_hi": (153, 104, 68, 255),
+    "green": (91, 130, 87, 255), "green_hi": (145, 177, 115, 255),
+    "pants": (105, 78, 61, 255), "pants_hi": (147, 111, 81, 255),
+    "boot": (65, 48, 40, 255), "boot_hi": (129, 87, 57, 255),
+    "gold": (221, 174, 91, 255), "shadow": (26, 42, 37, 105),
+}
+def watcher_frame(direction, frame):
+    im = Image.new("RGBA", (64, 80), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    walk = (-2, 0, 2, 0)[frame]
+    arm = (-2, 0, 2, 0)[frame]
+    d.ellipse((12, 73, 52, 78), fill=WP["shadow"])
+    # Boots and trousers share a fixed ground baseline in all directions.
+    d.rectangle((19 + walk, 61, 29 + walk, 72), fill=WP["pants"], outline=WP["ink"])
+    d.rectangle((35 - walk, 61, 45 - walk, 72), fill=WP["pants"], outline=WP["ink"])
+    d.rectangle((17 + walk, 69, 31 + walk, 77), fill=WP["boot"], outline=WP["ink"])
+    d.rectangle((34 - walk, 69, 48 - walk, 77), fill=WP["boot"], outline=WP["ink"])
+    d.rectangle((19 + walk, 70, 27 + walk, 72), fill=WP["boot_hi"])
+    d.rectangle((37 - walk, 70, 45 - walk, 72), fill=WP["boot_hi"])
+    # Travel trousers and belt.
+    d.rectangle((18, 55, 46, 67), fill=WP["pants"], outline=WP["ink"])
+    d.rectangle((20, 58, 44, 63), fill=WP["pants_hi"])
+    d.rectangle((18, 54, 46, 59), fill=WP["leather"], outline=WP["ink"])
+    d.rectangle((29, 54, 35, 59), fill=WP["gold"], outline=WP["ink"])
+    d.rectangle((31, 55, 33, 57), fill=WP["leather"])
+    # Shirt and fitted leather vest.
+    d.rectangle((17, 34, 47, 61), fill=WP["cream"], outline=WP["ink"])
+    d.rectangle((20, 37, 44, 57), fill=WP["cream_hi"])
+    d.rectangle((18, 39, 25, 56), fill=WP["cream_sh"])
+    d.rectangle((39, 39, 46, 56), fill=WP["cream_sh"])
+    d.polygon([(18, 35), (29, 33), (32, 39), (27, 59), (18, 57)],
+              fill=WP["vest"], outline=WP["ink"])
+    d.polygon([(46, 35), (35, 33), (32, 39), (37, 59), (46, 57)],
+              fill=WP["vest"], outline=WP["ink"])
+    d.line((22, 39, 28, 55), fill=WP["vest_hi"], width=2)
+    d.line((42, 39, 36, 55), fill=WP["vest_hi"], width=2)
+    d.rectangle((28, 43, 35, 47), fill=WP["gold"])
+    # Arms and gloves, animated subtly while walking.
+    d.rectangle((10, 39 + arm, 18, 55 + arm), fill=WP["vest"], outline=WP["ink"])
+    d.rectangle((11, 41 + arm, 16, 52 + arm), fill=WP["cream"])
+    d.rectangle((46, 39 - arm, 54, 55 - arm), fill=WP["vest"], outline=WP["ink"])
+    d.rectangle((48, 41 - arm, 53, 52 - arm), fill=WP["cream"])
+    d.rectangle((11, 53 + arm, 17, 60 + arm), fill=WP["leather"], outline=WP["ink"])
+    d.rectangle((47, 53 - arm, 53, 60 - arm), fill=WP["leather"], outline=WP["ink"])
+    # Head, hair and short beard.
+    d.rectangle((20, 13, 44, 35), fill=WP["skin"], outline=WP["ink"])
+    d.rectangle((22, 16, 42, 32), fill=WP["skin_hi"])
+    d.rectangle((18, 18, 22, 29), fill=WP["hair"], outline=WP["ink"])
+    d.rectangle((42, 18, 46, 29), fill=WP["hair"], outline=WP["ink"])
+    if direction == "front":
+        d.rectangle((24, 22, 27, 25), fill=WP["ink"])
+        d.rectangle((37, 22, 40, 25), fill=WP["ink"])
+        d.point((25, 22), fill=WP["cream_hi"])
+        d.point((38, 22), fill=WP["cream_hi"])
+        d.line((29, 28, 34, 28), fill=WP["ink2"], width=1)
+        d.polygon([(26, 30), (38, 30), (35, 35), (29, 35)],
+                  fill=WP["hair"], outline=WP["ink"])
+        d.rectangle((29, 31, 35, 32), fill=WP["hair_hi"])
+    elif direction == "left":
+        d.rectangle((24, 22, 27, 25), fill=WP["ink"])
+        d.point((25, 22), fill=WP["cream_hi"])
+        d.rectangle((20, 27, 25, 29), fill=WP["skin_hi"])
+        d.polygon([(24, 29), (35, 30), (33, 35), (26, 34)],
+                  fill=WP["hair"], outline=WP["ink"])
+    elif direction == "right":
+        d.rectangle((37, 22, 40, 25), fill=WP["ink"])
+        d.point((38, 22), fill=WP["cream_hi"])
+        d.rectangle((39, 27, 44, 29), fill=WP["skin_hi"])
+        d.polygon([(29, 30), (40, 29), (38, 34), (31, 35)],
+                  fill=WP["hair"], outline=WP["ink"])
+    else:
+        d.rectangle((19, 14, 45, 34), fill=WP["hair"], outline=WP["ink"])
+        d.rectangle((23, 17, 41, 30), fill=WP["hair_hi"])
+        d.rectangle((25, 19, 39, 28), fill=WP["hair"])
+    # Olive explorer cap, with the small flower/leaf pin from the approved portrait.
+    d.polygon([(15, 17), (17, 8), (26, 4), (39, 5), (48, 11),
+               (49, 17), (42, 15), (24, 15)], fill=WP["cap"], outline=WP["ink"])
+    d.polygon([(19, 12), (27, 7), (39, 8), (44, 12), (34, 13)],
+              fill=WP["cap_hi"])
+    d.rectangle((14, 15, 49, 18), fill=WP["cap"], outline=WP["ink"])
+    d.line((19, 15, 43, 15), fill=WP["cap_hi"], width=2)
+    d.polygon([(43, 7), (52, 1), (49, 12), (44, 14)], fill=WP["leaf"], outline=WP["ink"])
+    d.rectangle((38, 9, 42, 13), fill=WP["cream_hi"], outline=WP["gold"])
+    d.point((40, 11), fill=WP["gold"])
+    # Green neck scarf and trailing ends.
+    d.polygon([(24, 33), (40, 33), (44, 39), (32, 43), (20, 39)],
+              fill=WP["green"], outline=WP["ink"])
+    d.polygon([(36, 37), (43, 39), (47, 51), (42, 49), (38, 43)],
+              fill=WP["green_hi"], outline=WP["ink"])
+    d.line((25, 37, 35, 40), fill=WP["green_hi"], width=2)
+    # Small field satchel and strap.
+    if direction in ("front", "left", "right"):
+        d.line((19, 37, 43, 59), fill=WP["leather"], width=3)
+        d.rectangle((8, 51, 18, 64), fill=WP["leather"], outline=WP["ink"])
+        d.rectangle((10, 53, 16, 61), fill=WP["leather_hi"])
+        d.rectangle((12, 54, 15, 56), fill=WP["gold"])
+    return im
+
+watcher_sheet = Image.new("RGBA", (256, 320), (0, 0, 0, 0))
+for row, direction in enumerate(("front", "left", "right", "back")):
+    for col in range(4):
+        watcher_sheet.alpha_composite(watcher_frame(direction, col), (col * 64, row * 80))
+watcher_sheet.save(WATCHER_OUT, optimize=True)
+print(f"Generated native pixel Watcher sprite sheet: {WATCHER_OUT} (256x320, 4x4 cells at 64x80)")
