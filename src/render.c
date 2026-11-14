@@ -495,7 +495,6 @@ static void DrawShrine(Vector2 p,float t,bool solved,bool finalCore) {
     Color c=solved?C_GOLD:(Color){158,185,166,255};
     if(finalCore) {
         // The Tidal Ruins keystone is the chapter's central mechanism, not another small shrine.
-        DrawEllipse((int)p.x,(int)p.y+13,104,25,(Color){35,57,61,145});
         DrawCircleLines((int)p.x,(int)p.y+7,91,Fade((Color){93,169,174,255},.38f));
         DrawCircleLines((int)p.x,(int)p.y+7,74,Fade((Color){218,192,128,255},.55f));
         DrawCircleLines((int)p.x,(int)p.y+7,58,Fade((Color){93,169,174,255},.32f));
@@ -738,9 +737,7 @@ static void DrawGateMarker(Game *g,int gateId,Vector2 grid) {
     float pulse=.5f+.5f*sinf(g->time*2.8f+gateId);
     // A grounded masonry plinth connects each portal to the path and removes the floating-object look.
     // Irregular embedded stone threshold: no floating rectangular slab.
-    DrawEllipse((int)p.x,(int)p.y+12,66,17,(Color){24,43,42,135});
-    DrawEllipse((int)p.x,(int)p.y+7,57,12,(Color){91,100,82,255});
-    DrawEllipseLines((int)p.x,(int)p.y+7,57,12,(Color){169,158,119,230});
+    /* No detached oval shadow under portals; the arch art carries its own base. */
     for(int i=0;i<7;i++) {
         float a=(float)i*PI2/7.0f+.18f;
         Vector2 shard={p.x+cosf(a)*47.0f,p.y+7.0f+sinf(a)*10.0f};
@@ -1016,7 +1013,7 @@ static void RenderWorld(Game *g) {
                 else if(it->index==305)DrawStructureProp(5,p,168*it->scale,152*it->scale);
                 else if(it->index>=300&&it->index<400)DrawStructureProp(it->index-300,p,112*it->scale,104*it->scale);
                 else if(it->index>=400&&it->index<416)DrawOriginalProp(it->index-400,p,92*it->scale,92*it->scale);
-                else if(it->index==500)DrawGeneratedMapAsset(620,p,it->scale);
+                else if(it->index==500)DrawGeneratedMapAsset(620,p,it->scale*.35f);
                 else if(it->index>=500&&it->index<504)DrawKenneyBuilding(it->index-500,p,it->scale);
                 else if(it->index>=600&&it->index<=676)DrawGeneratedMapAsset(it->index,p,it->scale);
                 break;
