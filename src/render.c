@@ -461,11 +461,11 @@ static void DrawMoatail(Vector2 p,float t) {
     if(TEX_MOATAIL_PIXEL.id) {
         int frame=(int)(t*4.4f+1.0f)%4;
         Rectangle src={(float)(frame*32),0,32,32};
-        Rectangle dst={p.x-22.0f,footY-48.0f-floatY,44.0f,48.0f};
+        Rectangle dst={p.x-22.0f,footY-48.0f-bob,44.0f,48.0f};
         DrawTexturePro(TEX_MOATAIL_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_MOATAIL_ILLUSTRATION.id) {
         Rectangle src={0,0,(float)TEX_MOATAIL_ILLUSTRATION.width,(float)TEX_MOATAIL_ILLUSTRATION.height};
-        Rectangle dst={p.x-22.0f,footY-48.0f-floatY,44.0f,48.0f};
+        Rectangle dst={p.x-22.0f,footY-48.0f-bob,44.0f,48.0f};
         DrawTexturePro(TEX_MOATAIL_ILLUSTRATION,src,dst,(Vector2){0,0},0,WHITE);
     }
 }
@@ -476,11 +476,11 @@ static void DrawGecko(Vector2 p,float t) {
     if(TEX_GECKO_PIXEL.id) {
         int frame=(int)(t*5.0f+2.0f)%4;
         Rectangle src={(float)(frame*32),0,32,32};
-        Rectangle dst={p.x-22.0f,footY-48.0f-floatY,44.0f,48.0f};
+        Rectangle dst={p.x-22.0f,footY-48.0f-bob,44.0f,48.0f};
         DrawTexturePro(TEX_GECKO_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_GECKO_ILLUSTRATION.id) {
         Rectangle src={0,0,(float)TEX_GECKO_ILLUSTRATION.width,(float)TEX_GECKO_ILLUSTRATION.height};
-        Rectangle dst={p.x-22.0f,footY-48.0f-floatY,44.0f,48.0f};
+        Rectangle dst={p.x-22.0f,footY-48.0f-bob,44.0f,48.0f};
         DrawTexturePro(TEX_GECKO_ILLUSTRATION,src,dst,(Vector2){0,0},0,WHITE);
     }
 }
