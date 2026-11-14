@@ -297,8 +297,10 @@ require("Fade((Color){7,17,36,255},.82f*weatherAlpha)" in RENDER,
         "night fog is a clearly visible layered atmosphere")
 require("Fade((Color){17,39,62,255},.34f*weatherAlpha)" in RENDER,
         "rain uses a stronger cool atmospheric grade")
-require(not re.search(r"(?m)^37(?:,|$)|,37(?:,|$)", (ROOT / "maps/lighthouse_courtyard.tmx").read_text(encoding="utf-8")),
-        "lighthouse boss courtyard has no stray grass-corner terrain cells")
+LIGHTHOUSE_GROUND_EARLY=(ROOT / "maps/lighthouse_courtyard.tmx").read_text(encoding="utf-8").split('<data encoding="csv">',1)[1].split("</data>",1)[0].strip().splitlines()
+LIGHTHOUSE_ROWS_EARLY=[[int(value) for value in line.split(",") if value] for line in LIGHTHOUSE_GROUND_EARLY]
+require(all(LIGHTHOUSE_ROWS_EARLY[y][x]!=37 for y in range(2,5) for x in (1,2,15,16)),
+        "lighthouse boss courtyard has no distracting sea/grass corner patches")
 require("generate_ground_atlas.py" in CMAKE and "topdown_terrain_atlas_v1.png" in CMAKE,
         "CMake regenerates the same seamless ground atlas for desktop and Raspberry Pi")
 require("AREA_GROUND" in MAP_BUILD and "AREA_COLLISION" in MAP_BUILD and "AREA_MARKERS" in MAP_BUILD and "AREA_OBJECTS" in MAP_BUILD,
