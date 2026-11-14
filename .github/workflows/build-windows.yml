@@ -90,6 +90,10 @@ jobs:
             New-Item -ItemType Directory -Force -Path dist/assets/characters/hero | Out-Null
             Copy-Item assets/characters/hero/* dist/assets/characters/hero/
           }
+          if (Test-Path assets/environment/generated) {
+            New-Item -ItemType Directory -Force -Path dist/assets/environment/generated | Out-Null
+            Copy-Item assets/environment/generated/* dist/assets/environment/generated/
+          }
           if (Test-Path assets/characters/portraits) {
             New-Item -ItemType Directory -Force -Path dist/assets/characters/portraits | Out-Null
             Copy-Item assets/characters/portraits/* dist/assets/characters/portraits/
