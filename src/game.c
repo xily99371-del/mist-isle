@@ -694,7 +694,7 @@ void GameUpdate(Game *g,float dt) {
             {offset.x-.48f,offset.y},{offset.x+.48f,offset.y},
             {offset.x*.55f,offset.y*.55f},{offset.x*1.35f,offset.y*1.35f}
         };
-        float best=1.0e9f;
+        float best=foundTarget?Dist(target,b->pos):1.0e9f;
         for(int ai=0;ai<6;ai++) {
             Vector2 candidate=Vector2Add(p->pos,alternatives[ai]);
             if(Solid(g,candidate))continue;
