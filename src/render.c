@@ -1507,7 +1507,7 @@ void RenderInit(void) {
         if(TEX_HEROINE_PIXEL.id)SetTextureFilter(TEX_HEROINE_PIXEL,TEXTURE_FILTER_POINT);
         else TraceLog(LOG_ERROR,"Mist Isle: approved heroine pixel sheet failed to load.");
     } else TraceLog(LOG_ERROR,"Mist Isle: approved heroine pixel sheet missing; refusing silent generated-hero fallback.");
-    if(FileExists("assets/characters/npc/watcher_pixel_idle_64x80.png")) {
+    if(FileExists("assets/characters/npc/watcher_pixel_4x4_48x76.png")) {
         TEX_WATCHER_PIXEL=LoadTexture("assets/characters/npc/watcher_pixel_idle_64x80.png");
         if(TEX_WATCHER_PIXEL.id)SetTextureFilter(TEX_WATCHER_PIXEL,TEXTURE_FILTER_POINT);
     } else TraceLog(LOG_ERROR,"Mist Isle: approved Watcher pixel actor missing.");
