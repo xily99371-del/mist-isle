@@ -330,15 +330,12 @@ static void DrawKeeper(Vector2 p,float t,float scale) {
     // Native 64x80 pixel RPG actor sheet; this is a sprite character, never a
     // pixelated crop of the high-resolution Watcher portrait.
     if(TEX_WATCHER_PIXEL.id) {
-        Rectangle src={0,0,64,80}; /* front idle frame */
+        Rectangle src={0,0,48,76}; /* front idle frame, native display resolution */
         float w=48.0f*scale,h=76.0f*scale;
         Rectangle dst={p.x-w*.5f,footY-h,w,h};
         DrawTexturePro(TEX_WATCHER_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
-    } else if(TEX_KEEPER.id) {
-        Rectangle src={0,0,(float)TEX_KEEPER.width,(float)TEX_KEEPER.height};
-        float w=36.0f*scale,h=40.0f*scale;
-        Rectangle dst={p.x-w*.5f,footY-h,w,h};
-        DrawTexturePro(TEX_KEEPER,src,dst,(Vector2){0,0},0,WHITE);
+    } else {
+        TraceLog(LOG_ERROR,"Mist Isle: native pixel Watcher actor missing; no portrait or low-resolution fallback will be displayed.");
     }
 }
 static void DrawFirefly(Vector2 p,float t) {
