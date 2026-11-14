@@ -1179,22 +1179,22 @@ static void RenderWorld(Game *g) {
     } else if(g->weather==4) {
         /* Night fog should read as a moving layer in front of the whole island,
            not a barely visible blue tint. Keep the darkest value near the horizon. */
-        DrawRectangleGradientV(0,0,SW,SH,Fade((Color){7,17,36,255},.82f*weatherAlpha),Fade((Color){18,39,52,255},.68f*weatherAlpha));
-        DrawRectangle(0,SH*.34f,SW,SH*.42f,Fade((Color){130,157,157,255},.075f*weatherAlpha));
+        DrawRectangleGradientV(0,0,SW,SH,Fade((Color){14,27,47,255},.72f*weatherAlpha),Fade((Color){28,52,64,255},.58f*weatherAlpha));
+        DrawRectangle(0,SH*.34f,SW,SH*.42f,Fade((Color){151,177,177,255},.065f*weatherAlpha));
         for(int i=0;i<12;i++) {
             float x=fmodf((float)i*173.0f+g->time*(10.0f+(float)(i%4)*5.0f),SW+520.0f)-260.0f;
             float y=72.0f+(float)i*54.0f+sinf(g->time*.28f+i*1.4f)*30.0f;
             float puff=1.65f+(float)(i%4)*.42f;
-            DrawCloudPuff(x,y,puff,Fade((Color){190,213,208,255},(.27f+(float)(i%3)*.045f)*weatherAlpha));
-            DrawCloudPuff(x+115.0f,y+12.0f,puff*.78f,Fade((Color){159,190,190,255},.23f*weatherAlpha));
+            DrawCloudPuff(x,y,puff,Fade((Color){207,225,219,255},(.23f+(float)(i%3)*.040f)*weatherAlpha));
+            DrawCloudPuff(x+115.0f,y+12.0f,puff*.78f,Fade((Color){178,202,201,255},.19f*weatherAlpha));
         }
         /* Broad, low fog banks drift across the foreground in staggered layers. */
         for(int i=0;i<5;i++) {
             float x=fmodf((float)i*287.0f+g->time*(15.0f+(float)(i%2)*9.0f),SW+700.0f)-350.0f;
             float y=SH*.30f+(float)i*SH*.145f+sinf(g->time*.20f+i*1.7f)*18.0f;
             float w=260.0f+(float)(i%3)*85.0f;
-            DrawEllipse((int)x,(int)y,(int)w,(int)(24.0f+(i%2)*9.0f),Fade((Color){190,211,207,255},(.22f+(i%3)*.035f)*weatherAlpha));
-            DrawEllipse((int)(x+150.0f),(int)(y+5.0f),(int)(w*.72f),18,Fade((Color){139,174,181,255},.19f*weatherAlpha));
+            DrawEllipse((int)x,(int)y,(int)w,(int)(24.0f+(i%2)*9.0f),Fade((Color){207,224,218,255},(.19f+(i%3)*.030f)*weatherAlpha));
+            DrawEllipse((int)(x+150.0f),(int)(y+5.0f),(int)(w*.72f),18,Fade((Color){160,190,195,255},.16f*weatherAlpha));
         }
         for(int i=0;i<38;i++) {
             float x=fmodf(WeatherNoise(i,51)*SW+g->time*(2.5f+WeatherNoise(i,52)*7.0f),SW);
