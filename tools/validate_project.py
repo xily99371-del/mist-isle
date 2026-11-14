@@ -159,7 +159,7 @@ require("BuddyFollowOffset" in GAME and "static const Vector2 formation[4][3]" i
         "companions follow in a facing-aware fan formation with collision-aware catch-up movement")
 require("当前位置" in RENDER and "DrawCircleLines((int)pts[i].x,(int)pts[i].y,41" in RENDER,
         "island map shows an explicit current-area marker and readable legend")
-require("attacking?((int)(t*8.0f)%4):((int)(t*2.0f)%4)" in RENDER and "attacking?64.0f:0.0f" in RENDER,
+require("attacking?((int)(t*8.0f)%4):((int)(t*2.0f)%4)" in RENDER and "attacking?80.0f:0.0f" in RENDER,
         "lighthouse guardian uses its dedicated attack animation row during the enemy turn")
 require('DrawUIText(isBoss?"首领战":"遭遇战"' in RENDER and "核心耐久" in RENDER,
         "boss encounter has a distinct dark arena, boss title and lantern-core health bar")
