@@ -12,22 +12,24 @@ if exist "%~dp0MistIsle_MapArt_v8.zip" (
   powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_MapArt_v8.zip' -DestinationPath '%~dp0' -Force"
   if errorlevel 1 goto failed
 )
-if exist "%~dp0MistIsle_ApprovedArt_v6.zip" (
-  echo Installing portrait-matched Watcher pixel sprites and lossless portraits...
-  powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_ApprovedArt_v6.zip' -DestinationPath '%~dp0' -Force"
-  if errorlevel 1 goto failed
-) else if exist "%~dp0MistIsle_ApprovedArt_v5.zip" (
-  echo Installing lossless high-resolution portraits and approved pixel sprites...
-  powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_ApprovedArt_v5.zip' -DestinationPath '%~dp0' -Force"
-  if errorlevel 1 goto failed
-) else if exist "%~dp0MistIsle_ApprovedArt_v4.zip" (
-  echo Installing the previous approved art bundle...
-  powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_ApprovedArt_v4.zip' -DestinationPath '%~dp0' -Force"
-  if errorlevel 1 goto failed
-) else if exist "%~dp0MistIsle_ApprovedArt_v3.zip" (
-  echo Installing the previous approved art bundle...
-  powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_ApprovedArt_v3.zip' -DestinationPath '%~dp0' -Force"
-  if errorlevel 1 goto failed
+if not exist "%~dp0MistIsle_ApprovedArt_v7.zip" (
+  if exist "%~dp0MistIsle_ApprovedArt_v6.zip" (
+    echo Installing portrait-matched Watcher pixel sprites and lossless portraits...
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_ApprovedArt_v6.zip' -DestinationPath '%~dp0' -Force"
+    if errorlevel 1 goto failed
+  ) else if exist "%~dp0MistIsle_ApprovedArt_v5.zip" (
+    echo Installing lossless high-resolution portraits and approved pixel sprites...
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_ApprovedArt_v5.zip' -DestinationPath '%~dp0' -Force"
+    if errorlevel 1 goto failed
+  ) else if exist "%~dp0MistIsle_ApprovedArt_v4.zip" (
+    echo Installing the previous approved art bundle...
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_ApprovedArt_v4.zip' -DestinationPath '%~dp0' -Force"
+    if errorlevel 1 goto failed
+  ) else if exist "%~dp0MistIsle_ApprovedArt_v3.zip" (
+    echo Installing the previous approved art bundle...
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_ApprovedArt_v3.zip' -DestinationPath '%~dp0' -Force"
+    if errorlevel 1 goto failed
+  )
 )
 
 rem A packaged playtest contains the executable at the package root.
