@@ -37,6 +37,7 @@ assets = {
     "assets/characters/hero/heroine_approved_8x4.png": (192, 128),
     "assets/characters/boss/lighthouse_guardian_4x2.png": (192, 128),
     "assets/characters/png/heroine_portrait.png": (512, 640),
+    "assets/characters/png/heroine_world_4x4_64x80.png": (256, 320),
     "assets/characters/png/watcher_portrait.png": (512, 640),
     "assets/characters/png/lighthouse_guardian_portrait.png": (512, 640),
     "assets/characters/png/moss_lumi.png": (256, 256),
@@ -90,8 +91,8 @@ require("TEX_KEEPER.id" in RENDER and "DrawTexturePro(TEX_KEEPER" in RENDER and 
 # Renderer source rectangles must match the approved sheet cell dimensions.
 require("frame*32" in RENDER and "facing*32" in RENDER,
         "hero/companion frame indexing uses 32px source cells")
-require("frame*64" not in RENDER and "facing*64" not in RENDER,
-        "no stale 64px source-frame indexing remains")
+require("frame*64" in RENDER and "facing*80" in RENDER and "frame*32" in RENDER,
+        "heroine uses 64x80 source cells while companions retain their 32px animation cells")
 require("index*96" in RENDER, "environment props use 96px atlas cells")
 require("DrawAreaProp" in RENDER and "area_props_96.png" in RENDER, "area-specific supplemental prop atlas is integrated")
 require("DrawTopDownTile" in RENDER and "WorldToScreen" in RENDER, "orthographic top-down square-tile renderer is active")
