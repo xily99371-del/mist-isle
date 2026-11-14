@@ -1,7 +1,7 @@
 name: Windows and Raspberry Pi builds
 on:
   push:
-    branches: [main]
+    branches: [main, fix/approved-art-and-grounding]
   pull_request:
     branches: [main, feature/scene-interaction-polish, polish/full-game-character-art]
 jobs:
