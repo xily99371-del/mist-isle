@@ -80,6 +80,7 @@ static Texture2D TEX_CHARACTER_PORTRAITS={0}, TEX_HEROINE_WORLD={0}, TEX_WATCHER
 static Texture2D TEX_LUMI_ILLUSTRATION={0}, TEX_MOATAIL_ILLUSTRATION={0}, TEX_GECKO_ILLUSTRATION={0};
 static Texture2D TEX_HERO_PIXEL={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, TEX_GECKO_PIXEL={0}, TEX_TILES={0}, TEX_PROPS={0};
 static Texture2D TEX_ISO_TILES={0}, TEX_HERO_WALK={0}, TEX_ENV_PROPS={0}, TEX_LEAFLING={0}, TEX_GROVE_MOTE={0}, TEX_AREA_PROPS={0}, TEX_TOPDOWN_TILES={0}, TEX_FLORA_ATLAS={0}, TEX_CLIFF_ATLAS={0}, TEX_STRUCTURE_ATLAS={0}, TEX_ORIGINAL_PROPS={0}, TEX_KENNEY_BUILDINGS={0}, TEX_ENDING_CG={0};
+static Texture2D TEX_NATURE_SHEET={0}, TEX_GROVE_SHEET={0}, TEX_RUINS_SHEET={0}, TEX_LIGHTHOUSE_SHEET={0};
 static RenderTexture2D TEX_GROUND_CACHE={0};
 static int CACHED_GROUND_AREA=-1;
 static void DrawPortrait(Texture2D tex, Vector2 p, float w, float h, float bob) {
@@ -308,12 +309,92 @@ static void DrawTree(Vector2 p,float s,float t) {
         DrawEnvProp(variant,p,82*s,92*s);
         return;
     }
-    DrawEllipse((int)p.x,(int)p.y+5,15*s,5*s,(Color){67,101,76,75});
     DrawRectangle((int)(p.x-3*s),(int)(p.y-24*s),(int)(6*s),(int)(28*s),(Color){153,113,77,255});
     DrawCircleV((Vector2){p.x,p.y-36*s},16*s,(Color){99,163,109,255});
     DrawCircleV((Vector2){p.x-9*s,p.y-42*s},11*s,(Color){126,186,126,255});
     DrawCircleV((Vector2){p.x+9*s,p.y-42*s},11*s,(Color){112,177,119,255});
     DrawCircleV((Vector2){p.x+4*s,p.y-49*s},4*s,Fade(C_GOLD,.3f+.1f*sinf(t+p.x)));
+}
+
+static void DrawGeneratedMapAsset(int index,Vector2 p,float scale) {
+    Texture2D tex={0}; Rectangle src={0};
+    switch(index) {
+        /* Main island: flowering trees, shrubs, low flowers, stones, saplings, glow plants. */
+        case 600: tex=TEX_NATURE_SHEET;src=(Rectangle){18,86,275,276};break;
+        case 601: tex=TEX_NATURE_SHEET;src=(Rectangle){324,87,258,276};break;
+        case 602: tex=TEX_NATURE_SHEET;src=(Rectangle){631,82,269,282};break;
+        case 603: tex=TEX_NATURE_SHEET;src=(Rectangle){939,86,295,280};break;
+        case 604: tex=TEX_NATURE_SHEET;src=(Rectangle){20,444,201,154};break;
+        case 605: tex=TEX_NATURE_SHEET;src=(Rectangle){233,448,183,150};break;
+        case 606: tex=TEX_NATURE_SHEET;src=(Rectangle){434,453,188,144};break;
+        case 607: tex=TEX_NATURE_SHEET;src=(Rectangle){673,473,114,105};break;
+        case 608: tex=TEX_NATURE_SHEET;src=(Rectangle){964,483,120,96};break;
+        case 609: tex=TEX_NATURE_SHEET;src=(Rectangle){1110,485,121,93};break;
+        case 610: tex=TEX_NATURE_SHEET;src=(Rectangle){820,502,119,76};break;
+        case 611: tex=TEX_NATURE_SHEET;src=(Rectangle){41,702,182,109};break;
+        case 612: tex=TEX_NATURE_SHEET;src=(Rectangle){269,732,135,71};break;
+        case 613: tex=TEX_NATURE_SHEET;src=(Rectangle){463,739,95,58};break;
+        case 614: tex=TEX_NATURE_SHEET;src=(Rectangle){615,745,121,57};break;
+        case 615: tex=TEX_NATURE_SHEET;src=(Rectangle){814,679,113,128};break;
+        case 616: tex=TEX_NATURE_SHEET;src=(Rectangle){1120,693,95,110};break;
+        case 617: tex=TEX_NATURE_SHEET;src=(Rectangle){971,717,92,86};break;
+        case 618: tex=TEX_NATURE_SHEET;src=(Rectangle){36,900,231,233};break;
+        case 619: tex=TEX_NATURE_SHEET;src=(Rectangle){348,907,225,220};break;
+        /* Glowglade: its own cottage and woodland flora. */
+        case 620: tex=TEX_GROVE_SHEET;src=(Rectangle){48,68,753,501};break;
+        case 621: tex=TEX_GROVE_SHEET;src=(Rectangle){834,247,382,296};break;
+        case 622: tex=TEX_GROVE_SHEET;src=(Rectangle){53,614,250,210};break;
+        case 623: tex=TEX_GROVE_SHEET;src=(Rectangle){349,629,232,196};break;
+        case 624: tex=TEX_GROVE_SHEET;src=(Rectangle){630,605,285,230};break;
+        case 625: tex=TEX_GROVE_SHEET;src=(Rectangle){967,603,243,228};break;
+        case 626: tex=TEX_GROVE_SHEET;src=(Rectangle){24,871,380,307};break;
+        case 627: tex=TEX_GROVE_SHEET;src=(Rectangle){425,885,354,289};break;
+        case 628: tex=TEX_GROVE_SHEET;src=(Rectangle){816,894,172,278};break;
+        case 629: tex=TEX_GROVE_SHEET;src=(Rectangle){1023,908,191,256};break;
+        /* Tidal ruins: broken arches, columns, plinths, tide pools and tablets. */
+        case 640: tex=TEX_RUINS_SHEET;src=(Rectangle){42,59,321,316};break;
+        case 641: tex=TEX_RUINS_SHEET;src=(Rectangle){394,73,299,294};break;
+        case 642: tex=TEX_RUINS_SHEET;src=(Rectangle){723,107,140,254};break;
+        case 643: tex=TEX_RUINS_SHEET;src=(Rectangle){895,189,132,175};break;
+        case 644: tex=TEX_RUINS_SHEET;src=(Rectangle){1047,267,176,96};break;
+        case 645: tex=TEX_RUINS_SHEET;src=(Rectangle){58,433,353,186};break;
+        case 646: tex=TEX_RUINS_SHEET;src=(Rectangle){474,449,327,171};break;
+        case 647: tex=TEX_RUINS_SHEET;src=(Rectangle){856,449,334,153};break;
+        case 648: tex=TEX_RUINS_SHEET;src=(Rectangle){31,660,255,225};break;
+        case 649: tex=TEX_RUINS_SHEET;src=(Rectangle){319,711,273,162};break;
+        case 650: tex=TEX_RUINS_SHEET;src=(Rectangle){625,738,289,144};break;
+        case 651: tex=TEX_RUINS_SHEET;src=(Rectangle){920,975,274,190};break;
+        case 652: tex=TEX_RUINS_SHEET;src=(Rectangle){69,1002,214,131};break;
+        case 653: tex=TEX_RUINS_SHEET;src=(Rectangle){611,944,275,232};break;
+        case 654: tex=TEX_RUINS_SHEET;src=(Rectangle){356,1065,204,73};break;
+        /* Lighthouse courtyard: dead trees, ruined pillars, altar, rubble, thorn and lanterns. */
+        case 660: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){49,15,406,347};break;
+        case 661: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){449,49,369,312};break;
+        case 662: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){842,100,328,261};break;
+        case 663: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){21,398,212,247};break;
+        case 664: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){262,422,209,211};break;
+        case 665: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){486,411,192,219};break;
+        case 666: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){702,446,256,195};break;
+        case 667: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){977,398,268,243};break;
+        case 668: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){13,732,256,170};break;
+        case 669: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){286,736,202,172};break;
+        case 670: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){513,702,208,205};break;
+        case 671: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){751,742,211,161};break;
+        case 672: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){989,707,250,199};break;
+        case 673: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){27,1020,369,189};break;
+        case 674: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){420,1018,319,185};break;
+        case 675: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){764,983,172,227};break;
+        case 676: tex=TEX_LIGHTHOUSE_SHEET;src=(Rectangle){998,957,228,261};break;
+        default:return;
+    }
+    if(!tex.id||src.width<=0||src.height<=0)return;
+    float w=src.width*scale,h=src.height*scale;
+    Rectangle dst={p.x-w*.5f,p.y-h,w,h};
+    DrawTexturePro(tex,src,dst,(Vector2){0,0},0,WHITE);
+}
+static float WeatherNoise(int i,int salt) {
+    float v=sinf((float)(i*127+salt*311)*12.9898f)*43758.5453f;
+    return v-floorf(v);
 }
 static void DrawProp(int index,Vector2 p,float w,float h) {
     if(!TEX_PROPS.id||index<0||index>=12)return;
@@ -325,7 +406,6 @@ static void DrawProp(int index,Vector2 p,float w,float h) {
 }
 static void DrawKeeper(Vector2 p,float t,float scale) {
     const float footY=p.y+7.0f*scale;
-    DrawEllipse((int)p.x,(int)footY,(int)(10*scale),(int)(3*scale),(Color){35,49,45,75});
     // Four-frame native pixel NPC sheet, never a pixelated portrait crop.
     if(TEX_WATCHER_PIXEL.id) {
         int frame=(int)(t*2.2f)%4;
@@ -445,7 +525,6 @@ static void DrawShrine(Vector2 p,float t,bool solved,bool finalCore) {
         }
         return;
     }
-    DrawEllipse((int)p.x,(int)p.y+8,34,10,(Color){66,95,85,95});
     if(TEX_AREA_PROPS.id) DrawAreaProp(11,p,104,108);
     else if(TEX_ENV_PROPS.id) DrawEnvProp(4,p,82,82);
     else {
@@ -896,7 +975,7 @@ static void RenderWorld(Game *g) {
         Vector2 screen=GetWorldToScreen2D(p,g->cam);
         if(screen.x<-180.0f||screen.x>SW+180.0f||screen.y<-180.0f||screen.y>SH+180.0f)continue;
         switch(it->kind) {
-            case RENDER_TREE: p.y+=8.0f; DrawEllipse((int)p.x,(int)p.y+7,(int)(34*it->scale),(int)(8*it->scale),(Color){35,67,49,72}); DrawEllipse((int)p.x,(int)p.y+5,(int)(25*it->scale),(int)(5*it->scale),(Color){71,111,70,48}); DrawFloraProp(8+(it->index%3),p,108*it->scale,120*it->scale); break;
+            case RENDER_TREE: p.y+=8.0f; DrawFloraProp(8+(it->index%3),p,108*it->scale,120*it->scale); break;
             case RENDER_PROP:
                 p.y+=7.0f;
                 if(it->index==4)DrawProp(4,p,72,68);
@@ -937,8 +1016,9 @@ static void RenderWorld(Game *g) {
                 else if(it->index==305)DrawStructureProp(5,p,168*it->scale,152*it->scale);
                 else if(it->index>=300&&it->index<400)DrawStructureProp(it->index-300,p,112*it->scale,104*it->scale);
                 else if(it->index>=400&&it->index<416)DrawOriginalProp(it->index-400,p,92*it->scale,92*it->scale);
-                else if(it->index==500&&TEX_GROVE_COTTAGE.id)DrawGroveCottage(p,it->scale);
+                else if(it->index==500)DrawGeneratedMapAsset(620,p,it->scale);
                 else if(it->index>=500&&it->index<504)DrawKenneyBuilding(it->index-500,p,it->scale);
+                else if(it->index>=600&&it->index<=676)DrawGeneratedMapAsset(it->index,p,it->scale);
                 break;
             case RENDER_FIRE: DrawCampfire(p,g->time); break;
             case RENDER_PICKUP: DrawPickup(&g->world.pickups[it->index]); break;
@@ -983,40 +1063,82 @@ static void RenderWorld(Game *g) {
     }
     EndMode2D();
     float night=0.5f+0.5f*cosf(g->dayClock*PI2);
-    if(night>0.62f)DrawRectangle(0,0,SW,SH,Fade((Color){43,59,99,255},(night-0.62f)*0.22f));
-    if(g->weather==1) {
-        // Cool overcast tint, three rain depths and visible impacts on water surfaces.
-        DrawRectangle(0,0,SW,SH,Fade((Color){34,57,75,255},.105f));
-        for(int i=0;i<MISTISLE_RAIN_DROPS;i++) {
-            float speed=285.0f+(float)(i%5)*72.0f;
-            float travel=fmodf(g->time*speed+(float)(i*83),SH+70.0f);
-            float x=fmodf((float)(i*149)+g->time*(125.0f+(float)(i%4)*19.0f),SW+90.0f)-45.0f;
-            float y=travel-35.0f;
-            float length=12.0f+(float)(i%4)*4.5f;
-            float alpha=.28f+(float)(i%4)*.075f;
-            float width=(i%7==0)?1.8f:1.0f;
-            DrawLineEx((Vector2){x,y},(Vector2){x-8.0f,y+length},width,Fade((Color){197,222,232,255},alpha));
+    if(night>0.62f)DrawRectangle(0,0,SW,SH,Fade((Color){25,39,68,255},(night-0.62f)*.30f));
+    float weatherAlpha=fminf(1.0f,g->weatherFade);
+    /* Area-specific grading: a hushed blue-green forest and a colder, oppressive boss court. */
+    if(g->area==AREA_GROVE)DrawRectangle(0,0,SW,SH,Fade((Color){20,43,48,255},.20f));
+    else if(g->area==AREA_LIGHTHOUSE)DrawRectangle(0,0,SW,SH,Fade((Color){20,24,35,255},.24f));
+    if(g->weather==0) {
+        DrawRectangle(0,0,SW,SH,Fade((Color){255,221,157,255},.055f*weatherAlpha));
+        for(int i=0;i<30;i++) {
+            float phase=WeatherNoise(i,17);
+            float x=fmodf(phase*SW+g->time*(5.0f+WeatherNoise(i,18)*9.0f),SW);
+            float y=fmodf(WeatherNoise(i,19)*SH+ sinf(g->time*.42f+i)*22.0f,SH);
+            DrawCircleV((Vector2){x,y},1.2f+WeatherNoise(i,20)*1.8f,Fade((Color){255,232,169,255},.42f*weatherAlpha));
         }
-        for(int i=0;i<MISTISLE_RAIN_RIPPLES;i++) {
-            float x=fmodf((float)(i*97)+g->time*31.0f,SW);
-            float y=fmodf((float)(i*61)+g->time*19.0f,SH);
-            float pulse=fmodf(g->time*1.8f+(float)i*.37f,1.0f);
-            DrawCircleLines((int)x,(int)y,(int)(2.0f+pulse*4.0f),Fade((Color){196,225,231,255},.38f*(1.0f-pulse)));
+    } else if(g->weather==1) {
+        DrawRectangle(0,0,SW,SH,Fade((Color){27,48,68,255},.18f*weatherAlpha));
+        float gust=.58f+.42f*(.5f+.5f*sinf(g->time*.72f));
+        int active=(int)((float)MISTISLE_RAIN_DROPS*(.52f+.48f*gust));
+        for(int i=0;i<active;i++) {
+            float r=WeatherNoise(i,1),r2=WeatherNoise(i,2),r3=WeatherNoise(i,3);
+            float speed=210.0f+r2*310.0f;
+            float phase=r*(SH+100.0f);
+            float y=fmodf(phase+g->time*speed,SH+100.0f)-50.0f;
+            float lane=(float)(i%19)/19.0f;
+            float x=fmodf(r3*SW+lane*SW*.38f+g->time*(48.0f+r2*115.0f)+sinf(g->time*.8f+i*.37f)*16.0f,SW+80.0f)-40.0f;
+            float length=7.0f+r2*19.0f;
+            float alpha=(.14f+r3*.38f)*weatherAlpha*(.65f+.35f*gust);
+            float width=.65f+r*.9f;
+            if(i%11==0)length*=1.45f;
+            DrawLineEx((Vector2){x,y},(Vector2){x-5.0f-r2*8.0f,y+length},width,Fade((Color){190,218,232,255},alpha));
         }
-        // Ripples stay attached to the visible water tiles as the camera moves.
         int rippleCount=0;
         for(int y=minY;y<=maxY&&rippleCount<MISTISLE_RAIN_RIPPLES;y++)for(int x=minX;x<=maxX&&rippleCount<MISTISLE_RAIN_RIPPLES;x++) {
             if(terrainKinds[y][x]!=4)continue;
             unsigned int h=TileHash(x,y,91);
-            if(h%23u!=0u)continue;
+            if(h%17u!=0u)continue;
             Vector2 world=WorldToScreen((float)x,(float)y);
             Vector2 screen=GetWorldToScreen2D(world,g->cam);
-            float pulse=fmodf(g->time*1.4f+(float)(h%19u)*.11f,1.0f);
-            DrawCircleLines((int)screen.x,(int)screen.y,(int)(2.0f+pulse*5.0f),Fade((Color){204,231,231,255},.40f*(1.0f-pulse)));
+            float pulse=fmodf(g->time*(1.0f+(float)(h%7u)*.12f)+(float)(h%19u)*.11f,1.0f);
+            DrawCircleLines((int)screen.x,(int)screen.y,(int)(2.0f+pulse*6.0f),Fade((Color){204,231,239,255},.34f*(1.0f-pulse)*weatherAlpha));
             rippleCount++;
         }
+        for(int i=0;i<10;i++) {
+            float phase=WeatherNoise(i,33);
+            float x=fmodf(phase*SW+g->time*(18.0f+i*3.0f),SW);
+            float y=fmodf(WeatherNoise(i,34)*SH+g->time*(34.0f+i*4.0f),SH);
+            DrawCircleV((Vector2){x,y},1.2f,Fade((Color){208,231,237,255},.28f*weatherAlpha));
+        }
     } else if(g->weather==2) {
-        for(int i=0;i<24;i++){int x=(i*97+(int)(sinf(g->time+i)*18)+SW)%SW;int y=(i*53+(int)(cosf(g->time*.7f+i)*12)+SH)%SH;DrawCircle(x,y,2,Fade(C_GOLD,.6f));}
+        DrawRectangle(0,0,SW,SH,Fade((Color){29,43,54,255},.10f*weatherAlpha));
+        for(int i=0;i<44;i++) {
+            float phase=WeatherNoise(i,41);
+            float x=fmodf(phase*SW+sinf(g->time*.55f+i)*20.0f,SW);
+            float y=fmodf(WeatherNoise(i,42)*SH-g->time*(8.0f+WeatherNoise(i,43)*15.0f),SH);
+            float pulse=.35f+.65f*(.5f+.5f*sinf(g->time*2.4f+i*1.7f));
+            DrawCircleV((Vector2){x,y},1.4f+WeatherNoise(i,44)*2.2f,Fade((Color){255,218,125,255},pulse*.75f*weatherAlpha));
+            if(i%5==0)DrawCircleV((Vector2){x,y},5.0f,Fade((Color){255,202,92,255},pulse*.10f*weatherAlpha));
+        }
+    } else if(g->weather==3) {
+        DrawRectangle(0,0,SW,SH,Fade((Color){51,65,78,255},.27f*weatherAlpha));
+        for(int i=0;i<5;i++) {
+            float x=fmodf((float)i*310.0f+g->time*(13.0f+i*2.0f),SW+420.0f)-210.0f;
+            float y=70.0f+(float)i*118.0f+sinf(g->time*.18f+i)*18.0f;
+            DrawCloudPuff(x,y,1.2f+(float)(i%3)*.32f,Fade((Color){137,153,164,255},.10f*weatherAlpha));
+        }
+    } else if(g->weather==4) {
+        DrawRectangleGradientV(0,0,SW,SH,Fade((Color){12,26,47,255},.62f*weatherAlpha),Fade((Color){29,48,57,255},.42f*weatherAlpha));
+        for(int i=0;i<8;i++) {
+            float x=fmodf((float)i*227.0f+g->time*(7.0f+(float)(i%3)*4.0f),SW+560.0f)-280.0f;
+            float y=110.0f+(float)i*78.0f+sinf(g->time*.22f+i*1.4f)*24.0f;
+            DrawCloudPuff(x,y,1.5f+(float)(i%3)*.34f,Fade((Color){166,190,185,255},.12f*weatherAlpha));
+        }
+        for(int i=0;i<25;i++) {
+            float x=fmodf(WeatherNoise(i,51)*SW+g->time*(2.5f+WeatherNoise(i,52)*5.0f),SW);
+            float y=fmodf(WeatherNoise(i,53)*SH+cosf(g->time*.22f+i)*11.0f,SH);
+            DrawCircleV((Vector2){x,y},1.0f+WeatherNoise(i,54)*1.5f,Fade((Color){176,221,214,255},.38f*weatherAlpha));
+        }
     }
 }
 static void Panel(Rectangle r) {
@@ -1503,6 +1625,22 @@ void RenderInit(void) {
             } else TraceLog(LOG_WARNING,"Mist Isle asset failed to load: %s",paths[i]);
         } else TraceLog(LOG_WARNING,"Mist Isle asset missing: %s",paths[i]);
     }
+    const char *mapArtPaths[]={
+        "assets/environment/generated/nature_props_sheet.png",
+        "assets/environment/generated/glowglade_props_sheet.png",
+        "assets/environment/generated/tidal_ruins_props_sheet.png",
+        "assets/environment/generated/lighthouse_ruins_props_sheet.png"
+    };
+    Texture2D *mapArtTargets[]={&TEX_NATURE_SHEET,&TEX_GROVE_SHEET,&TEX_RUINS_SHEET,&TEX_LIGHTHOUSE_SHEET};
+    for(int i=0;i<4;i++) {
+        if(FileExists(mapArtPaths[i])) {
+            *mapArtTargets[i]=LoadTexture(mapArtPaths[i]);
+            if(mapArtTargets[i]->id) {
+                SetTextureFilter(*mapArtTargets[i],TEXTURE_FILTER_BILINEAR);
+                TraceLog(LOG_INFO,"Mist Isle map art loaded: %s (%dx%d)",mapArtPaths[i],mapArtTargets[i]->width,mapArtTargets[i]->height);
+            } else TraceLog(LOG_ERROR,"Mist Isle map art decode failed: %s",mapArtPaths[i]);
+        } else TraceLog(LOG_WARNING,"Mist Isle map art missing: %s",mapArtPaths[i]);
+    }
     if(FileExists("assets/characters/hero/heroine_pixel_4x4_64x80.png")) {
         TEX_HEROINE_PIXEL=LoadTexture("assets/characters/hero/heroine_pixel_4x4_64x80.png");
         if(TEX_HEROINE_PIXEL.id)SetTextureFilter(TEX_HEROINE_PIXEL,TEXTURE_FILTER_POINT);
@@ -1548,6 +1686,8 @@ void RenderClose(void) {
     if(TEX_COASTAL_HOUSE.id)UnloadTexture(TEX_COASTAL_HOUSE);
     if(TEX_GROUND_CACHE.id)UnloadRenderTexture(TEX_GROUND_CACHE);
     TEX_GROUND_CACHE=(RenderTexture2D){0};
+    Texture2D *mapArt[]={&TEX_NATURE_SHEET,&TEX_GROVE_SHEET,&TEX_RUINS_SHEET,&TEX_LIGHTHOUSE_SHEET};
+    for(int i=0;i<4;i++)if(mapArt[i]->id)UnloadTexture(*mapArt[i]);
     CACHED_GROUND_AREA=-1;
     UnloadUIFont();
     Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS,&TEX_HERO_PORTRAIT,&TEX_WATCHER_PORTRAIT,&TEX_GUARDIAN_PORTRAIT,&TEX_LUMI_ILLUSTRATION,&TEX_MOATAIL_ILLUSTRATION,&TEX_GECKO_ILLUSTRATION,&TEX_HEROINE_APPROVED,&TEX_GUARDIAN_APPROVED,&TEX_CHARACTER_PORTRAITS,&TEX_HEROINE_WORLD,&TEX_WATCHER_WORLD,&TEX_GROVE_COTTAGE};
