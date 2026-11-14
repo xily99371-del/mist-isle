@@ -96,7 +96,7 @@ def draw_object(image,obj,sheets):
         draw.ellipse((x-35*scale,y+1*scale,x+35*scale,y+15*scale),fill=(35,67,49,72))
         draw.ellipse((x-26*scale,y+3*scale,x+26*scale,y+11*scale),fill=(71,111,70,48))
         sprite=crop_cell(sheets["flora"],8+int(kind[-1]),8,128)
-        paste_anchor(image,sprite,x,y+8,138*scale,152*scale)
+        paste_anchor(image,sprite,x,y+8,108*scale,120*scale)
     elif kind=="campfire":
         d=ImageDraw.Draw(image,"RGBA")
         d.ellipse((x-15,y-18,x+15,y+7),fill=(221,112,49,220),outline=(87,57,40,255),width=2)
@@ -119,7 +119,7 @@ def draw_object(image,obj,sheets):
             paste_anchor(image,sprite,x,y+7,112*scale,112*scale)
         elif 300<=index<400:
             sprite=crop_cell(sheets["structures"],index-300,8,128)
-            dims={302:(330,260),303:(176,154),304:(166,180),305:(168,152)}
+            dims={302:(196,156),303:(176,154),304:(166,180),305:(168,152)}
             width,height=dims.get(index,(150,140))
             paste_anchor(image,sprite,x,y+7,width*scale,height*scale)
         elif 400<=index<416:
