@@ -270,8 +270,11 @@ if all((ROOT / p).exists() for p in map_art_paths):
     require("DrawGeneratedMapAsset" in RENDER and "TEX_NATURE_SHEET" in RENDER and
             "TEX_GROVE_SHEET" in RENDER and "TEX_RUINS_SHEET" in RENDER and "TEX_LIGHTHOUSE_SHEET" in RENDER,
             "four generated art sheets are wired to the runtime area-specific prop renderer")
-    require(all(f"prop_{n}" in MAPS for n in (600, 620, 640, 660)),
-            "all four Tiled maps contain their new generated area-specific props")
+    require(all(f"prop_{n}" in MAPS for n in (600, 620, 640, 660)) and
+            all(f'type="prop_{n}"' in MAPS for n in (601,603,605,606,608,609,610,612,613,614,616,617,618,619,
+                                                       625,627,629,641,643,644,646,647,649,651,652,654,
+                                                       664,667,669,670,672,674,676)),
+            "generated environment sheets are actually populated across all four Tiled maps, including both blue-fire braziers")
 
 require("#define MAPW 18" in HEADER and "#define MAPH 12" in HEADER and "W,H,T,MAX_OBJECTS=18,12,56,64" in MAP_BUILD and "WIDTH, HEIGHT = 18, 12" in MAP_AUTOTILE and "W,H,T=18,12,56" in MAP_PREVIEW,
         "all four maps, runtime arrays, autotile masks and Tiled previews use compact 18×12 one-screen dimensions")
@@ -385,12 +388,14 @@ require("IsKeyPressed(KEY_O)" in GAME and "objectiveToggle" in GAME,
         "objective tracker supports keyboard and mouse toggles")
 require("Rectangle panel={SW-350.0f,18.0f,330.0f,116.0f}" in RENDER,
         "expanded objective tracker is narrower and shorter than the previous HUD panel")
-require("MISTISLE_RAIN_DROPS 56" in RENDER and "MISTISLE_RAIN_DROPS 190" in RENDER and "WeatherNoise" in RENDER and "float gust=" in RENDER,
-        "rain uses staggered randomized drops, gust-driven density and irregular water impacts")
+require("MISTISLE_RAIN_DROPS 56" in RENDER and "MISTISLE_RAIN_DROPS 190" in RENDER and "WeatherNoise" in RENDER and "float gust=" in RENDER and
+        "(.30f+r3*.42f)" in RENDER and "length=13.0f+r2*25.0f" in RENDER,
+        "rain uses denser, brighter staggered streaks, gust-driven density and stronger water impacts")
 require("weather=(g->weather+1)%5" in GAME and "g->weather=4" in GAME and "g->weatherClock>38.0f" in GAME,
         "five-state weather cycles faster and begins in night fog")
-require("g->weather==3" in RENDER and "g->weather==4" in RENDER and "DrawCloudPuff" in RENDER,
-        "overcast and night fog have distinct moving cloud and fog visuals")
+require("g->weather==3" in RENDER and "g->weather==4" in RENDER and "DrawCloudPuff" in RENDER and
+        "Broad, low fog banks drift across the foreground" in RENDER and ".20f+(float)(i%3)*.035f" in RENDER,
+        "overcast and night fog have distinct moving cloud visuals and clearly visible layered fog banks")
 require("DrawCoastalCliffs(g,terrainKinds,minX,minY,maxX,maxY)" in RENDER and "AREA_GROUND" in GAME,
         "shoreline and all four ground layouts are sourced from Tiled maps")
 require("GetVisibleTileBounds" in RENDER and "screen.x<-180.0f" in RENDER,
