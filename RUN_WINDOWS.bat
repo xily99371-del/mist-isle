@@ -2,8 +2,12 @@
 setlocal
 cd /d "%~dp0"
 
-if exist "%~dp0MistIsle_ApprovedArt_v4.zip" (
-  echo Installing full-resolution approved portraits and native pixel art...
+if exist "%~dp0MistIsle_ApprovedArt_v5.zip" (
+  echo Installing lossless high-resolution portraits and approved pixel sprites...
+  powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_ApprovedArt_v5.zip' -DestinationPath '%~dp0' -Force"
+  if errorlevel 1 goto failed
+) else if exist "%~dp0MistIsle_ApprovedArt_v4.zip" (
+  echo Installing the previous approved art bundle...
   powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_ApprovedArt_v4.zip' -DestinationPath '%~dp0' -Force"
   if errorlevel 1 goto failed
 ) else if exist "%~dp0MistIsle_ApprovedArt_v3.zip" (
@@ -35,19 +39,20 @@ echo [2/3] Generating pixel-art assets...
 python tools\generate_pixel_assets.py
 if errorlevel 1 goto failed
 
-if not exist assets\characters\portraits\watcher_portrait.jpg goto missing_art
-if not exist assets\characters\portraits\guardian_portrait.jpg goto missing_art
-if not exist assets\characters\portraits\heroine_portrait.jpg (
+if not exist assets\characters\portraits\watcher_portrait.png goto missing_art
+if not exist assets\characters\portraits\guardian_portrait.png goto missing_art
+if not exist assets\characters\portraits\heroine_portrait.png (
   echo.
-  echo Approved artwork is missing. Download MistIsle_ApprovedArt_v4.zip from this chat,
+  echo Approved artwork is missing. Download MistIsle_ApprovedArt_v5.zip from this chat,
   echo place it beside RUN_WINDOWS.bat, then run this file again.
   goto failed
 )
 if not exist assets\characters\hero\heroine_pixel_4x4_64x80.png goto missing_art
 if not exist assets\characters\npc\watcher_pixel_4x4_48x76.png goto missing_art
-if not exist assets\characters\portraits\moss_lumi_portrait.jpg goto missing_art
-if not exist assets\characters\portraits\moatail_portrait.jpg goto missing_art
-if not exist assets\characters\portraits\crystal_gecko_portrait.jpg goto missing_art
+if not exist assets\characters\boss\lighthouse_guardian_4x2.png goto missing_art
+if not exist assets\characters\portraits\moss_lumi_portrait.png goto missing_art
+if not exist assets\characters\portraits\moatail_portrait.png goto missing_art
+if not exist assets\characters\portraits\crystal_gecko_portrait.png goto missing_art
 if not exist assets\environment\coastal_keeper_house.png goto missing_art
 python tools\generate_ground_atlas.py
 if errorlevel 1 goto failed
