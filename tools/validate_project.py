@@ -21,6 +21,7 @@ MAP_PREVIEW = (ROOT / "tools/preview_tiled_maps.py").read_text(encoding="utf-8")
 WATER_PREVIEW = MAP_PREVIEW
 RASTERIZER = (ROOT / "tools/rasterize_assets.py").read_text(encoding="utf-8")
 GROVE_MAP = (ROOT / "maps/glowglade_grove.tmx").read_text(encoding="utf-8")
+MAPS = "\\n".join((ROOT / "maps" / name).read_text(encoding="utf-8") for name in ("coastal_camp.tmx","glowglade_grove.tmx","tidal_ruins.tmx","lighthouse_courtyard.tmx"))
 MAP_FILES = [ROOT / "maps" / name for name in (
     "terrain.tsx", "coastal_camp.tmx", "glowglade_grove.tmx",
     "tidal_ruins.tmx", "lighthouse_courtyard.tmx"
