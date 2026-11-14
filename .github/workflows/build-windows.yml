@@ -53,9 +53,28 @@ jobs:
           Copy-Item build-pi-artifact/assets/characters/png/moatail.png assets/characters/png/ -Force
           Copy-Item build-pi-artifact/assets/characters/png/crystal_gecko.png assets/characters/png/ -Force
           Copy-Item build-pi-artifact/assets/characters/png/heroine_world_4x4_64x80.png assets/characters/png/ -Force
+          if (Test-Path build-pi-artifact/assets/environment/generated) {
+            New-Item -ItemType Directory -Force -Path assets/environment/generated | Out-Null
+            Copy-Item build-pi-artifact/assets/environment/generated/* assets/environment/generated/ -Force
+          }
           python tools/preview_tiled_maps.py --output build/map-previews
           if (Test-Path third_party/kenney/rpg-base/KenneyRPGpack.zip) { python tools/preview_cc0_packs.py }
           python tools/validate_project.py
+      - name: Verify generated map art integration
+        shell: pwsh
+        run: |
+          if (Test-Path MistIsle_MapArt_v8.zip) {
+            $mapArt = @(
+              'assets/environment/generated/nature_props_sheet.png',
+              'assets/environment/generated/glowglade_props_sheet.png',
+              'assets/environment/generated/tidal_ruins_props_sheet.png',
+              'assets/environment/generated/lighthouse_ruins_props_sheet.png'
+            )
+            $missingMapArt = $mapArt | Where-Object { -not (Test-Path $_) }
+            if ($missingMapArt.Count -gt 0) { Write-Error ("Map art bundle incomplete: " + ($missingMapArt -join ', ')) }
+          } elseif (-not (Test-Path build-pi-artifact/assets/environment/generated)) {
+            Write-Warning "Generated map art bundle is not present; this run validates source and builds but not final map-art visuals."
+          }
       - name: Verify approved art integration
         shell: pwsh
         run: |
