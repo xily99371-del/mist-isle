@@ -144,7 +144,7 @@ require("g->world.objectCount" in RENDER and "RENDER_TREE" in RENDER and "AREA_O
         "Tiled-authored scene objects drive tree and prop placement")
 require("MoveTowardsConstant" in GAME and "680.0f*dt" in GAME,
         "camera uses direct constant-speed follow without an easing dead zone")
-require("InRect" in GAME and "const float r=.37f" in GAME and "distance/0.08f" in GAME,
+require("InRect" in GAME and "const float r=.31f" in GAME and "distance/0.08f" in GAME,
         "player collision checks authored prop footprints with dense substeps")
 require("RENDER_BOSS" in RENDER and "DrawLighthouseGuardian" in RENDER,
         "lighthouse guardian is visible in the world and battle scene")
