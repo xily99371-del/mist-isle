@@ -73,6 +73,7 @@ static void DrawUITextWrapped(const char *text,int x,int y,int maxWidth,int size
 
 static Texture2D TEX_HERO={0}, TEX_LUMI={0}, TEX_MOATAIL={0}, TEX_GECKO={0}, TEX_KEEPER={0};
 static Texture2D TEX_HERO_PORTRAIT={0}, TEX_WATCHER_PORTRAIT={0}, TEX_GUARDIAN_PORTRAIT={0};
+static Texture2D TEX_HEROINE_APPROVED={0}, TEX_GUARDIAN_APPROVED={0};
 static Texture2D TEX_LUMI_ILLUSTRATION={0}, TEX_MOATAIL_ILLUSTRATION={0}, TEX_GECKO_ILLUSTRATION={0};
 static Texture2D TEX_HERO_PIXEL={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, TEX_GECKO_PIXEL={0}, TEX_TILES={0}, TEX_PROPS={0};
 static Texture2D TEX_ISO_TILES={0}, TEX_HERO_WALK={0}, TEX_ENV_PROPS={0}, TEX_LEAFLING={0}, TEX_GROVE_MOTE={0}, TEX_AREA_PROPS={0}, TEX_TOPDOWN_TILES={0}, TEX_FLORA_ATLAS={0}, TEX_CLIFF_ATLAS={0}, TEX_STRUCTURE_ATLAS={0}, TEX_ORIGINAL_PROPS={0}, TEX_KENNEY_BUILDINGS={0}, TEX_ENDING_CG={0};
@@ -338,22 +339,26 @@ static void DrawLumi(Vector2 p,float t,float bob) {
     }
 }
 static void DrawPlayer(Vector2 p,float t,bool moving,int facing) {
-    float bob=moving?fabsf(sinf(t*13))*1.2f:0.0f;
     const float footY=p.y+9.0f;
-    DrawEllipse((int)p.x,(int)footY,16,5,(Color){48,66,57,105});
-    (void)facing;
-    // The authored heroine illustration is the world-character source of truth.
-    // Keep a gentle idle/run bob until the dedicated 4-direction illustrated
-    // animation sheet replaces the legacy block-built walk cycle.
-    if(TEX_HERO_PORTRAIT.id) {
-        Rectangle src={0,0,(float)TEX_HERO_PORTRAIT.width,(float)TEX_HERO_PORTRAIT.height};
-        Rectangle dst={p.x-43.0f,footY-108.0f-bob,86.0f,108.0f};
-        DrawTexturePro(TEX_HERO_PORTRAIT,src,dst,(Vector2){0,0},0,WHITE);
+    float bob=moving?fabsf(sinf(t*13.0f))*1.0f:0.0f;
+    DrawEllipse((int)p.x,(int)footY,18,5,(Color){42,48,52,112});
+    if(facing<0||facing>3)facing=0;
+    if(TEX_HEROINE_APPROVED.id) {
+        // Approved 8-frame x 4-direction heroine sheet: front, left, right, back.
+        // Keep the ground-contact point fixed so the boots never slide while animating.
+        int frame=moving?((int)(t*10.0f)%8):((int)(t*1.7f)%2);
+        Rectangle src={(float)(frame*24),(float)(facing*32),24,32};
+        Rectangle dst={p.x-35.0f,footY-91.0f-bob,70.0f,93.0f};
+        DrawTexturePro(TEX_HEROINE_APPROVED,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_HERO_WALK.id) {
         int frame=moving?((int)(t*8.0f)%4):0;
         Rectangle src={(float)(frame*32),(float)(facing*32),32,32};
-        Rectangle dst={p.x-33,footY-66-bob,66,66};
+        Rectangle dst={p.x-33.0f,footY-66.0f-bob,66.0f,66.0f};
         DrawTexturePro(TEX_HERO_WALK,src,dst,(Vector2){0,0},0,WHITE);
+    } else if(TEX_HERO_PORTRAIT.id) {
+        Rectangle src={0,0,(float)TEX_HERO_PORTRAIT.width,(float)TEX_HERO_PORTRAIT.height};
+        Rectangle dst={p.x-43.0f,footY-108.0f-bob,86.0f,108.0f};
+        DrawTexturePro(TEX_HERO_PORTRAIT,src,dst,(Vector2){0,0},0,WHITE);
     }
 }
 static void DrawShrine(Vector2 p,float t,bool solved,bool finalCore) {
@@ -443,9 +448,19 @@ static void DrawGecko(Vector2 p,float t) {
     }
 }
 static void DrawLighthouseGuardian(Vector2 p,float t,float scale) {
-    float bob=sinf(t*1.8f)*1.4f*scale;
-    DrawEllipse((int)p.x,(int)(p.y+6*scale),(int)(44*scale),(int)(12*scale),(Color){24,39,47,135});
-    if(TEX_GUARDIAN_PORTRAIT.id) {
+    float bob=sinf(t*1.35f)*1.6f*scale;
+    float pulse=.5f+.5f*sinf(t*2.2f);
+    DrawEllipse((int)p.x,(int)(p.y+7*scale),(int)(58*scale),(int)(15*scale),(Color){13,20,27,178});
+    // Heavy shadow and concentric lantern sigils establish a boss-scale silhouette.
+    DrawCircleLines((int)p.x,(int)(p.y-72*scale),(int)(54*scale),Fade((Color){255,190,91,255},.20f+.12f*pulse));
+    DrawCircleLines((int)p.x,(int)(p.y-72*scale),(int)(67*scale),Fade((Color){113,204,211,255},.12f));
+    if(TEX_GUARDIAN_APPROVED.id) {
+        int frame=(int)(t*1.8f)%4;
+        Rectangle src={(float)(frame*48),0,48,64};
+        float w=164.0f*scale,h=218.0f*scale;
+        Rectangle dst={p.x-w*.5f,p.y-h+bob,w,h};
+        DrawTexturePro(TEX_GUARDIAN_APPROVED,src,dst,(Vector2){0,0},0,WHITE);
+    } else if(TEX_GUARDIAN_PORTRAIT.id) {
         Rectangle src={0,0,(float)TEX_GUARDIAN_PORTRAIT.width,(float)TEX_GUARDIAN_PORTRAIT.height};
         float w=148.0f*scale,h=184.0f*scale;
         Rectangle dst={p.x-w*.5f,p.y-h+bob,w,h};
@@ -1362,13 +1377,15 @@ void RenderInit(void) {
         "assets/characters/png/lighthouse_guardian_portrait.png",
         "assets/characters/png/moss_lumi.png",
         "assets/characters/png/moatail.png",
-        "assets/characters/png/crystal_gecko.png"
+        "assets/characters/png/crystal_gecko.png",
+        "assets/characters/hero/heroine_approved_8x4.png",
+        "assets/characters/boss/lighthouse_guardian_4x2.png"
     };
-    Texture2D *targets[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS,&TEX_HERO_PORTRAIT,&TEX_WATCHER_PORTRAIT,&TEX_GUARDIAN_PORTRAIT,&TEX_LUMI_ILLUSTRATION,&TEX_MOATAIL_ILLUSTRATION,&TEX_GECKO_ILLUSTRATION};
-    for(int i=0;i<23;i++) {
+    Texture2D *targets[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS,&TEX_HERO_PORTRAIT,&TEX_WATCHER_PORTRAIT,&TEX_GUARDIAN_PORTRAIT,&TEX_LUMI_ILLUSTRATION,&TEX_MOATAIL_ILLUSTRATION,&TEX_GECKO_ILLUSTRATION,&TEX_HEROINE_APPROVED,&TEX_GUARDIAN_APPROVED};
+    for(int i=0;i<25;i++) {
         if(FileExists(paths[i])) {
             *targets[i]=LoadTexture(paths[i]);
-            if(targets[i]->id)SetTextureFilter(*targets[i],i>=17?TEXTURE_FILTER_BILINEAR:TEXTURE_FILTER_POINT);
+            if(targets[i]->id)SetTextureFilter(*targets[i],i>=17&&i<23?TEXTURE_FILTER_BILINEAR:TEXTURE_FILTER_POINT);
         }
     }
     TEX_GROUND_CACHE=LoadRenderTexture((int)WORLD_PIXEL_W,(int)WORLD_PIXEL_H);
@@ -1382,7 +1399,7 @@ void RenderClose(void) {
     CACHED_GROUND_AREA=-1;
     UnloadUIFont();
     Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS,&TEX_HERO_PORTRAIT,&TEX_WATCHER_PORTRAIT,&TEX_GUARDIAN_PORTRAIT,&TEX_LUMI_ILLUSTRATION,&TEX_MOATAIL_ILLUSTRATION,&TEX_GECKO_ILLUSTRATION};
-    for(int i=0;i<23;i++)if(textures[i]->id)UnloadTexture(*textures[i]);
+    for(int i=0;i<25;i++)if(textures[i]->id)UnloadTexture(*textures[i]);
     if(TEX_ENDING_CG.id)UnloadTexture(TEX_ENDING_CG);
 }
 void GameRender(Game *g) {

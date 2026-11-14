@@ -477,7 +477,7 @@ static void EnterBattle(Game *g,int idx) {
     g->battleMessage=0;
 }
 static void StartStoryBattle(Game *g) {
-    AddEnemy(g,ENEMY_GUARD,18,13,55);
+    AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,150);
     EnterBattle(g,g->enemyCount-1);
 }
 void GameUpdate(Game *g,float dt) {
