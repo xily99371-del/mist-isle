@@ -29,7 +29,6 @@
   <object id="306" name="失落的灯塔" type="prop_33" x="532.00" y="196.00"><properties><property name="scale" type="float" value="1.18"/></properties><point/></object>
   <object id="660" name="庭院枯树" type="prop_660" x="140.00" y="140.00"><properties><property name="scale" type="float" value="0.48"/></properties><point/></object>
   <object id="661" name="风蚀枯木" type="prop_661" x="980.00" y="140.00"><properties><property name="scale" type="float" value="0.46"/></properties><point/></object>
-  <object id="675" name="幽蓝火灯" type="prop_675" x="980.00" y="476.00"><properties><property name="scale" type="float" value="0.38"/></properties><point/></object>
   <object id="720" name="庭院枯树·西" type="prop_660" x="84.00" y="140.00"><properties><property name="scale" type="float" value="0.52"/></properties><point/></object>
   <object id="721" name="庭院枯树·东" type="prop_661" x="980.00" y="140.00"><properties><property name="scale" type="float" value="0.50"/></properties><point/></object>
   <object id="722" name="枯树根·西" type="prop_662" x="140.00" y="532.00"><properties><property name="scale" type="float" value="0.48"/></properties><point/></object>
