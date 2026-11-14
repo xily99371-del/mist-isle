@@ -391,6 +391,13 @@ static void DrawGeneratedMapAsset(int index,Vector2 p,float scale) {
     float w=src.width*scale,h=src.height*scale;
     Rectangle dst={p.x-w*.5f,p.y-h,w,h};
     DrawTexturePro(tex,src,dst,(Vector2){0,0},0,WHITE);
+    if(index==676) {
+        /* The blue brazier is a focal light source, not just a static rubble prop. */
+        float pulse=.5f+.5f*sinf((float)GetTime()*2.4f+p.x*.013f);
+        Vector2 flame={p.x,p.y-h*.72f};
+        DrawCircleV(flame,30.0f+5.0f*pulse,Fade((Color){57,153,255,255},.15f+.08f*pulse));
+        DrawCircleV(flame,15.0f+3.0f*pulse,Fade((Color){112,201,255,255},.20f+.12f*pulse));
+    }
 }
 static float WeatherNoise(int i,int salt) {
     float v=sinf((float)(i*127+salt*311)*12.9898f)*43758.5453f;
