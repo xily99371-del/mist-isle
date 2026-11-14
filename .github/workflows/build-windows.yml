@@ -114,6 +114,7 @@ jobs:
           python -m pip install pillow cairosvg
           python tools/generate_pixel_assets.py
           python tools/generate_heroine_highres.py
+          python tools/rasterize_assets.py
           python tools/generate_ground_atlas.py
           python tools/preview_kenney_pack.py
           python tools/build_kenney_runtime_atlas.py
