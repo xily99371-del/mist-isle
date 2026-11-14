@@ -31,6 +31,8 @@ echo [2/3] Generating pixel-art assets...
 python tools\generate_pixel_assets.py
 if errorlevel 1 goto failed
 
+if not exist assets\characters\portraits\watcher_portrait.jpg goto missing_art
+if not exist assets\characters\portraits\guardian_portrait.jpg goto missing_art
 if not exist assets\characters\portraits\heroine_portrait.jpg (
   echo.
   echo Approved artwork is missing. Download MistIsle_ApprovedArt_v3.zip from this chat,
