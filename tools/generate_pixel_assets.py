@@ -325,5 +325,18 @@ for row, direction in enumerate(("front", "left", "right", "back")):
     for col in range(4):
         frame = watcher_frame(direction, col).resize((48, 76), Image.Resampling.NEAREST)
         watcher_sheet.alpha_composite(frame, (col * 48, row * 76))
-watcher_sheet.save(WATCHER_OUT, optimize=True)
-print(f"Generated native pixel Watcher sprite sheet: {WATCHER_OUT} (192x304, 4x4 cells at 48x76)")
+# Preserve the separately art-directed, approved pixel sheet imported from bundle v5.
+# Generate the code-authored fallback only when no correctly sized approved sheet exists.
+if WATCHER_OUT.exists():
+    try:
+        with Image.open(WATCHER_OUT) as existing:
+            keep_approved = existing.size == (192, 304)
+    except Exception:
+        keep_approved = False
+else:
+    keep_approved = False
+if not keep_approved:
+    watcher_sheet.save(WATCHER_OUT, optimize=True)
+    print(f"Generated fallback pixel Watcher sprite sheet: {WATCHER_OUT} (192x304)")
+else:
+    print(f"Preserved approved Watcher pixel sprite sheet: {WATCHER_OUT} (192x304)")
