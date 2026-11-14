@@ -146,7 +146,7 @@ def parse(path):
     # Several characters occupy a water-side or collision-protected tile; the
     # player must still be able to stand within one orthogonal step to interact.
     approaches={
-        "coastal_camp": ((7,7,"keeper"),(6,8,"Moss Lumi"),(6,7,"campfire")),
+        "coastal_camp": ((7,7,"keeper"),(6,8,"Moss Lumi"),(7,8,"campfire")),
         "glowglade_grove": ((14,7,"Moatail"),),
         "tidal_ruins": ((13,8,"Crystal Gecko"),),
         "lighthouse_courtyard": ((int(round(markers["boss"][0])),int(round(markers["boss"][1])),"guardian arena"),),
