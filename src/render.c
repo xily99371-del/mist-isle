@@ -1180,14 +1180,14 @@ static void DrawDialoguePortrait(Game *g,int portrait,const char *speaker) {
         portrait==4?&TEX_MOATAIL_ILLUSTRATION:
         portrait==5?&TEX_GECKO_ILLUSTRATION:&TEX_HERO_PORTRAIT;
     Rectangle dst={48,386,192,256};
-    // The shared portrait atlas contains only the three human characters.
-    // Companions use their own dedicated high-resolution illustrations.
-    if(portrait>=0&&portrait<=2&&TEX_CHARACTER_PORTRAITS.id) {
-        Rectangle src={(float)(portrait*128),0,128,170};
-        DrawTexturePro(TEX_CHARACTER_PORTRAITS,src,dst,(Vector2){0,0},0,WHITE);
-    } else if(fallback->id) {
+    // Dedicated high-resolution illustrations always take priority over the old
+    // low-detail portrait atlas. Pixel walk sheets are never used as dialogue portraits.
+    if(fallback->id) {
         Rectangle src={0,0,(float)fallback->width,(float)fallback->height};
         DrawTexturePro(*fallback,src,dst,(Vector2){0,0},0,WHITE);
+    } else if(portrait>=0&&portrait<=2&&TEX_CHARACTER_PORTRAITS.id) {
+        Rectangle src={(float)(portrait*128),0,128,170};
+        DrawTexturePro(TEX_CHARACTER_PORTRAITS,src,dst,(Vector2){0,0},0,WHITE);
     }
     const char *label=(speaker&&speaker[0])?speaker:"旅人";
     DrawRectangleRounded((Rectangle){52,647,184,27},.2f,5,(Color){8,25,36,225});
