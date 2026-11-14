@@ -391,11 +391,19 @@ require("Rectangle panel={SW-350.0f,18.0f,330.0f,116.0f}" in RENDER,
 require("MISTISLE_RAIN_DROPS 56" in RENDER and "MISTISLE_RAIN_DROPS 190" in RENDER and "WeatherNoise" in RENDER and "float gust=" in RENDER and
         "(.30f+r3*.42f)" in RENDER and "length=13.0f+r2*25.0f" in RENDER,
         "rain uses denser, brighter staggered streaks, gust-driven density and stronger water impacts")
-require("weather=(g->weather+1)%5" in GAME and "g->weather=4" in GAME and "g->weatherClock>38.0f" in GAME,
-        "five-state weather cycles faster and begins in night fog")
+require("g->weather=0; g->weatherFade=1.0f" in GAME and "g->weatherClock>38.0f" in GAME and
+        "static const int roamingWeather[4]={0,1,3,4}" in GAME,
+        "clear sunny weather is the default and world weather rotation excludes grove-only fireflies") 
+require("if(area==AREA_GROVE)" in GAME and "g->weather=2;" in GAME and "else if(previousArea==AREA_GROVE)" in GAME,
+        "entering Glowglade Grove automatically enables exclusive firefly weather and leaving restores clear weather")
 require("g->weather==3" in RENDER and "g->weather==4" in RENDER and "DrawCloudPuff" in RENDER and
         "Broad, low fog banks drift across the foreground" in RENDER and ".20f+(float)(i%3)*.035f" in RENDER,
-        "overcast and night fog have distinct moving cloud visuals and clearly visible layered fog banks")
+        "overcast and optional night fog have distinct moving cloud visuals and clearly visible layered fog banks")
+LIGHTHOUSE_MAP_TEXT=(ROOT/"maps/lighthouse_courtyard.tmx").read_text(encoding="utf-8")
+require('type="prop_676"' in LIGHTHOUSE_MAP_TEXT and LIGHTHOUSE_MAP_TEXT.count('type="prop_676"')==2 and
+        not any(f'type="tree{i}"' in LIGHTHOUSE_MAP_TEXT for i in range(3)) and
+        not any(f'type="prop_{i}"' in LIGHTHOUSE_MAP_TEXT for i in range(116,130)),
+        "Boss courtyard uses a unified generated ruin-art composition with two symmetrical blue braziers and no bright grove foliage")
 require("DrawCoastalCliffs(g,terrainKinds,minX,minY,maxX,maxY)" in RENDER and "AREA_GROUND" in GAME,
         "shoreline and all four ground layouts are sourced from Tiled maps")
 require("GetVisibleTileBounds" in RENDER and "screen.x<-180.0f" in RENDER,
