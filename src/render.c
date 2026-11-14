@@ -293,6 +293,11 @@ static void DrawKeeper(Vector2 p,float t,float scale) {
         float w=104.0f*scale,h=130.0f*scale;
         Rectangle dst={p.x-w*.5f,footY-h,w,h};
         DrawTexturePro(TEX_WATCHER_PORTRAIT,src,dst,(Vector2){0,0},0,WHITE);
+    } else if(TEX_KEEPER.id) {
+        Rectangle src={0,0,(float)TEX_KEEPER.width,(float)TEX_KEEPER.height};
+        float w=86.0f*scale,h=112.0f*scale;
+        Rectangle dst={p.x-w*.5f,footY-h,w,h};
+        DrawTexturePro(TEX_KEEPER,src,dst,(Vector2){0,0},0,WHITE);
     }
 }
 static void DrawFirefly(Vector2 p,float t) {
@@ -1138,9 +1143,19 @@ static void DrawDialoguePortrait(Game *g,int portrait) {
         Rectangle src={0,0,(float)art->width,(float)art->height};
         Rectangle dst={48,386,192,240};
         DrawTexturePro(*art,src,dst,(Vector2){0,0},0,WHITE);
+    } else if(portrait==0&&TEX_HEROINE_APPROVED.id) {
+        Rectangle src={0,0,24,32},dst={55,390,180,250};
+        DrawTexturePro(TEX_HEROINE_APPROVED,src,dst,(Vector2){0,0},0,WHITE);
     } else if(portrait==0&&TEX_HERO_WALK.id) {
         Rectangle src={0,0,32,32},dst={55,390,180,250};
         DrawTexturePro(TEX_HERO_WALK,src,dst,(Vector2){0,0},0,WHITE);
+    } else if(portrait==1&&TEX_KEEPER.id) {
+        Rectangle src={0,0,(float)TEX_KEEPER.width,(float)TEX_KEEPER.height};
+        Rectangle dst={72,414,144,190};
+        DrawTexturePro(TEX_KEEPER,src,dst,(Vector2){0,0},0,WHITE);
+    } else if(portrait==2&&TEX_GUARDIAN_APPROVED.id) {
+        Rectangle src={0,0,48,64},dst={76,394,136,222};
+        DrawTexturePro(TEX_GUARDIAN_APPROVED,src,dst,(Vector2){0,0},0,WHITE);
     } else if(portrait==3) {
         DrawLumi((Vector2){144,625},g->time,0);
     }

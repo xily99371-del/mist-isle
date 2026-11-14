@@ -83,6 +83,8 @@ for rel, expected in {
         print(f"INFO: optional approved sprite sheet not imported yet: {rel}")
 require("if(TEX_HEROINE_APPROVED.id)" in RENDER and "if(TEX_GUARDIAN_APPROVED.id)" in RENDER,
         "approved directional heroine and guardian sprite sheets take priority over portrait fallbacks")
+require("TEX_KEEPER.id" in RENDER and "DrawTexturePro(TEX_KEEPER" in RENDER and "TEX_GUARDIAN_APPROVED.id" in RENDER,
+        "local source builds have authored pixel-sprite fallbacks for Keeper and guardian dialogue portraits")
 
 
 # Renderer source rectangles must match the approved sheet cell dimensions.
@@ -341,6 +343,9 @@ require("if(g->bossDefeated&&Dist(p->pos,g->world.shrine)<1.05f)" not in GAME,
         "finale no longer auto-triggers from proximity")
 require(GAME.find("if(g->scene==SCENE_END)") < GAME.find("if(g->journalOpen || g->inventoryOpen || g->mapOpen)"),
         "finale update is processed before modal UI early returns")
+
+require("fetch_portrait_assets.ps1" not in (ROOT / "RUN_WINDOWS.bat").read_text(encoding="utf-8") and "TEX_KEEPER.id" in RENDER,
+        "Windows source build no longer downloads GitHub Actions artifacts and has local portrait fallbacks")
 
 # Critical gameplay entry points and persistence must remain present.
 for token, label in [
