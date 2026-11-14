@@ -174,6 +174,34 @@ require("!g->splash.owned" in RENDER and "!g->spark.owned" in RENDER,
         "unrecruited water and crystal companions are visible as world encounters")
 require("RenderInit(void)" in RENDER and "RenderClose(void)" in RENDER,
         "renderer owns texture load and release lifecycle")
+
+# The user's approved high-resolution portraits and pixel sheet are a separate import bundle.
+approved_assets = {
+    "assets/characters/portraits/heroine_portrait.jpg": (320, 427),
+    "assets/characters/portraits/watcher_portrait.jpg": (320, 427),
+    "assets/characters/portraits/guardian_portrait.jpg": (320, 427),
+    "assets/characters/portraits/moss_lumi_portrait.jpg": (320, 427),
+    "assets/characters/portraits/moatail_portrait.jpg": (320, 427),
+    "assets/characters/portraits/crystal_gecko_portrait.jpg": (320, 427),
+    "assets/characters/hero/heroine_pixel_4x4_64x80.png": (256, 320),
+    "assets/environment/coastal_keeper_house.png": (360, 291),
+}
+if all((ROOT / p).exists() for p in approved_assets):
+    for rel, expected in approved_assets.items():
+        with Image.open(ROOT / rel) as im:
+            require(im.size == expected, f"approved user art {rel} has expected dimensions {expected}")
+    require("TEX_HEROINE_PIXEL" in RENDER and "heroine_pixel_4x4_64x80.png" in RENDER,
+            "the exact user-approved 4x4 pixel sheet drives the playable heroine")
+    require("assets/characters/portraits/heroine_portrait.jpg" in RENDER and
+            "assets/characters/portraits/moss_lumi_portrait.jpg" in RENDER and
+            "assets/characters/portraits/moatail_portrait.jpg" in RENDER and
+            "assets/characters/portraits/crystal_gecko_portrait.jpg" in RENDER,
+            "dialogue portrait paths use the user's high-resolution anime illustrations")
+    require("DrawCoastalHouse" in RENDER and "coastal_keeper_house.png" in RENDER,
+            "coastal keeper house uses the user's approved pixel-art building")
+else:
+    print("INFO: MistIsle_ApprovedArt_v3.zip is not installed; user-approved runtime artwork is not yet available.")
+
 require(all((ROOT / f"assets/characters/svg/{name}.svg").exists() for name in ("heroine_portrait","watcher_portrait","lighthouse_guardian_portrait")),
         "three authored static character portrait source illustrations are present")
 require("cairosvg" in RASTERIZER and all(name in RASTERIZER for name in ("heroine_portrait.svg","watcher_portrait.svg","lighthouse_guardian_portrait.svg")),
