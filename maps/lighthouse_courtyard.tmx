@@ -4,7 +4,7 @@
   <property name="level_id" value="lighthouse_courtyard"/>
   <property name="layout_style" value="one_screen_handcrafted_topdown"/>
   <property name="route_design" value="axial_entry_to_open_boss_arena_with_formal_lighthouse_forecourt"/>
-  <property name="map_review_revision" type="int" value="14"/>
+  <property name="map_review_revision" type="int" value="15"/>
   <property name="terrain_zone_design" value="stone forecourt, worn sandy approach, narrow sea-edge water bands; no grass corners"/>
   <property name="scene_description" value="Final lighthouse forecourt; axial approach, formal stone court, open guardian arena."/>
  </properties>
@@ -48,6 +48,14 @@
   <object id="735" name="西侧幽蓝火盆" type="prop_676" x="252.00" y="364.00"><properties><property name="scale" type="float" value="0.40"/></properties><point/></object>
   <object id="736" name="东侧幽蓝火盆" type="prop_676" x="812.00" y="364.00"><properties><property name="scale" type="float" value="0.40"/></properties><point/></object>
   <object id="737" name="庭院断柱·东侧" type="prop_664" x="812.00" y="252.00"><properties><property name="scale" type="float" value="0.40"/></properties><point/></object>
+  <object id="738" name="西侧幽蓝火盆·上列" type="prop_676" x="308.00" y="252.00"><properties><property name="scale" type="float" value="0.36"/></properties><point/></object>
+  <object id="739" name="东侧幽蓝火盆·上列" type="prop_676" x="756.00" y="252.00"><properties><property name="scale" type="float" value="0.36"/></properties><point/></object>
+  <object id="740" name="西侧幽蓝火盆·下列" type="prop_676" x="308.00" y="476.00"><properties><property name="scale" type="float" value="0.36"/></properties><point/></object>
+  <object id="741" name="东侧幽蓝火盆·下列" type="prop_676" x="756.00" y="476.00"><properties><property name="scale" type="float" value="0.36"/></properties><point/></object>
+  <object id="742" name="西侧悬灯·上列" type="prop_675" x="196.00" y="308.00"><properties><property name="scale" type="float" value="0.42"/></properties><point/></object>
+  <object id="743" name="东侧悬灯·上列" type="prop_675" x="868.00" y="308.00"><properties><property name="scale" type="float" value="0.42"/></properties><point/></object>
+  <object id="744" name="西侧悬灯·下列" type="prop_675" x="196.00" y="476.00"><properties><property name="scale" type="float" value="0.42"/></properties><point/></object>
+  <object id="745" name="东侧悬灯·下列" type="prop_675" x="868.00" y="476.00"><properties><property name="scale" type="float" value="0.42"/></properties><point/></object>
 </objectgroup>
  <objectgroup id="4" name="Markers" draworder="topdown">
   <object id="500" name="spawn" type="spawn" x="140.00" y="532.00"><point/></object>
