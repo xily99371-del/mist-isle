@@ -30,8 +30,18 @@ if errorlevel 1 goto failed
 echo [2/3] Generating pixel-art assets...
 python tools\generate_pixel_assets.py
 if errorlevel 1 goto failed
-python tools\generate_heroine_highres.py
-if errorlevel 1 goto failed
+
+if not exist assets\characters\portraits\heroine_portrait.jpg (
+  echo.
+  echo Approved artwork is missing. Download MistIsle_ApprovedArt_v3.zip from this chat,
+  echo place it beside RUN_WINDOWS.bat, then run this file again.
+  goto failed
+)
+if not exist assets\characters\hero\heroine_pixel_4x4_64x80.png goto missing_art
+if not exist assets\characters\portraits\moss_lumi_portrait.jpg goto missing_art
+if not exist assets\characters\portraits\moatail_portrait.jpg goto missing_art
+if not exist assets\characters\portraits\crystal_gecko_portrait.jpg goto missing_art
+if not exist assets\environment\coastal_keeper_house.png goto missing_art
 if not exist assets\characters\png\heroine_portrait.png echo INFO: using the approved heroine pixel-sheet fallback for local dialogue.
 if not exist assets\characters\png\watcher_portrait.png echo INFO: using the generated Keeper pixel sprite for local dialogue.
 if not exist assets\characters\png\lighthouse_guardian_portrait.png echo INFO: using the approved guardian pixel-sheet fallback for local dialogue.
@@ -76,6 +86,10 @@ if exist "%~dp0build\mist_isle.exe" (
   exit /b 0
 )
 echo Could not locate mist_isle.exe after build.
+goto failed
+
+:missing_art
+echo Approved art bundle is incomplete. Re-extract MistIsle_ApprovedArt_v3.zip into this folder.
 goto failed
 
 :failed
