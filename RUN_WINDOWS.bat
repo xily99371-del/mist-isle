@@ -53,11 +53,12 @@ if errorlevel 1 goto failed
 
 echo.
 echo Build complete.
-if exist "%~dp0assets\environment\environment_props_96.png" (
-  echo Approved art pack detected. Loading imported character and environment assets.
+if exist "%~dp0assets\characters\hero\heroine_approved_8x4.png" if exist "%~dp0assets\characters\boss\lighthouse_guardian_4x2.png" (
+  echo Approved heroine and lighthouse guardian sprite sheets detected.
 ) else (
-  echo NOTE: Approved art pack not found. The game will use fallback visuals.
-  echo Extract MistIsle_ArtIntegration_v2_1.zip into this folder to enable approved art.
+  echo NOTE: Approved character sheets are missing from this checkout.
+  echo For an older local copy, extract MistIsle_ApprovedArt_Import_v2.zip into this folder
+  echo and run MistIsle_ApprovedArt\IMPORT_APPROVED_ART.bat once.
 )
 if exist "%~dp0build\Release\mist_isle.exe" (
   start "" "%~dp0build\Release\mist_isle.exe"
