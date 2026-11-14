@@ -71,9 +71,11 @@ static int DialoguePortraitForSpeaker(const char *speaker) {
     if(!speaker)return 0;
     if(strcmp(speaker,"守望者")==0)return 1;
     if(strcmp(speaker,"灯塔守卫")==0)return 2;
-    // Story labels such as “旅人手记” still belong to the protagonist, not a companion.
+    if(strcmp(speaker,"苔灯灵")==0||strcmp(speaker,"苔藓灵")==0)return 3;
+    if(strcmp(speaker,"沫尾兽")==0||strcmp(speaker,"沫尾")==0)return 4;
+    if(strcmp(speaker,"鸣晶蜥")==0)return 5;
     if(strncmp(speaker,"旅人",strlen("旅人"))==0||strcmp(speaker,"主角")==0)return 0;
-    return 3;
+    return 0;
 }
 static void SetDialogueSequence(Game *g,const char *const *speakers,const char *const *lines,int count,bool startsBossBattle) {
     g->dialogueCount=count<4?count:4;

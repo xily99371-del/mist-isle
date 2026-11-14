@@ -347,6 +347,19 @@ require(GAME.find("if(g->scene==SCENE_END)") < GAME.find("if(g->journalOpen || g
 require("fetch_portrait_assets.ps1" not in (ROOT / "RUN_WINDOWS.bat").read_text(encoding="utf-8") and "TEX_KEEPER.id" in RENDER,
         "Windows source build no longer downloads GitHub Actions artifacts and has local portrait fallbacks")
 
+require('strcmp(speaker,"沫尾兽")==0)return 4' in GAME and 'strcmp(speaker,"鸣晶蜥")==0)return 5' in GAME,
+        "each recruited companion resolves to its own portrait ID")
+require("TEX_CHARACTER_PORTRAITS" in RENDER and "DrawTexturePro(TEX_CHARACTER_PORTRAITS" in RENDER,
+        "high-resolution character portrait atlas is used for dialogue and the boss battle")
+require("核心耐久" in RENDER and "阶段三" in RENDER and "核心蓄能" in RENDER and "PHASE III" not in RENDER,
+        "boss phase and core status are displayed in Chinese in a non-overlapping panel")
+require("TEX_HEROINE_WORLD" in RENDER and "32,48" in RENDER and "84.0f,112.0f" in RENDER,
+        "heroine uses crisp four-frame directional pixel art at a larger in-world scale")
+require("TEX_GROVE_COTTAGE" in RENDER and "DrawGroveCottage" in RENDER,
+        "grove house uses the approved handcrafted cottage asset")
+require('x="812.00" y="84.00"' in (ROOT / "maps/glowglade_grove.tmx").read_text(encoding="utf-8") and 'x="812.00" y="588.00"' in (ROOT / "maps/glowglade_grove.tmx").read_text(encoding="utf-8"),
+        "grove edge trees are placed on land, not over the creek")
+
 # Critical gameplay entry points and persistence must remain present.
 for token, label in [
     ("BuildAreaWorld", "Tiled world construction"),

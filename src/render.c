@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 static Font UI_FONT={0};
-static const int UI_CODEPOINTS[]={32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,183,8211,8212,8230,8592,8594,12289,12290,19968,19977,19978,19981,19982,19990,19996,20004,20013,20026,20027,20046,20063,20102,20107,20110,20113,20114,20132,20142,20154,20173,20174,20195,20197,20204,20214,20219,20237,20241,20249,20250,20260,20276,20284,20301,20307,20316,20320,20351,20379,20381,20391,20415,20445,20572,20799,20808,20809,20811,20837,20840,20849,20851,20860,20861,20877,20889,20914,20915,20986,20987,20999,21040,21046,21050,21069,21147,21152,21153,21160,21161,21191,21215,21253,21306,21319,21327,21335,21345,21355,21360,21457,21462,21463,21464,21475,21476,21482,21487,21488,21494,21507,21508,21512,21516,21518,21543,21560,21561,21629,21644,21709,21796,21890,21916,21943,22218,22238,22242,22270,22280,22312,22320,22495,22522,22612,22771,22788,22797,22806,22810,22825,22830,22833,22836,22987,23384,23427,23432,23433,23436,23450,23453,23454,23475,23478,23481,23494,23547,23548,23553,23558,23567,23578,23601,23614,23618,23637,23679,23707,23736,24038,24050,24102,24110,24182,24212,24231,24237,24320,24341,24359,24403,24405,24418,24448,24452,24453,24456,24471,24494,24515,24577,24674,24687,24819,24840,24847,24895,25104,25110,25112,25163,25165,25171,25214,25216,25226,25260,25307,25320,25321,25345,25353,25361,25377,25442,25506,25509,25552,25805,25910,25915,25918,25925,25928,25932,25937,25955,25972,25991,26007,26032,26041,26045,26049,26053,26080,26085,26087,26102,26143,26159,26174,26222,26228,26230,26263,26356,26368,26377,26391,26395,26410,26412,26426,26469,26519,26522,26524,26530,26597,26631,26639,26723,27425,27426,27491,27573,27668,27700,27719,27728,27773,27785,27809,27819,27835,27839,27861,27873,27922,27963,27969,27973,28014,28023,28145,28165,28287,28304,28418,28526,28608,28779,28781,28783,28784,28789,28857,29031,29060,29255,29256,29289,29366,29616,29702,29983,29992,30005,30028,30041,30333,30340,30446,30475,30528,30561,30707,30784,30830,30865,31181,31192,31227,31243,31456,31526,31532,31561,32034,32418,32441,32445,32447,32454,32456,32463,32469,32473,32487,32493,32622,32769,32773,32852,32972,33016,33021,33394,33410,33469,33487,33492,33719,33828,33829,33853,33976,34067,34255,34276,34411,34597,34892,34987,35013,35199,35201,35265,35299,35748,35753,35760,35835,35848,36125,36133,36164,36208,36215,36234,36291,36319,36335,36454,36530,36716,36731,36745,36793,36807,36817,36820,36824,36825,36827,36828,36857,36864,36873,36890,36896,36935,36947,36951,36973,37117,37266,37319,37324,37325,37327,38145,38190,38271,38378,38381,38388,38395,38431,38451,38459,38477,38498,38500,38505,38544,38598,38632,38654,38656,38706,38752,38754,39063,39064,39069,39118,39128,39295,39321,39564,40483,40736,65281,65292,65306,65307,35282,28796,30171,21407,25105,30452,24517,29420,33258,26463,21435,20303,19979,22826,20037,20309,35302,30896,22842,26366,25252,21534,21517,23383,37027};
+static const int UI_CODEPOINTS[]={32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,183,8211,8212,8230,8592,8594,12289,12290,19968,19977,19978,19981,19982,19990,19996,20004,20013,20026,20027,20046,20063,20102,20107,20110,20113,20114,20132,20142,20154,20173,20174,20195,20197,20204,20214,20219,20237,20241,20249,20250,20260,20276,20284,20301,20307,20316,20320,20351,20379,20381,20391,20415,20445,20572,20799,20808,20809,20811,20837,20840,20849,20851,20860,20861,20877,20889,20914,20915,20986,20987,20999,21040,21046,21050,21069,21147,21152,21153,21160,21161,21191,21215,21253,21306,21319,21327,21335,21345,21355,21360,21457,21462,21463,21464,21475,21476,21482,21487,21488,21494,21507,21508,21512,21516,21518,21543,21560,21561,21629,21644,21709,21796,21890,21916,21943,22218,22238,22242,22270,22280,22312,22320,22495,22522,22612,22771,22788,22797,22806,22810,22825,22830,22833,22836,22987,23384,23427,23432,23433,23436,23450,23453,23454,23475,23478,23481,23494,23547,23548,23553,23558,23567,23578,23601,23614,23618,23637,23679,23707,23736,24038,24050,24102,24110,24182,24212,24231,24237,24320,24341,24359,24403,24405,24418,24448,24452,24453,24456,24471,24494,24515,24577,24674,24687,24819,24840,24847,24895,25104,25110,25112,25163,25165,25171,25214,25216,25226,25260,25307,25320,25321,25345,25353,25361,25377,25442,25506,25509,25552,25805,25910,25915,25918,25925,25928,25932,25937,25955,25972,25991,26007,26032,26041,26045,26049,26053,26080,26085,26087,26102,26143,26159,26174,26222,26228,26230,26263,26356,26368,26377,26391,26395,26410,26412,26426,26469,26519,26522,26524,26530,26597,26631,26639,26723,27425,27426,27491,27573,27668,27700,27719,27728,27773,27785,27809,27819,27835,27839,27861,27873,27922,27963,27969,27973,28014,28023,28145,28165,28287,28304,28418,28526,28608,28779,28781,28783,28784,28789,28857,29031,29060,29255,29256,29289,29366,29616,29702,29983,29992,30005,30028,30041,30333,30340,30446,30475,30528,30561,30707,30784,30830,30865,31181,31192,31227,31243,31456,31526,31532,31561,32034,32418,32441,32445,32447,32454,32456,32463,32469,32473,32487,32493,32622,32769,32773,32852,32972,33016,33021,33394,33410,33469,33487,33492,33719,33828,33829,33853,33976,34067,34255,34276,34411,34597,34892,34987,35013,35199,35201,35265,35299,35748,35753,35760,35835,35848,36125,36133,36164,36208,36215,36234,36291,36319,36335,36454,36530,36716,36731,36745,36793,36807,36817,36820,36824,36825,36827,36828,36857,36864,36873,36890,36896,36935,36947,36951,36973,37117,37266,37319,37324,37325,37327,38145,38190,38271,38378,38381,38388,38395,38431,38451,38459,38477,38498,38500,38505,38544,38598,38632,38654,38656,38706,38752,38754,39063,39064,39069,39118,39128,39295,39321,39564,40483,40736,65281,65292,65306,65307,35282,28796,30171,21407,25105,30452,24517,29420,33258,26463,21435,20303,19979,22826,20037,20309,35302,30896,22842,26366,25252,21534,21517,23383,37027,39318,39046,26680,32784,38454,22686,24378,20302,33988,31283,26029};;
 static bool UIFontHasRequiredGlyphs(Font f) {
     for(int i=0;i<(int)(sizeof(UI_CODEPOINTS)/sizeof(UI_CODEPOINTS[0]));i++) {
         int cp=UI_CODEPOINTS[i];
@@ -74,6 +74,7 @@ static void DrawUITextWrapped(const char *text,int x,int y,int maxWidth,int size
 static Texture2D TEX_HERO={0}, TEX_LUMI={0}, TEX_MOATAIL={0}, TEX_GECKO={0}, TEX_KEEPER={0};
 static Texture2D TEX_HERO_PORTRAIT={0}, TEX_WATCHER_PORTRAIT={0}, TEX_GUARDIAN_PORTRAIT={0};
 static Texture2D TEX_HEROINE_APPROVED={0}, TEX_GUARDIAN_APPROVED={0};
+static Texture2D TEX_CHARACTER_PORTRAITS={0}, TEX_HEROINE_WORLD={0}, TEX_WATCHER_WORLD={0}, TEX_GROVE_COTTAGE={0};
 static Texture2D TEX_LUMI_ILLUSTRATION={0}, TEX_MOATAIL_ILLUSTRATION={0}, TEX_GECKO_ILLUSTRATION={0};
 static Texture2D TEX_HERO_PIXEL={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, TEX_GECKO_PIXEL={0}, TEX_TILES={0}, TEX_PROPS={0};
 static Texture2D TEX_ISO_TILES={0}, TEX_HERO_WALK={0}, TEX_ENV_PROPS={0}, TEX_LEAFLING={0}, TEX_GROVE_MOTE={0}, TEX_AREA_PROPS={0}, TEX_TOPDOWN_TILES={0}, TEX_FLORA_ATLAS={0}, TEX_CLIFF_ATLAS={0}, TEX_STRUCTURE_ATLAS={0}, TEX_ORIGINAL_PROPS={0}, TEX_KENNEY_BUILDINGS={0}, TEX_ENDING_CG={0};
@@ -265,6 +266,14 @@ static void DrawEnvProp(int index,Vector2 p,float w,float h) {
     Rectangle dst={p.x-w*.5f,p.y-h,w,h};
     DrawTexturePro(TEX_ENV_PROPS,src,dst,(Vector2){0,0},0,WHITE);
 }
+static void DrawGroveCottage(Vector2 p,float scale) {
+    if(!TEX_GROVE_COTTAGE.id)return;
+    DrawEllipse((int)p.x,(int)p.y+5,(int)(132*scale),(int)(18*scale),(Color){34,53,45,105});
+    Rectangle src={0,0,(float)TEX_GROVE_COTTAGE.width,(float)TEX_GROVE_COTTAGE.height};
+    float w=276.0f*scale,h=226.0f*scale;
+    Rectangle dst={p.x-w*.5f,p.y-h,w,h};
+    DrawTexturePro(TEX_GROVE_COTTAGE,src,dst,(Vector2){0,0},0,WHITE);
+}
 static void DrawTree(Vector2 p,float s,float t) {
     if(TEX_ENV_PROPS.id) {
         int variant=((int)(p.x+p.y))%3;
@@ -288,7 +297,12 @@ static void DrawKeeper(Vector2 p,float t,float scale) {
     (void)t;
     const float footY=p.y+8.0f*scale;
     DrawEllipse((int)p.x,(int)footY,(int)(29*scale),(int)(8*scale),(Color){35,49,45,105});
-    if(TEX_WATCHER_PORTRAIT.id) {
+    if(TEX_WATCHER_WORLD.id) {
+        Rectangle src={0,0,(float)TEX_WATCHER_WORLD.width,(float)TEX_WATCHER_WORLD.height};
+        float w=104.0f*scale,h=148.0f*scale;
+        Rectangle dst={p.x-w*.5f,footY-h,w,h};
+        DrawTexturePro(TEX_WATCHER_WORLD,src,dst,(Vector2){0,0},0,WHITE);
+    } else if(TEX_WATCHER_PORTRAIT.id) {
         Rectangle src={0,0,(float)TEX_WATCHER_PORTRAIT.width,(float)TEX_WATCHER_PORTRAIT.height};
         float w=104.0f*scale,h=130.0f*scale;
         Rectangle dst={p.x-w*.5f,footY-h,w,h};
@@ -353,12 +367,15 @@ static void DrawPlayer(Vector2 p,float t,bool moving,int facing) {
     float bob=moving?fabsf(sinf(t*13.0f))*1.0f:0.0f;
     DrawEllipse((int)p.x,(int)footY,18,5,(Color){42,48,52,112});
     if(facing<0||facing>3)facing=0;
-    if(TEX_HEROINE_APPROVED.id) {
-        // Approved 8-frame x 4-direction heroine sheet: front, left, right, back.
-        // Keep the ground-contact point fixed so the boots never slide while animating.
-        int frame=moving?((int)(t*10.0f)%8):((int)(t*1.7f)%2);
+    if(TEX_HEROINE_WORLD.id) {
+        int frame=moving?((int)(t*8.0f)%4):0;
+        Rectangle src={(float)(frame*32),(float)(facing*48),32,48};
+        Rectangle dst={p.x-42.0f,footY-112.0f-bob,84.0f,112.0f};
+        DrawTexturePro(TEX_HEROINE_WORLD,src,dst,(Vector2){0,0},0,WHITE);
+    } else if(TEX_HEROINE_APPROVED.id) {
+        int frame=moving?((int)(t*10.0f)%8):0;
         Rectangle src={(float)(frame*24),(float)(facing*32),24,32};
-        Rectangle dst={p.x-35.0f,footY-91.0f-bob,70.0f,93.0f};
+        Rectangle dst={p.x-40.0f,footY-108.0f-bob,80.0f,108.0f};
         DrawTexturePro(TEX_HEROINE_APPROVED,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_HERO_WALK.id) {
         int frame=moving?((int)(t*8.0f)%4):0;
@@ -900,6 +917,7 @@ static void RenderWorld(Game *g) {
                 else if(it->index==305)DrawStructureProp(5,p,168*it->scale,152*it->scale);
                 else if(it->index>=300&&it->index<400)DrawStructureProp(it->index-300,p,150*it->scale,140*it->scale);
                 else if(it->index>=400&&it->index<416)DrawOriginalProp(it->index-400,p,92*it->scale,92*it->scale);
+                else if(it->index==500&&TEX_GROVE_COTTAGE.id)DrawGroveCottage(p,it->scale);
                 else if(it->index>=500&&it->index<504)DrawKenneyBuilding(it->index-500,p,it->scale);
                 break;
             case RENDER_FIRE: DrawCampfire(p,g->time); break;
@@ -1133,34 +1151,32 @@ static void RenderMap(Game *g) {
     DrawUIText("按 M / ESC 关闭",800,580,16,(Color){132,137,111,255});
     DrawUIText("按 M / ESC 关闭",800,580,16,(Color){132,137,111,255});
 }
-static void DrawDialoguePortrait(Game *g,int portrait) {
+static void DrawDialoguePortrait(Game *g,int portrait,const char *speaker) {
     Rectangle card={34,372,220,314};
     DrawRectangleRounded(card,.10f,10,(Color){11,31,43,245});
     DrawRectangleRoundedLinesEx(card,.10f,10,2.0f,(Color){208,177,111,255});
     DrawRectangleGradientV(48,386,192,286,(Color){62,83,86,255},(Color){22,43,54,255});
-    Texture2D *art=portrait==0?&TEX_HERO_PORTRAIT:(portrait==1?&TEX_WATCHER_PORTRAIT:(portrait==2?&TEX_GUARDIAN_PORTRAIT:NULL));
-    if(art&&art->id) {
-        Rectangle src={0,0,(float)art->width,(float)art->height};
-        Rectangle dst={48,386,192,240};
-        DrawTexturePro(*art,src,dst,(Vector2){0,0},0,WHITE);
-    } else if(portrait==0&&TEX_HEROINE_APPROVED.id) {
-        Rectangle src={0,0,24,32},dst={55,390,180,250};
-        DrawTexturePro(TEX_HEROINE_APPROVED,src,dst,(Vector2){0,0},0,WHITE);
-    } else if(portrait==0&&TEX_HERO_WALK.id) {
-        Rectangle src={0,0,32,32},dst={55,390,180,250};
-        DrawTexturePro(TEX_HERO_WALK,src,dst,(Vector2){0,0},0,WHITE);
-    } else if(portrait==1&&TEX_KEEPER.id) {
-        Rectangle src={0,0,(float)TEX_KEEPER.width,(float)TEX_KEEPER.height};
-        Rectangle dst={72,414,144,190};
-        DrawTexturePro(TEX_KEEPER,src,dst,(Vector2){0,0},0,WHITE);
-    } else if(portrait==2&&TEX_GUARDIAN_APPROVED.id) {
-        Rectangle src={0,0,48,64},dst={76,394,136,222};
-        DrawTexturePro(TEX_GUARDIAN_APPROVED,src,dst,(Vector2){0,0},0,WHITE);
-    } else if(portrait==3) {
-        DrawLumi((Vector2){144,625},g->time,0);
+    if(TEX_CHARACTER_PORTRAITS.id) {
+        int index=portrait<0||portrait>5?0:portrait;
+        Rectangle src={(float)((index%3)*128),(float)((index/3)*170),128,170};
+        Rectangle dst={48,386,192,256};
+        DrawTexturePro(TEX_CHARACTER_PORTRAITS,src,dst,(Vector2){0,0},0,WHITE);
+    } else {
+        Texture2D *fallback=portrait==0?&TEX_HERO_PORTRAIT:
+            portrait==1?&TEX_WATCHER_PORTRAIT:
+            portrait==2?&TEX_GUARDIAN_PORTRAIT:
+            portrait==3?&TEX_LUMI_ILLUSTRATION:
+            portrait==4?&TEX_MOATAIL_ILLUSTRATION:
+            portrait==5?&TEX_GECKO_ILLUSTRATION:&TEX_HERO_PORTRAIT;
+        if(fallback->id) {
+            Rectangle src={0,0,(float)fallback->width,(float)fallback->height};
+            Rectangle dst={48,386,192,256};
+            DrawTexturePro(*fallback,src,dst,(Vector2){0,0},0,WHITE);
+        }
     }
+    const char *label=(speaker&&speaker[0])?speaker:"旅人";
     DrawRectangleRounded((Rectangle){52,647,184,27},.2f,5,(Color){8,25,36,225});
-    DrawUIText(portrait==0?"旅人":portrait==1?"守望者":"灯塔守卫",88,651,14,(Color){255,231,178,255});
+    DrawUIText(label,62,651,13,(Color){255,231,178,255});
 }
 static void RenderDialogue(Game *g) {
     DrawRectangle(0,0,SW,SH,Fade((Color){22,39,48,255},.46f));
@@ -1171,7 +1187,7 @@ static void RenderDialogue(Game *g) {
     int portrait=page>=0?g->dialoguePortrait[page]:0;
     const char *speaker=page>=0?g->dialogueLineSpeaker[page]:g->dialogueSpeaker;
     if(strncmp(speaker,"旅人",strlen("旅人"))==0)speaker="旅人";
-    DrawDialoguePortrait(g,portrait);
+    DrawDialoguePortrait(g,portrait,speaker);
     DrawRectangleRounded((Rectangle){258,541,190,31},.16f,6,(Color){37,64,61,255});
     DrawUIText(speaker,274,547,17,(Color){255,224,165,255});
     DrawUITextWrapped(g->dialogue[page],270,592,930,23,2,(Color){44,61,55,255});
@@ -1207,7 +1223,7 @@ static void RenderBattle(Game *g) {
 
     const char *enemyName=e->type==ENEMY_MOTE?"林地微光兽":e->type==ENEMY_BOSS?"灯塔守卫":"遗迹守卫";
     Panel((Rectangle){28,22,350,112});
-    DrawUIText(isBoss?"BOSS":"遭遇战",50,34,25,isBoss?(Color){255,220,168,255}:C_INK);
+    DrawUIText(isBoss?"首领战":"遭遇战",50,34,25,isBoss?(Color){255,220,168,255}:C_INK);
     DrawUIText(TextFormat("第 %d 回合",g->battleRound),50,68,15,(Color){104,119,93,255});
     DrawUIText(TextFormat("旅人生命  %d / %d",(int)g->player.hp,(int)g->player.maxHp),50,94,15,C_INK);
     DrawRectangle(210,97,142,12,(Color){218,213,193,255});
@@ -1215,22 +1231,22 @@ static void RenderBattle(Game *g) {
 
     Panel((Rectangle){902,22,350,112});
     DrawUIText(enemyName,925,35,22,C_INK);
-    DrawUIText(TextFormat("%s  %d / %d",isBoss?"CORE":"生命",(int)fmaxf(0,e->hp),(int)e->maxHp),925,72,15,isBoss?(Color){235,197,143,255}:(Color){104,119,93,255});
+    DrawUIText(TextFormat("%s  %d / %d",isBoss?"核心耐久":"生命",(int)fmaxf(0,e->hp),(int)e->maxHp),925,72,15,isBoss?(Color){235,197,143,255}:(Color){104,119,93,255});
     DrawRectangle(925,99,295,13,(Color){218,213,193,255});
     if(isBoss)DrawRectangleGradientH(925,99,(int)(295.0f*fmaxf(0.0f,e->hp/e->maxHp)),13,(Color){255,201,104,255},(Color){174,66,55,255});
     else DrawRectangle(925,99,(int)(295.0f*fmaxf(0.0f,e->hp/e->maxHp)),13,C_PINK);
     if(isBoss) {
         int phase=e->hp<=50.0f?3:(e->hp<=100.0f?2:1);
         bool heavy=phase==3?(g->battleRound%2==0):(g->battleRound%3==0);
-        const char *phaseLabel=phase==3?"PHASE III  /  LAST LIGHT":(phase==2?"PHASE II  /  RESONANCE":"PHASE I  /  AWAKENING");
-        DrawRectangleRounded((Rectangle){742,148,510,42},.18f,8,(Color){12,24,35,224});
-        DrawRectangleRoundedLines((Rectangle){742,148,510,42},.18f,8,Fade((Color){255,198,113,255},.7f));
-        DrawUIText(phaseLabel,760,154,14,(Color){255,219,166,255});
-        const char *coreState=g->enemySoaked?"CORE DAMPED  /  STRIKE WEAKENED":
-            (heavy?"CORE CHARGED  /  HEAVY STRIKE NEXT":"CORE STABLE  /  WET STATUS INTERRUPTS");
+        const char *phaseLabel=phase==3?"阶段三 · 最后的灯火":(phase==2?"阶段二 · 共鸣增强":"阶段一 · 灯火苏醒");
+        DrawRectangleRounded((Rectangle){742,145,510,64},.18f,8,(Color){12,24,35,232});
+        DrawRectangleRoundedLines((Rectangle){742,145,510,64},.18f,8,Fade((Color){255,198,113,255},.7f));
+        DrawUIText(phaseLabel,760,151,17,(Color){255,219,166,255});
+        const char *coreState=g->enemySoaked?"核心受潮：本次攻击伤害降低":
+            (heavy?"核心蓄能：下一回合将发动重击":"核心稳定：可用潮湿技能打断");
         Color coreTint=g->enemySoaked?(Color){132,216,224,255}:
             (heavy?(Color){255,170,117,255}:(Color){154,220,211,255});
-        DrawUIText(coreState,930,154,12,coreTint);
+        DrawUIText(coreState,760,178,14,coreTint);
     }
 
     if(g->selectedBuddy==0 && g->lumi.owned)DrawLumi((Vector2){395,430},g->time,0);
@@ -1241,7 +1257,11 @@ static void RenderBattle(Game *g) {
     if(e->type==ENEMY_MOTE) {
         DrawMote((Vector2){880,385},g->time);
     } else if(e->type==ENEMY_BOSS) {
-        DrawLighthouseGuardian((Vector2){880,454},g->time,1.72f,g->battleTurn!=0);
+        if(TEX_CHARACTER_PORTRAITS.id) {
+            Rectangle src={0,170,128,170};
+            Rectangle dst={650,165,500,455};
+            DrawTexturePro(TEX_CHARACTER_PORTRAITS,src,dst,(Vector2){0,0},0,WHITE);
+        } else DrawLighthouseGuardian((Vector2){880,454},g->time,1.95f,g->battleTurn!=0);
         DrawCircleLines(880,395,126,Fade(C_GOLD,.35f));
         DrawCircleLines(880,395,142,Fade(C_BLUE,.22f));
     } else {
@@ -1449,14 +1469,22 @@ void RenderInit(void) {
         "assets/characters/png/moatail.png",
         "assets/characters/png/crystal_gecko.png",
         "assets/characters/hero/heroine_approved_8x4.png",
-        "assets/characters/boss/lighthouse_guardian_4x2.png"
+        "assets/characters/boss/lighthouse_guardian_4x2.png",
+        "assets/characters/portraits/character_portraits_atlas.jpg",
+        "assets/characters/hero/heroine_world_4x4_32x48.png",
+        "assets/characters/portraits/watcher_world_cutout.png",
+        "assets/environment/glowglade_cottage_cutout.png"
     };
-    Texture2D *targets[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS,&TEX_HERO_PORTRAIT,&TEX_WATCHER_PORTRAIT,&TEX_GUARDIAN_PORTRAIT,&TEX_LUMI_ILLUSTRATION,&TEX_MOATAIL_ILLUSTRATION,&TEX_GECKO_ILLUSTRATION,&TEX_HEROINE_APPROVED,&TEX_GUARDIAN_APPROVED};
-    for(int i=0;i<25;i++) {
+    Texture2D *targets[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS,&TEX_HERO_PORTRAIT,&TEX_WATCHER_PORTRAIT,&TEX_GUARDIAN_PORTRAIT,&TEX_LUMI_ILLUSTRATION,&TEX_MOATAIL_ILLUSTRATION,&TEX_GECKO_ILLUSTRATION,&TEX_HEROINE_APPROVED,&TEX_GUARDIAN_APPROVED,&TEX_CHARACTER_PORTRAITS,&TEX_HEROINE_WORLD,&TEX_WATCHER_WORLD,&TEX_GROVE_COTTAGE};
+    for(int i=0;i<29;i++) {
         if(FileExists(paths[i])) {
             *targets[i]=LoadTexture(paths[i]);
-            if(targets[i]->id)SetTextureFilter(*targets[i],i>=17&&i<23?TEXTURE_FILTER_BILINEAR:TEXTURE_FILTER_POINT);
-        }
+            if(targets[i]->id) {
+                bool pixel=i<17||i==23||i==24||i==26||i==27;
+                SetTextureFilter(*targets[i],pixel?TEXTURE_FILTER_POINT:TEXTURE_FILTER_BILINEAR);
+                TraceLog(LOG_INFO,"Mist Isle asset loaded: %s (%dx%d)",paths[i],targets[i]->width,targets[i]->height);
+            } else TraceLog(LOG_WARNING,"Mist Isle asset failed to load: %s",paths[i]);
+        } else TraceLog(LOG_WARNING,"Mist Isle asset missing: %s",paths[i]);
     }
     TEX_GROUND_CACHE=LoadRenderTexture((int)WORLD_PIXEL_W,(int)WORLD_PIXEL_H);
     if(TEX_GROUND_CACHE.id)SetTextureFilter(TEX_GROUND_CACHE.texture,TEXTURE_FILTER_POINT);
@@ -1468,8 +1496,8 @@ void RenderClose(void) {
     TEX_GROUND_CACHE=(RenderTexture2D){0};
     CACHED_GROUND_AREA=-1;
     UnloadUIFont();
-    Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS,&TEX_HERO_PORTRAIT,&TEX_WATCHER_PORTRAIT,&TEX_GUARDIAN_PORTRAIT,&TEX_LUMI_ILLUSTRATION,&TEX_MOATAIL_ILLUSTRATION,&TEX_GECKO_ILLUSTRATION,&TEX_HEROINE_APPROVED,&TEX_GUARDIAN_APPROVED};
-    for(int i=0;i<25;i++)if(textures[i]->id)UnloadTexture(*textures[i]);
+    Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS,&TEX_HERO_PORTRAIT,&TEX_WATCHER_PORTRAIT,&TEX_GUARDIAN_PORTRAIT,&TEX_LUMI_ILLUSTRATION,&TEX_MOATAIL_ILLUSTRATION,&TEX_GECKO_ILLUSTRATION,&TEX_HEROINE_APPROVED,&TEX_GUARDIAN_APPROVED,&TEX_CHARACTER_PORTRAITS,&TEX_HEROINE_WORLD,&TEX_WATCHER_WORLD,&TEX_GROVE_COTTAGE};
+    for(int i=0;i<29;i++)if(textures[i]->id)UnloadTexture(*textures[i]);
     if(TEX_ENDING_CG.id)UnloadTexture(TEX_ENDING_CG);
 }
 void GameRender(Game *g) {
