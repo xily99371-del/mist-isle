@@ -1087,9 +1087,11 @@ static void RenderMap(Game *g) {
     DrawUIText("岛 屿 地 图",300,120,32,(Color){74,105,83,255});
     const char *names[4]={"海岸营地","辉光林地","潮汐遗迹","灯塔庭院"};
     Vector2 pts[4]={{390,320},{560,235},{745,320},{900,235}};
+    // The camp is the hub for the grove and ruins; the lighthouse is reached
+    // through the solved tidal-ruins shrine, not by a direct camp connection.
     DrawLineEx(pts[0],pts[1],5,(Color){185,177,139,255});
     DrawLineEx(pts[0],pts[2],5,(Color){185,177,139,255});
-    DrawLineEx(pts[0],pts[3],5,(Color){185,177,139,255});
+    DrawLineEx(pts[2],pts[3],5,(Color){185,177,139,255});
     for(int i=0;i<4;i++) {
         bool unlocked=(i==0)||(i==1)||(i==2&&g->lumi.owned&&g->splash.owned)||(i==3&&g->shrineSolved);
         DrawCircleV(pts[i],g->area==i?36:28,g->area==i?C_GOLD:unlocked?(Color){144,190,132,255}:(Color){181,184,164,255});

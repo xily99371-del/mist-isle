@@ -266,6 +266,8 @@ require("RENDER_GATE" in RENDER and "DrawGateMarker" in RENDER and "DrawStructur
         "all area transitions use a visible authored stone-arch portal with destination signage")
 require("辉光林地" in RENDER and "潮汐遗迹" in RENDER and "灯塔庭院" in RENDER and "返回海岸营地" in RENDER,
         "camp entrances and sub-map return route have explicit Chinese destination labels")
+require("DrawLineEx(pts[2],pts[3]" in RENDER and "DrawLineEx(pts[0],pts[3]" not in RENDER,
+        "island map displays the actual hub-to-grove, hub-to-ruins and ruins-to-lighthouse route graph")
 require("需要两位伙伴" in RENDER and "封印尚未解除" in RENDER,
         "locked entrances explain their unlock conditions")
 const_glyph_match = re.search(r"static const int UI_CODEPOINTS\[\]=\{([^}]+)\}", RENDER)
