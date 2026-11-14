@@ -369,7 +369,7 @@ static void DrawPlayer(Vector2 p,float t,bool moving,int facing) {
     if(facing<0||facing>3)facing=0;
     if(TEX_HEROINE_WORLD.id) {
         int frame=moving?((int)(t*8.0f)%4):0;
-        Rectangle src={(float)(frame*32),(float)(facing*48),32,48};
+        Rectangle src={(float)(frame*64),(float)(facing*80),64,80};
         Rectangle dst={p.x-24.0f,footY-68.0f-bob,48.0f,68.0f};
         DrawTexturePro(TEX_HEROINE_WORLD,src,dst,(Vector2){0,0},0,WHITE);
     } else if(TEX_HEROINE_APPROVED.id) {
@@ -1469,7 +1469,7 @@ void RenderInit(void) {
         "assets/characters/hero/heroine_approved_8x4.png",
         "assets/characters/boss/lighthouse_guardian_4x2.png",
         "assets/characters/portraits/character_portraits_atlas.jpg",
-        "assets/characters/hero/heroine_world_4x4_32x48.png",
+        "assets/characters/png/heroine_world_4x4_64x80.png",
         "assets/characters/portraits/watcher_world_cutout.png",
         "assets/environment/glowglade_cottage_cutout.png"
     };

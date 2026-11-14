@@ -21,6 +21,7 @@ SIZES = {
     "moatail_idle_pixel.svg": (64, 32),
     "gecko_idle_pixel.svg": (64, 32),
     "heroine_portrait.svg": (512, 640),
+    "heroine_world_4x4_64x80.svg": (256, 320),
     "watcher_portrait.svg": (512, 640),
     "lighthouse_guardian_portrait.svg": (512, 640),
     "moss_lumi.svg": (256, 256),

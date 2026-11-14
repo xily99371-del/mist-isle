@@ -353,7 +353,7 @@ require("TEX_CHARACTER_PORTRAITS" in RENDER and "portrait>=0&&portrait<=2" in RE
         "high-resolution character portrait atlas is used for dialogue and the boss battle")
 require("核心耐久" in RENDER and "阶段三" in RENDER and "核心蓄能" in RENDER and "PHASE III" not in RENDER,
         "boss phase and core status are displayed in Chinese in a non-overlapping panel")
-require("TEX_HEROINE_WORLD" in RENDER and "32,48" in RENDER and "48.0f,68.0f" in RENDER,
+require("TEX_HEROINE_WORLD" in RENDER and "frame*64" in RENDER and "facing*80" in RENDER and "48.0f,68.0f" in RENDER,
         "heroine uses crisp four-frame directional pixel art at a larger in-world scale")
 require("TEX_GROVE_COTTAGE" in RENDER and "DrawGroveCottage" in RENDER,
         "grove house uses the approved handcrafted cottage asset")
