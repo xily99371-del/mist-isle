@@ -359,7 +359,7 @@ with Image.open(io.BytesIO(base64.b64decode(cg_data, validate=True))) as cg:
     require(cg.size == (448, 448), "lighthouse finale illustration is a 448px square scene")
 require("assets/cinematics" in WORKFLOW and "Copy-Item assets/cinematics/*" in WORKFLOW,
         "Windows playtest package includes the cinematic asset")
-require("footY-68.0f" in RENDER and "48.0f,68.0f" in RENDER,
+require("footY-76.0f" in RENDER and "48.0f,76.0f" in RENDER,
         "player and companion sprites use enlarged world-space dimensions")
 require("unsigned char solid[MAPH][MAPW]" in HEADER and "w->solid[y][x]=AREA_COLLISION" in GAME and "g->world.solid[y][x]" in GAME,
         "Tiled collision layer is shared with gameplay collision")
@@ -383,7 +383,7 @@ require("TEX_CHARACTER_PORTRAITS" in RENDER and "portrait>=0&&portrait<=2" in RE
         "high-resolution character portrait atlas is used for dialogue and the boss battle")
 require("核心耐久" in RENDER and "阶段三" in RENDER and "核心蓄能" in RENDER and "PHASE III" not in RENDER,
         "boss phase and core status are displayed in Chinese in a non-overlapping panel")
-require("TEX_HEROINE_WORLD" in RENDER and "frame*64" in RENDER and "facing*80" in RENDER and "48.0f,68.0f" in RENDER,
+require("TEX_HEROINE_PIXEL" in RENDER and "frame*64" in RENDER and "facing*80" in RENDER and "48.0f,76.0f" in RENDER,
         "heroine uses crisp four-frame directional pixel art at a larger in-world scale")
 require("TEX_GROVE_COTTAGE" in RENDER and "DrawGroveCottage" in RENDER,
         "grove house uses the approved handcrafted cottage asset")
