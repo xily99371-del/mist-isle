@@ -60,6 +60,16 @@
   <object id="353" name="海风灌木" type="prop_229" x="812.00" y="532.00"><properties><property name="scale" type="float" value="0.80"/></properties><point/></object>
   <object id="354" name="庭院花簇" type="prop_116" x="308.00" y="532.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
   <object id="355" name="庭院花簇" type="prop_117" x="756.00" y="532.00"><properties><property name="scale" type="float" value="0.78"/></properties><point/></object>
+  <object id="660" name="庭院枯树" type="prop_660" x="140.00" y="140.00"><properties><property name="scale" type="float" value="0.48"/></properties><point/></object>
+  <object id="661" name="风蚀枯木" type="prop_661" x="980.00" y="140.00"><properties><property name="scale" type="float" value="0.46"/></properties><point/></object>
+  <object id="662" name="枯朽树根" type="prop_662" x="140.00" y="532.00"><properties><property name="scale" type="float" value="0.48"/></properties><point/></object>
+  <object id="663" name="断裂石柱" type="prop_663" x="252.00" y="252.00"><properties><property name="scale" type="float" value="0.42"/></properties><point/></object>
+  <object id="665" name="倒塌石柱" type="prop_665" x="868.00" y="252.00"><properties><property name="scale" type="float" value="0.42"/></properties><point/></object>
+  <object id="666" name="破败祭坛" type="prop_666" x="252.00" y="476.00"><properties><property name="scale" type="float" value="0.40"/></properties><point/></object>
+  <object id="668" name="庭院瓦砾" type="prop_668" x="140.00" y="588.00"><properties><property name="scale" type="float" value="0.46"/></properties><point/></object>
+  <object id="671" name="荆棘残骸" type="prop_671" x="868.00" y="532.00"><properties><property name="scale" type="float" value="0.40"/></properties><point/></object>
+  <object id="673" name="枯草地表" type="prop_673" x="364.00" y="588.00"><properties><property name="scale" type="float" value="0.42"/></properties><point/></object>
+  <object id="675" name="幽蓝火灯" type="prop_675" x="980.00" y="476.00"><properties><property name="scale" type="float" value="0.38"/></properties><point/></object>
 </objectgroup>
  <objectgroup id="4" name="Markers" draworder="topdown">
   <object id="500" name="spawn" type="spawn" x="140.00" y="532.00"><point/></object>
