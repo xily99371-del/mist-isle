@@ -32,6 +32,15 @@ set(MISTISLE_APPROVED_ART_BUNDLE "${CMAKE_SOURCE_DIR}/MistIsle_ApprovedArt_v3.zi
 if(EXISTS "${MISTISLE_APPROVED_ART_BUNDLE}")
   file(ARCHIVE_EXTRACT INPUT "${MISTISLE_APPROVED_ART_BUNDLE}" DESTINATION "${CMAKE_SOURCE_DIR}")
 endif()
+set(MISTISLE_PIXEL_ASSET_STAMP "${MISTISLE_GENERATED_DIR}/pixel_assets.stamp")
+add_custom_command(
+  OUTPUT "${MISTISLE_PIXEL_ASSET_STAMP}"
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/tools/generate_pixel_assets.py"
+  COMMAND "${CMAKE_COMMAND}" -E touch "${MISTISLE_PIXEL_ASSET_STAMP}"
+  DEPENDS "${CMAKE_SOURCE_DIR}/tools/generate_pixel_assets.py"
+  VERBATIM
+)
+add_custom_target(generate_pixel_assets DEPENDS "${MISTISLE_PIXEL_ASSET_STAMP}")
 set(MISTISLE_ATLAS_BOUNDS_HEADER "${MISTISLE_GENERATED_DIR}/atlas_bounds.h")
 add_custom_command(
   OUTPUT "${MISTISLE_ATLAS_BOUNDS_HEADER}"
@@ -49,6 +58,7 @@ add_custom_command(
   VERBATIM
 )
 add_custom_target(generate_atlas_bounds DEPENDS "${MISTISLE_ATLAS_BOUNDS_HEADER}")
+add_dependencies(generate_atlas_bounds generate_pixel_assets)
 set(MISTISLE_MAP_HEADER "${MISTISLE_GENERATED_DIR}/area_maps.h")
 set(MISTISLE_GROUND_ATLAS "${CMAKE_SOURCE_DIR}/assets/environment/topdown_terrain_atlas_v1.png")
 set(MISTISLE_GROUND_ATLAS_STAMP "${MISTISLE_GENERATED_DIR}/ground_atlas.stamp")
