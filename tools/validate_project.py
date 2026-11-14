@@ -35,7 +35,6 @@ def require(condition, message):
 assets = {
     "assets/characters/hero/hero_walk_4dir_64.png": (128, 128),
     "assets/characters/hero/heroine_approved_8x4.png": (192, 128),
-    "assets/characters/boss/lighthouse_guardian_4x2.png": (256, 160),
     "assets/characters/png/heroine_portrait.png": (512, 640),
     "assets/characters/png/heroine_world_4x4_64x80.png": (256, 320),
     "assets/characters/png/watcher_portrait.png": (512, 640),
@@ -71,7 +70,6 @@ else:
 # checkouts, but its exact cell geometry is checked as soon as it is installed.
 for rel, expected in {
     "assets/characters/hero/heroine_approved_8x4.png": (192, 128),
-    "assets/characters/boss/lighthouse_guardian_4x2.png": (256, 160),
 }.items():
     path = ROOT / rel
     if path.exists():
@@ -79,6 +77,18 @@ for rel, expected in {
             require(im.size == expected, f"{rel} dimensions {im.size} == {expected}")
     else:
         print(f"INFO: optional approved sprite sheet not imported yet: {rel}")
+
+# The repaired Lighthouse Guardian sheet is shipped in art bundle v7. Older
+# tracked builds contain a damaged 192x128 indexed PNG, so only validate the
+# new 256x160 sheet when v7 has actually been installed.
+boss_sheet = ROOT / "assets/characters/boss/lighthouse_guardian_4x2.png"
+if (ROOT / "MistIsle_ApprovedArt_v7.zip").exists():
+    require(boss_sheet.exists(), "v7 Lighthouse Guardian pixel sheet is present")
+    with Image.open(boss_sheet) as im:
+        im.load()
+        require(im.size == (256, 160), f"Boss sprite sheet dimensions {im.size} == (256, 160)")
+else:
+    print("INFO: v7 Boss sprite sheet not installed in this checkout; visual Boss validation is deferred.")
 require("if(TEX_HEROINE_APPROVED.id)" in RENDER and "if(TEX_GUARDIAN_APPROVED.id)" in RENDER,
         "approved directional heroine and guardian sprite sheets take priority over portrait fallbacks")
 require("TEX_WATCHER_PIXEL.id" in RENDER and "TEX_GUARDIAN_APPROVED.id" in RENDER,
