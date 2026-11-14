@@ -18,6 +18,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Extract approved art bundle when supplied
+        shell: pwsh
+        run: |
+          if (Test-Path MistIsle_ApprovedArt_v3.zip) {
+            Expand-Archive -LiteralPath MistIsle_ApprovedArt_v3.zip -DestinationPath . -Force
+          }
       - name: Generate pixel assets
         run: |
           python -m pip install pillow
@@ -36,6 +42,23 @@ jobs:
           python tools/preview_tiled_maps.py --output build/map-previews
           if (Test-Path third_party/kenney/rpg-base/KenneyRPGpack.zip) { python tools/preview_cc0_packs.py }
           python tools/validate_project.py
+      - name: Verify approved art integration
+        shell: pwsh
+        run: |
+          $required = @(
+            'assets/characters/portraits/heroine_portrait.jpg',
+            'assets/characters/portraits/watcher_portrait.jpg',
+            'assets/characters/portraits/guardian_portrait.jpg',
+            'assets/characters/portraits/moss_lumi_portrait.jpg',
+            'assets/characters/portraits/moatail_portrait.jpg',
+            'assets/characters/portraits/crystal_gecko_portrait.jpg',
+            'assets/characters/hero/heroine_pixel_4x4_64x80.png',
+            'assets/environment/coastal_keeper_house.png'
+          )
+          $missing = $required | Where-Object { -not (Test-Path $_) }
+          if ($missing.Count -gt 0) {
+            Write-Error ("Approved art bundle missing: " + ($missing -join ', ') + ". Download MistIsle_ApprovedArt_v3.zip and place it in the repository root.")
+          }
       - name: Configure
         run: cmake -S . -B build -A x64
       - name: Build
@@ -109,6 +132,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential cmake git pkg-config libx11-dev libxext-dev libxcursor-dev libxinerama-dev libxrandr-dev libxi-dev libasound2-dev libgl1-mesa-dev libwayland-dev libxkbcommon-dev wayland-protocols
+      - name: Extract approved art bundle when supplied
+        run: |
+          if [ -f MistIsle_ApprovedArt_v3.zip ]; then unzip -o MistIsle_ApprovedArt_v3.zip -d .; fi
       - name: Generate art and validate Tiled maps
         run: |
           python -m pip install pillow cairosvg
