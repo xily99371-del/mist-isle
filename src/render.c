@@ -338,21 +338,15 @@ static void DrawLumi(Vector2 p,float t,float bob) {
     }
 }
 static void DrawPlayer(Vector2 p,float t,bool moving,int facing) {
-    float bob=moving?fabsf(sinf(t*13))*1.2f:0.0f;
+    float bob=moving?fabsf(sinf(t*12.0f))*1.0f:0.0f;
     const float footY=p.y+9.0f;
-    DrawEllipse((int)p.x,(int)footY,16,5,(Color){48,66,57,105});
-    (void)facing;
-    // The authored heroine illustration is the world-character source of truth.
-    // Keep a gentle idle/run bob until the dedicated 4-direction illustrated
-    // animation sheet replaces the legacy block-built walk cycle.
-    if(TEX_HERO_PORTRAIT.id) {
-        Rectangle src={0,0,(float)TEX_HERO_PORTRAIT.width,(float)TEX_HERO_PORTRAIT.height};
-        Rectangle dst={p.x-43.0f,footY-108.0f-bob,86.0f,108.0f};
-        DrawTexturePro(TEX_HERO_PORTRAIT,src,dst,(Vector2){0,0},0,WHITE);
-    } else if(TEX_HERO_WALK.id) {
-        int frame=moving?((int)(t*8.0f)%4):0;
-        Rectangle src={(float)(frame*32),(float)(facing*32),32,32};
-        Rectangle dst={p.x-33,footY-66-bob,66,66};
+    DrawEllipse((int)p.x,(int)footY,17,5,(Color){48,66,57,105});
+    if(TEX_HERO_WALK.id) {
+        // 8 frames per direction: front, left, right, rear.
+        int frame=moving?((int)(t*10.0f)%8):0;
+        int direction=facing<0?0:(facing>3?3:facing);
+        Rectangle src={(float)(frame*32),(float)(direction*32),32,32};
+        Rectangle dst={p.x-35.0f,footY-72.0f-bob,70.0f,72.0f};
         DrawTexturePro(TEX_HERO_WALK,src,dst,(Vector2){0,0},0,WHITE);
     }
 }
@@ -1340,7 +1334,7 @@ static void LoadEndingCG(void) {
 void RenderInit(void) {
     LoadUIFont();
     const char *paths[]={
-        "assets/characters/hero/hero_walk_4dir_64.png",
+        "assets/characters/hero/hero_walk_8frame_4dir.png",
         "assets/characters/companions/moss_lumi_idle_64.png",
         "assets/characters/companions/moatail_idle_64.png",
         "assets/characters/companions/crystal_gecko_idle_64.png",
