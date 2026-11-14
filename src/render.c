@@ -330,7 +330,7 @@ static void DrawKeeper(Vector2 p,float t,float scale) {
     if(TEX_WATCHER_PIXEL.id) {
         int frame=(int)(t*2.2f)%4;
         Rectangle src={(float)(frame*64),0,64,80};
-        float w=44.0f*scale,h=70.0f*scale;
+        float w=42.0f*scale,h=68.0f*scale;
         Rectangle dst={roundf(p.x-w*.5f),roundf(footY-h),w,h};
         DrawTexturePro(TEX_WATCHER_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
     } else {
@@ -516,8 +516,8 @@ static void DrawLighthouseGuardian(Vector2 p,float t,float scale,bool attacking)
     DrawCircleLines((int)p.x,(int)(p.y-72*scale),(int)(67*scale),Fade((Color){113,204,211,255},.12f));
     if(TEX_GUARDIAN_APPROVED.id) {
         int frame=attacking?((int)(t*8.0f)%4):((int)(t*2.0f)%4);
-        Rectangle src={(float)(frame*48),attacking?64.0f:0.0f,48,64};
-        float w=96.0f*scale,h=128.0f*scale;
+        Rectangle src={(float)(frame*64),attacking?80.0f:0.0f,64,80};
+        float w=112.0f*scale,h=140.0f*scale;
         Rectangle dst={p.x-w*.5f,p.y-h+bob,w,h};
         DrawTexturePro(TEX_GUARDIAN_APPROVED,src,dst,(Vector2){0,0},0,WHITE);
     } else {
@@ -963,13 +963,10 @@ static void RenderWorld(Game *g) {
             case RENDER_LEAFLING: DrawLeafling(p,g->time); break;
             case RENDER_MOTE: DrawMote(p,g->time); break;
             case RENDER_BOSS:
-                DrawEllipse((int)p.x,(int)p.y+5,72,18,(Color){24,38,46,145});
-                DrawCircleLines((int)p.x,(int)p.y+3,61,Fade((Color){117,203,220,255},.42f));
-                DrawCircleLines((int)p.x,(int)p.y+3,48,Fade((Color){255,205,115,255},.28f));
                 DrawLighthouseGuardian(p,g->time,1.0f,false);
-                DrawRectangleRounded((Rectangle){p.x-52,p.y-154,104,22},.25f,5,(Color){8,24,38,230});
-                DrawRectangleRoundedLinesEx((Rectangle){p.x-52,p.y-154,104,22},.25f,5,1.5f,(Color){255,205,115,220});
-                DrawUIText("灯塔守卫",(int)p.x-28,(int)p.y-150,13,(Color){255,232,170,255});
+                DrawRectangleRounded((Rectangle){p.x-52,p.y-168,104,22},.25f,5,(Color){8,24,38,230});
+                DrawRectangleRoundedLinesEx((Rectangle){p.x-52,p.y-168,104,22},.25f,5,1.5f,(Color){255,205,115,220});
+                DrawUIText("灯塔守卫",(int)p.x-28,(int)p.y-164,13,(Color){255,232,170,255});
                 break;
             case RENDER_GATE: DrawGateMarker(g,it->index,it->grid); break;
             case RENDER_PLAYER: DrawPlayer(p,g->time,Vector2Length(g->player.vel)>.1f,g->player.facing); break;
@@ -1275,10 +1272,8 @@ static void RenderBattle(Game *g) {
     if(e->type==ENEMY_MOTE) {
         DrawMote((Vector2){880,385},g->time);
     } else if(e->type==ENEMY_BOSS) {
-        /* Boss arena uses the dedicated 48x64 pixel boss sheet, not the dialogue poster. */
+        /* Boss arena uses the dedicated 64x80 pixel boss sheet, not the dialogue poster. */
         DrawLighthouseGuardian((Vector2){880,454},g->time,1.5f,g->battleTurn!=0);
-        DrawCircleLines(880,395,126,Fade(C_GOLD,.35f));
-        DrawCircleLines(880,395,142,Fade(C_BLUE,.22f));
     } else {
         DrawCircleV((Vector2){880,380},62,Fade(C_LILAC,.18f));
         DrawEllipse(880,395,61,48,(Color){163,139,160,255});
@@ -1533,9 +1528,13 @@ void RenderInit(void) {
         TEX_GUARDIAN_APPROVED=LoadTexture(bossPixelPath);
         if(TEX_GUARDIAN_APPROVED.id) {
             SetTextureFilter(TEX_GUARDIAN_APPROVED,TEXTURE_FILTER_POINT);
-            if(TEX_GUARDIAN_APPROVED.width==192&&TEX_GUARDIAN_APPROVED.height==128)
-                TraceLog(LOG_INFO,"Mist Isle: dedicated 4x2 pixel Boss sheet loaded (192x128).");
-            else TraceLog(LOG_ERROR,"Mist Isle: Boss sheet dimensions are %dx%d; expected 192x128.",TEX_GUARDIAN_APPROVED.width,TEX_GUARDIAN_APPROVED.height);
+            if(TEX_GUARDIAN_APPROVED.width==256&&TEX_GUARDIAN_APPROVED.height==160) {
+                TraceLog(LOG_INFO,"Mist Isle: dedicated 4x2 pixel Boss sheet loaded (256x160; 64x80 cells).");
+            } else {
+                TraceLog(LOG_ERROR,"Mist Isle: Boss sheet dimensions are %dx%d; expected 256x160. Disabling invalid Boss texture.",TEX_GUARDIAN_APPROVED.width,TEX_GUARDIAN_APPROVED.height);
+                UnloadTexture(TEX_GUARDIAN_APPROVED);
+                TEX_GUARDIAN_APPROVED=(Texture2D){0};
+            }
         } else TraceLog(LOG_ERROR,"Mist Isle: Boss sheet exists but LoadTexture failed.");
     } else TraceLog(LOG_ERROR,"Mist Isle: Boss pixel sheet missing at %s.",bossPixelPath);
     TEX_GROUND_CACHE=LoadRenderTexture((int)WORLD_PIXEL_W,(int)WORLD_PIXEL_H);
