@@ -195,18 +195,14 @@ static void BuildAreaWorld(Game *g,Area area) {
     }
 }
 static void SwitchArea(Game *g,Area area) {
-    Area previousArea=g->area;
     BuildAreaWorld(g,area);
-    /* Firefly weather belongs exclusively to Glowglade Grove. */
-    if(area==AREA_GROVE) {
-        g->weather=2;
-        g->weatherClock=0.0f;
-        g->weatherFade=0.0f;
-    } else if(previousArea==AREA_GROVE) {
-        g->weather=0;
-        g->weatherClock=0.0f;
-        g->weatherFade=0.0f;
-    }
+    /* Each sub-area owns a signature climate; only the coastal hub rotates weather. */
+    if(area==AREA_GROVE) g->weather=2;
+    else if(area==AREA_RUINS) g->weather=1;
+    else if(area==AREA_LIGHTHOUSE) g->weather=4;
+    else g->weather=0;
+    g->weatherClock=0.0f;
+    g->weatherFade=0.0f;
     g->player.pos=(area==AREA_CAMP)?g->world.returnPoint:g->world.camp;
     for(int i=0;i<g->world.pickupCount && i<MAX_PICKUPS;i++)g->world.pickups[i].taken=g->areaPickupTaken[(int)area][i]!=0;
     g->enemyCount=0;
@@ -541,26 +537,31 @@ void GameUpdate(Game *g,float dt) {
     g->fireflyPhase+=dt;
     g->dayClock=fmodf(g->dayClock+dt/420.0f,1.0f);
     g->weatherFade=fminf(1.0f,g->weatherFade+dt*0.32f);
-    if(g->area==AREA_GROVE) {
-        /* The grove always carries its signature firefly ambience. */
-        if(g->weather!=2) {
-            g->weather=2;
+    if(g->area==AREA_GROVE || g->area==AREA_RUINS || g->area==AREA_LIGHTHOUSE) {
+        int areaWeather=g->area==AREA_GROVE?2:(g->area==AREA_RUINS?1:4);
+        if(g->weather!=areaWeather) {
+            g->weather=areaWeather;
             g->weatherClock=0.0f;
             g->weatherFade=0.0f;
         }
     } else {
+        /* The coastal hub never receives Grove fireflies or Lighthouse night fog. */
+        if(g->weather==2 || g->weather==4) {
+            g->weather=0;
+            g->weatherClock=0.0f;
+            g->weatherFade=0.0f;
+        }
         g->weatherClock+=dt;
-        if(g->weather==2)g->weather=0; /* Never leak grove-only fireflies into other maps. */
         if(g->weatherClock>38.0f) {
-            static const int roamingWeather[4]={0,1,3,4};
-            int pick=GetRandomValue(0,3);
+            static const int roamingWeather[3]={0,1,3};
+            int pick=GetRandomValue(0,2);
             int nextWeather=roamingWeather[pick];
-            if(nextWeather==g->weather)nextWeather=roamingWeather[(pick+1+GetRandomValue(0,2))%4];
+            if(nextWeather==g->weather)nextWeather=roamingWeather[(pick+1+GetRandomValue(0,1))%3];
             g->weather=nextWeather;
             g->weatherClock=0.0f;
             g->weatherFade=0.0f;
-            const char *weatherNotice[5]={"天气转晴，暖光穿过云层。","林间阵雨聚拢，风势渐强。","萤火微光在林间浮现。","云层压低，海风转冷。","夜雾漫过岛屿，灯火逐渐显现。"};
-            Toast(g,weatherNotice[g->weather]);
+            const char *weatherNotice[4]={"天气转晴，暖光穿过云层。","海风转急，阵雨即将落下。","天气：萤火","云层压低，海风转冷。"};
+            Toast(g,weatherNotice[g->weather==3?3:g->weather]);
         }
     }
     if(g->scene==SCENE_PLAY) {
@@ -574,18 +575,21 @@ void GameUpdate(Game *g,float dt) {
         }
         if(IsKeyPressed(KEY_F7)) {
             if(g->area==AREA_GROVE) {
-                g->weather=2;
-                Toast(g,"辉光林地：萤火微光在林间浮现。");
+                Toast(g,"辉光林地专属天气：萤火流光。");
+            } else if(g->area==AREA_RUINS) {
+                Toast(g,"潮汐遗迹专属天气：暴雨持续。");
+            } else if(g->area==AREA_LIGHTHOUSE) {
+                Toast(g,"灯塔庭院专属天气：夜雾封锁庭院。");
             } else {
-                static const int roamingWeather[4]={0,1,3,4};
-                int current=-1;
-                for(int i=0;i<4;i++)if(roamingWeather[i]==g->weather)current=i;
-                int next=roamingWeather[(current+1)%4];
+                static const int roamingWeather[3]={0,1,3};
+                int current=0;
+                for(int i=0;i<3;i++)if(roamingWeather[i]==g->weather)current=i;
+                int next=roamingWeather[(current+1)%3];
                 g->weather=next;
                 g->weatherClock=0.0f;
                 g->weatherFade=0.0f;
-                const char *weatherNotice[5]={"天气：晴朗","天气：阵雨","天气：萤火","天气：阴云","天气：夜雾"};
-                Toast(g,weatherNotice[g->weather]);
+                const char *weatherNotice[4]={"天气：晴朗","天气：阵雨","天气：萤火","天气：阴云"};
+                Toast(g,weatherNotice[g->weather==3?3:g->weather]);
             }
         }
     }
@@ -833,14 +837,14 @@ void GameUpdate(Game *g,float dt) {
             if(Dist(p->pos,g->world.groveGate)<1.4f){SwitchArea(g,AREA_GROVE);GameSave(g);Toast(g,"进入辉光林地 · 萤火微光浮现");return;}
             if(Dist(p->pos,g->world.ruinGate)<1.4f){
                 if(!(g->lumi.owned&&g->splash.owned)){Toast(g,"先让苔灯灵和沫尾兽加入队伍，便可进入遗迹寻找鸣晶蜥。");return;}
-                SwitchArea(g,AREA_RUINS);GameSave(g);Toast(g,"进入潮汐遗迹");return;
+                SwitchArea(g,AREA_RUINS);GameSave(g);Toast(g,"进入潮汐遗迹 · 暴雨骤然落下");return;
             }
             if(Dist(p->pos,g->world.shrine)<1.4f){
                 if(!g->shrineSolved){Toast(g,"灯塔庭院仍被古老封印阻挡。");return;}
-                SwitchArea(g,AREA_LIGHTHOUSE);GameSave(g);Toast(g,"进入灯塔庭院");return;
+                SwitchArea(g,AREA_LIGHTHOUSE);GameSave(g);Toast(g,"进入灯塔庭院 · 夜雾封锁前路");return;
             }
         } else if(Dist(p->pos,g->world.returnPoint)<1.6f) {
-            SwitchArea(g,AREA_CAMP);GameSave(g);Toast(g,"返回海岸营地");return;
+            SwitchArea(g,AREA_CAMP);GameSave(g);Toast(g,"返回海岸营地 · 天气转晴");return;
         }
     }
     if(IsKeyPressed(KEY_E)) {
