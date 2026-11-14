@@ -498,7 +498,7 @@ static void DrawPlayer(Vector2 p,float t,bool moving,int facing) {
         DrawTexturePro(TEX_HERO_PORTRAIT,src,dst,(Vector2){0,0},0,WHITE);
     }
 }
-static void DrawShrine(Vector2 p,float t,bool solved,bool finalCore) {
+static void DrawShrine(Vector2 p,float t,bool solved,bool finalCore,bool lighthouseCore) {
     Color c=solved?C_GOLD:(Color){158,185,166,255};
     if(finalCore) {
         // The Tidal Ruins keystone is the chapter's central mechanism, not another small shrine.
@@ -528,6 +528,39 @@ static void DrawShrine(Vector2 p,float t,bool solved,bool finalCore) {
                 float a=t*.7f+(float)i*PI2/6.0f;
                 DrawCircleV((Vector2){p.x+cosf(a)*88,p.y-40+sinf(a)*30},3.2f,Fade(C_GOLD,.85f));
             }
+        }
+        return;
+    }
+    if(lighthouseCore) {
+        /* The final beacon altar is a large ritual dais, not the small travel shrine. */
+        float pulse=.5f+.5f*sinf(t*2.1f);
+        DrawCircleLines((int)p.x,(int)p.y+10,126,Fade((Color){54,133,172,255},.34f));
+        DrawCircleLines((int)p.x,(int)p.y+10,108,Fade((Color){112,187,207,255},.58f));
+        DrawCircleLines((int)p.x,(int)p.y+10,86,Fade((Color){226,185,112,255},.72f));
+        DrawCircleLines((int)p.x,(int)p.y+10,64,Fade((Color){76,155,187,255},.48f));
+        DrawGeneratedMapAsset(666,p,.78f);
+        for(int i=0;i<8;i++) {
+            float a=(float)i*PI2/8.0f+t*.035f;
+            Vector2 q={p.x+cosf(a)*98.0f,p.y+10.0f+sinf(a)*36.0f};
+            DrawCircleV(q,5.0f,Fade((Color){77,190,222,255},.18f+.18f*pulse));
+            DrawCircleV(q,2.2f,Fade(solved?C_GOLD:(Color){140,224,240,255},.75f+.2f*pulse));
+            if(i%2==0)DrawLineEx((Vector2){p.x+cosf(a)*72.0f,p.y+10.0f+sinf(a)*27.0f},
+                                  (Vector2){p.x+cosf(a)*118.0f,p.y+10.0f+sinf(a)*43.0f},
+                                  2.0f,Fade((Color){105,194,215,255},.48f));
+        }
+        Vector2 core={p.x,p.y-112.0f-sinf(t*2.0f)*5.0f};
+        DrawCircleV(core,48.0f,Fade((Color){42,143,218,255},.10f+.10f*pulse));
+        DrawCircleV(core,29.0f,Fade((Color){76,189,239,255},.17f+.15f*pulse));
+        DrawCircleV(core,13.0f,Fade(solved?(Color){255,221,143,255}:(Color){142,226,255,255},.88f));
+        DrawCircleV(core,5.0f,Fade(WHITE,.98f));
+        for(int i=0;i<6;i++) {
+            float a=t*.55f+(float)i*PI2/6.0f;
+            Vector2 q={core.x+cosf(a)*47.0f,core.y+sinf(a)*20.0f};
+            DrawCircleV(q,3.0f,Fade(i%2?C_GOLD:(Color){139,225,255,255},.68f+.22f*pulse));
+        }
+        if(solved) {
+            DrawCircleV((Vector2){p.x,p.y-88.0f},92.0f,Fade(C_GOLD,.10f));
+            DrawCircleLines((int)p.x,(int)p.y+10,137,Fade(C_GOLD,.55f+.2f*pulse));
         }
         return;
     }
@@ -839,11 +872,11 @@ static void DrawCoastalCliffs(Game *g,int terrainKinds[MAPH][MAPW],int minX,int 
 #if defined(MISTISLE_PI_PROFILE)
 #define MISTISLE_RAIN_DROPS 64
 #define MISTISLE_RAIN_RIPPLES 8
-#define MISTISLE_FIREFLY_COUNT 30
+#define MISTISLE_FIREFLY_COUNT 56
 #else
 #define MISTISLE_RAIN_DROPS 230
 #define MISTISLE_RAIN_RIPPLES 28
-#define MISTISLE_FIREFLY_COUNT 58
+#define MISTISLE_FIREFLY_COUNT 120
 #endif
 static void BuildGroundCache(Game *g) {
     if(!TEX_GROUND_CACHE.id || CACHED_GROUND_AREA==(int)g->area)return;
@@ -1028,7 +1061,7 @@ static void RenderWorld(Game *g) {
                 break;
             case RENDER_FIRE: DrawCampfire(p,g->time); break;
             case RENDER_PICKUP: DrawPickup(&g->world.pickups[it->index]); break;
-            case RENDER_SHRINE: DrawShrine(p,g->time,g->shrineSolved,g->area==AREA_RUINS); break;
+            case RENDER_SHRINE: DrawShrine(p,g->time,g->shrineSolved,g->area==AREA_RUINS,g->area==AREA_LIGHTHOUSE); break;
             case RENDER_KEEPER: DrawKeeper(p,g->time,1.0f); break;
             case RENDER_LUMI: DrawLumi(p,g->time,g->lumi.bob); break;
             case RENDER_MOATAIL:
@@ -1122,14 +1155,18 @@ static void RenderWorld(Game *g) {
             float phase=WeatherNoise(i,41);
             float x=fmodf(phase*SW+sinf(g->time*.55f+i)*25.0f,SW);
             float y=fmodf(WeatherNoise(i,42)*SH-g->time*(9.0f+WeatherNoise(i,43)*18.0f),SH);
-            float pulse=.30f+.70f*(.5f+.5f*sinf(g->time*2.4f+i*1.7f));
+            float pulse=.24f+.76f*(.5f+.5f*sinf(g->time*2.2f+i*1.37f));
+            bool nearLayer=(i%5)==0;
             Vector2 mote={x,y};
-            DrawCircleV(mote,9.0f+3.0f*pulse,Fade((Color){255,195,91,255},pulse*.16f*weatherAlpha));
-            DrawCircleV(mote,3.0f+1.4f*pulse,Fade((Color){255,220,132,255},pulse*.62f*weatherAlpha));
-            DrawCircleV(mote,1.35f,Fade((Color){255,249,208,255},.92f*weatherAlpha));
-            if(i%4==0) {
-                DrawLineEx((Vector2){x-4.5f,y},(Vector2){x+4.5f,y},1.0f,Fade((Color){255,229,163,255},pulse*.42f*weatherAlpha));
-                DrawLineEx((Vector2){x,y-4.5f},(Vector2){x,y+4.5f},1.0f,Fade((Color){255,229,163,255},pulse*.42f*weatherAlpha));
+            float halo=nearLayer?15.0f:8.0f;
+            float core=nearLayer?4.4f:2.8f;
+            DrawCircleV(mote,halo+4.0f*pulse,Fade((Color){255,184,76,255},pulse*(nearLayer?.22f:.15f)*weatherAlpha));
+            DrawCircleV(mote,core+1.6f*pulse,Fade((Color){255,218,126,255},pulse*(nearLayer?.78f:.64f)*weatherAlpha));
+            DrawCircleV(mote,nearLayer?2.0f:1.35f,Fade((Color){255,250,215,255},.96f*weatherAlpha));
+            if(nearLayer) {
+                float drift=3.0f+sinf(g->time*1.8f+i)*2.0f;
+                DrawLineEx((Vector2){x-drift,y+drift*.35f},(Vector2){x+drift,y-drift*.35f},1.25f,Fade((Color){255,233,170,255},pulse*.58f*weatherAlpha));
+                DrawLineEx((Vector2){x,y-drift},(Vector2){x,y+drift},1.1f,Fade((Color){255,233,170,255},pulse*.48f*weatherAlpha));
             }
         }
     } else if(g->weather==3) {
