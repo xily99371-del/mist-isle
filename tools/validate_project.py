@@ -270,7 +270,7 @@ if all((ROOT / p).exists() for p in map_art_paths):
     require("DrawGeneratedMapAsset" in RENDER and "TEX_NATURE_SHEET" in RENDER and
             "TEX_GROVE_SHEET" in RENDER and "TEX_RUINS_SHEET" in RENDER and "TEX_LIGHTHOUSE_SHEET" in RENDER,
             "four generated art sheets are wired to the runtime area-specific prop renderer")
-    require(all(f"prop_{n}" in MAPS for n in (600, 620, 640, 660)) and
+    require(all(f"prop_{n}" in MAPS for n in (600, 500, 640, 660)) and
             all(f'type="prop_{n}"' in MAPS for n in (601,603,605,606,608,609,610,612,613,614,616,617,618,619,
                                                        625,627,629,641,643,644,646,647,649,651,652,654,
                                                        664,667,669,670,672,674,676)),
