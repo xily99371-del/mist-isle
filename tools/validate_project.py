@@ -348,7 +348,7 @@ require(GAME.find("if(g->scene==SCENE_END)") < GAME.find("if(g->journalOpen || g
 require("fetch_portrait_assets.ps1" not in (ROOT / "RUN_WINDOWS.bat").read_text(encoding="utf-8") and "TEX_KEEPER.id" in RENDER,
         "Windows source build no longer downloads GitHub Actions artifacts and has local portrait fallbacks")
 
-require('strcmp(speaker,"沫尾兽")==0)return 4' in GAME and 'strcmp(speaker,"鸣晶蜥")==0)return 5' in GAME,
+require('strcmp(speaker,"沫尾兽")==0' in GAME and 'strcmp(speaker,"沫尾")==0' in GAME and 'strcmp(speaker,"鸣晶蜥")==0)return 5' in GAME,
         "each recruited companion resolves to its own portrait ID")
 require("TEX_CHARACTER_PORTRAITS" in RENDER and "portrait>=0&&portrait<=2" in RENDER and "TEX_MOATAIL_ILLUSTRATION" in RENDER,
         "high-resolution character portrait atlas is used for dialogue and the boss battle")
