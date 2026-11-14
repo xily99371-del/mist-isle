@@ -6,7 +6,7 @@ A cute anime-inspired 2.5D companion adventure built in C with raylib. Windows-f
 Explore a small island, befriend three companions, solve an elemental ruin puzzle, and restore the lighthouse.
 
 ## Current status
-The repository contains the first chapter gameplay prototype, original pixel-art character sheets, an isometric ground atlas, and a Windows-first CMake build. The current milestone is focused on making the coastal camp and first companion sequence feel like a cohesive pixel-art adventure.
+The repository contains a playable first chapter, original pixel-art character and companion sheets, four authored Tiled regions, a lighthouse guardian boss encounter, and Windows / Raspberry Pi 5 CMake builds.
 
 ## Data-driven maps and Raspberry Pi 5
 
@@ -26,6 +26,14 @@ chmod +x scripts/build_raspberry_pi.sh
 ```
 
 The Pi profile uses raylib 5.5 desktop OpenGL 2.1, disables MSAA, keeps the 1280x720 logical canvas and reduces weather draw calls. Press F3 to display FPS and frame time. See docs/RASPBERRY_PI5.md for dependencies and limitations.
+
+## Approved character sprite sheets
+
+The approved heroine and lighthouse guardian sheets are included in the repository and packaged builds:
+- `assets/characters/hero/heroine_approved_8x4.png` — 8 frames × 4 directions, 24×32 source cells.
+- `assets/characters/boss/lighthouse_guardian_4x2.png` — 4 frames × 2 animation rows, 48×64 source cells.
+
+For an older local checkout that does not yet contain these files, extract the `MistIsle_ApprovedArt` folder from the companion import ZIP into the repository root and run `IMPORT_APPROVED_ART.bat`. New checkouts do not need a separate import.
 
 ## Build
 Requires CMake, Git, and a C compiler. CMake fetches raylib 5.5.

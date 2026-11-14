@@ -41,4 +41,4 @@ The approved heroine has brown hair, a blue ribbon, teal scarf, cream adventurer
 
 ## Boss encounter presentation
 
-The lighthouse guardian's idle view is kept front-facing in exploration. Its second sprite-sheet row is reserved for the four-frame attack sequence and is played only during the enemy turn. The battle scene switches to a darker slate-and-ember palette, uses a dedicated `首领战` heading and displays the guardian's lantern core as its health bar. This keeps the guardian visually and mechanically distinct from the ordinary ruin sentry and from the camp watcher.
+The lighthouse guardian's idle view is kept front-facing in exploration. Its second sprite-sheet row is reserved for the four-frame attack sequence and is played only during the enemy turn. The battle scene switches to a darker slate-and-ember palette, uses a dedicated `BOSS` heading and displays the guardian's lantern core as its health bar. This keeps the guardian visually and mechanically distinct from the ordinary ruin sentry and from the camp watcher.

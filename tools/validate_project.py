@@ -34,6 +34,8 @@ def require(condition, message):
 # The imported approved art is optional in CI, but if present its real frame geometry is enforced.
 assets = {
     "assets/characters/hero/hero_walk_4dir_64.png": (128, 128),
+    "assets/characters/hero/heroine_approved_8x4.png": (192, 128),
+    "assets/characters/boss/lighthouse_guardian_4x2.png": (192, 128),
     "assets/characters/png/heroine_portrait.png": (512, 640),
     "assets/characters/png/watcher_portrait.png": (512, 640),
     "assets/characters/png/lighthouse_guardian_portrait.png": (512, 640),
