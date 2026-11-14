@@ -225,9 +225,14 @@ if all((ROOT / p).exists() for p in approved_assets):
             "water and crystal companion recruitment bind their own names and portrait IDs")
     require("if(distance>6.0f&&foundTarget&&!Solid(g,target))" in GAME,
             "companions teleport back to a safe formation slot after exceeding the hard leash distance")
-    require("DrawEllipse((int)p.x,(int)footY+3" not in RENDER and
-            "DrawEllipse((int)p.x,(int)p.y+4" not in RENDER,
-            "large buildings do not render detached oval ground shadows")
+    require("case RENDER_TREE: p.y+=8.0f; DrawFloraProp" in RENDER and
+            "DrawEllipse((int)p.x,(int)p.y+5,15*s" not in RENDER and
+            "DrawEllipse((int)p.x,(int)p.y+8,34,10" not in RENDER,
+            "trees and shrine decorations do not render detached circular ground shadows")
+require("type_id in (29,31,33)" in MAP_BUILD and "210-213 small stones" in MAP_BUILD and "type_id==229" not in MAP_BUILD,
+            "small stones, low shrubs and flowering props are non-blocking while structural bases remain solid")
+require("block_rect(cx-1,cy-1,cx+1,cy-1)" in MAP_BUILD and "compact one-row tent base" in MAP_BUILD,
+            "house and tent collision footprints are reduced to compact rear/base rows")
 else:
     print("INFO: MistIsle_ApprovedArt_v3.zip is not installed; user-approved runtime artwork is not yet available.")
 
@@ -249,6 +254,23 @@ require("MISTISLE_PI_PROFILE" in CMAKE and 'set(OPENGL_VERSION "2.1"' in CMAKE a
 require("find_package(Python3 REQUIRED COMPONENTS Interpreter)" in CMAKE and "tools/build_maps.py" in CMAKE,
         "Python is required only at build time to compile Tiled maps")
 require(all(path.exists() for path in MAP_FILES), "all four Tiled maps and the terrain tileset are present")
+map_art_paths = [
+    "assets/environment/generated/nature_props_sheet.png",
+    "assets/environment/generated/glowglade_props_sheet.png",
+    "assets/environment/generated/tidal_ruins_props_sheet.png",
+    "assets/environment/generated/lighthouse_ruins_props_sheet.png",
+]
+if all((ROOT / p).exists() for p in map_art_paths):
+    for rel in map_art_paths:
+        with Image.open(ROOT / rel) as im:
+            require(im.mode == "RGBA" and im.width >= 1200 and im.height >= 1200,
+                    f"generated area art {rel} is a full-resolution transparent sheet")
+    require("DrawGeneratedMapAsset" in RENDER and "TEX_NATURE_SHEET" in RENDER and
+            "TEX_GROVE_SHEET" in RENDER and "TEX_RUINS_SHEET" in RENDER and "TEX_LIGHTHOUSE_SHEET" in RENDER,
+            "four generated art sheets are wired to the runtime area-specific prop renderer")
+    require(all(f"prop_{n}" in MAPS for n in (600, 620, 640, 660)),
+            "all four Tiled maps contain their new generated area-specific props")
+
 require("#define MAPW 18" in HEADER and "#define MAPH 12" in HEADER and "W,H,T,MAX_OBJECTS=18,12,56,64" in MAP_BUILD and "WIDTH, HEIGHT = 18, 12" in MAP_AUTOTILE and "W,H,T=18,12,56" in MAP_PREVIEW,
         "all four maps, runtime arrays, autotile masks and Tiled previews use compact 18×12 one-screen dimensions")
 require(all(f'width="18" height="12"' in path.read_text(encoding="utf-8") for path in MAP_FILES if path.suffix==".tmx"),
@@ -361,10 +383,12 @@ require("IsKeyPressed(KEY_O)" in GAME and "objectiveToggle" in GAME,
         "objective tracker supports keyboard and mouse toggles")
 require("Rectangle panel={SW-350.0f,18.0f,330.0f,116.0f}" in RENDER,
         "expanded objective tracker is narrower and shorter than the previous HUD panel")
-require("MISTISLE_RAIN_DROPS 56" in RENDER and "MISTISLE_RAIN_DROPS 190" in RENDER and "g->weather==1" in RENDER,
-        "rain has multiple visible streak depths, surface impacts and water ripples")
-require("IsKeyPressed(KEY_F7)" in GAME and "weather=(g->weather+1)%4" in GAME,
-        "weather can be cycled on demand for reliable demonstration")
+require("MISTISLE_RAIN_DROPS 56" in RENDER and "MISTISLE_RAIN_DROPS 190" in RENDER and "WeatherNoise" in RENDER and "float gust=" in RENDER,
+        "rain uses staggered randomized drops, gust-driven density and irregular water impacts")
+require("weather=(g->weather+1)%5" in GAME and "g->weather=4" in GAME and "g->weatherClock>38.0f" in GAME,
+        "five-state weather cycles faster and begins in night fog")
+require("g->weather==3" in RENDER and "g->weather==4" in RENDER and "DrawCloudPuff" in RENDER,
+        "overcast and night fog have distinct moving cloud and fog visuals")
 require("DrawCoastalCliffs(g,terrainKinds,minX,minY,maxX,maxY)" in RENDER and "AREA_GROUND" in GAME,
         "shoreline and all four ground layouts are sourced from Tiled maps")
 require("GetVisibleTileBounds" in RENDER and "screen.x<-180.0f" in RENDER,
