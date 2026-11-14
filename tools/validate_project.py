@@ -237,7 +237,7 @@ require("nearest free, reachable tile" in GAME and "visual footprint of tall str
         "collectibles avoid both collision footprints and visually occluding large props")
 require("196*it->scale,156*it->scale" in RENDER and "302:(196,156)" in MAP_PREVIEW,
         "the coastal and forest cottages are enlarged consistently in runtime and map previews")
-require("DrawGroveCottage" in RENDER and "rear wall of the enlarged house" in MAP_BUILD,
+require("DrawGroveCottage" in RENDER and "compact rear wall of the cottage" in MAP_BUILD,
         "large cottage structures use the structure atlas with matching collision foundations")
 require('#include "area_maps.h"' in RENDER and "AREA_OVERLAY[(int)g->area][direction][y][x]" in RENDER and "direction*90" in RENDER,
         "renderer draws every directional shoreline mask from the generated Tiled map header")
