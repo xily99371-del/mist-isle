@@ -91,7 +91,7 @@ require(forest_start>=0 and forest_end>forest_start and "DrawCircle" not in REND
 
 require("flora_props_atlas_128.png" in RENDER and "cliffs_fences_atlas_128.png" in RENDER and "structures_atlas_128.png" in RENDER, "refined flora, cliff and structure sprite atlases are integrated")
 require("original_props_16_v1.png" in RENDER and "DrawOriginalProp" in RENDER, "curated original 16-prop atlas is integrated")
-require("TEX_ORIGINAL_PROPS" in RENDER and "for(int i=0;i<23;i++)" in RENDER, "original prop atlas texture lifecycle is complete")
+require("TEX_ORIGINAL_PROPS" in RENDER and "for(int i=0;i<25;i++)" in RENDER, "original prop atlas texture lifecycle is complete")
 require("kenney_buildings_atlas.png" in RENDER and "DrawKenneyBuilding" in RENDER, "Kenney Tiny Town building atlas is integrated")
 rpg_pack = ROOT / "third_party/kenney/rpg-base/KenneyRPGpack.zip"
 ui_pack = ROOT / "third_party/kenney/pixel-ui/PixelUIpack.zip"
@@ -380,7 +380,7 @@ for signature, forbidden, label in [
 require('"assets/characters/png/moss_lumi.png"' in RENDER and
         '"assets/characters/png/moatail.png"' in RENDER and
         '"assets/characters/png/crystal_gecko.png"' in RENDER and
-        "for(int i=0;i<23;i++)" in RENDER,
+        "for(int i=0;i<25;i++)" in RENDER,
         "illustration texture load/unload lifecycle is complete")
 
 print(f"Validation complete. Imported art sheets checked: {present}/{len(assets)}.")
