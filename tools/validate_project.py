@@ -400,8 +400,10 @@ require("fetch_portrait_assets.ps1" not in (ROOT / "RUN_WINDOWS.bat").read_text(
 
 require('strcmp(speaker,"沫尾兽")==0' in GAME and 'strcmp(speaker,"沫尾")==0' in GAME and 'strcmp(speaker,"鸣晶蜥")==0)return 5' in GAME,
         "each recruited companion resolves to its own portrait ID")
-require("TEX_CHARACTER_PORTRAITS" in RENDER and "portrait>=0&&portrait<=2" in RENDER and "TEX_MOATAIL_ILLUSTRATION" in RENDER,
-        "high-resolution character portrait atlas is used for dialogue and the boss battle")
+require("TEX_CHARACTER_PORTRAITS" in RENDER and "portrait>=0&&portrait<=2" in RENDER and
+        "TEX_MOATAIL_ILLUSTRATION" in RENDER and "TEX_GUARDIAN_APPROVED" in RENDER and
+        "DrawLighthouseGuardian((Vector2){880,454},g->time,1.5f,g->battleTurn!=0)" in RENDER,
+        "high-resolution character portraits are dialogue-only while the boss battle uses its pixel sprite sheet")
 require("核心耐久" in RENDER and "阶段三" in RENDER and "核心蓄能" in RENDER and "PHASE III" not in RENDER,
         "boss phase and core status are displayed in Chinese in a non-overlapping panel")
 require("TEX_HEROINE_PIXEL" in RENDER and "frame*64" in RENDER and "facing*80" in RENDER and "48.0f,76.0f" in RENDER,
