@@ -1,210 +1,195 @@
-# Mist Isle — 雾屿回响
+# 雾屿回响 · Mist Isle
+
+<p align="center">
+  <strong>一段关于海岛、伙伴与失落灯塔的像素冒险。</strong><br/>
+  <em>A handcrafted pixel-art adventure about an island, companions, and a lost lighthouse.</em>
+</p>
+
+<p align="center">
+  <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-7c9a83"/>
+  <img alt="Language" src="https://img.shields.io/badge/language-C-596b8a"/>
+  <img alt="Graphics" src="https://img.shields.io/badge/graphics-raylib-6f8f72"/>
+  <img alt="Platforms" src="https://img.shields.io/badge/platform-Windows%20%7C%20Raspberry%20Pi%205-8b789d"/>
+</p>
 
-A cute anime-inspired 2.5D companion adventure built in C with raylib. Windows-first development, Raspberry Pi 5 deployment target.
+---
 
-## Chapter 1: The Lost Lighthouse
-Explore a small island, befriend three companions, solve an elemental ruin puzzle, and restore the lighthouse.
+## 游戏画面 / Art Gallery
 
-## Current status
-The repository contains the first chapter gameplay prototype, original pixel-art character sheets, an isometric ground atlas, and a Windows-first CMake build. The current milestone is focused on making the coastal camp and first companion sequence feel like a cohesive pixel-art adventure.
+<p align="center">
+  <img src="assets/environment/topdown_terrain_atlas_v1.png" alt="Top-down terrain atlas" width="48%"/>
+  <img src="assets/environment/area_props_96.png" alt="Original area props atlas" width="48%"/>
+</p>
+<p align="center">
+  <img src="assets/environment/flora_props_atlas_128.png" alt="Flora and vegetation atlas" width="48%"/>
+  <img src="assets/environment/cliffs_fences_atlas_128.png" alt="Cliffs, bridges and fences atlas" width="48%"/>
+</p>
+<p align="center"><sub>游戏使用的地形、植被、区域道具与环境素材图集 / Terrain, flora, area props and environment atlases used in-game.</sub></p>
 
-## Data-driven maps and Raspberry Pi 5
+## 中文
 
-The four Chapter 1 regions are now authored in Tiled:
-- Coastal Camp
-- Glowglade Grove
-- Tidal Ruins
-- Lighthouse Courtyard
+### 关于游戏
 
-Ground tiles, collision rectangles, scene-object placements and story markers are compiled into a lightweight C header during the CMake build. The executable does not parse TMX files and does not need Python or Tiled at runtime. See docs/MAP_AUTHORING.md.
+《雾屿回响》是一款以探索和伙伴收集为核心的俯视角像素 RPG。玩家从海岸营地启程，穿过林地与潮汐遗迹，逐步揭开失落灯塔背后的故事。
 
-Windows remains the main development target. For native Raspberry Pi 5 ARM64 builds, use the dedicated low-cost profile:
+### 第一章：海岛旅程
 
-```bash
-chmod +x scripts/build_raspberry_pi.sh
-./scripts/build_raspberry_pi.sh
-```
+- **海岸营地**：旅程起点，与守望者相遇，在营火旁整备。
+- **辉光林地**：探索发光植被与林间遗迹，感受专属萤火氛围。
+- **潮汐遗迹**：在雨幕与古代机关之间寻找线索。
+- **灯塔庭院**：穿过幽蓝火光与夜雾，迎战灯塔守卫，点亮最终祭坛。
 
-The Pi profile uses raylib 5.5 desktop OpenGL 2.1, disables MSAA, keeps the 1280x720 logical canvas and reduces weather draw calls. Press F3 to display FPS and frame time. See docs/RASPBERRY_PI5.md for dependencies and limitations.
+### 玩法特色
 
-## Build
-Requires CMake, Git, and a C compiler. CMake fetches raylib 5.5.
+- 探索式地图与逐步解锁的区域路线。
+- 三位可加入队伍的伙伴，各自拥有独立形象与互动。
+- 战斗、收集、对话、存档与章节结局。
+- 按区域设计的天气：林地萤火、遗迹降雨、灯塔夜雾。
+- 手工绘制与整理的像素角色、地形和环境素材。
+- Windows 桌面版与 Raspberry Pi 5 ARM64 构建配置。
 
-```powershell
-cmake -S . -B build
-cmake --build build --config Release
-.\build\Release\mist_isle.exe
-```
+### 操作
 
-Controls: WASD move, Shift dash, E interact, Tab switch companion, 1/2/3 select battle skill, Enter confirm.
+| 按键 | 功能 |
+|---|---|
+| WASD / 方向键 | 移动 |
+| E | 互动、对话、确认 |
+| Shift | 冲刺 |
+| Tab | 切换伙伴 |
+| J | 旅程手记 |
+| I | 背包 |
+| M | 地图 |
+| F5 / F9 | 保存 / 读取 |
+| F7 | 天气调试切换 |
+| O | 收起 / 展开目标栏 |
+| Esc | 返回 / 关闭界面 |
 
-## Art direction
-Cozy top-down pixel-RPG exploration inspired by classic farming/adventure games, with anime-style character concepts, rounded silhouettes, expressive companions, warm island palette, and soft magical lighting. The in-game explorer uses a 4-direction 4-frame 32×32 walking sheet; companions have 2-frame idle sheets; isometric ground uses a crisp 64×32 diamond tile atlas. See `docs/ART_DIRECTION.md`.
+### Windows 运行
 
+推荐使用 Windows 10/11、CMake、Visual Studio C++ Build Tools 和 Python 3。
 
-## Art assets
-Original vector character portraits are included under `assets/characters/svg/`:
-- `hero_explorer.svg`
-- `moss_lumi.svg`
-- `moatail.svg`
-- `crystal_gecko.svg`
+1. 克隆仓库：
+       git clone https://github.com/xily99371-del/mist-isle.git
+       cd mist-isle
+2. 运行启动脚本：
+       .\RUN_WINDOWS.bat
 
-Original pixel sprites and environment props are generated from a portable Pillow script. Install Pillow and run `python tools/generate_pixel_assets.py` before launching. Editable SVG concept sheets are also retained in the repository:
+脚本会生成所需像素素材、配置 raylib 并编译游戏。也可以从 GitHub Actions 下载已打包的 Windows 版本。
 
-See `docs/ART_DIRECTION.md` and `docs/ASSET_MANIFEST.md` for the visual style and asset/license record.
+### Raspberry Pi 5
 
+项目提供 Raspberry Pi 5 ARM64 构建配置，采用更保守的 OpenGL 2.1 路径，并针对天气粒子与场景绘制做了性能预算。
 
-## Pixel-art assets
-The generated game assets include:
-- `assets/characters/png/hero_walk_4dir.png`
-- `assets/characters/png/lumi_idle_pixel.png`
-- `assets/characters/png/moatail_idle_pixel.png`
-- `assets/characters/png/gecko_idle_pixel.png`
-- `assets/tiles/png/island_iso_tiles.png`
+详细说明见 [docs/RASPBERRY_PI5.md](docs/RASPBERRY_PI5.md)。
 
-Sprite textures use nearest-neighbor filtering to preserve pixel edges. Missing PNGs fall back to primitive placeholder rendering.
+### 技术栈
 
+- C11
+- [raylib 5.5](https://www.raylib.com/)
+- CMake
+- Python + Pillow（开发期素材生成与地图校验）
+- Tiled TMX/TSX（地图编辑与构建）
+- GitHub Actions（Windows / Raspberry Pi 5 构建）
 
-## CI build artifact
-Every successful push to `main` builds the Windows executable and publishes a GitHub Actions artifact named `MistIsle-Windows-Prototype`, including the generated PNG assets. Download it from the repository's Actions run page.
+### 项目结构
 
+    mist-isle/
+    ├── assets/          # 角色、地形、环境与过场素材
+    ├── docs/            # 设计与平台文档
+    ├── maps/            # Tiled 地图与 tileset
+    ├── src/              # C 游戏逻辑与渲染
+    ├── tools/            # 素材生成、地图构建与校验
+    ├── third_party/      # 第三方素材与许可证
+    ├── CMakeLists.txt
+    └── RUN_WINDOWS.bat
 
-## Coastal camp milestone
-The current coastal-camp scene includes a generated pixel-art campsite prop atlas and a friendly keeper sprite:
-- Tent, supply crate, signpost, lighthouse, campfire, mailbox, flower patch and shore rock.
-- The keeper NPC is visible at the camp and can be spoken to with **E**.
-- Campfire flicker and glow are animated in the renderer.
-- All pixel textures use nearest-neighbor filtering.
+### 致谢与素材许可
 
-Run `RUN_WINDOWS.bat` to regenerate all PNG assets before building. The GitHub Actions workflow packages the executable together with its runtime asset folders.
+项目原创角色与环境素材归项目所有。第三方素材仅按其原始许可使用；相关来源与许可证记录见 [ASSET_SOURCES_AND_LICENSES.md](ASSET_SOURCES_AND_LICENSES.md) 及 third_party 目录。
 
+---
 
-## New in the grove milestone
-- A field journal (`J`) tracks wildlife discoveries, companion collection and chapter objectives.
-- A drifting firefly can be discovered and registered.
-- Feed the hungry Leafling one island fruit to reveal a hidden star crystal.
-- Grove environment now includes mushroom clusters, a fallen log, rune stone and flower patch.
-- Save manually with `F5`; load with `F9`. The game also autosaves after key progression events.
-- The save file is `mist_isle_save.dat` in the game working directory.
+## English
 
-See `docs/GROVE_EXPLORATION.md` for the milestone details.
+### About
 
+**Mist Isle** is a top-down pixel-art RPG focused on exploration and companion collection. Begin at a quiet coastal camp, travel through a luminous grove and tide-worn ruins, and uncover the story behind the island's lost lighthouse.
 
-## Expanded RPG systems
-- `J`: field journal, wildlife discoveries and chapter objectives.
-- `I`: inventory, resources, health and companion levels.
-- `M`: island route map and progression unlocks.
-- `F5`: save; `F9`: load. Key progression events autosave.
-- Combat skill synergy: Moatail applies Soaked, then Crystal Gecko deals bonus electric damage.
-- Companion XP: active companion gains XP after victory and levels up at 50 XP.
+### Chapter One: An Island Journey
 
-See `docs/CHAPTER1_RPG_MILESTONE.md`.
+- **Coastal Camp** — The starting hub. Meet the Watcher and prepare beside the campfire.
+- **Glowglade Grove** — Explore luminous plants and forgotten woodland paths under its signature firefly ambience.
+- **Tidal Ruins** — Search ancient mechanisms through rain and weathered stone.
+- **Lighthouse Courtyard** — Follow the blue flames through the night fog, face the Lighthouse Guardian, and awaken the final altar.
 
+### Features
 
-## Chapter content expansion
-The grove now contains a discoverable firefly, a fruit-loving Leafling that reveals a hidden crystal, and a one-time wild mote battle with a fruit reward. The field journal tracks these encounters. The inventory and route map are available with I and M. Companion combat now has healing, Soaked status, electric bonus damage and XP-based levels.
+- Exploration-led hub-and-submap progression.
+- Three recruitable companions with distinct identities and interactions.
+- Combat, collectibles, dialogue, save/load, and a chapter finale.
+- Region-specific weather: fireflies in the grove, rain in the ruins, and night fog at the lighthouse.
+- Handcrafted pixel characters, terrain, and environment art.
+- Windows desktop and Raspberry Pi 5 ARM64 build profiles.
 
-See `docs/CHAPTER1_CONTENT_EXPANSION.md` for the current milestone and remaining work.
+### Controls
 
+| Key | Action |
+|---|---|
+| WASD / Arrow keys | Move |
+| E | Interact, talk, confirm |
+| Shift | Dash |
+| Tab | Switch companion |
+| J | Journal |
+| I | Inventory |
+| M | Map |
+| F5 / F9 | Save / Load |
+| F7 | Weather debug cycle |
+| O | Collapse / expand objectives |
+| Esc | Back / close |
 
-## Chapter 1 polish
-- Player four-direction walk animation and animated companion idle sprites.
-- Isometric depth sorting for characters and environmental props.
-- Dynamic day/night tint and weather ambience (rain and firefly nights).
-- Companion levels scale healing and elemental skill damage.
-- Combat synergy: Soaked from Moatail increases Crystal Gecko electric damage.
-- Active companion level/XP shown in the HUD.
-- Restored lighthouse finale includes companion dialogue and animated light motes.
+### Build on Windows
 
-See `docs/CHAPTER1_POLISH_MILESTONE.md` for the implementation boundary and remaining polish.
+Recommended: Windows 10/11, CMake, Visual Studio C++ Build Tools, and Python 3.
 
+1. Clone the repository:
+       git clone https://github.com/xily99371-del/mist-isle.git
+       cd mist-isle
+2. Run:
+       .\RUN_WINDOWS.bat
 
-## Windows playtest candidate
-The current milestone is feature-frozen for the first full Windows playthrough. Please use the packaged Windows artifact from GitHub Actions once the latest build succeeds. The playtest checklist is in `docs/WINDOWS_PLAYTEST_CANDIDATE.md`.
+The script generates required pixel assets, configures raylib, and builds the game. A packaged Windows build is also produced by GitHub Actions.
 
-After this package is delivered, feature work pauses. The next development cycle should focus on defects and usability issues discovered in the Windows playthrough, not another round of speculative features.
+### Raspberry Pi 5
 
+An ARM64 build profile is provided for Raspberry Pi 5. It uses a conservative OpenGL 2.1 path and a reduced rendering budget for weather particles and scene effects.
 
-## Approved art direction and runtime sprites
-The approved art direction combines cute, expressive monster-companion characters with a warm, cozy pixel-RPG environment mood. These are original generated project assets, not extracted Pokémon or Stardew Valley sprites.
+See [docs/RASPBERRY_PI5.md](docs/RASPBERRY_PI5.md) for details.
 
-The runtime sprite archive is stored at `assets/approved_art/MistIsle_RuntimeSprites_v1.zip`. `RUN_WINDOWS.bat` and Windows CI extract it before building. The renderer loads the new hero four-direction walk sheet and the Moss Lumi, Moatail and Crystal Gecko idle strips.
+### Technology
 
-See `docs/APPROVED_ART_ASSETS.md` for sheet layouts, source archive details and remaining environment integration work.
+- C11
+- [raylib 5.5](https://www.raylib.com/)
+- CMake
+- Python + Pillow for development-time asset generation and map validation
+- Tiled TMX/TSX maps
+- GitHub Actions for Windows and Raspberry Pi 5 builds
 
+### Repository Layout
 
-## Approved art integration v2
-Extract `MistIsle_ArtIntegration_v2.zip` into the repository root (merge the `assets/` directory). The renderer uses 32x32 source cells for the approved player/companion sheets, 96x96 cells for the environment prop atlas, and a six-variant 64x32 isometric ground atlas. Environment source bands are retained for future tile/prop selection.
+    mist-isle/
+    ├── assets/          # Characters, terrain, environment and cinematic art
+    ├── docs/            # Design and platform documentation
+    ├── maps/            # Tiled maps and tilesets
+    ├── src/              # C gameplay and rendering
+    ├── tools/            # Asset generation, map building and validation
+    ├── third_party/      # Third-party assets and licenses
+    ├── CMakeLists.txt
+    └── RUN_WINDOWS.bat
 
+### Credits and Asset Licenses
 
-## Art integration v2.1 — Windows playtest preparation
-The updated art archive is available in ChatGPT Library as `MistIsle_ArtIntegration_v2_1.zip`. Extract it into the repository root and merge `assets/`. This release includes the hand-projected grass, flower-grass, sand, stone and water isometric tiles. The asset generator now preserves an imported ground atlas instead of overwriting it with procedural placeholders.
+Original project characters and environment art belong to the project. Third-party assets are used under their respective licenses. See [ASSET_SOURCES_AND_LICENSES.md](ASSET_SOURCES_AND_LICENSES.md) and the third_party directory.
 
-The renderer source frame size is 32x32 (the `_64` filename refers to the intended display scale, not the source-cell dimensions). The environment prop atlas uses 96x96 cells.
+---
 
-
-## Hub + sub-map world
-The chapter now uses a hub-and-three-sub-map structure: Coastal Camp, Glowglade Forest, Tidal Ruins and Lighthouse Courtyard. Enter each region from the hub gates with E; use the marked west exit in a sub-map to return. The Tidal Ruins gate unlocks after recruiting Moss Lumi and Moatail; the Lighthouse Courtyard opens after solving the shrine.
-
-Save format v4 stores the active region and resource pickups separately for all four maps. See `docs/HUB_SUBMAPS.md` for the map flow, progression and remaining art gaps.
-
-
-## Supplemental area art
-A new 16-prop original generated atlas is available in ChatGPT Library as `MistIsle_AreaProps_v1.zip`. Extract it into the repository root and merge `assets/`. It supplies area-specific coastal props (dock, boat, tent, buoy), grove props (flowering tree, glow mushrooms, mossy log, luminous flowers), ruin props (arch, pillar, broken wall, rune fountain), and lighthouse props (stairs, lighthouse tower, gate, garden fountain). The renderer loads the optional atlas from `assets/environment/area_props_96.png`.
-
-
-## One-time art import into GitHub
-The v3 art pack is intended to be committed into the repository once, so future clones and ZIP downloads contain all runtime assets. For an existing local copy, use a real Git clone (a downloaded GitHub ZIP has no `.git` metadata):
-
-```powershell
-git clone https://github.com/xily99371-del/mist-isle.git
-cd mist-isle
-```
-
-Extract `MistIsle_ArtPack_v3_HubSubmaps.zip` into the cloned repository root, merge `assets/`, then run `UPLOAD_ART_TO_GITHUB.bat`. It stages only `assets/`, commits them, and pushes to the configured `origin`. After that one-time push, future source downloads will include the art pack and no separate art ZIP is needed.
-
-
-## One-time v3 art import and full Windows playtest build
-
-The complete generated art pack is maintained as a local ZIP in ChatGPT Library. To commit the binary PNG files into this repository once:
-
-1. Clone the repository (do not use the GitHub Download ZIP, which has no `.git` folder):
-   ```powershell
-   cd D:\Games
-   git clone https://github.com/xily99371-del/mist-isle.git
-   cd mist-isle
-   ```
-2. Place `MistIsle_ArtPack_v3_HubSubmaps.zip` beside `UPLOAD_ART_TO_GITHUB.bat`.
-3. Run `UPLOAD_ART_TO_GITHUB.bat`. It extracts the pack, validates the expected images, commits only `assets/`, and pushes to `main`.
-4. The push triggers a Windows build. Download the artifact named `MistIsle-Windows-Playtest-v1` from that run.
-
-After this one-time import, all future source ZIPs and Windows build artifacts will contain the art assets. No separate art archive merge will be required.
-
-
-## Controls and movement coordinate convention
-The game uses an orthographic top-down grid. WASD and arrow keys are screen-cardinal: W/up decreases world Y, S/down increases world Y, A/left decreases world X, D/right increases world X. World tiles are 56x56 pixels. Camera tracking is clamped to the active sub-map bounds.
-
-
-## Refined top-down terrain art pack v4
-The v4 art pack includes the approved v3 environment/character art plus `assets/environment/topdown_terrain_atlas_v1.png`, a native 56px orthographic terrain atlas built from the grass, sand, stone and water variant sheets. It contains 9 grass variants, 9 sand variants, 9 stone variants and 12 water/shore variants. Extract `MistIsle_ArtPack_v4_TopDown_Refined.zip` at the repository root and run `UPLOAD_ART_TO_GITHUB.bat` to commit the assets once.
-
-
-## Refined top-down art pack v5
-The v5 pack adds four runtime atlases: 56px grass/sand/stone/water terrain tiles; a 44-sprite flora and props atlas; a 30-sprite cliffs, shoreline, bridges and fences atlas; and a 10-sprite structures atlas for cottage, tent, shrine, fountain and campfire. The renderer now loads these atlases and uses the detailed square tiles and sprites for the top-down maps. Import once with `MistIsle_ArtPack_v5_TopDown_Refined.zip` and `UPLOAD_ART_TO_GITHUB.bat`.
-
-
-## Art pack v6 — polished original props
-The v6 art pack adds `assets/environment/original_props_16_v1.png`, a 4x4 atlas of 16 original project props normalized to 32x32 cells. The renderer uses it for the coastal dock, beach props, grove trees/mushrooms/log, ruin arch/pillar/rune platform/fountain, and lighthouse/courtyard structures. Use `MistIsle_ArtPack_v6_TopDown_Polished.zip` for the current full asset bundle and run `UPLOAD_ART_TO_GITHUB.bat` once to commit it into the cloned repository.
-
-
-## Third-party art included
-The repository now vendors the **Kenney Tiny Town** CC0 pack at `third_party/kenney/tiny-town/`, preserving the original ZIP, license and source note. It is used selectively for 3/4-view building/prop options only; the game remains on orthographic top-down movement and terrain, so its 3/4-view ground tiles are not mixed into the orthographic ground layer. CI generates a contact sheet for review and includes the original pack in the Windows distribution archive. See `ASSET_SOURCES_AND_LICENSES.md`.
-
-
-## One-time complete art import (recommended)
-Download the `MistIsle_ArtPack_v6_TopDown_Polished.zip` attachment directly from this ChatGPT conversation, then download and run `IMPORT_ART_V6_TO_GITHUB.bat` from this repository's main branch. The script automatically clones the repository to `Documents/GitHub/mist-isle`, opens a file picker for the conversation attachment, extracts it, downloads the Kenney RPG Base and Pixel UI CC0 packs, generates the Kenney runtime atlas and CC0 review sheets, validates image dimensions and archive integrity, commits `assets/` and the third-party source archives, and pushes to GitHub. The push triggers the complete Windows build. After the one-time import, a normal `git clone` or `git pull` contains the original character, terrain, flora, cliff, structure and prop atlases.
-
-The binary art ZIP is not stored inside this source repository until that import script is run successfully from a local machine. Do not treat a Library copy or a CI-generated fallback package as proof that the full v6 PNG set has been committed.
-
-
-The two supplemental Kenney packs are from OpenGameArt and are CC0: [RPG pack: base set](https://opengameart.org/content/rpg-pack-base-set) and [Pixel UI pack (750 assets)](https://opengameart.org/content/pixel-ui-pack-750-assets). Their source archives are retained under `third_party/kenney/`; contact sheets are generated under `build/art-review/` for selection before any additional runtime integration.
+<p align="center"><sub>雾屿回响 · Mist Isle — Version 1.0.0</sub></p>

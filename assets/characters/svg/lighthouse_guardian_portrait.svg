@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="640" viewBox="0 0 512 640">
 <defs>
- <linearGradient id="armor" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#839ca0"/><stop offset=".42" stop-color="#435d69"/><stop offset="1" stop-color="#172d40"/></linearGradient>
+ <linearGradient id="armor" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#77807c"/><stop offset=".42" stop-color="#394247"/><stop offset="1" stop-color="#171d25"/></linearGradient>
  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0ba"/><stop offset=".5" stop-color="#d4a45a"/><stop offset="1" stop-color="#73503b"/></linearGradient>
  <linearGradient id="steel" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#c3d0c8"/><stop offset=".5" stop-color="#758d91"/><stop offset="1" stop-color="#344c5a"/></linearGradient>
- <radialGradient id="core"><stop stop-color="#efffff"/><stop offset=".32" stop-color="#8be9ed"/><stop offset=".75" stop-color="#2c9caf"/><stop offset="1" stop-color="#15445c"/></radialGradient>
- <linearGradient id="cape" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1e3449"/><stop offset="1" stop-color="#101d31"/></linearGradient>
+ <radialGradient id="core"><stop stop-color="#fff9d9"/><stop offset=".32" stop-color="#ffd36d"/><stop offset=".75" stop-color="#d17a35"/><stop offset="1" stop-color="#713b27"/></radialGradient>
+ <linearGradient id="cape" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#542d35"/><stop offset=".55" stop-color="#321d2b"/><stop offset="1" stop-color="#171722"/></linearGradient>
 </defs>
-<!-- dark mantle -->
+<!-- dark ragged mantle and weather-torn crimson cape -->
 <path d="M115 383Q66 441 47 640H464Q442 446 389 385Q321 348 255 367Q184 349 115 383Z" fill="url(#cape)" stroke="#101d2b" stroke-width="13"/>
 <path d="M120 411Q182 460 255 451Q329 459 389 409" fill="none" stroke="url(#gold)" stroke-width="10"/>
 <path d="M148 440Q190 488 207 640M365 439Q322 488 305 640" fill="none" stroke="#627e89" stroke-width="8"/>

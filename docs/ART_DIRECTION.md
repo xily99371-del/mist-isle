@@ -73,7 +73,7 @@ Do not create character portraits, buildings, trees, portals or decorative props
 
 ## Protagonist and portrait identity lock
 
-- The playable explorer is female. Keep the same chestnut-brown hair, red scarf, goggles, cream travel shirt, brown leather vest, utility straps and backpack language as the in-game sprite.
-- Do not add a hat. Goggles may rest on the hair; the face, hair silhouette and outfit must remain recognizably continuous with the pixel sprite.
-- The dialogue portrait is a dedicated static illustration, not an enlarged 32px walking frame.
-- Watcher and Lighthouse Guardian each have their own static illustrated portrait source. Keep portrait framing and lighting consistent across all three.
+- The playable explorer is female. The user's approved design has chestnut-brown wavy hair, a blue ribbon, a soft grey scarf, cream travel coat, brown leather belts and backpack, a blue lantern and a compass.
+- No hat, goggles or unrelated outfit redesigns. Keep the same hair silhouette, blue ribbon, scarf and cream/brown palette between the high-resolution portrait and the pixel sprite.
+- The dialogue portrait uses the user's high-resolution anime illustration. Never enlarge a low-resolution pixel walking frame into a dialogue portrait.
+- The Watcher and Lighthouse Guardian use their own user-approved high-resolution anime illustrations for dialogue/character portraits. They are not enlarged world sprites.
