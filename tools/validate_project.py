@@ -268,7 +268,7 @@ require("living stone arch" in RENDER and "beacon tower" in RENDER and "Return r
 require("finalCore" in RENDER and "DrawAreaProp(11,p,190,194)" in RENDER,
         "the Tidal Ruins keystone is a larger multi-ring final altar, distinct from ordinary shrines")
 require("DrawLighthouseGuardian(p,g->time,1.0f,false)" in RENDER and "static void DrawKeeper(Vector2 p,float t,float scale)" in RENDER and "TEX_WATCHER_PORTRAIT" in RENDER and "TEX_WATCHER_PIXEL" in RENDER and "TEX_GUARDIAN_PORTRAIT" in RENDER,
-        "the lighthouse guardian and Watcher use authored world-scene portrait illustrations")
+        "the lighthouse guardian and Watcher use authored pixel world actors with separate dialogue portraits")
 require("DrawDialoguePortrait" in RENDER and "dialoguePortrait[page]" in RENDER and "DrawTexturePro(*fallback" in RENDER,
         "dialogue scenes render full-size portraits for the hero, Watcher and lighthouse guardian")
 require('strncmp(speaker,"旅人",strlen("旅人"))==0' in GAME,
