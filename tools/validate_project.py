@@ -84,8 +84,8 @@ for rel, expected in {
         print(f"INFO: optional approved sprite sheet not imported yet: {rel}")
 require("if(TEX_HEROINE_APPROVED.id)" in RENDER and "if(TEX_GUARDIAN_APPROVED.id)" in RENDER,
         "approved directional heroine and guardian sprite sheets take priority over portrait fallbacks")
-require("TEX_KEEPER.id" in RENDER and "DrawTexturePro(TEX_KEEPER" in RENDER and "TEX_GUARDIAN_APPROVED.id" in RENDER,
-        "local source builds have authored pixel-sprite fallbacks for Keeper and guardian dialogue portraits")
+require("TEX_WATCHER_PIXEL.id" in RENDER and "TEX_GUARDIAN_APPROVED.id" in RENDER,
+        "world Watcher and guardian actors use dedicated pixel sprite sheets, never illustrated portrait fallbacks")
 
 
 # Renderer source rectangles must match the approved sheet cell dimensions.
