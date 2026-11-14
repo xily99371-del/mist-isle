@@ -1172,17 +1172,17 @@ static void RenderMap(Game *g) {
     DrawUIText("按 M / ESC 关闭",800,580,16,(Color){132,137,111,255});
 }
 static void DrawDialoguePortrait(Game *g,int portrait,const char *speaker) {
-    Rectangle card={34,372,220,314};
+    Rectangle card={22,372,246,314};
     DrawRectangleRounded(card,.10f,10,(Color){11,31,43,245});
     DrawRectangleRoundedLinesEx(card,.10f,10,2.0f,(Color){208,177,111,255});
-    DrawRectangleGradientV(48,386,192,286,(Color){62,83,86,255},(Color){22,43,54,255});
+    DrawRectangleGradientV(38,382,214,286,(Color){62,83,86,255},(Color){22,43,54,255});
     Texture2D *fallback=portrait==0?&TEX_HERO_PORTRAIT:
         portrait==1?&TEX_WATCHER_PORTRAIT:
         portrait==2?&TEX_GUARDIAN_PORTRAIT:
         portrait==3?&TEX_LUMI_ILLUSTRATION:
         portrait==4?&TEX_MOATAIL_ILLUSTRATION:
         portrait==5?&TEX_GECKO_ILLUSTRATION:&TEX_HERO_PORTRAIT;
-    Rectangle dst={48,386,192,256};
+    Rectangle dst={38,382,214,285};
     // Dedicated high-resolution illustrations always take priority over the old
     // low-detail portrait atlas. Pixel walk sheets are never used as dialogue portraits.
     if(fallback->id) {
@@ -1193,8 +1193,8 @@ static void DrawDialoguePortrait(Game *g,int portrait,const char *speaker) {
         DrawTexturePro(TEX_CHARACTER_PORTRAITS,src,dst,(Vector2){0,0},0,WHITE);
     }
     const char *label=(speaker&&speaker[0])?speaker:"旅人";
-    DrawRectangleRounded((Rectangle){52,647,184,27},.2f,5,(Color){8,25,36,225});
-    DrawUIText(label,62,651,13,(Color){255,231,178,255});
+    DrawRectangleRounded((Rectangle){42,670,206,25},.2f,5,(Color){8,25,36,225});
+    DrawUIText(label,52,674,13,(Color){255,231,178,255});
 }
 static void RenderDialogue(Game *g) {
     DrawRectangle(0,0,SW,SH,Fade((Color){22,39,48,255},.46f));
