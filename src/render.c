@@ -331,8 +331,13 @@ static void DrawLumi(Vector2 p,float t,float bob) {
     (void)bob;
     const float footY=p.y+8.0f;
     float floatY=sinf(t*4.4f)*2.0f;
-    DrawEllipse((int)p.x,(int)footY,19,7,(Color){48,66,57,72});
-    if(TEX_LUMI_ILLUSTRATION.id) {
+    DrawEllipse((int)p.x,(int)footY,19,7,(Color){48,66,57,82});
+    if(TEX_LUMI_PIXEL.id) {
+        int frame=(int)(t*5.2f)%4;
+        Rectangle src={(float)(frame*32),0,32,32};
+        Rectangle dst={p.x-35.0f,footY-70.0f-floatY,70.0f,70.0f};
+        DrawTexturePro(TEX_LUMI_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
+    } else if(TEX_LUMI_ILLUSTRATION.id) {
         Rectangle src={0,0,(float)TEX_LUMI_ILLUSTRATION.width,(float)TEX_LUMI_ILLUSTRATION.height};
         Rectangle dst={p.x-35.0f,footY-70.0f-floatY,70.0f,70.0f};
         DrawTexturePro(TEX_LUMI_ILLUSTRATION,src,dst,(Vector2){0,0},0,WHITE);
@@ -429,9 +434,14 @@ static void PushRenderItem(RenderItem *items,int *count,RenderKind kind,int inde
 }
 static void DrawMoatail(Vector2 p,float t) {
     const float footY=p.y+8.0f;
-    float bob=sinf(t*4.0f)*2.0f;
-    DrawEllipse((int)p.x,(int)footY,18,6,(Color){48,66,57,75});
-    if(TEX_MOATAIL_ILLUSTRATION.id) {
+    float bob=sinf(t*3.8f+1.2f)*2.2f;
+    DrawEllipse((int)p.x,(int)footY,19,6,(Color){48,66,57,82});
+    if(TEX_MOATAIL_PIXEL.id) {
+        int frame=(int)(t*4.4f+1.0f)%4;
+        Rectangle src={(float)(frame*32),0,32,32};
+        Rectangle dst={p.x-35.0f,footY-70.0f-bob,70.0f,70.0f};
+        DrawTexturePro(TEX_MOATAIL_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
+    } else if(TEX_MOATAIL_ILLUSTRATION.id) {
         Rectangle src={0,0,(float)TEX_MOATAIL_ILLUSTRATION.width,(float)TEX_MOATAIL_ILLUSTRATION.height};
         Rectangle dst={p.x-35.0f,footY-70.0f-bob,70.0f,70.0f};
         DrawTexturePro(TEX_MOATAIL_ILLUSTRATION,src,dst,(Vector2){0,0},0,WHITE);
@@ -439,9 +449,14 @@ static void DrawMoatail(Vector2 p,float t) {
 }
 static void DrawGecko(Vector2 p,float t) {
     const float footY=p.y+8.0f;
-    float bob=sinf(t*5.0f)*1.8f;
-    DrawEllipse((int)p.x,(int)footY,18,6,(Color){48,66,57,75});
-    if(TEX_GECKO_ILLUSTRATION.id) {
+    float bob=sinf(t*4.8f+2.1f)*1.8f;
+    DrawEllipse((int)p.x,(int)footY,18,6,(Color){48,66,57,82});
+    if(TEX_GECKO_PIXEL.id) {
+        int frame=(int)(t*5.0f+2.0f)%4;
+        Rectangle src={(float)(frame*32),0,32,32};
+        Rectangle dst={p.x-35.0f,footY-70.0f-bob,70.0f,70.0f};
+        DrawTexturePro(TEX_GECKO_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
+    } else if(TEX_GECKO_ILLUSTRATION.id) {
         Rectangle src={0,0,(float)TEX_GECKO_ILLUSTRATION.width,(float)TEX_GECKO_ILLUSTRATION.height};
         Rectangle dst={p.x-35.0f,footY-70.0f-bob,70.0f,70.0f};
         DrawTexturePro(TEX_GECKO_ILLUSTRATION,src,dst,(Vector2){0,0},0,WHITE);
@@ -1096,10 +1111,21 @@ static void RenderMap(Game *g) {
         bool unlocked=(i==0)||(i==1)||(i==2&&g->lumi.owned&&g->splash.owned)||(i==3&&g->shrineSolved);
         DrawCircleV(pts[i],g->area==i?36:28,g->area==i?C_GOLD:unlocked?(Color){144,190,132,255}:(Color){181,184,164,255});
         DrawCircleV(pts[i],13,(Color){255,240,196,255});
+        if(g->area==i) {
+            DrawCircleLines((int)pts[i].x,(int)pts[i].y,41,(Color){255,112,96,255});
+            DrawCircleV((Vector2){pts[i].x+22.0f,pts[i].y-22.0f},6,(Color){231,82,76,255});
+            DrawCircleV((Vector2){pts[i].x+22.0f,pts[i].y-22.0f},2,WHITE);
+        }
         DrawUIText(names[i],(int)pts[i].x-45,(int)pts[i].y+42,17,C_INK);
     }
-    DrawUIText("主地图为枢纽；各区域通过入口往返。",320,520,17,(Color){105,121,97,255});
-    DrawUIText("红点：当前位置   灰色区域：尚未解锁",320,545,18,(Color){105,121,97,255});
+    DrawCircleV((Vector2){342,551},6,(Color){231,82,76,255});
+    DrawUIText("当前位置",356,543,15,(Color){105,121,97,255});
+    DrawCircleV((Vector2){500,551},6,(Color){144,190,132,255});
+    DrawUIText("已开放",514,543,15,(Color){105,121,97,255});
+    DrawCircleV((Vector2){640,551},6,(Color){181,184,164,255});
+    DrawUIText("未开放",654,543,15,(Color){105,121,97,255});
+    DrawUIText("主地图为枢纽；各区域通过入口往返。",320,580,17,(Color){105,121,97,255});
+    DrawUIText("按 M / ESC 关闭",800,580,16,(Color){132,137,111,255});
     DrawUIText("按 M / ESC 关闭",800,580,16,(Color){132,137,111,255});
 }
 static void DrawDialoguePortrait(Game *g,int portrait) {
@@ -1185,8 +1211,11 @@ static void RenderBattle(Game *g) {
         DrawRectangleRounded((Rectangle){742,148,510,42},.18f,8,(Color){12,24,35,224});
         DrawRectangleRoundedLines((Rectangle){742,148,510,42},.18f,8,Fade((Color){255,198,113,255},.7f));
         DrawUIText(phaseLabel,760,154,14,(Color){255,219,166,255});
-        DrawUIText(heavy?"CORE CHARGED  /  HEAVY STRIKE NEXT":"CORE STABLE  /  WET STATUS INTERRUPTS",930,154,12,
-                   heavy?(Color){255,170,117,255}:(Color){154,220,211,255});
+        const char *coreState=g->enemySoaked?"CORE DAMPED  /  STRIKE WEAKENED":
+            (heavy?"CORE CHARGED  /  HEAVY STRIKE NEXT":"CORE STABLE  /  WET STATUS INTERRUPTS");
+        Color coreTint=g->enemySoaked?(Color){132,216,224,255}:
+            (heavy?(Color){255,170,117,255}:(Color){154,220,211,255});
+        DrawUIText(coreState,930,154,12,coreTint);
     }
 
     if(g->selectedBuddy==0 && g->lumi.owned)DrawLumi((Vector2){395,430},g->time,0);

@@ -141,6 +141,14 @@ require("bossPhase==3?(g->battleRound%2==0):(g->battleRound%3==0)" in GAME and "
         "lighthouse guardian escalates from measured attacks to a telegraphed resonance strike")
 require("incoming*=e->type==ENEMY_BOSS?0.65f:0.8f" in GAME and "CORE CHARGED  /  HEAVY STRIKE NEXT" in RENDER,
         "wet status interrupts the guardian core and reduces its boss attack damage")
+require("g->enemySoaked=false; // Wetness interrupts one incoming attack" in GAME and "CORE DAMPED  /  STRIKE WEAKENED" in RENDER,
+        "wet status is consumed by one enemy attack and visibly dampens the guardian core")
+require("TEX_LUMI_PIXEL.id" in RENDER and "TEX_MOATAIL_PIXEL.id" in RENDER and "TEX_GECKO_PIXEL.id" in RENDER and "frame*32" in RENDER,
+        "all three recruited companions use their four-frame authored pixel idle sheets")
+require("BuddyFollowOffset" in GAME and "static const Vector2 formation[4][3]" in GAME and "distance>3.8f?7.2f" in GAME,
+        "companions follow in a facing-aware fan formation with collision-aware catch-up movement")
+require("当前位置" in RENDER and "DrawCircleLines((int)pts[i].x,(int)pts[i].y,41" in RENDER,
+        "island map shows an explicit current-area marker and readable legend")
 require("attacking?((int)(t*8.0f)%4):0" in RENDER and "attacking?64.0f:0.0f" in RENDER,
         "lighthouse guardian uses its dedicated attack animation row during the enemy turn")
 require('DrawUIText(isBoss?"BOSS":"遭遇战"' in RENDER and "DrawRectangleGradientH" in RENDER,
