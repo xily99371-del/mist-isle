@@ -290,14 +290,13 @@ static void DrawCoastalHouse(Vector2 p,float scale) {
     if(!TEX_COASTAL_HOUSE.id)return;
     const float footY=p.y+7.0f;
     const float w=252.0f*scale,h=204.0f*scale;
-    DrawEllipse((int)p.x,(int)footY+3,(int)(w*.38f),(int)(9.0f*scale),(Color){31,48,40,112});
+    /* Buildings use authored foundations and contact edges, not detached oval shadows. */
     Rectangle src={0,0,(float)TEX_COASTAL_HOUSE.width,(float)TEX_COASTAL_HOUSE.height};
     Rectangle dst={p.x-w*.5f,footY-h,w,h};
     DrawTexturePro(TEX_COASTAL_HOUSE,src,dst,(Vector2){0,0},0,WHITE);
 }
 static void DrawGroveCottage(Vector2 p,float scale) {
     if(!TEX_GROVE_COTTAGE.id)return;
-    DrawEllipse((int)p.x,(int)p.y+4,(int)(88*scale),(int)(12*scale),(Color){34,53,45,105});
     Rectangle src={0,0,(float)TEX_GROVE_COTTAGE.width,(float)TEX_GROVE_COTTAGE.height};
     float w=176.0f*scale,h=144.0f*scale;
     Rectangle dst={p.x-w*.5f,p.y-h,w,h};
@@ -327,10 +326,11 @@ static void DrawProp(int index,Vector2 p,float w,float h) {
 static void DrawKeeper(Vector2 p,float t,float scale) {
     (void)t;
     const float footY=p.y+7.0f*scale;
-    DrawEllipse((int)p.x,(int)footY,(int)(13*scale),(int)(4*scale),(Color){35,49,45,105});
-    // The Watcher portrait is dialogue-only. The world actor uses a compact pixel NPC.
+    DrawEllipse((int)p.x,(int)footY,(int)(12*scale),(int)(3*scale),(Color){35,49,45,85});
+    // Native 64x80 pixel RPG actor sheet; this is a sprite character, never a
+    // pixelated crop of the high-resolution Watcher portrait.
     if(TEX_WATCHER_PIXEL.id) {
-        Rectangle src={0,0,(float)TEX_WATCHER_PIXEL.width,(float)TEX_WATCHER_PIXEL.height};
+        Rectangle src={0,0,64,80}; /* front idle frame */
         float w=48.0f*scale,h=76.0f*scale;
         Rectangle dst={p.x-w*.5f,footY-h,w,h};
         DrawTexturePro(TEX_WATCHER_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
@@ -524,11 +524,8 @@ static void DrawLighthouseGuardian(Vector2 p,float t,float scale,bool attacking)
         float w=96.0f*scale,h=128.0f*scale;
         Rectangle dst={p.x-w*.5f,p.y-h+bob,w,h};
         DrawTexturePro(TEX_GUARDIAN_APPROVED,src,dst,(Vector2){0,0},0,WHITE);
-    } else if(TEX_GUARDIAN_PORTRAIT.id) {
-        Rectangle src={0,0,(float)TEX_GUARDIAN_PORTRAIT.width,(float)TEX_GUARDIAN_PORTRAIT.height};
-        float w=148.0f*scale,h=184.0f*scale;
-        Rectangle dst={p.x-w*.5f,p.y-h+bob,w,h};
-        DrawTexturePro(TEX_GUARDIAN_PORTRAIT,src,dst,(Vector2){0,0},0,WHITE);
+    } else {
+        TraceLog(LOG_ERROR,"Mist Isle: pixel guardian sheet is missing; refusing to display the anime portrait as a world actor.");
     }
 }
 static void DrawCloudPuff(float x,float y,float s,Color color) {
@@ -1282,11 +1279,8 @@ static void RenderBattle(Game *g) {
     if(e->type==ENEMY_MOTE) {
         DrawMote((Vector2){880,385},g->time);
     } else if(e->type==ENEMY_BOSS) {
-        if(TEX_GUARDIAN_PORTRAIT.id) {
-            Rectangle src={0,0,(float)TEX_GUARDIAN_PORTRAIT.width,(float)TEX_GUARDIAN_PORTRAIT.height};
-            Rectangle dst={690,145,410,500};
-            DrawTexturePro(TEX_GUARDIAN_PORTRAIT,src,dst,(Vector2){0,0},0,WHITE);
-        } else DrawLighthouseGuardian((Vector2){880,454},g->time,1.35f,g->battleTurn!=0);
+        /* Boss arena uses the dedicated 48x64 pixel boss sheet, not the dialogue poster. */
+        DrawLighthouseGuardian((Vector2){880,454},g->time,1.5f,g->battleTurn!=0);
         DrawCircleLines(880,395,126,Fade(C_GOLD,.35f));
         DrawCircleLines(880,395,142,Fade(C_BLUE,.22f));
     } else {
