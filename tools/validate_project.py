@@ -413,6 +413,11 @@ require("g->weather==3" in RENDER and "g->weather==4" in RENDER and "DrawCloudPu
         "Fade((Color){7,17,36,255},.82f*weatherAlpha)" in RENDER,
         "overcast and optional night fog have distinct moving cloud visuals and clearly visible layered fog banks")
 LIGHTHOUSE_MAP_TEXT=(ROOT/"maps/lighthouse_courtyard.tmx").read_text(encoding="utf-8")
+LIGHTHOUSE_GROUND=re.search(r'<data encoding="csv">([\\s\\S]*?)</data>',LIGHTHOUSE_MAP_TEXT).group(1).strip().splitlines()
+LIGHTHOUSE_GROUND_ROWS=[[int(value) for value in line.split(",") if value] for line in LIGHTHOUSE_GROUND]
+require("terrain_zone_design" in LIGHTHOUSE_MAP_TEXT and len({(gid-1)//12 for row in LIGHTHOUSE_GROUND_ROWS for gid in row})>=3 and
+        all(row[0]==37 and row[17]==37 for row in LIGHTHOUSE_GROUND_ROWS[3:]),
+        "lighthouse courtyard uses stone, worn sand and narrow sea-edge water bands without grass corners")
 require('type="prop_676"' in LIGHTHOUSE_MAP_TEXT and LIGHTHOUSE_MAP_TEXT.count('type="prop_676"')==2 and
         not any(f'type="tree{i}"' in LIGHTHOUSE_MAP_TEXT for i in range(3)) and
         not any(f'type="prop_{i}"' in LIGHTHOUSE_MAP_TEXT for i in range(116,130)) and
