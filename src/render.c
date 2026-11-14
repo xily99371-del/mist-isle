@@ -908,7 +908,7 @@ static void RenderWorld(Game *g) {
                 DrawEllipse((int)p.x,(int)p.y+5,72,18,(Color){24,38,46,145});
                 DrawCircleLines((int)p.x,(int)p.y+3,61,Fade((Color){117,203,220,255},.42f));
                 DrawCircleLines((int)p.x,(int)p.y+3,48,Fade((Color){255,205,115,255},.28f));
-                DrawLighthouseGuardian(p,g->time,1.48f);
+                DrawLighthouseGuardian(p,g->time,1.48f,false);
                 DrawRectangleRounded((Rectangle){p.x-52,p.y-154,104,22},.25f,5,(Color){8,24,38,230});
                 DrawRectangleRoundedLinesEx((Rectangle){p.x-52,p.y-154,104,22},.25f,5,1.5f,(Color){255,205,115,220});
                 DrawUIText("灯塔守卫",(int)p.x-28,(int)p.y-150,13,(Color){255,232,170,255});
