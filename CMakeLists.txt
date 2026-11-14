@@ -26,6 +26,29 @@ FetchContent_Declare(raylib GIT_REPOSITORY https://github.com/raysan5/raylib.git
 FetchContent_MakeAvailable(raylib)
 
 set(MISTISLE_GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
+# The approved art bundle is distributed separately from source code. If present,
+# extract it into the project tree before configuring runtime asset paths.
+set(MISTISLE_APPROVED_ART_BUNDLE "${CMAKE_SOURCE_DIR}/MistIsle_ApprovedArt_v3.zip")
+if(EXISTS "${MISTISLE_APPROVED_ART_BUNDLE}")
+  file(ARCHIVE_EXTRACT INPUT "${MISTISLE_APPROVED_ART_BUNDLE}" DESTINATION "${CMAKE_SOURCE_DIR}")
+endif()
+set(MISTISLE_ATLAS_BOUNDS_HEADER "${MISTISLE_GENERATED_DIR}/atlas_bounds.h")
+add_custom_command(
+  OUTPUT "${MISTISLE_ATLAS_BOUNDS_HEADER}"
+  COMMAND "${CMAKE_COMMAND}" -E make_directory "${MISTISLE_GENERATED_DIR}"
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/tools/generate_atlas_bounds.py"
+  DEPENDS
+    "${CMAKE_SOURCE_DIR}/tools/generate_atlas_bounds.py"
+    "${CMAKE_SOURCE_DIR}/assets/environment/flora_props_atlas_128.png"
+    "${CMAKE_SOURCE_DIR}/assets/environment/cliffs_fences_atlas_128.png"
+    "${CMAKE_SOURCE_DIR}/assets/environment/structures_atlas_128.png"
+    "${CMAKE_SOURCE_DIR}/assets/environment/original_props_16_v1.png"
+    "${CMAKE_SOURCE_DIR}/assets/environment/area_props_96.png"
+    "${CMAKE_SOURCE_DIR}/assets/environment/environment_props_96.png"
+    "${CMAKE_SOURCE_DIR}/assets/tiles/png/environment_props.png"
+  VERBATIM
+)
+add_custom_target(generate_atlas_bounds DEPENDS "${MISTISLE_ATLAS_BOUNDS_HEADER}")
 set(MISTISLE_MAP_HEADER "${MISTISLE_GENERATED_DIR}/area_maps.h")
 set(MISTISLE_GROUND_ATLAS "${CMAKE_SOURCE_DIR}/assets/environment/topdown_terrain_atlas_v1.png")
 set(MISTISLE_GROUND_ATLAS_STAMP "${MISTISLE_GENERATED_DIR}/ground_atlas.stamp")
@@ -63,6 +86,7 @@ add_executable(mist_isle
 )
 add_dependencies(mist_isle generate_area_maps)
 add_dependencies(mist_isle generate_ground_atlas)
+add_dependencies(mist_isle generate_atlas_bounds)
 target_include_directories(mist_isle PRIVATE src "${MISTISLE_GENERATED_DIR}")
 target_link_libraries(mist_isle PRIVATE raylib)
 if(MSVC)
