@@ -125,7 +125,8 @@ typedef struct {
     float fireflyPhase;
     float dayClock;
     float weatherClock;
-    int weather;
+    float weatherFade;
+    int weather; // 0 sunny, 1 rain, 2 fireflies, 3 overcast, 4 night fog
 } Game;
 extern Color C_BG,C_INK,C_PAPER,C_GREEN,C_DARKGREEN,C_GOLD,C_BLUE,C_LILAC,C_PINK,C_RED;
 void GameReset(Game *g,int seed);
