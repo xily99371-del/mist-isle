@@ -41,7 +41,12 @@ def crop_cell(sheet,index,columns,cell):
 
 def paste_anchor(dst,sprite,cx,foot_y,width,height):
     if sprite is None:return
-    sprite=sprite.resize((max(1,int(width)),max(1,int(height))),Image.Resampling.NEAREST)
+    # Trim transparent padding before scaling; the visible alpha bounds, not the
+    # rectangular atlas cell, determine the sprite's ground-contact point.
+    bbox=sprite.getchannel("A").getbbox()
+    if bbox is None:return
+    sprite=sprite.crop(bbox)
+    sprite=sprite.resize((max(1,int(width)),max(1,int(height))),Image.Resampling.LANCZOS)
     dst.alpha_composite(sprite,(int(cx-width/2),int(foot_y-height)))
 
 
@@ -118,6 +123,8 @@ def draw_object(image,obj,sheets):
         elif 200<=index<300:
             sprite=crop_cell(sheets["cliffs"],index-200,8,128)
             paste_anchor(image,sprite,x,y+7,112*scale,112*scale)
+        elif index==302 and sheets["coastal_house"] is not None:
+            paste_anchor(image,sheets["coastal_house"],x,y+7,252*scale,204*scale)
         elif 300<=index<400:
             sprite=crop_cell(sheets["structures"],index-300,8,128)
             dims={302:(196,156),303:(176,154),304:(166,180),305:(168,152)}
@@ -149,6 +156,7 @@ def render_map(name,out_dir):
         "flora":load(FLORA),"area":load(AREA),"env":load(ENV),
         "structures":load(STRUCTURES),"cliffs":load(CLIFFS),
         "original":load(ORIGINAL),"kenney":load(KENNEY),"cottage":load(COTTAGE),
+        "coastal_house":load(ROOT/"assets/environment/coastal_keeper_house.png"),
     }
     layer=root.find("./layer[@name='Ground']/data")
     gids=[int(v.strip()) for v in (layer.text or "").replace("\n","").split(",") if v.strip()]
