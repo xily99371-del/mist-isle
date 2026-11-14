@@ -184,13 +184,14 @@ approved_assets = {
     "assets/characters/portraits/moatail_portrait.jpg": (320, 427),
     "assets/characters/portraits/crystal_gecko_portrait.jpg": (320, 427),
     "assets/characters/hero/heroine_pixel_4x4_64x80.png": (256, 320),
+    "assets/characters/npc/watcher_pixel_idle_64x80.png": (64, 80),
     "assets/environment/coastal_keeper_house.png": (360, 291),
 }
 if all((ROOT / p).exists() for p in approved_assets):
     for rel, expected in approved_assets.items():
         with Image.open(ROOT / rel) as im:
             require(im.size == expected, f"approved user art {rel} has expected dimensions {expected}")
-    require("TEX_HEROINE_PIXEL" in RENDER and "heroine_pixel_4x4_64x80.png" in RENDER,
+    require("TEX_HEROINE_PIXEL" in RENDER and "heroine_pixel_4x4_64x80.png" in RENDER and "TEX_WATCHER_PIXEL" in RENDER,
             "the exact user-approved 4x4 pixel sheet drives the playable heroine")
     require("assets/characters/portraits/heroine_portrait.jpg" in RENDER and
             "assets/characters/portraits/moss_lumi_portrait.jpg" in RENDER and
