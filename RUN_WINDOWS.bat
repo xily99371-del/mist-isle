@@ -2,7 +2,11 @@
 setlocal
 cd /d "%~dp0"
 
-if exist "%~dp0MistIsle_ApprovedArt_v5.zip" (
+if exist "%~dp0MistIsle_ApprovedArt_v6.zip" (
+  echo Installing portrait-matched Watcher pixel sprites and lossless portraits...
+  powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_ApprovedArt_v6.zip' -DestinationPath '%~dp0' -Force"
+  if errorlevel 1 goto failed
+) else if exist "%~dp0MistIsle_ApprovedArt_v5.zip" (
   echo Installing lossless high-resolution portraits and approved pixel sprites...
   powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_ApprovedArt_v5.zip' -DestinationPath '%~dp0' -Force"
   if errorlevel 1 goto failed
@@ -43,7 +47,7 @@ if not exist assets\characters\portraits\watcher_portrait.png goto missing_art
 if not exist assets\characters\portraits\guardian_portrait.png goto missing_art
 if not exist assets\characters\portraits\heroine_portrait.png (
   echo.
-  echo Approved artwork is missing. Download MistIsle_ApprovedArt_v5.zip from this chat,
+  echo Approved artwork is missing. Download MistIsle_ApprovedArt_v6.zip from this chat,
   echo place it beside RUN_WINDOWS.bat, then run this file again.
   goto failed
 )
