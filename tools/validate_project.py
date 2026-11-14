@@ -287,6 +287,18 @@ require("PushRenderItem(items,&count,RENDER_KEEPER,0,(Vector2){7.0f,7.0f}" in RE
 
 require('name=="campfire": type_id=2000' in MAP_BUILD and "obj->type==2000" in RENDER,
         "the campfire remains an animated Tiled-authored scene object")
+require('name="营火" type="campfire" x="420.00" y="532.00"' in (ROOT / "maps/coastal_camp.tmx").read_text(encoding="utf-8"),
+        "campfire is placed in the foreground below the Watcher")
+require('"进入辉光林地 · 萤火微光浮现"' in GAME,
+        "Glowglade arrival explicitly announces its exclusive firefly weather")
+require("MISTISLE_FIREFLY_COUNT 58" in RENDER and "pulse*.62f*weatherAlpha" in RENDER,
+        "firefly weather has bright multi-layer motes and a desktop-dense field")
+require("Fade((Color){7,17,36,255},.82f*weatherAlpha)" in RENDER,
+        "night fog is a clearly visible layered atmosphere")
+require("Fade((Color){17,39,62,255},.34f*weatherAlpha)" in RENDER,
+        "rain uses a stronger cool atmospheric grade")
+require(not re.search(r"(?m)^37(?:,|$)|,37(?:,|$)", (ROOT / "maps/lighthouse_courtyard.tmx").read_text(encoding="utf-8")),
+        "lighthouse boss courtyard has no stray grass-corner terrain cells")
 require("generate_ground_atlas.py" in CMAKE and "topdown_terrain_atlas_v1.png" in CMAKE,
         "CMake regenerates the same seamless ground atlas for desktop and Raspberry Pi")
 require("AREA_GROUND" in MAP_BUILD and "AREA_COLLISION" in MAP_BUILD and "AREA_MARKERS" in MAP_BUILD and "AREA_OBJECTS" in MAP_BUILD,
@@ -357,7 +369,7 @@ require("#define MAX_PARTICLES 160" in HEADER and "#define MAX_PARTICLES 300" in
         "Raspberry Pi uses a bounded particle pool while desktop keeps the full pool")
 require("Safe fallback if the target GPU cannot allocate the single-area ground cache" in RENDER,
         "terrain still renders if a Raspberry Pi GPU cannot allocate the cache")
-require("#define MISTISLE_RAIN_DROPS 56" in RENDER and "#define MISTISLE_RAIN_RIPPLES 6" in RENDER,
+require("#define MISTISLE_RAIN_DROPS 64" in RENDER and "#define MISTISLE_RAIN_RIPPLES 8" in RENDER and "#define MISTISLE_RAIN_DROPS 230" in RENDER,
         "Raspberry Pi profile reduces weather overdraw")
 require("Static grass, sand and stone detail is baked into the ground cache" in RENDER,
         "Raspberry Pi avoids redrawing static terrain accents every frame")
