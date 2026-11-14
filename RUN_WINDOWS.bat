@@ -6,7 +6,8 @@ if exist "%~dp0MistIsle_ApprovedArt_v7.zip" (
   echo Installing final Watcher and repaired Lighthouse Guardian pixel sheets...
   powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_ApprovedArt_v7.zip' -DestinationPath '%~dp0' -Force"
   if errorlevel 1 goto failed
-) else if exist "%~dp0MistIsle_MapArt_v8.zip" (
+)
+if exist "%~dp0MistIsle_MapArt_v8.zip" (
   echo Installing generated four-area map art...
   powershell -NoProfile -ExecutionPolicy Bypass -Command "Expand-Archive -LiteralPath '%~dp0MistIsle_MapArt_v8.zip' -DestinationPath '%~dp0' -Force"
   if errorlevel 1 goto failed
