@@ -1,0 +1,28 @@
+name: Boss balance and footstep QA
+on:
+  push:
+    branches: [feature/animated-battle-v2]
+    paths: ['.github/workflows/balance-audio-qa.yml']
+permissions:
+  contents: read
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Export exact source and original CC0 sound pack
+        run: |
+          mkdir -p qa-input
+          git archive --format=tar.gz HEAD > qa-input/source.tar.gz
+          git rev-parse HEAD > qa-input/SOURCE_COMMIT
+          curl --fail --location --retry 3 --max-time 90 'https://kenney.nl/media/pages/assets/impact-sounds/87b4ddecda-1677589768/kenney_impact-sounds.zip' -o qa-input/kenney_impact-sounds.zip
+          sha256sum qa-input/* > qa-input/SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: boss-footsteps-qa-input
+          path: qa-input
+          retention-days: 3
+          compression-level: 0
