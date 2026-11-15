@@ -26,27 +26,35 @@
 </p>
 <p align="center"><sub>游戏使用的地形、植被、区域道具与环境素材图集 / Terrain, flora, area props and environment atlases used in-game.</sub></p>
 
-## 角色与像素素材 / Character & Pixel Art
+## 高清角色图鉴 / High-Resolution Character Gallery
 
 <p align="center">
-  <img src="assets/characters/hero/heroine_approved_8x4.png" alt="Approved heroine pixel sprite sheet" width="38%"/>
-  <img src="assets/characters/boss/lighthouse_guardian_4x2.png" alt="Lighthouse Guardian approved pixel sprite sheet" width="38%"/>
+  <img src="assets/characters/portraits/heroine_portrait.png" alt="Approved heroine high-resolution portrait" width="31%"/>
+  <img src="assets/characters/portraits/watcher_portrait.png" alt="Approved Watcher high-resolution portrait" width="31%"/>
+  <img src="assets/characters/portraits/guardian_portrait.png" alt="Approved Lighthouse Guardian high-resolution portrait" width="31%"/>
 </p>
-<p align="center"><sub>已确认采用的女主角与灯塔守卫游戏内像素动画 / Approved in-game pixel animation sheets for the heroine and Lighthouse Guardian.</sub></p>
+<p align="center"><sub>v7 最终高清角色立绘：女主角、守望者、灯塔守卫 / Final v7 high-resolution portraits: heroine, Watcher and Lighthouse Guardian.</sub></p>
 
 <p align="center">
-  <img src="assets/characters/companions/moss_lumi_idle_64.png" alt="Moss Lumi approved companion sprite" width="24%"/>
-  <img src="assets/characters/companions/moatail_idle_64.png" alt="Moatail approved companion sprite" width="24%"/>
-  <img src="assets/characters/companions/crystal_gecko_idle_64.png" alt="Crystal Gecko approved companion sprite" width="24%"/>
+  <img src="assets/characters/portraits/moss_lumi_portrait.png" alt="Moss Lumi high-resolution portrait" width="24%"/>
+  <img src="assets/characters/portraits/moatail_portrait.png" alt="Moatail high-resolution portrait" width="24%"/>
+  <img src="assets/characters/portraits/crystal_gecko_portrait.png" alt="Crystal Gecko high-resolution portrait" width="24%"/>
 </p>
-<p align="center"><sub>三位伙伴的独立像素素材 / Individual pixel assets for the three companions.</sub></p>
+<p align="center"><sub>三位伙伴的 v7 高清独立立绘 / Final v7 individual high-resolution companion portraits.</sub></p>
+
+## 游戏内像素形象 / In-Game Pixel Sprites
 
 <p align="center">
-  <img src="assets/characters/portraits/watcher_world_cutout.png" alt="Watcher in-game character artwork" width="32%"/>
+  <img src="assets/characters/hero/heroine_pixel_4x4_64x80.png" alt="Approved heroine pixel sprite sheet" width="30%"/>
+  <img src="assets/characters/npc/watcher_pixel_4x4_64x80.png" alt="Approved Watcher pixel sprite sheet" width="30%"/>
+  <img src="assets/characters/boss/lighthouse_guardian_4x2.png" alt="Approved Lighthouse Guardian pixel sprite sheet" width="30%"/>
 </p>
-<p align="center"><sub>守望者游戏内角色素材 / The Watcher's in-game character asset.</sub></p>
-
-<p align="center"><sub>说明：本图鉴只展示仓库中已确认的最终游戏内像素素材。高清对话立绘原图尚未纳入当前仓库，因此不再用早期 SVG 示意图或压缩拼图代替。 / This gallery shows only approved in-game pixel assets currently present in the repository. Original high-resolution dialogue portraits are not yet included; early SVG stand-ins and compressed collages are intentionally excluded.</sub></p>
+<p align="center">
+  <img src="assets/characters/companions/moss_lumi_idle_64.png" alt="Moss Lumi pixel sprite" width="22%"/>
+  <img src="assets/characters/companions/moatail_idle_64.png" alt="Moatail pixel sprite" width="22%"/>
+  <img src="assets/characters/companions/crystal_gecko_idle_64.png" alt="Crystal Gecko pixel sprite" width="22%"/>
+</p>
+<p align="center"><sub>高清对话立绘与游戏内像素动画分开展示。上述高清立绘来自 MistIsle_ApprovedArt_v7.zip，地图环境素材来自 MistIsle_MapArt_v8.zip。 / High-resolution dialogue portraits are shown separately from in-game pixel sprites. Portraits come from v7; environment art comes from v8.</sub></p>
 ## 中文
 
 ### 关于游戏
