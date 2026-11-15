@@ -44,6 +44,11 @@ jobs:
                       publish = previous.returncode != 0 or previous.stdout.strip() != version
                   else:
                       publish = True
+                  # Retry a version whose earlier build failed before its tag was created.
+                  tag = subprocess.run(['git', 'show-ref', '--verify', '--quiet', f'refs/tags/v{version}'])
+                  if tag.returncode not in (0, 1):
+                      raise SystemExit('Could not determine whether the release tag exists.')
+                  publish = publish or tag.returncode == 1
           if publish and not Path(f'docs/RELEASE_v{version}.md').is_file():
               raise SystemExit('Release notes are missing for this version.')
           with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:

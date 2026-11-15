@@ -5,7 +5,9 @@ from zipfile import ZipFile
 import json
 import hashlib
 import re
+import tempfile
 from PIL import Image
+from package_release import copy_runtime
 
 ROOT = Path(__file__).resolve().parents[1]
 RENDER = (ROOT / "src/render.c").read_text(encoding="utf-8")
@@ -558,9 +560,15 @@ require("MISTISLE_RAIN_DROPS 64" in RENDER and "MISTISLE_RAIN_RIPPLES 8" in REND
         "Raspberry Pi profile reduces weather draw calls")
 require("g->area==AREA_LIGHTHOUSE&&g->bossDefeated&&Dist(p->pos,g->world.shrine)<3.0f" in GAME and "g->scene=SCENE_END" in GAME,
         "completed chapters retain the beacon-stone interaction for replay and older saves")
-require(any("Copy-Item" in line and "assets/cinematics" in line and "-Recurse" in line
-            for line in WORKFLOW.splitlines()),
-        "Windows packaging recursively includes all cinematic subdirectories")
+with tempfile.TemporaryDirectory(prefix="mist-isle-runtime-check-") as temporary:
+    packaged = Path(temporary)
+    copy_runtime(packaged)
+    cinematic_files = [path for path in (ROOT / "assets/cinematics").rglob("*") if path.is_file()]
+    require(bool(cinematic_files) and all(
+        (packaged / path.relative_to(ROOT)).is_file()
+        and (packaged / path.relative_to(ROOT)).read_bytes() == path.read_bytes()
+        for path in cinematic_files),
+        "release packaging recursively preserves every cinematic file")
 require("DrawLighthouseBackdrop(g->time,false)" in RENDER,
         "the lighthouse remains dark in exploration until the finale cutscene")
 require("TerrainKindFromAtlasIndex" in RENDER and "tileIndex%4" in RENDER and "AREA_GROUND" in GAME,
