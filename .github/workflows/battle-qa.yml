@@ -1,0 +1,28 @@
+name: Battle visual QA
+on:
+  push:
+    branches: [feature/animated-battle-v2]
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Prepare reproducible source and pinned graphics dependency
+        run: |
+          mkdir -p /tmp/battle-qa
+          git archive HEAD | tar -x -C /tmp/battle-qa
+          git clone --depth 1 --branch 5.5 https://github.com/raysan5/raylib.git /tmp/raylib
+          mkdir -p /tmp/battle-qa/vendor/raylib
+          git -C /tmp/raylib archive HEAD | tar -x -C /tmp/battle-qa/vendor/raylib
+          git rev-parse HEAD > /tmp/battle-qa/SOURCE_COMMIT
+          tar -C /tmp/battle-qa -czf /tmp/battle-qa-source.tar.gz .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: battle-qa-source
+          path: /tmp/battle-qa-source.tar.gz
+          retention-days: 1
+          compression-level: 0
