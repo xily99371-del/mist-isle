@@ -1551,7 +1551,7 @@ static void RenderBattle(Game *g) {
     }
 
     Panel((Rectangle){24,510,1232,185});
-    DrawUIText("选择行动 · 伙伴技能",50,520,20,C_INK);
+    DrawUIText("选择出战伙伴 · 行动技能",50,520,20,C_INK);
     const char *phaseText=g->battleTimer>0.0f?
         (playerAction?"技能释放中 · 命中反馈":"敌方攻击演出中"):
         (g->battleTurn==0?"选择一项行动，观察技能效果":"敌方回合 · 按 Enter 迎接攻击");
