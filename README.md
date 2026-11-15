@@ -14,17 +14,17 @@
 
 ---
 
-## 游戏画面 / Art Gallery
+## 最终地图素材 / Final Map Art — v8
 
 <p align="center">
-  <img src="assets/environment/topdown_terrain_atlas_v1.png" alt="Top-down terrain atlas" width="48%"/>
-  <img src="assets/environment/area_props_96.png" alt="Original area props atlas" width="48%"/>
+  <img src="assets/environment/generated/nature_props_sheet.png" alt="Final shared nature and coastal environment props from MapArt v8" width="48%"/>
+  <img src="assets/environment/generated/glowglade_props_sheet.png" alt="Final Glowglade Grove environment art from MapArt v8" width="48%"/>
 </p>
 <p align="center">
-  <img src="assets/environment/flora_props_atlas_128.png" alt="Flora and vegetation atlas" width="48%"/>
-  <img src="assets/environment/cliffs_fences_atlas_128.png" alt="Cliffs, bridges and fences atlas" width="48%"/>
+  <img src="assets/environment/generated/tidal_ruins_props_sheet.png" alt="Final Tidal Ruins environment art from MapArt v8" width="48%"/>
+  <img src="assets/environment/generated/lighthouse_ruins_props_sheet.png" alt="Final Lighthouse Courtyard environment art from MapArt v8" width="48%"/>
 </p>
-<p align="center"><sub>游戏使用的地形、植被、区域道具与环境素材图集 / Terrain, flora, area props and environment atlases used in-game.</sub></p>
+<p align="center"><sub>四张最终地图专属素材图集，直接来自 MistIsle_MapArt_v8.zip。旧版通用地形图集不再作为最终地图美术展示。 / Four final area-specific art sheets extracted from MistIsle_MapArt_v8.zip. Earlier generic atlases are no longer presented as the final map art.</sub></p>
 
 ## 高清角色图鉴 / High-Resolution Character Gallery
 
