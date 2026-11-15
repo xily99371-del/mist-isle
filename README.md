@@ -45,15 +45,15 @@
 ## 游戏内像素形象 / In-Game Pixel Sprites
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/xily99371-del/mist-isle/main/assets/characters/hero/heroine_pixel_4x4_64x80.png" alt="Runtime heroine pixel sprite sheet loaded by the game" width="30%"/>
-  <img src="https://raw.githubusercontent.com/xily99371-del/mist-isle/main/assets/characters/npc/watcher_pixel_4x4_64x80.png" alt="Runtime Watcher pixel sprite sheet loaded by the game" width="30%"/>
-  <img src="https://raw.githubusercontent.com/xily99371-del/mist-isle/main/assets/characters/boss/lighthouse_guardian_4x2.png" alt="Runtime Lighthouse Guardian pixel sprite sheet loaded by the game" width="30%"/>
+  <img src="https://github.com/xily99371-del/mist-isle/blob/main/assets/characters/hero/heroine_pixel_4x4_64x80.png?raw=1" alt="Runtime heroine pixel sprite sheet loaded by the game" width="30%"/>
+  <img src="https://github.com/xily99371-del/mist-isle/blob/main/assets/characters/npc/watcher_pixel_4x4_64x80.png?raw=1" alt="Runtime Watcher pixel sprite sheet loaded by the game" width="30%"/>
+  <img src="https://github.com/xily99371-del/mist-isle/blob/main/assets/characters/boss/lighthouse_guardian_4x2.png?raw=1" alt="Runtime Lighthouse Guardian pixel sprite sheet loaded by the game" width="30%"/>
 </p>
 <p align="center"><sub>以上三张角色动画均对应 src/render.c 中实际加载的文件路径 / All three sprite sheets use the exact paths loaded by src/render.c.</sub></p>
 <p align="center">
-  <img src="https://raw.githubusercontent.com/xily99371-del/mist-isle/main/assets/characters/companions/moss_lumi_idle_64.png" alt="Runtime Moss Lumi sprite sheet" width="22%"/>
-  <img src="https://raw.githubusercontent.com/xily99371-del/mist-isle/main/assets/characters/companions/moatail_idle_64.png" alt="Runtime Moatail sprite sheet" width="22%"/>
-  <img src="https://raw.githubusercontent.com/xily99371-del/mist-isle/main/assets/characters/companions/crystal_gecko_idle_64.png" alt="Runtime Crystal Gecko sprite sheet" width="22%"/>
+  <img src="https://github.com/xily99371-del/mist-isle/blob/main/assets/characters/companions/moss_lumi_idle_64.png?raw=1" alt="Runtime Moss Lumi sprite sheet" width="22%"/>
+  <img src="https://github.com/xily99371-del/mist-isle/blob/main/assets/characters/companions/moatail_idle_64.png?raw=1" alt="Runtime Moatail sprite sheet" width="22%"/>
+  <img src="https://github.com/xily99371-del/mist-isle/blob/main/assets/characters/companions/crystal_gecko_idle_64.png?raw=1" alt="Runtime Crystal Gecko sprite sheet" width="22%"/>
 </p>
 <p align="center"><sub>三位伙伴同样使用游戏运行时加载的独立四帧动画素材 / Companion strips are the exact four-frame runtime assets.</sub></p>
 <p align="center"><sub>高清对话立绘与游戏内像素动画分开展示。上述高清立绘来自 MistIsle_ApprovedArt_v7.zip，地图环境素材来自 MistIsle_MapArt_v8.zip。 / High-resolution dialogue portraits are shown separately from in-game pixel sprites. Portraits come from v7; environment art comes from v8.</sub></p>
