@@ -2,36 +2,103 @@ name: Pet combat and clean footsteps QA
 on:
   push:
     branches: [feature/animated-battle-v2]
-    paths: ['.github/workflows/pet-combat-qa.yml']
+    paths: ['.github/workflows/pet-combat-qa.yml', 'tools/.pet-upgrade/**']
 permissions:
-  contents: read
+  contents: write
 jobs:
-  prepare:
+  apply-and-verify:
     runs-on: ubuntu-24.04
-    timeout-minutes: 8
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
         with:
-          persist-credentials: false
-      - name: Export exact source and separate material recordings
+          fetch-depth: 2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify and apply exact reviewed pet-only source
         run: |
-          mkdir -p qa-pets/sounds
-          git archive --format=tar.gz HEAD > qa-pets/source.tar.gz
-          git rev-parse HEAD > qa-pets/SOURCE_COMMIT
-          curl --fail --location --retry 2 --max-time 60 https://opengameart.org/sites/default/files/sfx_step_grass_l.flac -o qa-pets/sounds/sfx_step_grass_l.flac
-          curl --fail --location --retry 2 --max-time 60 https://opengameart.org/sites/default/files/sfx_step_grass_r.flac -o qa-pets/sounds/sfx_step_grass_r.flac
-          git clone --depth 1 https://github.com/Mcamento8/open-game-sfx-index.git /tmp/sfx-index
-          find /tmp/sfx-index/audio -type f \( -name 'footstep_concrete_*.ogg' -o -name 'footstep_grass_*.ogg' \) -exec cp {} qa-pets/sounds/ \;
-          cp /tmp/sfx-index/ATTRIBUTION.md qa-pets/sounds/KENNEY_MIRROR_ATTRIBUTION.md
-          cp /tmp/sfx-index/SOURCES.md qa-pets/sounds/KENNEY_MIRROR_SOURCES.md
-          git -C /tmp/sfx-index rev-parse HEAD > qa-pets/sounds/KENNEY_MIRROR_COMMIT
-          test -f qa-pets/sounds/footstep_concrete_000.ogg
-          git clone --depth 1 --branch 5.5 https://github.com/raysan5/raylib.git /tmp/raylib
-          tar -C /tmp -czf qa-pets/raylib.tar.gz raylib/src raylib/CMakeLists.txt raylib/cmake raylib/LICENSE
-          sha256sum qa-pets/sounds/* > qa-pets/SHA256SUMS
+          python - <<'PY'
+          import base64, hashlib, json, lzma, subprocess
+          from pathlib import Path
+          digest = lambda b: hashlib.sha256(b).hexdigest()
+          data = lzma.decompress(base64.b64decode(''.join(Path(f'tools/.pet-upgrade/{i}.b64').read_text() for i in range(2)), validate=True))
+          assert digest(data) == '2da90ad6f2b2bd33c827b8d094601c562bf4a8f208fc887f3ebac22caf24d502'
+          manifest = json.loads(data)
+          assert subprocess.check_output(['git','rev-parse','HEAD^'],text=True).strip() == manifest['base'], 'Source branch changed'
+          allowed = set('ASSET_SOURCES_AND_LICENSES.md assets/audio/README.md src/battle.c src/battle.h src/battle_render.inc src/game.c src/main.c src/render.c tools/battle_visual_qa.c tools/import_footsteps.py tools/test_footstep_assets.py tools/tests/test_battle.c tools/validate_project.py assets/audio/FOOTSTEP_CREDITS.md docs/BATTLE_IMPACT_02_2.md third_party/audio/clean_footsteps/LICENSE.md third_party/audio/clean_footsteps/SOURCES.json'.split())
+          assert {f['path'] for f in manifest['files']} == allowed
+          writes=[]
+          for f in manifest['files']:
+              path=Path(f['path'])
+              if f['old'] is not None:
+                  old=path.read_bytes()
+                  assert digest(old)==f['old'], 'Original mismatch: '+str(path)
+                  lines=old.decode('utf-8').splitlines(keepends=True)
+                  for patch in reversed(f['patches']):
+                      lines[patch['start']:patch['end']]=[patch['text']]
+                  result=''.join(lines).encode('utf-8')
+              else:
+                  assert not path.exists(), 'Unexpected new file: '+str(path)
+                  result=f['content'].encode('utf-8')
+              assert digest(result)==f['sha256'], 'Result mismatch: '+str(path)
+              writes.append((path,result))
+          for path,result in writes:
+              path.parent.mkdir(parents=True,exist_ok=True)
+              path.write_bytes(result)
+          Path('/tmp/pet-paths.json').write_text(json.dumps(sorted(allowed)))
+          PY
+      - name: Prepare distinct original recordings and graphics tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake libx11-dev libxrandr-dev libxi-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libasound2-dev xvfb ffmpeg
+          python -m pip install pillow
+          dest=third_party/audio/clean_footsteps
+          curl --fail --location --retry 2 --max-time 60 https://opengameart.org/sites/default/files/sfx_step_grass_l.flac -o "$dest/sfx_step_grass_l.flac"
+          curl --fail --location --retry 2 --max-time 60 https://opengameart.org/sites/default/files/sfx_step_grass_r.flac -o "$dest/sfx_step_grass_r.flac"
+          git init /tmp/sfx-index
+          git -C /tmp/sfx-index remote add origin https://github.com/Mcamento8/open-game-sfx-index.git
+          git -C /tmp/sfx-index fetch --depth 1 origin 34bbe8b525b5ceff3804915ea745532af11f6055
+          git -C /tmp/sfx-index checkout --detach FETCH_HEAD
+          find /tmp/sfx-index/audio -type f -name 'footstep_concrete_*.ogg' -exec cp {} "$dest/" \;
+          python tools/import_footsteps.py
+      - name: Compile and run real gameplay regressions
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --parallel 4
+          python tools/test_battle.py --raylib build/_deps/raylib-src/src
+          python tools/test_postbattle.py --raylib build/_deps/raylib-src/src
+          python tools/test_audio.py --raylib build/_deps/raylib-src/src
+          python tools/test_render_math.py --raylib build/_deps/raylib-src/src
+          python tools/validate_project.py
+          python tools/test_battle_visuals.py --build build
+      - name: Commit only verified implementation and audio to feature branch
+        run: |
+          python - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          paths=json.loads(Path('/tmp/pet-paths.json').read_text())
+          paths += ['assets/audio/footsteps_manifest.json']
+          paths += [str(p) for p in Path('third_party/audio/clean_footsteps').iterdir() if p.suffix in ('.flac','.ogg')]
+          paths += [str(p) for surface in ('grass','stone') for p in Path('assets/audio/sfx').glob('step_'+surface+'_*.wav')]
+          subprocess.run(['git','add','--',*paths],check=True)
+          PY
+          git diff --cached --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'IMPACT-02.2: pet-only combat, team healing and clean grass/solid-stone footsteps'
+          git push origin HEAD:feature/animated-battle-v2
+          git rev-parse HEAD > build/PET_REVISION
+          git rev-parse HEAD >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
-          name: pet-combat-qa-input
-          path: qa-pets
-          retention-days: 3
+          name: pet-combat-verified
+          path: |
+            build/PET_REVISION
+            build/battle-impact-02.mp4
+            build/battle-frames/frame-*.png
+            assets/audio/footsteps_manifest.json
+            assets/audio/sfx/step_grass_*.wav
+            assets/audio/sfx/step_stone_*.wav
+          retention-days: 7
           compression-level: 0
