@@ -13,14 +13,17 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Export exact source and original CC0 sound pack
+      - name: Export exact source
         run: |
           mkdir -p qa-input
           git archive --format=tar.gz HEAD > qa-input/source.tar.gz
           git rev-parse HEAD > qa-input/SOURCE_COMMIT
-          curl --fail --location --retry 3 --max-time 90 'https://kenney.nl/media/pages/assets/impact-sounds/87b4ddecda-1677589768/kenney_impact-sounds.zip' -o qa-input/kenney_impact-sounds.zip
+      - name: Fetch CC0 grass and stone recordings
+        run: |
+          curl --fail --location --retry 2 --max-time 90 'https://opengameart.org/sites/default/files/Fantozzi-footsteps.7z' -o qa-input/Fantozzi-footsteps.7z
           sha256sum qa-input/* > qa-input/SHA256SUMS
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: boss-footsteps-qa-input
           path: qa-input
