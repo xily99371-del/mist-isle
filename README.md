@@ -58,167 +58,195 @@
 
 ## 中文
 
-### 关于游戏
+### 游戏简介
 
-《雾屿回响》是一款以探索和伙伴收集为核心的俯视角像素 RPG。玩家从海岸营地启程，穿过林地与潮汐遗迹，逐步揭开失落灯塔背后的故事。
+《雾屿回响》（Mist Isle）是一款俯视角像素 RPG。你将从海岸营地出发，探索一座被遗忘的海岛，与岛上的小生灵结伴，逐步恢复失落灯塔的力量。
 
-### 第一章：海岛旅程
+v1.0.0 收录第一章完整旅程，包含四张相互连通的手工设计地图，以及从初次探索到灯塔最终仪式的章节流程。
 
-- **海岸营地**：旅程起点，与守望者相遇，在营火旁整备。
-- **辉光林地**：探索发光植被与林间遗迹，感受专属萤火氛围。
-- **潮汐遗迹**：在雨幕与古代机关之间寻找线索。
-- **灯塔庭院**：穿过幽蓝火光与夜雾，迎战灯塔守卫，点亮最终祭坛。
+### 第一章：失落的灯塔
 
-### 玩法特色
+- **海岸营地**：旅程起点，也是各区域之间的枢纽。与守望者交谈、整理物品，并从这里前往其他区域。
+- **辉光林地**：在专属萤火天气中探索林地，帮助叶团、寻找果实，并与林地微光兽交锋。
+- **潮汐遗迹**：在持续降雨的遗迹中寻找潮汐贝壳与星晶，解开机关并让鸣晶蜥加入队伍。
+- **灯塔庭院**：穿过夜雾与幽蓝火光，挑战灯塔守卫，击败它后返回最终祭坛，触发章节结局。
 
-- 探索式地图与逐步解锁的区域路线。
-- 三位可加入队伍的伙伴，各自拥有独立形象与互动。
-- 战斗、收集、对话、存档与章节结局。
-- 按区域设计的天气：林地萤火、遗迹降雨、灯塔夜雾。
-- 手工绘制与整理的像素角色、地形和环境素材。
-- Windows 桌面版与 Raspberry Pi 5 ARM64 构建配置。
+### 伙伴
 
-### 操作
+旅途中可以招募三位伙伴，并在探索时跟随、在战斗中协助：
+
+- **苔灯灵（Moss Lumi）**：以星光治愈与微光攻击支援队伍。
+- **沫尾兽（Moatail）**：使用泡泡水流，使敌人进入潮湿状态。
+- **鸣晶蜥（Crystal Gecko）**：来自潮汐遗迹的晶体伙伴。
+
+伙伴拥有独立像素形象、成长数据与战斗能力。通过 Tab 可以切换当前出战伙伴。
+
+### 区域天气
+
+- 海岸营地：晴朗、阵雨与阴云轮换，不出现夜雾。
+- 辉光林地：进入时切换为专属萤火天气。
+- 潮汐遗迹：进入时切换为雨天。
+- 灯塔庭院：进入时切换为夜雾。
+
+进入区域时会显示天气提示；离开后恢复对应区域的天气规则。
+
+### 操作说明
 
 | 按键 | 功能 |
 |---|---|
 | WASD / 方向键 | 移动 |
-| E | 互动、对话、拾取 |
-| Shift | 冲刺 |
+| 左 Shift | 冲刺 |
+| E | 互动、对话、拾取、使用场景机关 |
 | Tab | 切换当前出战伙伴 |
-| J | 旅程手记 |
-| I | 背包 |
-| M | 地图 |
-| F5 / F9 | 保存 / 读取 |
-| F7 | 天气调试切换（仅调试） |
+| J | 打开旅程手记 |
+| I | 打开背包 |
+| M | 打开地图 |
 | O | 收起 / 展开目标栏 |
-| Esc | 关闭界面 / 返回 |
+| F5 / F9 | 保存 / 读取存档 |
+| F7 | 天气调试切换 |
+| Esc | 关闭当前界面 |
+
+标题界面可使用 Enter 或鼠标开始游戏；战斗界面支持键盘与鼠标选择指令。
 
 ### Windows 运行
 
-推荐使用 Windows 10/11、CMake、Visual Studio C++ Build Tools 和 Python 3。
+推荐 Windows 10/11、CMake、Visual Studio C++ Build Tools 和 Python 3。
 
-1. 克隆仓库：
-       git clone https://github.com/xily99371-del/mist-isle.git
-       cd mist-isle
-2. 运行启动脚本：
-       .\RUN_WINDOWS.bat
+```powershell
+git clone https://github.com/xily99371-del/mist-isle.git
+cd mist-isle
+.\\RUN_WINDOWS.bat
+```
 
-脚本会生成所需像素素材、配置 raylib 并编译游戏。也可以从 GitHub Actions 下载已打包的 Windows 版本。
+启动脚本会准备所需素材、配置 raylib 并编译游戏。也可以从 GitHub Actions 下载 Windows 构建产物。
 
 ### Raspberry Pi 5
 
-项目提供 Raspberry Pi 5 ARM64 构建配置，采用更保守的 OpenGL 2.1 路径，并针对天气粒子与场景绘制做了性能预算。
+项目提供 Raspberry Pi 5 ARM64 构建配置，针对设备采用独立的图形配置与粒子预算。
 
 详细说明见 [docs/RASPBERRY_PI5.md](docs/RASPBERRY_PI5.md)。
 
 ### 技术栈
 
-- C11
-- [raylib 5.5](https://www.raylib.com/)
-- CMake
-- Python + Pillow（开发期素材生成与地图校验）
-- Tiled TMX/TSX（地图编辑与构建）
-- GitHub Actions（Windows / Raspberry Pi 5 构建）
+- C11 与 [raylib 5.5](https://www.raylib.com/)
+- CMake 构建系统
+- Python + Pillow：素材生成与地图校验
+- Tiled TMX/TSX：地图编辑与构建
+- GitHub Actions：Windows x64 与 Raspberry Pi 5 ARM64 自动构建
 
 ### 项目结构
 
-    mist-isle/
-    ├── assets/          # 角色、地形、环境与过场素材
-    ├── docs/            # 设计与平台文档
-    ├── maps/            # Tiled 地图与 tileset
-    ├── src/              # C 游戏逻辑与渲染
-    ├── tools/            # 素材生成、地图构建与校验
-    ├── third_party/      # 第三方素材与许可证
-    ├── CMakeLists.txt
-    └── RUN_WINDOWS.bat
+```text
+mist-isle/
+├── assets/          # 角色、地图、环境与过场素材
+├── docs/            # 项目与平台文档
+├── maps/            # Tiled 地图与 tileset
+├── src/             # C 游戏逻辑与渲染
+├── tools/           # 素材生成、地图构建与校验
+├── third_party/     # 第三方素材与许可证
+├── CMakeLists.txt
+└── RUN_WINDOWS.bat
+```
 
-### 致谢与素材许可
+### 素材与许可
 
-项目原创角色与环境素材归项目所有。第三方素材仅按其原始许可使用；相关来源与许可证记录见 [ASSET_SOURCES_AND_LICENSES.md](ASSET_SOURCES_AND_LICENSES.md) 及 third_party 目录。
-
----
+最终角色素材以 `MistIsle_ApprovedArt_v7.zip` 为准，四张地图的环境素材以 `MistIsle_MapArt_v8.zip` 为准。第三方素材来源与许可证见 [ASSET_SOURCES_AND_LICENSES.md](ASSET_SOURCES_AND_LICENSES.md) 及 `third_party/`。
 
 ## English
 
-### About
+### About the Game
 
-**Mist Isle** is a top-down pixel-art RPG focused on exploration and companion collection. Begin at a quiet coastal camp, travel through a luminous grove and tide-worn ruins, and uncover the story behind the island's lost lighthouse.
+**Mist Isle** is a top-down pixel-art RPG. Set out from a coastal camp, explore a forgotten island, befriend its small inhabitants, and restore the power of a lost lighthouse.
 
-### Chapter One: An Island Journey
+Version 1.0.0 contains the complete first-chapter journey across four handcrafted, connected areas—from the first steps on the island to the final lighthouse ritual.
 
-- **Coastal Camp** — The starting hub. Meet the Watcher and prepare beside the campfire.
-- **Glowglade Grove** — Explore luminous plants and forgotten woodland paths under its signature firefly ambience.
-- **Tidal Ruins** — Search ancient mechanisms through rain and weathered stone.
-- **Lighthouse Courtyard** — Follow the blue flames through the night fog, face the Lighthouse Guardian, and awaken the final altar.
+### Chapter One: The Lost Lighthouse
 
-### Features
+- **Coastal Camp** — The starting hub and connection between regions. Talk to the Watcher, manage your inventory, and set out for the island's other areas.
+- **Glowglade Grove** — Explore under its exclusive firefly weather, help Leafling, gather fruit, and face the Grove Mote.
+- **Tidal Ruins** — Search the rain-soaked ruins for a Tide Shell and Star Crystal, solve the shrine mechanism, and recruit Crystal Gecko.
+- **Lighthouse Courtyard** — Cross the night fog and blue flames, challenge the Lighthouse Guardian, then return to the final altar to trigger the chapter ending.
 
-- Exploration-led hub-and-submap progression.
-- Three recruitable companions with distinct identities and interactions.
-- Combat, collectibles, dialogue, save/load, and a chapter finale.
-- Region-specific weather: fireflies in the grove, rain in the ruins, and night fog at the lighthouse.
-- Handcrafted pixel characters, terrain, and environment art.
-- Windows desktop and Raspberry Pi 5 ARM64 build profiles.
+### Companions
+
+Recruit three companions who follow you during exploration and assist in battle:
+
+- **Moss Lumi** — Supports the party with starlight healing and luminous attacks.
+- **Moatail** — Uses bubble streams to leave enemies in a wet state.
+- **Crystal Gecko** — A crystal companion found in the Tidal Ruins.
+
+Each companion has an individual pixel sprite, progression data and battle abilities. Press Tab to switch the active companion.
+
+### Regional Weather
+
+- Coastal Camp: clear, rain and overcast weather rotate; night fog is excluded.
+- Glowglade Grove: entering the area activates its exclusive firefly weather.
+- Tidal Ruins: entering the area activates rain.
+- Lighthouse Courtyard: entering the area activates night fog.
+
+An on-screen notice announces each area transition and its weather. Each region follows its own weather rules.
 
 ### Controls
 
 | Key | Action |
 |---|---|
 | WASD / Arrow keys | Move |
-| E | Interact, talk, pick up |
-| Shift | Dash |
+| Left Shift | Dash |
+| E | Interact, talk, pick up items and activate scene objects |
 | Tab | Switch active companion |
-| J | Journal |
-| I | Inventory |
-| M | Map |
-| F5 / F9 | Save / Load |
-| F7 | Weather debug cycle (debug only) |
+| J | Open journal |
+| I | Open inventory |
+| M | Open map |
 | O | Collapse / expand objectives |
-| Esc | Back / close interface |
+| F5 / F9 | Save / load |
+| F7 | Weather debug cycle |
+| Esc | Close the current interface |
+
+Press Enter or click the mouse to start from the title screen. Battle commands can be selected with the keyboard or mouse.
 
 ### Build on Windows
 
-Recommended: Windows 10/11, CMake, Visual Studio C++ Build Tools, and Python 3.
+Recommended: Windows 10/11, CMake, Visual Studio C++ Build Tools and Python 3.
 
-1. Clone the repository:
-       git clone https://github.com/xily99371-del/mist-isle.git
-       cd mist-isle
-2. Run:
-       .\RUN_WINDOWS.bat
+```powershell
+git clone https://github.com/xily99371-del/mist-isle.git
+cd mist-isle
+.\\RUN_WINDOWS.bat
+```
 
-The script generates required pixel assets, configures raylib, and builds the game. A packaged Windows build is also produced by GitHub Actions.
+The launcher prepares required assets, configures raylib and builds the game. A packaged Windows build is also available from GitHub Actions.
 
 ### Raspberry Pi 5
 
-An ARM64 build profile is provided for Raspberry Pi 5. It uses a conservative OpenGL 2.1 path and a reduced rendering budget for weather particles and scene effects.
+The project provides a dedicated Raspberry Pi 5 ARM64 build profile with device-specific graphics settings and particle budgets.
 
-See [docs/RASPBERRY_PI5.md](docs/RASPBERRY_PI5.md) for details.
+See [docs/RASPBERRY_PI5.md](docs/RASPBERRY_PI5.md).
 
 ### Technology
 
-- C11
-- [raylib 5.5](https://www.raylib.com/)
+- C11 and [raylib 5.5](https://www.raylib.com/)
 - CMake
-- Python + Pillow for development-time asset generation and map validation
-- Tiled TMX/TSX maps
-- GitHub Actions for Windows and Raspberry Pi 5 builds
+- Python + Pillow for asset generation and map validation
+- Tiled TMX/TSX for map authoring and compilation
+- GitHub Actions for Windows x64 and Raspberry Pi 5 ARM64 builds
 
 ### Repository Layout
 
-    mist-isle/
-    ├── assets/          # Characters, terrain, environment and cinematic art
-    ├── docs/            # Design and platform documentation
-    ├── maps/            # Tiled maps and tilesets
-    ├── src/              # C gameplay and rendering
-    ├── tools/            # Asset generation, map building and validation
-    ├── third_party/      # Third-party assets and licenses
-    ├── CMakeLists.txt
-    └── RUN_WINDOWS.bat
+```text
+mist-isle/
+├── assets/          # Characters, maps, environment and cinematic art
+├── docs/            # Project and platform documentation
+├── maps/            # Tiled maps and tilesets
+├── src/             # C gameplay and rendering
+├── tools/           # Asset generation, map building and validation
+├── third_party/     # Third-party assets and licenses
+├── CMakeLists.txt
+└── RUN_WINDOWS.bat
+```
 
-### Credits and Asset Licenses
+### Art Assets and Licenses
 
-Original project characters and environment art belong to the project. Third-party assets are used under their respective licenses. See [ASSET_SOURCES_AND_LICENSES.md](ASSET_SOURCES_AND_LICENSES.md) and the third_party directory.
+The final character assets are defined by `MistIsle_ApprovedArt_v7.zip`; the four area-specific environment art sheets are defined by `MistIsle_MapArt_v8.zip`. Third-party asset sources and licenses are documented in [ASSET_SOURCES_AND_LICENSES.md](ASSET_SOURCES_AND_LICENSES.md) and `third_party/`.
 
 ---
 
