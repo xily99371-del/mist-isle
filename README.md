@@ -29,24 +29,25 @@
 ## 角色图鉴 / Character Gallery
 
 <p align="center">
-  <img src="assets/characters/portraits/character_portraits_atlas.jpg" alt="Mist Isle character portrait collection" width="88%"/>
+  <img src="assets/characters/svg/heroine_portrait.svg" alt="The Traveller — high-resolution portrait" width="31%"/>
+  <img src="assets/characters/svg/watcher_portrait.svg" alt="The Watcher — high-resolution portrait" width="31%"/>
+  <img src="assets/characters/svg/lighthouse_guardian_portrait.svg" alt="The Lighthouse Guardian — high-resolution portrait" width="31%"/>
 </p>
-<p align="center"><sub>主要角色与伙伴立绘 / Main cast and companion portraits.</sub></p>
+<p align="center"><sub>旅者、守望者与灯塔守卫的高清独立立绘（SVG 矢量原稿，512 × 640） / High-resolution individual character portraits (original SVG artwork, 512 × 640).</sub></p>
 
 <p align="center">
-  <img src="assets/characters/hero/heroine_world_4x4_32x48.png" alt="The traveller pixel sprite sheet" width="32%"/>
-  <img src="assets/characters/companions/moss_lumi_idle_64.png" alt="Moss Lumi pixel sprite" width="20%"/>
-  <img src="assets/characters/companions/moatail_idle_64.png" alt="Moatail pixel sprite" width="20%"/>
-  <img src="assets/characters/companions/crystal_gecko_idle_64.png" alt="Crystal Gecko pixel sprite" width="20%"/>
+  <img src="assets/characters/svg/moss_lumi.svg" alt="Moss Lumi companion portrait" width="23%"/>
+  <img src="assets/characters/svg/moatail.svg" alt="Moatail companion portrait" width="23%"/>
+  <img src="assets/characters/svg/crystal_gecko.svg" alt="Crystal Gecko companion portrait" width="23%"/>
 </p>
-<p align="center"><sub>旅者与三位伙伴的游戏内像素形象 / In-game pixel sprites of the traveller and three companions.</sub></p>
+<p align="center"><sub>三位伙伴的独立高清形象 / Individual high-resolution companion artwork.</sub></p>
 
 <p align="center">
-  <img src="assets/characters/boss/lighthouse_guardian_4x2.png" alt="Lighthouse Guardian boss sprite sheet" width="42%"/>
-  <img src="assets/characters/portraits/watcher_world_cutout.png" alt="The Watcher character artwork" width="42%"/>
+  <img src="assets/characters/hero/heroine_approved_8x4.png" alt="Traveller in-game approved pixel sprite sheet" width="32%"/>
+  <img src="assets/characters/boss/lighthouse_guardian_4x2.png" alt="Lighthouse Guardian in-game pixel sprite sheet" width="32%"/>
+  <img src="assets/characters/portraits/watcher_world_cutout.png" alt="Watcher in-game character cutout" width="32%"/>
 </p>
-<p align="center"><sub>灯塔守卫与守望者 / The Lighthouse Guardian and the Watcher.</sub></p>
-
+<p align="center"><sub>游戏内像素动画与角色素材 / In-game pixel animation and character assets.</sub></p>
 ## 中文
 
 ### 关于游戏
