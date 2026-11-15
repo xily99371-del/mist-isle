@@ -26,6 +26,27 @@
 </p>
 <p align="center"><sub>游戏使用的地形、植被、区域道具与环境素材图集 / Terrain, flora, area props and environment atlases used in-game.</sub></p>
 
+## 角色图鉴 / Character Gallery
+
+<p align="center">
+  <img src="assets/characters/portraits/character_portraits_atlas.jpg" alt="Mist Isle character portrait collection" width="88%"/>
+</p>
+<p align="center"><sub>主要角色与伙伴立绘 / Main cast and companion portraits.</sub></p>
+
+<p align="center">
+  <img src="assets/characters/hero/heroine_world_4x4_32x48.png" alt="The traveller pixel sprite sheet" width="32%"/>
+  <img src="assets/characters/companions/moss_lumi_idle_64.png" alt="Moss Lumi pixel sprite" width="20%"/>
+  <img src="assets/characters/companions/moatail_idle_64.png" alt="Moatail pixel sprite" width="20%"/>
+  <img src="assets/characters/companions/crystal_gecko_idle_64.png" alt="Crystal Gecko pixel sprite" width="20%"/>
+</p>
+<p align="center"><sub>旅者与三位伙伴的游戏内像素形象 / In-game pixel sprites of the traveller and three companions.</sub></p>
+
+<p align="center">
+  <img src="assets/characters/boss/lighthouse_guardian_4x2.png" alt="Lighthouse Guardian boss sprite sheet" width="42%"/>
+  <img src="assets/characters/portraits/watcher_world_cutout.png" alt="The Watcher character artwork" width="42%"/>
+</p>
+<p align="center"><sub>灯塔守卫与守望者 / The Lighthouse Guardian and the Watcher.</sub></p>
+
 ## 中文
 
 ### 关于游戏
