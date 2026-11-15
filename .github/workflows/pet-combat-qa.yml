@@ -1,0 +1,37 @@
+name: Pet combat and clean footsteps QA
+on:
+  push:
+    branches: [feature/animated-battle-v2]
+    paths: ['.github/workflows/pet-combat-qa.yml']
+permissions:
+  contents: read
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Export exact source and separate material recordings
+        run: |
+          mkdir -p qa-pets/sounds
+          git archive --format=tar.gz HEAD > qa-pets/source.tar.gz
+          git rev-parse HEAD > qa-pets/SOURCE_COMMIT
+          curl --fail --location --retry 2 --max-time 60 https://opengameart.org/sites/default/files/sfx_step_grass_l.flac -o qa-pets/sounds/sfx_step_grass_l.flac
+          curl --fail --location --retry 2 --max-time 60 https://opengameart.org/sites/default/files/sfx_step_grass_r.flac -o qa-pets/sounds/sfx_step_grass_r.flac
+          git clone --depth 1 https://github.com/Mcamento8/open-game-sfx-index.git /tmp/sfx-index
+          find /tmp/sfx-index/audio -type f \( -name 'footstep_concrete_*.ogg' -o -name 'footstep_grass_*.ogg' \) -exec cp {} qa-pets/sounds/ \;
+          cp /tmp/sfx-index/ATTRIBUTION.md qa-pets/sounds/KENNEY_MIRROR_ATTRIBUTION.md
+          cp /tmp/sfx-index/SOURCES.md qa-pets/sounds/KENNEY_MIRROR_SOURCES.md
+          git -C /tmp/sfx-index rev-parse HEAD > qa-pets/sounds/KENNEY_MIRROR_COMMIT
+          test -f qa-pets/sounds/footstep_concrete_000.ogg
+          git clone --depth 1 --branch 5.5 https://github.com/raysan5/raylib.git /tmp/raylib
+          tar -C /tmp -czf qa-pets/raylib.tar.gz raylib/src raylib/CMakeLists.txt raylib/cmake raylib/LICENSE
+          sha256sum qa-pets/sounds/* > qa-pets/SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pet-combat-qa-input
+          path: qa-pets
+          retention-days: 3
+          compression-level: 0
