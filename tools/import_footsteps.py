@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Prepare warm, short grass/stone foley from Fantozzi's CC0 recordings.
+"""Build material-specific steps from tracked grass and solid-surface sources.
 
-Developer-only: extract third_party/audio/fantozzi/source.7z, then run
-python tools/import_footsteps.py --source-dir <extracted Fantozzi-footsteps/flac>
-Requires ffmpeg. Players use the tracked WAV files; no tools/downloads at runtime.
+Developer-only, requires ffmpeg. Players use the committed WAVs directly.
+Grass: Blender Foundation / Yo Frankie!, CC-BY-3.0 (actual L/R grass steps).
+Stone: Kenney Impact Sounds concrete, CC0-1.0 (short hard-surface taps).
+Never uses Fantozzi Sand/Stone, gravel, or a sand/noise overlay.
 """
 from array import array
 import argparse
@@ -16,76 +17,67 @@ import subprocess
 import sys
 import wave
 
-ROOT = Path(__file__).resolve().parents[1]
-RATE = 22050
-ARCHIVE_SHA256 = '415d360e0911c1c1c5355ee94023b772e6f4044f59b9b580610e7dbffd1840fd'
-SOURCE_URL = 'https://opengameart.org/content/fantozzis-footsteps-grasssand-stone'
+ROOT=Path(__file__).resolve().parents[1]
+RATE=22050
+SOURCE_DIR=ROOT/'third_party/audio/clean_footsteps'
 
+def digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
-def prepare(source: Path, surface: str) -> list[float]:
-    # No oscillator/sine layer: retain the original heel/sole/rustle texture.
-    cutoff = 2900 if surface == 'grass' else 4200
-    raw = subprocess.check_output([
-        'ffmpeg', '-v', 'error', '-i', str(source), '-ac', '1', '-ar', str(RATE),
-        '-af', f'highpass=f=100,lowpass=f={cutoff}', '-f', 'f32le', 'pipe:1'])
-    samples = array('f'); samples.frombytes(raw)
-    if sys.byteorder != 'little': samples.byteswap()
-    if not samples: raise ValueError(f'Empty recording: {source}')
-    peak = max(abs(x) for x in samples)
-    if not math.isfinite(peak) or peak < .0001: raise ValueError(f'Invalid recording: {source}')
-    threshold = peak * .018
-    first = next(i for i, x in enumerate(samples) if abs(x) > threshold)
-    first = max(0, first - int(.004 * RATE))
-    seconds = .27 if surface == 'grass' else .22
-    trimmed = list(samples[first:first + round(seconds * RATE)])
-    mean = sum(trimmed) / len(trimmed)
-    trimmed = [x - mean for x in trimmed]
-    rms = math.sqrt(sum(x*x for x in trimmed) / len(trimmed))
-    gain = (.060 if surface == 'grass' else .067) / max(rms, 1e-6)
-    ceiling = .30 if surface == 'grass' else .34
-    result = []
-    fade = round((.040 if surface == 'grass' else .030) * RATE)
-    for i, x in enumerate(trimmed):
-        envelope = min(1.0, i / (.003 * RATE), (len(trimmed)-1-i) / fade)
-        result.append(ceiling * math.tanh(x * gain / ceiling) * max(0, envelope))
-    return result
+def prepare(source, surface, variant):
+    cutoff=(1900,2050,1750)[variant] if surface=='grass' else (3400,3700,3200)[variant]
+    raw=subprocess.check_output(['ffmpeg','-v','error','-i',str(source),'-ac','1','-ar',str(RATE),
+        '-af',f'highpass=f=70,lowpass=f={cutoff}:p=2','-f','f32le','pipe:1'])
+    data=array('f');data.frombytes(raw)
+    if sys.byteorder!='little':data.byteswap()
+    if not data or any(not math.isfinite(x) for x in data):raise ValueError(f'Invalid source {source}')
+    peak=max(map(abs,data))
+    if peak<1e-5:raise ValueError(f'Silent source {source}')
+    onset=next(i for i,x in enumerate(data) if abs(x)>peak*.02)
+    start=max(0,onset-round(.004*RATE))
+    # Grass retains the soft plant-compression/leaf texture. Stone retains only
+    # the very short original solid tap, never a granular tail or new layer.
+    limit=.255 if surface=='grass' else .145
+    data=list(data[start:start+round(limit*RATE)])
+    mean=sum(data)/len(data);data=[x-mean for x in data]
+    fade=round((.065 if surface=='grass' else .015)*RATE)
+    for i in range(len(data)):
+        edge=min(1.,i/(.004*RATE),(len(data)-1-i)/fade)
+        data[i]*=max(0.,edge)
+    rms=math.sqrt(sum(x*x for x in data)/len(data))
+    target=(.043 if surface=='grass' else .052)*(1.,.97,1.03)[variant]
+    gain=min(target/max(rms,1e-8),.28/max(map(abs,data)))
+    return [x*gain for x in data]
 
-
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--source-dir', type=Path, required=True)
-    args = parser.parse_args()
-    if not shutil.which('ffmpeg'): parser.error('ffmpeg is required to import developer assets')
-    archive = ROOT / 'third_party/audio/fantozzi/source.7z'
-    if hashlib.sha256(archive.read_bytes()).hexdigest() != ARCHIVE_SHA256:
-        raise ValueError('Original recording archive does not match reviewed source')
-    target = ROOT / 'assets/audio/sfx'; target.mkdir(parents=True, exist_ok=True)
-    manifest = {'format_version': 1, 'author': 'Fantozzi', 'editor': 'qubodup (single-step cuts)',
-        'license': 'CC0-1.0', 'source_url': SOURCE_URL, 'source_archive_sha256': ARCHIVE_SHA256,
-        'processing': 'Mono 22050 Hz PCM16; 100 Hz high-pass; grass 2900 Hz / stone 4200 Hz low-pass; onset trim, short tail fade, RMS matching and soft peak limiting. No pitch or tempo shift in source files.',
-        'routing': {'coastal_camp': 'grass', 'glowglade_grove': 'grass', 'tidal_ruins': 'stone', 'lighthouse_courtyard': 'stone'},
-        'files': []}
-    for surface, original in [('grass', 'Sand'), ('stone', 'Stone')]:
-        for take in range(1, 4):
-            for foot_index, foot in enumerate('LR'):
-                name = f'Fantozzi-{original}{foot}{take}.flac'
-                source = args.source_dir / name
-                audio = prepare(source, surface)
-                suffix = 'abcdef'[(take-1)*2 + foot_index]
-                output = target / f'step_{surface}_{suffix}.wav'
-                pcm = array('h', (round(max(-1, min(1, x)) * 32767) for x in audio))
-                if sys.byteorder != 'little': pcm.byteswap()
-                with wave.open(str(output), 'wb') as wav:
-                    wav.setnchannels(1); wav.setsampwidth(2); wav.setframerate(RATE)
-                    wav.writeframes(pcm.tobytes())
-                manifest['files'].append({'path': output.relative_to(ROOT).as_posix(), 'source': name,
-                    'source_sha256': hashlib.sha256(source.read_bytes()).hexdigest(),
-                    'sha256': hashlib.sha256(output.read_bytes()).hexdigest(),
-                    'foot': foot, 'take': take, 'surface': surface,
-                    'seconds': len(audio)/RATE, 'peak': max(abs(x) for x in audio),
-                    'rms': math.sqrt(sum(x*x for x in audio)/len(audio))})
-    (ROOT / 'assets/audio/footsteps_manifest.json').write_text(json.dumps(manifest, indent=2, ensure_ascii=False)+'\n', encoding='utf-8')
-    print('Imported 12 recorded, click-free grass/stone steps; music and other SFX untouched.')
-
-
-if __name__ == '__main__': main()
+def main():
+    p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--source-dir',type=Path,default=SOURCE_DIR)
+    args=p.parse_args()
+    if not shutil.which('ffmpeg'):p.error('ffmpeg is needed only to regenerate developer assets')
+    source_manifest=json.loads((args.source_dir/'SOURCES.json').read_text(encoding='utf-8'))
+    for name,sha in source_manifest['sha256'].items():
+        if digest(args.source_dir/name)!=sha:raise ValueError(f'Original source hash mismatch: {name}')
+    target=ROOT/'assets/audio/sfx';target.mkdir(parents=True,exist_ok=True)
+    manifest={'format_version':2,'revision':'IMPACT-02.2-clean-materials',
+        'sources':source_manifest['sources'],
+        'processing':'No mixed sand/gravel sources. Mono PCM16 22050 Hz; 70 Hz high-pass; grass 1750-2050 Hz low-pass and 255 ms soft tail; concrete 3200-3700 Hz low-pass and original short tap; linear RMS matching, peak ceiling 0.28, click-free fades. No synthetic noise added.',
+        'variation_note':'Six playback variations per material, not six independent L/R recordings. Grass derives from two true L/R steps; stone from five concrete steps. Reused source variations differ in EQ/level. Foot denotes playback lane.',
+        'routing':{'coastal_camp':'grass','glowglade_grove':'grass','tidal_ruins':'stone','lighthouse_courtyard':'stone'},'files':[]}
+    for surface in ('grass','stone'):
+        for i,suffix in enumerate('abcdef'):
+            name=f'sfx_step_grass_{"lr"[i%2]}.flac' if surface=='grass' else f'footstep_concrete_{i%5:03}.ogg'
+            source=args.source_dir/name
+            data=prepare(source,surface,i//2)
+            out=target/f'step_{surface}_{suffix}.wav'
+            pcm=array('h',(round(x*32767) for x in data))
+            if sys.byteorder!='little':pcm.byteswap()
+            with wave.open(str(out),'wb') as wav:
+                wav.setnchannels(1);wav.setsampwidth(2);wav.setframerate(RATE);wav.writeframes(pcm.tobytes())
+            manifest['files'].append({'path':out.relative_to(ROOT).as_posix(),'source':name,
+                'source_sha256':digest(source),'sha256':digest(out),'foot':'LR'[i%2],'take':i//2+1,
+                'surface':surface,'license':'CC-BY-3.0' if surface=='grass' else 'CC0-1.0',
+                'seconds':len(data)/RATE,'peak':max(map(abs,data)),
+                'rms':math.sqrt(sum(x*x for x in data)/len(data))})
+    (ROOT/'assets/audio/footsteps_manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    print('Rebuilt 12 grass/solid-stone variations from separate tracked materials; no sand/gravel source.')
+if __name__=='__main__':main()

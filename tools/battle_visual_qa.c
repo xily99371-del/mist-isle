@@ -27,6 +27,7 @@ int main(int argc,char **argv){
     if(!IsWindowReady())return 2;
     RenderInit();RenderTexture2D canvas=LoadRenderTexture(SW,SH);
     Game g;GameStartBattlePreview(&g);
+    g.lumi.hp=61;g.splash.hp=45;g.spark.hp=67;BattleInit(&g);
     int action=0,frame=0;float rest=0;
     for(int tick=0;tick<630;tick++) {
         guard=false;

@@ -1,0 +1,42 @@
+{
+  "sources": [
+    {
+      "surface": "grass",
+      "author": "Blender Foundation",
+      "work": "Yo Frankie! - Grass Foot Step Sounds",
+      "license": "CC-BY-3.0",
+      "page": "https://opengameart.org/content/grass-foot-step-sounds-yo-frankie",
+      "license_url": "https://creativecommons.org/licenses/by/3.0/",
+      "files": [
+        "sfx_step_grass_l.flac",
+        "sfx_step_grass_r.flac"
+      ]
+    },
+    {
+      "surface": "stone",
+      "author": "Kenney",
+      "work": "Impact Sounds - concrete footsteps",
+      "license": "CC0-1.0",
+      "page": "https://kenney.nl/assets/impact-sounds",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "mirror": "https://github.com/Mcamento8/open-game-sfx-index",
+      "mirror_commit": "34bbe8b525b5ceff3804915ea745532af11f6055",
+      "files": [
+        "footstep_concrete_000.ogg",
+        "footstep_concrete_001.ogg",
+        "footstep_concrete_002.ogg",
+        "footstep_concrete_003.ogg",
+        "footstep_concrete_004.ogg"
+      ]
+    }
+  ],
+  "sha256": {
+    "sfx_step_grass_l.flac": "69361acad4d2fdad1bb50910fa87e39f5bfdd5d7a6532915bc2ce47b7bbc3101",
+    "sfx_step_grass_r.flac": "1121c8f1dc97db5fcaf8832fc8078c24e7cbc16656c13bf02358d7b353a5ec59",
+    "footstep_concrete_000.ogg": "d7267e183067757c92c169de2a379abea592cfca6b39bb2e8feea15221ad79fe",
+    "footstep_concrete_001.ogg": "507a75eb19b897087855a3be3cf11a12d7fa37d143ad535eeebe0b8031c7325d",
+    "footstep_concrete_002.ogg": "b21fa546d74941196b25da8a20b7010abd8c05c4fcf93545d1f344e66a664e13",
+    "footstep_concrete_003.ogg": "8b513c2f0316324060b9174b8f28df6c2147418c506e6a53b77f18e149a5547b",
+    "footstep_concrete_004.ogg": "24dd8db2413e5b81ad181e1205c12a1c7801da5f85715d471b92a4b2f632e45e"
+  }
+}

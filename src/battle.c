@@ -25,6 +25,20 @@ int BattleBuddyId(const Game *g,int slot) {
     }
     return -1;
 }
+static bool CanAct(Game *g,int id) {
+    Buddy *p=Partner(g,id);
+    return p&&p->owned&&p->hp>0;
+}
+static void SelectPartner(Game *g,int id) {
+    for(int slot=0;slot<BattleBuddyCount(g);slot++)if(BattleBuddyId(g,slot)==id) {
+        g->battleChoice=slot;g->selectedBuddy=id;return;
+    }
+}
+static void PartyDefeated(Game *g) {
+    BattleState *b=&g->battle;
+    b->phase=BATTLE_LOSS;b->clock=0;b->duration=.70f;b->hitStop=0;
+    b->actor=b->defender=-1;g->selectedBuddy=-1;g->battleTurn=0;
+}
 static bool Held(void) {
     return GameInputDown(KEY_ENTER)||GameInputDown(KEY_SPACE)||GameInputDown(KEY_E)||IsMouseButtonDown(MOUSE_BUTTON_LEFT);
 }
@@ -42,7 +56,6 @@ void BattleInit(Game *g) {
     b->initialized=true;b->preview=preview;b->phase=BATTLE_CHOOSE;
     b->actor=b->defender=-1;b->inputBlocked=Held();
     b->enemyHp=b->enemyTrail=g->enemies[g->battleEnemy].hp;
-    b->playerHp=g->player.hp;
     b->buddyHp[0]=g->lumi.hp;b->buddyHp[1]=g->splash.hp;b->buddyHp[2]=g->spark.hp;
     b->wetTurns=g->enemySoaked?2:0;b->dampen=g->enemySoaked;
     if(g->battleRound<1)g->battleRound=1;
@@ -50,21 +63,23 @@ void BattleInit(Game *g) {
     int count=BattleBuddyCount(g);g->battleChoice=0;
     for(int i=0;i<count;i++)if(BattleBuddyId(g,i)==g->selectedBuddy)g->battleChoice=i;
     g->selectedBuddy=count?BattleBuddyId(g,g->battleChoice):-1;
-    Message(g,"选择伙伴技能，按 Enter 出招。敌人会自动回击。");
+    if(!count){PartyDefeated(g);Message(g,"全队宠物体力耗尽，正在撤回营地。");return;}
+    Message(g,"选择宠物技能，按 Enter 出招。只有宠物参与战斗。");
 }
 static void Action(Game *g,BattlePhase phase,BattleAction action,int actor) {
     BattleState *b=&g->battle;
     b->phase=phase;b->action=action;b->actor=actor;
     b->clock=0;b->hitStop=0;b->impacted=false;b->guarded=false;b->guardAttempted=false;
     b->combo=false;b->damped=false;b->damage=0;b->heal=0;
+    memset(b->healByBuddy,0,sizeof(b->healByBuddy));
     g->battleTurn=phase==BATTLE_ENEMY?1:0;
 }
 bool BattleStartAction(Game *g,int actor) {
     BattleState *b=&g->battle;
     if(g->scene!=SCENE_BATTLE||b->phase!=BATTLE_CHOOSE)return false;
     Buddy *p=Partner(g,actor);
-    if(actor>=0&&(!p||!p->owned||p->hp<=0))return false;
-    if(actor<-1||actor>2)return false;
+    /* The traveller is a commander, never a fallback combatant. */
+    if(actor<0||actor>2||!CanAct(g,actor))return false;
     Action(g,BATTLE_PLAYER,(BattleAction)(actor+1),actor);
     b->defender=actor;g->selectedBuddy=actor;
     int level=p?p->level:1;if(level<1)level=1;
@@ -73,7 +88,7 @@ bool BattleStartAction(Game *g,int actor) {
         case ACTION_GLOW:
             b->duration=1.60f;b->impactAt=.95f;
             b->damage=8+(level-1)*2;b->heal=18+(level-1)*3;
-            Message(g,"星光治愈 · 光点集中，照亮旅人与伙伴。");break;
+            Message(g,"星光治愈 · 为全队宠物恢复体力。");break;
         case ACTION_WATER:
             b->damage=20+(level-1)*3;
             Message(g,"泡泡水流 · 水流将使敌人潮湿。");break;
@@ -81,9 +96,7 @@ bool BattleStartAction(Game *g,int actor) {
             b->duration=1.50f;b->impactAt=.78f;b->combo=g->enemySoaked;
             b->damage=(b->combo?38:26)+(level-1)*4;
             Message(g,b->combo?"潮湿导电 · 晶弧共鸣！":"晶弧放电 · 电光正在集中。");break;
-        default:
-            b->duration=1.20f;b->impactAt=.58f;b->damage=10;
-            Message(g,"旅人出击 · 向前冲刺！");break;
+        default:return false; /* Only the three pet skill IDs are accepted. */
     }
     AudioPlay(AUDIO_DASH);
     return true;
@@ -91,6 +104,8 @@ bool BattleStartAction(Game *g,int actor) {
 static void EnemyAction(Game *g) {
     BattleState *b=&g->battle;Enemy *e=&g->enemies[g->battleEnemy];
     int defender=b->defender;
+    if(!CanAct(g,defender))defender=BattleBuddyId(g,0);
+    if(defender<0){PartyDefeated(g);return;}
     int phase=BattleBossPhase(e->hp,e->maxHp);
     bool heavy=e->type==ENEMY_BOSS&&(phase==3?g->battleRound%2==0:g->battleRound%3==0);
     Action(g,BATTLE_ENEMY,heavy?ACTION_RESONANCE:ACTION_ENEMY,-1);
@@ -110,9 +125,18 @@ static void Impact(Game *g) {
         e->hp=fmaxf(0,e->hp-b->damage);
         b->trailDelay=.32f;
         if(b->action==ACTION_GLOW) {
-            float before=g->player.hp;
-            g->player.hp=fminf(g->player.maxHp,g->player.hp+b->heal);
-            b->heal=g->player.hp-before;
+            const float amount=fmaxf(0,b->heal);
+            b->heal=0;
+            /* Team recovery includes recruited exhausted pets; it cannot be
+             * cast after a wipe because the caster must still be active. */
+            for(int id=0;id<3;id++) {
+                Buddy *pet=Partner(g,id);
+                if(!pet->owned)continue;
+                float before=pet->hp;
+                pet->hp=fminf(pet->maxHp,pet->hp+amount);
+                b->healByBuddy[id]=fmaxf(0,pet->hp-before);
+                b->heal+=b->healByBuddy[id];
+            }
         }
         if(b->action==ACTION_WATER) {
             g->enemySoaked=true;b->wetTurns=2;b->dampen=true;
@@ -124,7 +148,7 @@ static void Impact(Game *g) {
         if(b->guarded)b->damage*=.45f;
         Buddy *p=Partner(g,b->defender);
         if(p&&p->owned&&p->hp>0)p->hp=fmaxf(0,p->hp-b->damage);
-        else {b->defender=-1;g->player.hp=fmaxf(0,g->player.hp-b->damage);}
+        else b->damage=0; /* A vanished pet target never redirects to traveller. */
         /* Only the one-use damage reduction is consumed. Wetness remains for
            the following player turn, so WATER -> SPARK is actually possible. */
         b->dampen=false;
@@ -137,21 +161,24 @@ static void Impact(Game *g) {
 static void ChooseInput(Game *g) {
     BattleState *b=&g->battle;
     if(b->inputBlocked){if(!Held())b->inputBlocked=false;return;}
-    int count=BattleBuddyCount(g),options=count?count:1;
-    if(g->battleChoice>=options||g->battleChoice<0)g->battleChoice=0;
-    if(GameInputPressed(KEY_ONE)||GameInputPressed(KEY_Q))g->battleChoice=0;
-    if((GameInputPressed(KEY_TWO)||GameInputPressed(KEY_W))&&options>1)g->battleChoice=1;
-    if((GameInputPressed(KEY_THREE)||GameInputPressed(KEY_E))&&options>2)g->battleChoice=2;
-    if(GameInputPressed(KEY_LEFT)||GameInputPressed(KEY_A))g->battleChoice=(g->battleChoice+options-1)%options;
-    if(GameInputPressed(KEY_RIGHT)||GameInputPressed(KEY_D))g->battleChoice=(g->battleChoice+1)%options;
+    int count=BattleBuddyCount(g);
+    if(count==0){PartyDefeated(g);return;}
+    if(g->battleChoice>=count||g->battleChoice<0)g->battleChoice=0;
+    /* Fixed number keys and fixed cards: a fainted pet never changes another
+     * pet's hotkey, and disabled cards cannot select the traveller. */
+    if(GameInputPressed(KEY_ONE)||GameInputPressed(KEY_Q))SelectPartner(g,0);
+    if(GameInputPressed(KEY_TWO)||GameInputPressed(KEY_W))SelectPartner(g,1);
+    if(GameInputPressed(KEY_THREE)||GameInputPressed(KEY_E))SelectPartner(g,2);
+    if(GameInputPressed(KEY_LEFT)||GameInputPressed(KEY_A))g->battleChoice=(g->battleChoice+count-1)%count;
+    if(GameInputPressed(KEY_RIGHT)||GameInputPressed(KEY_D))g->battleChoice=(g->battleChoice+1)%count;
     bool confirm=GameInputPressed(KEY_ENTER);
     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         Vector2 m=GetMousePosition();Rectangle v=CurrentGameViewport().destination;
         m=(Vector2){(m.x-v.x)*SW/v.width,(m.y-v.y)*SH/v.height};
-        for(int i=0;i<options;i++)if(CheckCollisionPointRec(m,(Rectangle){32+i*254.0f,570,240,112}))g->battleChoice=i;
+        for(int id=0;id<3;id++)if(CheckCollisionPointRec(m,(Rectangle){32+id*254.0f,570,240,112}))SelectPartner(g,id);
         confirm=confirm||CheckCollisionPointRec(m,(Rectangle){838,613,392,56});
     }
-    int id=count?BattleBuddyId(g,g->battleChoice):-1;g->selectedBuddy=id;
+    int id=BattleBuddyId(g,g->battleChoice);g->selectedBuddy=id;
     if(confirm)BattleStartAction(g,id);
 }
 void BattleUpdate(Game *g,float dt) {
@@ -161,7 +188,6 @@ void BattleUpdate(Game *g,float dt) {
     dt=isfinite(dt)?fmaxf(0,dt):0;
     g->time+=dt;g->toastTimer=fmaxf(0,g->toastTimer-dt);
     b->enemyHp=Towards(b->enemyHp,e->hp,dt,10);
-    b->playerHp=Towards(b->playerHp,g->player.hp,dt,10);
     for(int i=0;i<3;i++)b->buddyHp[i]=Towards(b->buddyHp[i],Partner(g,i)->hp,dt,10);
     b->trailDelay=fmaxf(0,b->trailDelay-dt);
     if(b->trailDelay<=0)b->enemyTrail=Towards(b->enemyTrail,e->hp,dt,3);
@@ -187,7 +213,7 @@ void BattleUpdate(Game *g,float dt) {
         if(e->hp<=0){b->phase=BATTLE_DEFEAT;b->clock=0;b->duration=.70f;b->hitStop=0;}
         else EnemyAction(g);
     } else if(b->phase==BATTLE_ENEMY) {
-        if(g->player.hp<=0){b->phase=BATTLE_LOSS;b->clock=0;b->duration=.70f;return;}
+        if(BattleBuddyCount(g)==0){PartyDefeated(g);return;}
         if(b->wetTurns>0&&--b->wetTurns==0)g->enemySoaked=false;
         g->battleRound++;g->battleTurn=0;b->phase=BATTLE_CHOOSE;b->clock=0;b->inputBlocked=Held();
         int count=BattleBuddyCount(g);g->battleChoice=0;

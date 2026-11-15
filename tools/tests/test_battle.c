@@ -76,12 +76,24 @@ int main(void) {
     CHECK(NEAR(g.spark.hp,83),"phase-two boss deals normal non-damped 17 damage");
     CHECK(g.defeatedGuards==0&&g.lumi.xp==0,"nonlethal hits do not grant rewards");
 
-    g=Fight();BattleStartAction(&g,0);GameUpdate(&g,.94f);
-    CHECK(NEAR(g.player.hp,70),"healing waits for cast impact");
+    g=Fight();g.player.hp=7;g.lumi.hp=40;g.splash.hp=70;g.spark.hp=99;
+    BattleStartAction(&g,0);GameUpdate(&g,.94f);
+    CHECK(NEAR(g.lumi.hp,40)&&NEAR(g.splash.hp,70)&&NEAR(g.spark.hp,99),"all healing waits for impact");
     GameUpdate(&g,.02f);
-    CHECK(NEAR(g.player.hp,88)&&NEAR(g.enemies[0].hp,142),"heal and glow damage are synchronized");
-    g=Fight();g.player.hp=99;BattleStartAction(&g,0);GameUpdate(&g,1);
-    CHECK(NEAR(g.player.hp,100)&&NEAR(g.battle.heal,1),"heal popup reports actual clamped recovery");
+    CHECK(NEAR(g.lumi.hp,58)&&NEAR(g.splash.hp,88)&&NEAR(g.spark.hp,100),"glow heals all three pets including caster, capped per pet");
+    CHECK(NEAR(g.player.hp,7)&&NEAR(g.enemies[0].hp,142),"glow never heals traveller, retains synchronized glow damage");
+    CHECK(NEAR(g.battle.healByBuddy[0],18)&&NEAR(g.battle.healByBuddy[1],18)&&NEAR(g.battle.healByBuddy[2],1)&&NEAR(g.battle.heal,37),"each popup is actual individual recovery");
+    Advance(&g,.15f);
+    CHECK(NEAR(g.lumi.hp,58)&&NEAR(g.splash.hp,88)&&NEAR(g.spark.hp,100),"healing is not repeated across impact frames");
+    g=Fight();g.lumi.level=3;g.lumi.hp=80;g.splash.hp=0;g.spark.hp=90;
+    BattleStartAction(&g,0);GameUpdate(&g,1);
+    CHECK(NEAR(g.lumi.hp,100)&&NEAR(g.splash.hp,24)&&NEAR(g.spark.hp,100),"level scaling applies to entire recruited team, including exhausted pets");
+    CHECK(BattleBuddyCount(&g)==3,"recovered pet can participate again");
+    g=Fight();g.spark.owned=false;g.spark.hp=0;g.lumi.hp=99;g.splash.hp=100;
+    BattleStartAction(&g,0);GameUpdate(&g,1);
+    CHECK(NEAR(g.lumi.hp,100)&&NEAR(g.spark.hp,0)&&!g.spark.owned,"team healing never recruits or heals an unowned pet");
+    CHECK(NEAR(g.battle.heal,1)&&NEAR(g.battle.healByBuddy[1],0)&&NEAR(g.battle.healByBuddy[2],0),"full health pets do not display fictitious recovery");
+    CHECK(NEAR(g.player.hp,70),"traveller stays unchanged during all team healing");
 
     g=Fight();BattleStartAction(&g,0);ToEnemy(&g);
     Advance(&g,g.battle.impactAt-.15f);Press(&g,KEY_SPACE,.001f);
@@ -92,14 +104,31 @@ int main(void) {
     CHECK(!g.battle.guarded,"repeated early presses cannot spam perfect guard");
     ToChoice(&g);CHECK(NEAR(g.lumi.hp,86),"early guard keeps normal incoming damage");
 
-    g=Fight();g.lumi.hp=1;BattleStartAction(&g,0);ToChoice(&g);
-    CHECK(NEAR(g.lumi.hp,0)&&BattleBuddyCount(&g)==2&&g.selectedBuddy!=0,"exhausted partner is deselected after recovery");
-    CHECK(!BattleStartAction(&g,0)&&!BattleStartAction(&g,3),"invalid and exhausted actors cannot act");
+    g=Fight();g.splash.hp=1;BattleStartAction(&g,1);ToChoice(&g);
+    CHECK(NEAR(g.splash.hp,0)&&BattleBuddyCount(&g)==2&&g.selectedBuddy!=1,"exhausted partner is deselected after recoil");
+    CHECK(!BattleStartAction(&g,1)&&!BattleStartAction(&g,3)&&!BattleStartAction(&g,-1),"exhausted, invalid and traveller actors cannot act");
+    g=Fight();g.lumi.hp=g.splash.hp=0;BattleInit(&g);
+    Press(&g,KEY_THREE,.016f);Confirm(&g);
+    CHECK(g.battle.actor==2&&g.battle.action==ACTION_SPARK,"key three always selects the third pet even if earlier pets are down");
+    g=Fight();g.lumi.hp=0;BattleInit(&g);Press(&g,KEY_ONE,.016f);
+    CHECK(g.selectedBuddy==1,"disabled number key cannot select an exhausted pet");
     g=Fight();g.lumi.hp=g.splash.hp=g.spark.hp=0;g.player.hp=5;BattleInit(&g);
-    CHECK(BattleBuddyCount(&g)==0&&g.selectedBuddy==-1,"traveller fallback is selected when all partners are down");
-    CHECK(BattleStartAction(&g,-1),"traveller fallback remains playable");
+    CHECK(BattleBuddyCount(&g)==0&&g.selectedBuddy==-1&&g.battle.phase==BATTLE_LOSS,"team wipe enters defeat, never traveller fallback");
+    CHECK(!BattleStartAction(&g,-1)&&!BattleStartAction(&g,0),"no actor can cast after a wipe");
     for(int i=0;i<1000&&g.scene==SCENE_BATTLE;i++)GameUpdate(&g,1.0f/120.0f);
-    CHECK(g.scene==SCENE_PLAY&&g.area==AREA_CAMP&&NEAR(g.player.hp,55),"loss actually returns to camp after the hit animation");
+    CHECK(g.scene==SCENE_PLAY&&g.area==AREA_CAMP&&NEAR(g.player.hp,5),"party defeat returns to camp without altering traveller HP");
+    g=Fight();g.player.hp=0;BattleStartAction(&g,1);ToChoice(&g);
+    CHECK(g.scene==SCENE_BATTLE&&g.battle.phase==BATTLE_CHOOSE,"legacy traveller HP has no effect on pet combat outcome");
+    g=Fight();g.lumi.hp=g.splash.hp=0;g.spark.hp=1;BattleInit(&g);
+    BattleStartAction(&g,2);int savedBeforeLoss=saveWrites;
+    for(int i=0;i<1000&&g.scene==SCENE_BATTLE;i++)GameUpdate(&g,1.0f/120.0f);
+    CHECK(g.scene==SCENE_PLAY&&g.area==AREA_CAMP&&NEAR(g.spark.hp,0),"final pet knocked out by an attack triggers normal retreat");
+    CHECK(NEAR(g.player.hp,70)&&g.defeatedGuards==0&&g.spark.xp==0&&saveWrites==savedBeforeLoss,"losing never harms traveller or grants victory rewards");
+    Release();GameStartBattlePreview(&g);g.lumi.hp=g.splash.hp=g.spark.hp=0;BattleInit(&g);
+    int previewSaveWrites=saveWrites;Advance(&g,1);
+    CHECK(g.battle.phase==BATTLE_PREVIEW_END&&saveWrites==previewSaveWrites,"preview wipe finishes without touching journey save");
+    Press(&g,KEY_R,.016f);
+    CHECK(BattleBuddyCount(&g)==3&&g.scene==SCENE_BATTLE,"preview replay restores full pet team");
 
     g=Fight();mousePressed=true;GameUpdate(&g,.016f);Release();
     CHECK(g.battle.phase==BATTLE_CHOOSE,"clicking the stage or subtitles cannot cast a skill");

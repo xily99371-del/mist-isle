@@ -9,18 +9,23 @@ import sys
 import wave
 ROOT=Path(__file__).resolve().parents[1]
 manifest=json.loads((ROOT/'assets/audio/footsteps_manifest.json').read_text(encoding='utf-8'))
-assert manifest['license']=='CC0-1.0'
+assert manifest['format_version']==2
+assert {s['license'] for s in manifest['sources']}=={'CC-BY-3.0','CC0-1.0'}
+assert (ROOT/'assets/audio/FOOTSTEP_CREDITS.md').is_file()
 assert manifest['routing']=={'coastal_camp':'grass','glowglade_grove':'grass','tidal_ruins':'stone','lighthouse_courtyard':'stone'}
 assert len(manifest['files'])==12
 assert {item['path'] for item in manifest['files']}=={f'assets/audio/sfx/step_{surface}_{suffix}.wav' for surface in ('grass','stone') for suffix in 'abcdef'}
 seen=set()
 for item in manifest['files']:
+    assert item['source'].startswith('sfx_step_grass_') if item['surface']=='grass' else item['source'].startswith('footstep_concrete_')
+    source=ROOT/'third_party/audio/clean_footsteps'/item['source']
+    assert hashlib.sha256(source.read_bytes()).hexdigest()==item['source_sha256']
     p=ROOT/item['path']; digest=hashlib.sha256(p.read_bytes()).hexdigest()
     assert digest==item['sha256'] and digest not in seen
     seen.add(digest)
     with wave.open(str(p)) as wav:
         assert (wav.getnchannels(),wav.getsampwidth(),wav.getframerate())==(1,2,22050)
-        assert .12<=wav.getnframes()/wav.getframerate()<=.30
+        assert .075<=wav.getnframes()/wav.getframerate()<=.27
         data=array('h');data.frombytes(wav.readframes(wav.getnframes()))
         if sys.byteorder!='little':data.byteswap()
     peak=max(abs(x) for x in data)/32767

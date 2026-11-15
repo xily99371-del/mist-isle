@@ -15,7 +15,7 @@ static Color BattleColor(BattleAction a) {
            a==ACTION_GLOW?(Color){220,247,156,255}:a==ACTION_RESONANCE?(Color){255,119,86,255}:(Color){255,215,158,255};
 }
 static const char *BattleSkill(BattleAction a) {
-    const char *names[]={"旅人出击","星光治愈","泡泡水流","晶弧放电","守卫出击","共鸣重击"};
+    const char *names[]={"待命","星光治愈","泡泡水流","晶弧放电","守卫出击","共鸣重击"};
     return names[(int)a>=0&&(int)a<6?a:0];
 }
 static void BattleGlow(Vector2 p,float radius,Color c,float alpha) {
@@ -104,6 +104,16 @@ static void BattleBar(Rectangle rect,float hp,float maxHp,float trail,Color c) {
     if(old>value)DrawRectangleRounded((Rectangle){rect.x,rect.y,rect.width*old,rect.height},.4f,8,(Color){244,209,161,255});
     if(value>0)DrawRectangleRounded((Rectangle){rect.x,rect.y,rect.width*value,rect.height},.4f,8,c);
 }
+static Vector2 BattlePetFoot(int id,int active) {
+    if(active<0||active>2) {
+        const Vector2 resting[3]={{230,407},{448,476},{285,500}};
+        return resting[id];
+    }
+    if(id==active)return (Vector2){448,476};
+    int rear=0;
+    for(int i=0;i<id;i++)if(i!=active)rear++;
+    return (Vector2){rear?285:230,rear?500:407};
+}
 static void RenderBattle(Game *g) {
     const BattleState *b=&g->battle;const Enemy *e=&g->enemies[g->battleEnemy];
     bool boss=e->type==ENEMY_BOSS,player=b->phase==BATTLE_PLAYER,enemy=b->phase==BATTLE_ENEMY;
@@ -112,20 +122,23 @@ static void RenderBattle(Game *g) {
     float impact=action&&b->impacted?1-Clamp(age/.35f,0,1):0;
     float reach=action?BattleAttackReach(b):0;
     int active=player?b->actor:enemy?b->defender:g->selectedBuddy;
-    Vector2 hero={258,478},buddy={438,476},foe={972,470};
+    const Buddy *pets[3]={&g->lumi,&g->splash,&g->spark};
+    Vector2 petFeet[3];
+    for(int id=0;id<3;id++)petFeet[id]=BattlePetFoot(id,active);
+    Vector2 buddy=active>=0?petFeet[active]:(Vector2){448,476},foe={972,470};
     float healRise=player&&b->action==ACTION_GLOW?sinf(Clamp(b->clock/b->duration,0,1)*PI)*28:0;
     if(player) {
-        if(b->actor<0)hero.x+=reach*610;
-        else {buddy.x+=reach*(b->action==ACTION_WATER?86:32);buddy.y-=healRise+reach*10;}
+        buddy.x+=reach*(b->action==ACTION_WATER?86:32);buddy.y-=healRise+reach*10;
         if(b->impacted)foe.x+=impact*23;
     }
     if(enemy) {
-        if(b->action==ACTION_ENEMY)foe.x-=reach*(b->defender<0?574:394);
+        if(b->action==ACTION_ENEMY)foe.x-=reach*384;
         else foe.y-=!b->impacted?reach*28:0;
-        if(b->impacted){if(b->defender<0)hero.x-=impact*27;else buddy.x-=impact*27;}
+        if(b->impacted)buddy.x-=impact*27;
     }
-    Vector2 caster=player?(b->actor<0?hero:buddy):foe;
-    Vector2 target=player?foe:(b->defender<0?hero:buddy);
+    if(active>=0)petFeet[active]=buddy;
+    Vector2 caster=player?buddy:foe;
+    Vector2 target=player?foe:buddy;
     caster.y-=65;target.y-=70;
     Color skill=BattleColor(b->action);
     float shake=impact*(b->action==ACTION_RESONANCE||b->combo?7:3);
@@ -134,8 +147,8 @@ static void RenderBattle(Game *g) {
     float zoom=1+impact*.018f;
     rlTranslatef(SW*.5f,SH*.55f,0);rlScalef(zoom,zoom,1);rlTranslatef(-SW*.5f,-SH*.55f,0);
     BattleStage(g);
-    DrawEllipse((int)hero.x,483,36,9,Fade(BLACK,.24f));
-    if(active>=0)DrawEllipse((int)buddy.x,484,42,11,Fade(BLACK,.24f));
+    for(int id=0;id<3;id++)if(pets[id]->owned)
+        DrawEllipse((int)petFeet[id].x,(int)petFeet[id].y+7,42,11,Fade(BLACK,.24f));
     DrawEllipse((int)foe.x,478,boss?80:50,15,Fade(BLACK,.30f));
     if(action&&!b->impacted) {
         float charge=Clamp(b->clock/(b->impactAt*.55f),0,1);
@@ -146,13 +159,14 @@ static void RenderBattle(Game *g) {
             BattleStar((Vector2){caster.x+cosf(a)*r,caster.y+sinf(a)*r*.75f},2,Fade(skill,charge*.8f));
         }
     }
-    bool hurtHero=enemy&&b->impacted&&b->defender<0;
     bool hurtBuddy=enemy&&b->impacted&&b->defender>=0;
     Color allyTint=impact>.12f&&((int)(age*30)%2)==0?(Color){255,164,147,255}:WHITE;
-    int frame=player&&b->actor<0?(int)(b->clock*14)%4:0;
-    BattleActor(TEX_HEROINE_PIXEL,(Rectangle){frame*64.0f,160,64,80},hero,74,116,
-        hurtHero?-impact*12:(player&&b->actor<0?reach*12:0),hurtHero?allyTint:WHITE);
-    if(active>=0)BattleBuddy(active,buddy,action?b->clock:g->time,player?reach:0,hurtBuddy,hurtBuddy?allyTint:WHITE);
+    for(int id=0;id<3;id++)if(pets[id]->owned) {
+        bool hurt=id==active&&hurtBuddy;
+        Color tint=pets[id]->hp>0?(hurt?allyTint:WHITE):(Color){140,153,170,130};
+        BattleBuddy(id,petFeet[id],id==active&&action?b->clock:g->time,
+                    id==active&&player?reach:0,hurt,tint);
+    }
     float fade=b->phase==BATTLE_DEFEAT?1-Clamp(b->clock/.70f,0,1):1;
     if(b->phase==BATTLE_PREVIEW_END&&e->hp<=0)fade=0;
     Color foeTint=player&&impact>.12f&&((int)(age*30)%2)==0?(Color){255,155,132,255}:WHITE;
@@ -189,21 +203,20 @@ static void RenderBattle(Game *g) {
                 BattleBolt((Vector2){target.x+110,target.y-90},target,b->clock,C_BLUE,.9f,13);
             }
         } else if(player&&b->action==ACTION_GLOW) {
-            Vector2 heart={hero.x,hero.y-64};
             float u=Clamp(b->clock/b->impactAt,0,1);
-            BattleGlow(heart,95,skill,(1-fabsf(u-.6f))*.22f);
-            DrawRing(heart,35+u*20,37+u*20,0,360,40,Fade(skill,.65f*(1-Clamp(age/.6f,0,1))));
-            for(int i=0;i<12;i++) {
-                float a=b->clock*3+i*PI2/12;
-                BattleStar((Vector2){heart.x+cosf(a)*54,heart.y+sinf(a)*35-b->clock*6},4,Fade(skill,.7f));
+            for(int id=0;id<3;id++)if(pets[id]->owned) {
+                Vector2 heart={petFeet[id].x,petFeet[id].y-54};
+                BattleGlow(heart,76,skill,(1-fabsf(u-.6f))*.22f);
+                DrawRing(heart,31+u*13,33+u*13,0,360,32,Fade(skill,.65f*(1-Clamp(age/.6f,0,1))));
+                for(int i=0;i<6;i++) {
+                    float a=b->clock*3+i*PI2/6;
+                    BattleStar((Vector2){heart.x+cosf(a)*43,heart.y+sinf(a)*30-b->clock*6},4,Fade(skill,.7f));
+                }
             }
             if(!b->impacted&&travel>0) {
                 Vector2 p=Vector2Lerp((Vector2){buddy.x+20,buddy.y-55},target,travel);
                 BattleGlow(p,32,skill,.4f);BattleStar(p,10,WHITE);
             }
-        } else if(player&&b->action==ACTION_STRIKE&&b->clock>b->impactAt-.09f&&age<.18f) {
-            DrawRing(target,28,76,200+travel*70,350+travel*70,24,Fade(skill,.8f));
-            DrawLineEx((Vector2){target.x-70,target.y+48},(Vector2){target.x+30,target.y-49},5,WHITE);
         } else if(enemy&&b->action==ACTION_RESONANCE&&b->impacted) {
             float u=Clamp(age/.35f,0,1);
             DrawEllipseLines((int)foe.x,477,70+u*640,18+u*65,Fade(skill,1-u));
@@ -228,10 +241,11 @@ static void RenderBattle(Game *g) {
 
     /* Native-pixel HUD stays still while only the battle stage shakes. */
     PanelDark((Rectangle){24,22,354,120});
-    DrawUIText("战斗演出版 · IMPACT-02.1",43,35,17,(Color){247,224,179,255});
+    DrawUIText("宠物战斗 · IMPACT-02.2",43,35,17,(Color){247,224,179,255});
     DrawUIText(TextFormat("第 %d 回合  /  %s",g->battleRound,boss?"首领战":"遭遇战"),43,63,16,(Color){183,203,216,255});
-    DrawUIText(TextFormat("旅人生命  %d / %d",(int)ceilf(b->playerHp),(int)g->player.maxHp),43,90,16,(Color){226,238,229,255});
-    BattleBar((Rectangle){44,120,310,7},b->playerHp,g->player.maxHp,b->playerHp,C_GREEN);
+    DrawUIText(TextFormat("可战斗宠物  %d / %d",BattleBuddyCount(g),
+        g->lumi.owned+g->splash.owned+g->spark.owned),43,90,16,(Color){226,238,229,255});
+    DrawUIText("星光治愈 · 全队宠物恢复",43,117,13,(Color){172,215,178,255});
     PanelDark((Rectangle){904,22,350,120});
     DrawUIText(boss?"灯塔守卫":"林地微光兽",925,35,24,(Color){255,229,185,255});
     DrawUIText(TextFormat("%s   %d / %d",boss?"核心耐久":"生命",(int)ceilf(b->enemyHp),(int)e->maxHp),925,76,17,(Color){206,222,232,255});
@@ -258,7 +272,9 @@ static void RenderBattle(Game *g) {
         const char *n=TextFormat("-%.0f",b->damage);
         DrawUIText(n,(int)target.x-26,(int)y+2,34,(Color){10,16,26,(unsigned char)(alpha*255)});
         DrawUIText(n,(int)target.x-28,(int)y,34,Fade(enemy?(b->guarded?C_BLUE:C_PINK):C_GOLD,alpha));
-        if(player&&b->heal>0)DrawUIText(TextFormat("+%.0f",b->heal),(int)hero.x-22,(int)(hero.y-147-age*32),28,Fade(C_GREEN,alpha));
+        if(player&&b->action==ACTION_GLOW)for(int id=0;id<3;id++)if(b->healByBuddy[id]>0)
+            DrawUIText(TextFormat("+%.0f",b->healByBuddy[id]),(int)petFeet[id].x-22,
+                (int)(petFeet[id].y-126-age*32),28,Fade(C_GREEN,alpha));
     }
     if(enemy&&!b->impacted)DrawUIText(b->guardAttempted?(b->guarded?"格挡生效":"过早格挡"):
         "光圈接近中心时按 Space",350,492,19,b->guarded?C_BLUE:C_GOLD);
@@ -266,28 +282,33 @@ static void RenderBattle(Game *g) {
     DrawLine(24,538,1256,538,(Color){116,144,158,255});
     const char *label=b->phase==BATTLE_CHOOSE?"选择出战伙伴 · 点击卡片后确认":
         b->phase==BATTLE_PREVIEW_END?"战斗体验完成 · R 重来 / Esc 退出":
-        enemy?"敌方自动行动 · 无需按 Enter":b->phase==BATTLE_DEFEAT?"战斗完成 · 灯火正在散去":"技能演出中 · 伤害在命中时生效";
+        enemy?"敌方自动行动 · 无需按 Enter":b->phase==BATTLE_LOSS?"全队宠物体力耗尽 · 正在撤离":b->phase==BATTLE_DEFEAT?"战斗完成 · 灯火正在散去":"技能演出中 · 伤害在命中时生效";
     DrawUIText(label,33,547,16,(Color){195,217,232,255});
-    int count=BattleBuddyCount(g),options=count?count:1;
-    for(int slot=0;slot<options;slot++) {
-        int id=count?BattleBuddyId(g,slot):-1;
-        Rectangle card={32+slot*254.0f,570,240,112};
-        bool chosen=id==g->selectedBuddy;
-        Color tint=BattleColor((BattleAction)(id+1));
+    /* All three identities keep their own card, HP and number key even at 0 HP. */
+    for(int id=0;id<3;id++) {
+        const Buddy *p=pets[id];bool owned=p->owned,able=owned&&p->hp>0;
+        Rectangle card={32+id*254.0f,570,240,112};
+        bool chosen=able&&id==g->selectedBuddy;
+        Color tint=able?BattleColor((BattleAction)(id+1)):(Color){126,143,156,255};
         DrawRectangleRounded(card,.12f,8,chosen?(Color){39,61,74,255}:(Color){22,39,53,255});
         DrawRectangleRoundedLinesEx(card,.12f,8,chosen?2:1,chosen?tint:(Color){65,87,102,255});
-        if(id==0)DrawIllustratedPortrait(TEX_LUMI_ILLUSTRATION,(Rectangle){card.x+10,card.y+14,51,68});
-        if(id==1)DrawIllustratedPortrait(TEX_MOATAIL_ILLUSTRATION,(Rectangle){card.x+10,card.y+14,51,68});
-        if(id==2)DrawIllustratedPortrait(TEX_GECKO_ILLUSTRATION,(Rectangle){card.x+10,card.y+14,51,68});
-        DrawUIText(TextFormat("%d  %s",slot+1,id==0?"苔灯灵":id==1?"沫尾兽":id==2?"鸣晶蜥":"旅人"),(int)card.x+72,584,17,(Color){236,239,229,255});
-        DrawUIText(BattleSkill((BattleAction)(id+1)),(int)card.x+72,610,17,tint);
-        DrawUIText(id==0?"恢复 / 微光伤害":id==1?"潮湿 / 降低攻击":id==2?"导电 / 共鸣伤害":"向前冲刺 / 近身攻击",(int)card.x+72,635,13,(Color){175,200,216,255});
-        const Buddy *p=id==0?&g->lumi:id==1?&g->splash:id==2?&g->spark:NULL;
-        if(p)BattleBar((Rectangle){card.x+72,662,152,6},b->buddyHp[id],p->maxHp,b->buddyHp[id],tint);
+        if(owned) {
+            if(id==0)DrawIllustratedPortrait(TEX_LUMI_ILLUSTRATION,(Rectangle){card.x+10,card.y+14,51,68});
+            if(id==1)DrawIllustratedPortrait(TEX_MOATAIL_ILLUSTRATION,(Rectangle){card.x+10,card.y+14,51,68});
+            if(id==2)DrawIllustratedPortrait(TEX_GECKO_ILLUSTRATION,(Rectangle){card.x+10,card.y+14,51,68});
+            if(!able)DrawRectangleRounded((Rectangle){card.x+9,card.y+12,54,72},.1f,6,Fade((Color){12,23,35,255},.60f));
+        }
+        DrawUIText(TextFormat("%d  %s",id+1,id==0?"苔灯灵":id==1?"沫尾兽":"鸣晶蜥"),(int)card.x+72,580,17,(Color){236,239,229,255});
+        DrawUIText(able?BattleSkill((BattleAction)(id+1)):owned?"体力耗尽":"尚未加入",(int)card.x+72,604,16,tint);
+        DrawUIText(id==0?"全队恢复 / 微光伤害":id==1?"潮湿 / 降低攻击":"导电 / 共鸣伤害",(int)card.x+72,628,12,(Color){175,200,216,255});
+        if(owned) {
+            DrawUIText(TextFormat("体力 %d / %d",(int)ceilf(b->buddyHp[id]),(int)p->maxHp),(int)card.x+72,646,12,tint);
+            BattleBar((Rectangle){card.x+72,668,152,6},b->buddyHp[id],p->maxHp,b->buddyHp[id],tint);
+        }
     }
     DrawUIText(g->enemySoaked?"潮湿仍在！下一招可用晶弧放电":"联动：泡泡水流 → 晶弧放电",838,578,15,(Color){173,211,227,255});
-    Rectangle confirm={838,613,392,56};bool ready=b->phase==BATTLE_CHOOSE;
+    Rectangle confirm={838,613,392,56};bool ready=b->phase==BATTLE_CHOOSE&&BattleBuddyCount(g)>0;
     DrawRectangleRounded(confirm,.2f,8,ready?(Color){212,185,129,255}:(Color){39,56,71,255});
     DrawUIText(ready?"Enter / 点击此处出招":b->phase==BATTLE_PREVIEW_END?"R 重来   Esc 退出":"行动进行中",899,630,20,ready?(Color){22,40,44,255}:(Color){167,192,211,255});
-    DrawUIText(b->preview?"战斗体验 · 不读取或写入存档":"IMPACT-02.1  |  1-3 / 方向键选择  ·  Space 精准格挡",33,697,12,(Color){143,168,184,255});
+    DrawUIText(b->preview?"战斗体验 · 不读取或写入存档":"IMPACT-02.2  |  1-3 / 方向键选择  ·  Space 精准格挡",33,697,12,(Color){143,168,184,255});
 }

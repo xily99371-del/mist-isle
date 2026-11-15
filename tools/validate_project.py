@@ -706,3 +706,11 @@ print(f"Validation complete. Imported art sheets checked: {present}/{len(assets)
 
 import runpy
 runpy.run_path(str(ROOT / "tools/test_footstep_assets.py"), run_name="__main__")
+
+# Pet-only combat invariants supplement the executable battle tests.
+require("g->player.hp" not in BATTLE and "playerHp" not in battle_renderer and
+        "TEX_HEROINE_PIXEL" not in battle_renderer and "ACTION_STRIKE" not in BATTLE,
+        "traveller has no combat health, attack or battle sprite")
+require("healByBuddy" in BATTLE and "healByBuddy" in battle_renderer and
+        "全队恢复" in battle_renderer and "体力耗尽" in battle_renderer,
+        "team healing and persistent exhausted-pet cards are rendered")

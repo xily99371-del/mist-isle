@@ -11,9 +11,11 @@
 
 音乐文件由项目使用者提供。`import_manifest.json` 记录源文件校验值、响度处理与时间对齐结果。音乐经过等响度处理，未剪辑歌曲内容；其版权归原权利人所有，不属于项目中 Kenney 素材的 CC0 许可。
 
-`sfx/` 中的草地、石路脚步改用 Fantozzi 的 CC0 录音并做短促、柔和化处理（不是从《星露谷物语》提取的游戏音频）。每种材质六个变体：左右脚交替，同一只脚不连续重复同一录音；轻微音高与音量变化降低循环感。主地图、辉光林地固定使用草地声；潮汐遗迹、灯塔庭院固定使用石路声，不再随雨天换成湿地声。脚步只跟随实际位移，静止、撞墙不连续触发。
+`sfx/` 中的草地声改用 Blender Foundation《Yo Frankie!》明确标注的左右脚踩草录音（CC BY 3.0），石路声改用 Kenney Impact Sounds 的短促 concrete 落脚声（CC0）。不再使用上一版 Fantozzi 的 Sand/Stone 素材，不混入沙砾或碎石拖尾。来源、许可和加工署名见 `FOOTSTEP_CREDITS.md`。
 
-`footsteps_manifest.json` 记录来源、处理方法和逐文件校验值。开发者可用 `tools/import_footsteps.py` 重建；普通编译和游戏运行直接使用已提交的 WAV，无需 ffmpeg 或下载素材。其他十个原有短音效仍由 `tools/generate_audio_sfx.py` 维护，该脚本不会再覆盖草地、石路录音。
+每种材质六个播放变体。草地由两段真实左右脚录音派生，石路由五段落脚声派生；变体做轻微均衡与响度区别，不冒称独立录音。主地图、辉光林地固定踩草；潮汐遗迹、灯塔庭院固定硬石路。只跟随实际位移发声，不因雨天切换材质。
+
+`footsteps_manifest.json` 记录来源与校验值。开发者可运行 `tools/import_footsteps.py`，使用仓库自带的 `third_party/audio/clean_footsteps/` 原始录音重建；普通编译和运行直接使用 WAV，无需额外下载或 ffmpeg。原有其他音效不变。
 
 ## 同步字幕
 
