@@ -17,43 +17,43 @@
 ## 最终地图素材 / Final Map Art — v8
 
 <p align="center">
-  <img src="assets/environment/generated/nature_props_sheet.png" alt="Final shared nature and coastal environment props from MapArt v8" width="48%"/>
-  <img src="assets/environment/generated/glowglade_props_sheet.png" alt="Final Glowglade Grove environment art from MapArt v8" width="48%"/>
+  <img src="https://raw.githubusercontent.com/xily99371-del/mist-isle/main/assets/environment/generated/nature_props_sheet.png" alt="Final shared nature and coastal environment props from MapArt v8" width="48%"/>
+  <img src="https://raw.githubusercontent.com/xily99371-del/mist-isle/main/assets/environment/generated/glowglade_props_sheet.png" alt="Final Glowglade Grove environment art from MapArt v8" width="48%"/>
 </p>
 <p align="center">
-  <img src="assets/environment/generated/tidal_ruins_props_sheet.png" alt="Final Tidal Ruins environment art from MapArt v8" width="48%"/>
-  <img src="assets/environment/generated/lighthouse_ruins_props_sheet.png" alt="Final Lighthouse Courtyard environment art from MapArt v8" width="48%"/>
+  <img src="https://raw.githubusercontent.com/xily99371-del/mist-isle/main/assets/environment/generated/tidal_ruins_props_sheet.png" alt="Final Tidal Ruins environment art from MapArt v8" width="48%"/>
+  <img src="https://raw.githubusercontent.com/xily99371-del/mist-isle/main/assets/environment/generated/lighthouse_ruins_props_sheet.png" alt="Final Lighthouse Courtyard environment art from MapArt v8" width="48%"/>
 </p>
 <p align="center"><sub>四张最终地图专属素材图集，直接来自 MistIsle_MapArt_v8.zip。旧版通用地形图集不再作为最终地图美术展示。 / Four final area-specific art sheets extracted from MistIsle_MapArt_v8.zip. Earlier generic atlases are no longer presented as the final map art.</sub></p>
 
 ## 高清角色图鉴 / High-Resolution Character Gallery
 
 <p align="center">
-  <img src="assets/characters/portraits/heroine_portrait.png" alt="Approved heroine high-resolution portrait" width="31%"/>
-  <img src="assets/characters/portraits/watcher_portrait.png" alt="Approved Watcher high-resolution portrait" width="31%"/>
-  <img src="assets/characters/portraits/guardian_portrait.png" alt="Approved Lighthouse Guardian high-resolution portrait" width="31%"/>
+  <img src="https://raw.githubusercontent.com/xily99371-del/mist-isle/main/assets/characters/portraits/heroine_portrait.png" alt="Approved heroine high-resolution portrait" width="31%"/>
+  <img src="https://raw.githubusercontent.com/xily99371-del/mist-isle/main/assets/characters/portraits/watcher_portrait.png" alt="Approved Watcher high-resolution portrait" width="31%"/>
+  <img src="https://raw.githubusercontent.com/xily99371-del/mist-isle/main/assets/characters/portraits/guardian_portrait.png" alt="Approved Lighthouse Guardian high-resolution portrait" width="31%"/>
 </p>
 <p align="center"><sub>v7 最终高清角色立绘：女主角、守望者、灯塔守卫 / Final v7 high-resolution portraits: heroine, Watcher and Lighthouse Guardian.</sub></p>
 
 <p align="center">
-  <img src="assets/characters/portraits/moss_lumi_portrait.png" alt="Moss Lumi high-resolution portrait" width="24%"/>
-  <img src="assets/characters/portraits/moatail_portrait.png" alt="Moatail high-resolution portrait" width="24%"/>
-  <img src="assets/characters/portraits/crystal_gecko_portrait.png" alt="Crystal Gecko high-resolution portrait" width="24%"/>
+  <img src="https://raw.githubusercontent.com/xily99371-del/mist-isle/main/assets/characters/portraits/moss_lumi_portrait.png" alt="Moss Lumi high-resolution portrait" width="24%"/>
+  <img src="https://raw.githubusercontent.com/xily99371-del/mist-isle/main/assets/characters/portraits/moatail_portrait.png" alt="Moatail high-resolution portrait" width="24%"/>
+  <img src="https://raw.githubusercontent.com/xily99371-del/mist-isle/main/assets/characters/portraits/crystal_gecko_portrait.png" alt="Crystal Gecko high-resolution portrait" width="24%"/>
 </p>
 <p align="center"><sub>三位伙伴的 v7 高清独立立绘 / Final v7 individual high-resolution companion portraits.</sub></p>
 
 ## 游戏内像素形象 / In-Game Pixel Sprites
 
 <p align="center">
-  <img src="assets/characters/hero/heroine_pixel_4x4_64x80.png" alt="Runtime heroine pixel sprite sheet loaded by the game" width="30%"/>
-  <img src="assets/characters/npc/watcher_pixel_4x4_64x80.png" alt="Runtime Watcher pixel sprite sheet loaded by the game" width="30%"/>
-  <img src="assets/characters/boss/lighthouse_guardian_4x2.png" alt="Runtime Lighthouse Guardian pixel sprite sheet loaded by the game" width="30%"/>
+  <img src="https://raw.githubusercontent.com/xily99371-del/mist-isle/main/assets/characters/hero/heroine_pixel_4x4_64x80.png" alt="Runtime heroine pixel sprite sheet loaded by the game" width="30%"/>
+  <img src="https://raw.githubusercontent.com/xily99371-del/mist-isle/main/assets/characters/npc/watcher_pixel_4x4_64x80.png" alt="Runtime Watcher pixel sprite sheet loaded by the game" width="30%"/>
+  <img src="https://raw.githubusercontent.com/xily99371-del/mist-isle/main/assets/characters/boss/lighthouse_guardian_4x2.png" alt="Runtime Lighthouse Guardian pixel sprite sheet loaded by the game" width="30%"/>
 </p>
 <p align="center"><sub>以上三张角色动画均对应 src/render.c 中实际加载的文件路径 / All three sprite sheets use the exact paths loaded by src/render.c.</sub></p>
 <p align="center">
-  <img src="assets/characters/companions/moss_lumi_idle_64.png" alt="Runtime Moss Lumi sprite sheet" width="22%"/>
-  <img src="assets/characters/companions/moatail_idle_64.png" alt="Runtime Moatail sprite sheet" width="22%"/>
-  <img src="assets/characters/companions/crystal_gecko_idle_64.png" alt="Runtime Crystal Gecko sprite sheet" width="22%"/>
+  <img src="https://raw.githubusercontent.com/xily99371-del/mist-isle/main/assets/characters/companions/moss_lumi_idle_64.png" alt="Runtime Moss Lumi sprite sheet" width="22%"/>
+  <img src="https://raw.githubusercontent.com/xily99371-del/mist-isle/main/assets/characters/companions/moatail_idle_64.png" alt="Runtime Moatail sprite sheet" width="22%"/>
+  <img src="https://raw.githubusercontent.com/xily99371-del/mist-isle/main/assets/characters/companions/crystal_gecko_idle_64.png" alt="Runtime Crystal Gecko sprite sheet" width="22%"/>
 </p>
 <p align="center"><sub>三位伙伴同样使用游戏运行时加载的独立四帧动画素材 / Companion strips are the exact four-frame runtime assets.</sub></p>
 <p align="center"><sub>高清对话立绘与游戏内像素动画分开展示。上述高清立绘来自 MistIsle_ApprovedArt_v7.zip，地图环境素材来自 MistIsle_MapArt_v8.zip。 / High-resolution dialogue portraits are shown separately from in-game pixel sprites. Portraits come from v7; environment art comes from v8.</sub></p>
