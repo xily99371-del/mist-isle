@@ -1424,7 +1424,7 @@ static void RenderBattle(Game *g) {
     float pulse=.5f+.5f*sinf(g->time*3.2f);
     bool playerAction=g->battleMessage>=1&&g->battleMessage<=4;
     bool enemyAction=g->battleMessage==5||g->battleMessage==6;
-    float lunge=sinf(Clamp(anim,0.0f,1.0f)*PI2)*72.0f;
+    float lunge=sinf(Clamp(anim,0.0f,1.0f)*3.14159265f)*72.0f;
     float hitFlash=g->battleTimer>0.0f?1.0f-anim:0.0f;
     DrawRectangleGradientV(0,0,SW,SH,
         isBoss?(Color){17,24,38,255}:(Color){43,65,76,255},

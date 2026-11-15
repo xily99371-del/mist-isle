@@ -766,7 +766,7 @@ void GameUpdate(Game *g,float dt) {
                 if(bossHeavy)incoming+=(bossPhase==3?12.0f:9.0f);
                 bool damped=g->enemySoaked;
                 if(damped)incoming*=e->type==ENEMY_BOSS?0.65f:0.8f;
-                g->enemySoaked=false;
+                g->enemySoaked=false; // Wetness interrupts one incoming attack, then dissipates.
                 Buddy *defender=BuddyById(g,g->selectedBuddy);
                 bool buddyTookHit=defender&&defender->owned&&defender->hp>0.0f;
                 if(buddyTookHit)defender->hp=fmaxf(0.0f,defender->hp-incoming);
