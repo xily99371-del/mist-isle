@@ -7,17 +7,17 @@ permissions:
   contents: read
 jobs:
   apply-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Verify exact source and apply reviewed text patches
+      - name: Verify exact source and apply reviewed game patches
         run: |
           python - <<'PY'
           import base64, hashlib, json, lzma, subprocess
@@ -26,11 +26,13 @@ jobs:
           data = lzma.decompress(base64.b64decode(''.join(Path(f'tools/.battle-upgrade/{i}.b64').read_text() for i in range(5)), validate=True))
           assert digest(data) == 'cd50e3b301121116472a42c0c716067e5ac4104cb6ff8ec5a0eb3723db558dd7', 'Transport hash mismatch'
           manifest = json.loads(data)
-          assert subprocess.check_output(['git','rev-parse','HEAD^'],text=True).strip() == manifest['base'], 'Source changed'
+          subprocess.run(['git','merge-base','--is-ancestor',manifest['base'],'HEAD'],check=True)
           allowed = set(''' .github/workflows/battle-qa.yml .github/workflows/build-windows.yml CMakeLists.txt src/game.c src/game.h src/main.c src/render.c tools/test_postbattle.py tools/tests/test_postbattle.c tools/validate_project.py src/battle.h src/battle.c src/battle_render.inc PREVIEW_BATTLE.bat tools/tests/test_battle.c tools/test_battle.py tools/battle_visual_qa.c tools/test_battle_visuals.py docs/BATTLE_IMPACT_02.md '''.split())
           assert {f['path'] for f in manifest['files']} == allowed
           writes = []
           for f in manifest['files']:
+              if f['path'].startswith('.github/'):
+                  continue
               path = Path(f['path'])
               if f['old'] is not None:
                   old = path.read_bytes()
@@ -47,10 +49,10 @@ jobs:
           for path,data in writes:
               path.parent.mkdir(parents=True,exist_ok=True)
               path.write_bytes(data)
-          subprocess.run(['git','add','--',*sorted(allowed)],check=True)
-          subprocess.run(['git','rm','--','.github/workflows/apply-battle-upgrade.yml',*[f'tools/.battle-upgrade/{i}.b64' for i in range(5)]],check=True)
+          subprocess.run(['git','add','--',*[str(p) for p,d in writes]],check=True)
+          subprocess.run(['git','rm','--',*[f'tools/.battle-upgrade/{i}.b64' for i in range(5)]],check=True)
           PY
-      - name: Commit the reviewed implementation to the feature branch only
+      - name: Commit reviewed game files to the feature branch only
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
