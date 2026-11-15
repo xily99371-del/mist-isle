@@ -5,24 +5,37 @@ on:
 permissions:
   contents: read
 jobs:
-  snapshot:
-    runs-on: ubuntu-latest
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Prepare reproducible source and pinned graphics dependency
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install headless graphics dependencies
         run: |
-          mkdir -p /tmp/battle-qa
-          git archive HEAD | tar -x -C /tmp/battle-qa
-          git clone --depth 1 --branch 5.5 https://github.com/raysan5/raylib.git /tmp/raylib
-          mkdir -p /tmp/battle-qa/vendor/raylib
-          git -C /tmp/raylib archive HEAD | tar -x -C /tmp/battle-qa/vendor/raylib
-          git rev-parse HEAD > /tmp/battle-qa/SOURCE_COMMIT
-          tar -C /tmp/battle-qa -czf /tmp/battle-qa-source.tar.gz .
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake libx11-dev libxrandr-dev libxi-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libasound2-dev xvfb ffmpeg
+          python -m pip install pillow
+      - name: Build and verify gameplay
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --parallel 4
+          python tools/validate_project.py
+          python tools/test_battle.py --raylib build/_deps/raylib-src/src
+          python tools/test_postbattle.py --raylib build/_deps/raylib-src/src
+          python tools/test_audio.py --raylib build/_deps/raylib-src/src
+          python tools/test_render_math.py --raylib build/_deps/raylib-src/src
+      - name: Capture production battle sequence
+        run: python tools/test_battle_visuals.py --build build
       - uses: actions/upload-artifact@v4
         with:
-          name: battle-qa-source
-          path: /tmp/battle-qa-source.tar.gz
-          retention-days: 1
+          name: battle-impact-02-visual-qa
+          path: |
+            build/battle-frames
+            build/battle-impact-02.mp4
+          retention-days: 7
           compression-level: 0
