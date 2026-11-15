@@ -45,18 +45,25 @@ jobs:
         shell: pwsh
         run: |
           $portraitDir = 'assets/characters/portraits'
-          New-Item -ItemType Directory -Force -Path $portraitDir | Out-Null
+          $mapArtDir = 'assets/environment/generated'
+          New-Item -ItemType Directory -Force -Path $portraitDir,$mapArtDir | Out-Null
           $portraits = @('heroine_portrait.png','watcher_portrait.png','guardian_portrait.png','moss_lumi_portrait.png','moatail_portrait.png','crystal_gecko_portrait.png')
           foreach ($name in $portraits) {
             $source = Join-Path $portraitDir $name
             if (-not (Test-Path $source)) { throw "Approved portrait missing after v7 extraction: $source" }
           }
+          $mapSheets = @('nature_props_sheet.png','glowglade_props_sheet.png','tidal_ruins_props_sheet.png','lighthouse_ruins_props_sheet.png')
+          foreach ($name in $mapSheets) {
+            $source = Join-Path 'build-pi-artifact/assets/environment/generated' $name
+            if (-not (Test-Path $source)) { throw "MapArt v8 sheet missing from Raspberry Pi build artifact: $source" }
+            Copy-Item $source (Join-Path $mapArtDir $name) -Force
+          }
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add $portraitDir
+          git add $portraitDir $mapArtDir
           git diff --cached --quiet
           if ($LASTEXITCODE -ne 0) {
-            git commit -m "Add approved v7 high-resolution character portraits [skip ci]"
+            git commit -m "Publish approved v7 portraits and v8 map art [skip ci]"
             git push
           }
       - name: Generate pixel assets
