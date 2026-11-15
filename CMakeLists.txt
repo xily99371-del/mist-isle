@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.20)
-project(MistIsle C)
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" MISTISLE_VERSION)
+string(STRIP "${MISTISLE_VERSION}" MISTISLE_VERSION)
+if(NOT MISTISLE_VERSION MATCHES "^[0-9]+\\.[0-9]+\\.[0-9]+$")
+  message(FATAL_ERROR "VERSION must contain a major.minor.patch release number")
+endif()
+project(MistIsle VERSION "${MISTISLE_VERSION}" LANGUAGES C)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/VERSION")
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
@@ -26,35 +32,23 @@ FetchContent_Declare(raylib GIT_REPOSITORY https://github.com/raysan5/raylib.git
 FetchContent_MakeAvailable(raylib)
 
 set(MISTISLE_GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
-# The approved art bundle is distributed separately from source code. If present,
-# extract it into the project tree before configuring runtime asset paths.
-set(MISTISLE_APPROVED_ART_BUNDLE_V7 "${CMAKE_SOURCE_DIR}/MistIsle_ApprovedArt_v7.zip")
-set(MISTISLE_MAP_ART_BUNDLE_V8 "${CMAKE_SOURCE_DIR}/MistIsle_MapArt_v8.zip")
-set(MISTISLE_APPROVED_ART_BUNDLE_V6 "${CMAKE_SOURCE_DIR}/MistIsle_ApprovedArt_v6.zip")
-set(MISTISLE_APPROVED_ART_BUNDLE_V5 "${CMAKE_SOURCE_DIR}/MistIsle_ApprovedArt_v5.zip")
-set(MISTISLE_APPROVED_ART_BUNDLE_V4 "${CMAKE_SOURCE_DIR}/MistIsle_ApprovedArt_v4.zip")
-set(MISTISLE_APPROVED_ART_BUNDLE_V3 "${CMAKE_SOURCE_DIR}/MistIsle_ApprovedArt_v3.zip")
-if(EXISTS "${MISTISLE_APPROVED_ART_BUNDLE_V7}")
-  file(ARCHIVE_EXTRACT INPUT "${MISTISLE_APPROVED_ART_BUNDLE_V7}" DESTINATION "${CMAKE_SOURCE_DIR}")
-endif()
-if(EXISTS "${MISTISLE_MAP_ART_BUNDLE_V8}")
-  file(ARCHIVE_EXTRACT INPUT "${MISTISLE_MAP_ART_BUNDLE_V8}" DESTINATION "${CMAKE_SOURCE_DIR}")
-endif()
-if(EXISTS "${MISTISLE_APPROVED_ART_BUNDLE_V6}")
-  file(ARCHIVE_EXTRACT INPUT "${MISTISLE_APPROVED_ART_BUNDLE_V6}" DESTINATION "${CMAKE_SOURCE_DIR}")
-elseif(EXISTS "${MISTISLE_APPROVED_ART_BUNDLE_V5}")
-  file(ARCHIVE_EXTRACT INPUT "${MISTISLE_APPROVED_ART_BUNDLE_V5}" DESTINATION "${CMAKE_SOURCE_DIR}")
-elseif(EXISTS "${MISTISLE_APPROVED_ART_BUNDLE_V4}")
-  file(ARCHIVE_EXTRACT INPUT "${MISTISLE_APPROVED_ART_BUNDLE_V4}" DESTINATION "${CMAKE_SOURCE_DIR}")
-elseif(EXISTS "${MISTISLE_APPROVED_ART_BUNDLE_V3}")
-  file(ARCHIVE_EXTRACT INPUT "${MISTISLE_APPROVED_ART_BUNDLE_V3}" DESTINATION "${CMAKE_SOURCE_DIR}")
+# Restore only missing approved artwork. Never overwrite a newer tracked asset
+# with an older v7/v8 ZIP, and never extract v3-v6 after the approved bundles.
+execute_process(
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/tools/prepare_runtime_assets.py"
+  RESULT_VARIABLE MISTISLE_ART_RESULT
+)
+if(NOT MISTISLE_ART_RESULT EQUAL 0)
+  message(FATAL_ERROR "Runtime artwork validation failed; see the missing or invalid files above.")
 endif()
 set(MISTISLE_PIXEL_ASSET_STAMP "${MISTISLE_GENERATED_DIR}/pixel_assets.stamp")
 add_custom_command(
   OUTPUT "${MISTISLE_PIXEL_ASSET_STAMP}"
+  COMMAND "${CMAKE_COMMAND}" -E make_directory "${MISTISLE_GENERATED_DIR}"
   COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/tools/generate_pixel_assets.py"
   COMMAND "${CMAKE_COMMAND}" -E touch "${MISTISLE_PIXEL_ASSET_STAMP}"
   DEPENDS "${CMAKE_SOURCE_DIR}/tools/generate_pixel_assets.py"
+    "${CMAKE_SOURCE_DIR}/tools/prepare_runtime_assets.py"
   VERBATIM
 )
 add_custom_target(generate_pixel_assets DEPENDS "${MISTISLE_PIXEL_ASSET_STAMP}")
@@ -84,7 +78,7 @@ add_custom_command(
   COMMAND "${CMAKE_COMMAND}" -E make_directory "${MISTISLE_GENERATED_DIR}"
   COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/tools/generate_ground_atlas.py" --output "${MISTISLE_GROUND_ATLAS}"
   COMMAND "${CMAKE_COMMAND}" -E touch "${MISTISLE_GROUND_ATLAS_STAMP}"
-  DEPENDS "${CMAKE_SOURCE_DIR}/tools/generate_ground_atlas.py"
+  DEPENDS "${CMAKE_SOURCE_DIR}/tools/generate_ground_atlas.py" "${MISTISLE_GROUND_ATLAS}"
   VERBATIM
 )
 add_custom_target(generate_ground_atlas DEPENDS "${MISTISLE_GROUND_ATLAS_STAMP}")
@@ -109,13 +103,21 @@ add_executable(mist_isle
   src/main.c
   src/game.c
   src/render.c
+  src/ending.c
+  src/ui_text.c
+  src/audio.c
+  src/platform_input.c
   "${MISTISLE_MAP_HEADER}"
 )
 add_dependencies(mist_isle generate_area_maps)
 add_dependencies(mist_isle generate_ground_atlas)
 add_dependencies(mist_isle generate_atlas_bounds)
 target_include_directories(mist_isle PRIVATE src "${MISTISLE_GENERATED_DIR}")
+target_compile_definitions(mist_isle PRIVATE MISTISLE_VERSION="${MistIsle_VERSION}")
 target_link_libraries(mist_isle PRIVATE raylib)
+if(WIN32)
+  target_link_libraries(mist_isle PRIVATE imm32 user32)
+endif()
 if(MSVC)
   target_compile_options(mist_isle PRIVATE /utf-8)
 endif()

@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #define SW 1280
 #define SH 720
+#define ENDING_DURATION 28.0f
 #define MAPW 18
 #define MAPH 12
 #define TILE_SIZE 56.0f
@@ -19,7 +20,8 @@
 #define MAX_PICKUPS 32
 #define MAX_MAP_OBJECTS 64
 #define PI2 6.28318530718f
-typedef enum { SCENE_TITLE, SCENE_PLAY, SCENE_DIALOGUE, SCENE_BATTLE, SCENE_END } Scene;
+typedef enum { SCENE_TITLE, SCENE_PLAY, SCENE_DIALOGUE, SCENE_BATTLE, SCENE_END,
+    SCENE_POST_BATTLE_BLACKOUT } Scene;
 typedef enum { AREA_CAMP, AREA_GROVE, AREA_RUINS, AREA_LIGHTHOUSE } Area;
 typedef enum { ENEMY_MOTE, ENEMY_GUARD, ENEMY_BOSS } EnemyType;
 typedef enum { SKILL_GLOW, SKILL_SPLASH, SKILL_SPARK } SkillType;
@@ -79,6 +81,7 @@ typedef struct {
 
 typedef struct {
     Scene scene;
+    bool previewOnly;
     Area area;
     Player player;
     Buddy lumi, splash, spark;
@@ -95,6 +98,8 @@ typedef struct {
     int dialoguePortrait[4];
     int dialogueCount;
     bool dialogueStartsBossBattle;
+    bool dialogueStartsEnding;
+    bool dialogueInputBlocked;
     int battleEnemy;
     int battleTurn;
     int battleMessage;
@@ -102,6 +107,7 @@ typedef struct {
     int battleChoice;
     float time;
     float endingTime;
+    float postBattleBlackoutTime;
     float cameraZoom;
     Camera2D cam;
     int collectedRelics;
@@ -132,6 +138,8 @@ extern Color C_BG,C_INK,C_PAPER,C_GREEN,C_DARKGREEN,C_GOLD,C_BLUE,C_LILAC,C_PINK
 void GameReset(Game *g,int seed);
 void GameUpdate(Game *g,float dt);
 void GameRender(Game *g);
+void RenderPrepareFrame(Game *g);
+void RenderBeginCanvas(RenderTexture2D canvas);
 void RenderInit(void);
 void RenderClose(void);
 void GameSave(Game *g);

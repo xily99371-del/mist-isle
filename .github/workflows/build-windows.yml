@@ -1,228 +1,109 @@
 name: Windows and Raspberry Pi builds
+
 on:
   push:
     branches: [main, fix/approved-art-and-grounding]
   pull_request:
     branches: [main, feature/scene-interaction-polish, polish/full-game-character-art]
+  workflow_dispatch:
+
 permissions:
-  contents: write
+  contents: read
+
 jobs:
+  release-plan:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.plan.outputs.version }}
+      publish: ${{ steps.plan.outputs.publish }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Read version and determine whether this is a release
+        id: plan
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          python - <<'PY'
+          import os, re, subprocess
+          from pathlib import Path
+          version = Path('VERSION').read_text(encoding='utf-8').strip()
+          if not re.fullmatch(r'(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)', version):
+              raise SystemExit('VERSION must contain a stable major.minor.patch version.')
+          publish = False
+          if os.environ['GITHUB_REF'] == 'refs/heads/main':
+              if os.environ['GITHUB_EVENT_NAME'] == 'workflow_dispatch':
+                  publish = True
+              elif os.environ['GITHUB_EVENT_NAME'] == 'push':
+                  before = os.environ.get('BEFORE_SHA', '')
+                  if before and set(before) != {'0'}:
+                      subprocess.run(['git', 'cat-file', '-e', before + '^{commit}'], check=True)
+                      previous = subprocess.run(['git', 'show', before + ':VERSION'], capture_output=True, text=True)
+                      publish = previous.returncode != 0 or previous.stdout.strip() != version
+                  else:
+                      publish = True
+          if publish and not Path(f'docs/RELEASE_v{version}.md').is_file():
+              raise SystemExit('Release notes are missing for this version.')
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write(f'version={version}\npublish={str(publish).lower()}\n')
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:
+              summary.write(f'Version **{version}** · source `{os.environ["GITHUB_SHA"]}`\n\n')
+              summary.write('Release requested after both builds pass.\n' if publish else 'Build and package verification only.\n')
+          PY
+
   build-windows:
-    needs: build-raspberry-pi5
+    needs: release-plan
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download portable portrait PNGs from the Linux rasterizer
-        uses: actions/download-artifact@v4
         with:
-          name: MistIsle-RaspberryPi5-ARM64
-          path: build-pi-artifact
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Extract generated map art bundle when supplied
-        shell: pwsh
-        run: |
-          if (Test-Path MistIsle_MapArt_v8.zip) {
-            Expand-Archive -LiteralPath MistIsle_MapArt_v8.zip -DestinationPath . -Force
-          }
-      - name: Extract approved art bundle when supplied
-        shell: pwsh
-        run: |
-          if (Test-Path MistIsle_ApprovedArt_v7.zip) {
-            Expand-Archive -LiteralPath MistIsle_ApprovedArt_v7.zip -DestinationPath . -Force
-          } elseif (Test-Path MistIsle_ApprovedArt_v6.zip) {
-            Expand-Archive -LiteralPath MistIsle_ApprovedArt_v6.zip -DestinationPath . -Force
-          } elseif (Test-Path MistIsle_ApprovedArt_v5.zip) {
-            Expand-Archive -LiteralPath MistIsle_ApprovedArt_v5.zip -DestinationPath . -Force
-          } elseif (Test-Path MistIsle_ApprovedArt_v4.zip) {
-            Expand-Archive -LiteralPath MistIsle_ApprovedArt_v4.zip -DestinationPath . -Force
-          } elseif (Test-Path MistIsle_ApprovedArt_v3.zip) {
-            Expand-Archive -LiteralPath MistIsle_ApprovedArt_v3.zip -DestinationPath . -Force
-          }
-      - name: Publish approved high-resolution portraits to repository
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        shell: pwsh
-        run: |
-          $portraitDir = 'assets/characters/portraits'
-          $mapArtDir = 'assets/environment/generated'
-          New-Item -ItemType Directory -Force -Path $portraitDir,$mapArtDir | Out-Null
-          $portraits = @('heroine_portrait.png','watcher_portrait.png','guardian_portrait.png','moss_lumi_portrait.png','moatail_portrait.png','crystal_gecko_portrait.png')
-          foreach ($name in $portraits) {
-            $source = Join-Path $portraitDir $name
-            if (-not (Test-Path $source)) { throw "Approved portrait missing after v7 extraction: $source" }
-          }
-          $mapSheets = @('nature_props_sheet.png','glowglade_props_sheet.png','tidal_ruins_props_sheet.png','lighthouse_ruins_props_sheet.png')
-          foreach ($name in $mapSheets) {
-            $source = Join-Path 'build-pi-artifact/assets/environment/generated' $name
-            if (-not (Test-Path $source)) { throw "MapArt v8 sheet missing from Raspberry Pi build artifact: $source" }
-            Copy-Item $source (Join-Path $mapArtDir $name) -Force
-          }
-          $runtimeSprites = @(
-            @{ Source='assets/characters/hero/heroine_pixel_4x4_64x80.png'; Destination='assets/characters/hero/heroine_pixel_4x4_64x80.png' },
-            @{ Source='assets/characters/npc/watcher_pixel_4x4_64x80.png'; Destination='assets/characters/npc/watcher_pixel_4x4_64x80.png' },
-            @{ Source='assets/characters/boss/lighthouse_guardian_4x2.png'; Destination='assets/characters/boss/lighthouse_guardian_4x2.png' },
-            @{ Source='assets/characters/companions/moss_lumi_idle_64.png'; Destination='assets/characters/companions/moss_lumi_idle_64.png' },
-            @{ Source='assets/characters/companions/moatail_idle_64.png'; Destination='assets/characters/companions/moatail_idle_64.png' },
-            @{ Source='assets/characters/companions/crystal_gecko_idle_64.png'; Destination='assets/characters/companions/crystal_gecko_idle_64.png' }
-          )
-          foreach ($sprite in $runtimeSprites) {
-            $source = Join-Path 'build-pi-artifact' $sprite.Source
-            if (-not (Test-Path $source)) { throw "Runtime sprite missing from approved v7 build artifact: $source" }
-            $destination = $sprite.Destination
-            New-Item -ItemType Directory -Force -Path (Split-Path $destination) | Out-Null
-            Copy-Item $source $destination -Force
-          }
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add $portraitDir $mapArtDir assets/characters/hero/heroine_pixel_4x4_64x80.png assets/characters/npc/watcher_pixel_4x4_64x80.png assets/characters/boss/lighthouse_guardian_4x2.png assets/characters/companions/moss_lumi_idle_64.png assets/characters/companions/moatail_idle_64.png assets/characters/companions/crystal_gecko_idle_64.png
-          git diff --cached --quiet
-          if ($LASTEXITCODE -ne 0) {
-            git commit -m "Publish runtime v7 sprites and v8 map art [skip ci]"
-            git pull --rebase origin main
-            git push origin HEAD:main
-          }
-      - name: Generate pixel assets
+      - name: Prepare current runtime artwork and map atlases
         run: |
           python -m pip install pillow
-          python tools/generate_pixel_assets.py
-          python tools/generate_ground_atlas.py
-          python tools/preview_kenney_pack.py
-          python tools/build_kenney_runtime_atlas.py
-          New-Item -ItemType Directory -Force -Path assets/characters/png | Out-Null
-          Copy-Item build-pi-artifact/assets/characters/png/heroine_portrait.png assets/characters/png/ -Force
-          Copy-Item build-pi-artifact/assets/characters/png/watcher_portrait.png assets/characters/png/ -Force
-          Copy-Item build-pi-artifact/assets/characters/png/lighthouse_guardian_portrait.png assets/characters/png/ -Force
-          Copy-Item build-pi-artifact/assets/characters/png/moss_lumi.png assets/characters/png/ -Force
-          Copy-Item build-pi-artifact/assets/characters/png/moatail.png assets/characters/png/ -Force
-          Copy-Item build-pi-artifact/assets/characters/png/crystal_gecko.png assets/characters/png/ -Force
-          Copy-Item build-pi-artifact/assets/characters/png/heroine_world_4x4_64x80.png assets/characters/png/ -Force
-          if (Test-Path build-pi-artifact/assets/environment/generated) {
-            New-Item -ItemType Directory -Force -Path assets/environment/generated | Out-Null
-            Copy-Item build-pi-artifact/assets/environment/generated/* assets/environment/generated/ -Force
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          foreach ($script in @('prepare_runtime_assets.py', 'generate_pixel_assets.py', 'generate_ground_atlas.py', 'preview_kenney_pack.py', 'build_kenney_runtime_atlas.py')) {
+            python "tools/$script"
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
           python tools/preview_tiled_maps.py --output build/map-previews
-          if (Test-Path third_party/kenney/rpg-base/KenneyRPGpack.zip) { python tools/preview_cc0_packs.py }
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if (Test-Path third_party/kenney/rpg-base/KenneyRPGpack.zip) {
+            python tools/preview_cc0_packs.py
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
           python tools/validate_project.py
-      - name: Verify generated map art integration
-        shell: pwsh
-        run: |
-          if (Test-Path MistIsle_MapArt_v8.zip) {
-            $mapArt = @(
-              'assets/environment/generated/nature_props_sheet.png',
-              'assets/environment/generated/glowglade_props_sheet.png',
-              'assets/environment/generated/tidal_ruins_props_sheet.png',
-              'assets/environment/generated/lighthouse_ruins_props_sheet.png'
-            )
-            $missingMapArt = $mapArt | Where-Object { -not (Test-Path $_) }
-            if ($missingMapArt.Count -gt 0) { Write-Error ("Map art bundle incomplete: " + ($missingMapArt -join ', ')) }
-          } elseif (-not (Test-Path build-pi-artifact/assets/environment/generated)) {
-            Write-Warning "Generated map art bundle is not present; this run validates source and builds but not final map-art visuals."
-          }
-      - name: Verify approved art integration
-        shell: pwsh
-        run: |
-          $bundle = (Test-Path MistIsle_ApprovedArt_v7.zip) -or (Test-Path MistIsle_ApprovedArt_v6.zip) -or (Test-Path MistIsle_ApprovedArt_v5.zip) -or (Test-Path MistIsle_ApprovedArt_v4.zip) -or (Test-Path MistIsle_ApprovedArt_v3.zip)
-          if (-not $bundle) {
-            Write-Warning "Approved art bundle is not committed to this checkout. Source/compile checks will continue, but this run is not a visual-art release validation."
-          } else {
-            $required = @(
-              'assets/characters/portraits/heroine_portrait.png',
-              'assets/characters/portraits/watcher_portrait.png',
-              'assets/characters/portraits/guardian_portrait.png',
-              'assets/characters/portraits/moss_lumi_portrait.png',
-              'assets/characters/portraits/moatail_portrait.png',
-              'assets/characters/portraits/crystal_gecko_portrait.png',
-              'assets/characters/hero/heroine_pixel_4x4_64x80.png',
-              'assets/characters/npc/watcher_pixel_4x4_64x80.png',
-              'assets/characters/boss/lighthouse_guardian_4x2.png',
-              'assets/environment/coastal_keeper_house.png'
-            )
-            $missing = $required | Where-Object { -not (Test-Path $_) }
-            if ($missing.Count -gt 0) {
-              Write-Error ("Approved art bundle is incomplete: " + ($missing -join ', '))
-            }
-          }
-      - name: Configure
-        run: cmake -S . -B build -A x64
+      - name: Configure standalone Windows executable
+        run: cmake -S . -B build -A x64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
       - name: Build
         run: cmake --build build --config Release
-      - name: Package Windows build
-        shell: pwsh
+      - name: Package and verify Windows release
+        env:
+          RELEASE_VERSION: ${{ needs.release-plan.outputs.version }}
         run: |
-          New-Item -ItemType Directory -Force -Path dist | Out-Null
-          Copy-Item build/Release/mist_isle.exe dist/
-          New-Item -ItemType Directory -Force -Path @('dist/assets/characters/png','dist/assets/tiles/png') | Out-Null
-          Copy-Item assets/characters/png/* dist/assets/characters/png/
-          Copy-Item assets/tiles/png/* dist/assets/tiles/png/
-          if (Test-Path assets/characters/hero) {
-            New-Item -ItemType Directory -Force -Path dist/assets/characters/hero | Out-Null
-            Copy-Item assets/characters/hero/* dist/assets/characters/hero/
-          }
-          if (Test-Path assets/environment/generated) {
-            New-Item -ItemType Directory -Force -Path dist/assets/environment/generated | Out-Null
-            Copy-Item assets/environment/generated/* dist/assets/environment/generated/
-          }
-          if (Test-Path assets/characters/portraits) {
-            New-Item -ItemType Directory -Force -Path dist/assets/characters/portraits | Out-Null
-            Copy-Item assets/characters/portraits/* dist/assets/characters/portraits/
-          }
-          if (Test-Path assets/characters/npc) {
-            New-Item -ItemType Directory -Force -Path dist/assets/characters/npc | Out-Null
-            Copy-Item assets/characters/npc/* dist/assets/characters/npc/
-          }
-          if (Test-Path assets/characters/boss) {
-            New-Item -ItemType Directory -Force -Path dist/assets/characters/boss | Out-Null
-            Copy-Item assets/characters/boss/* dist/assets/characters/boss/
-          }
-          if (Test-Path assets/characters/companions) {
-            New-Item -ItemType Directory -Force -Path dist/assets/characters/companions | Out-Null
-            Copy-Item assets/characters/companions/* dist/assets/characters/companions/
-          }
-          if (Test-Path assets/environment) {
-            New-Item -ItemType Directory -Force -Path dist/assets/environment | Out-Null
-            Get-ChildItem assets/environment -Force |
-              Where-Object { $_.Name -ne 'generated' } |
-              Copy-Item -Destination dist/assets/environment/ -Recurse -Force
-          }
-          if (Test-Path assets/cinematics) {
-            New-Item -ItemType Directory -Force -Path dist/assets/cinematics | Out-Null
-            Copy-Item assets/cinematics/* dist/assets/cinematics/
-          }
-          Copy-Item README.md dist/
-          New-Item -ItemType Directory -Force -Path dist/third_party/kenney/tiny-town | Out-Null
-          Copy-Item third_party/kenney/tiny-town/kenney_tiny_town.zip dist/third_party/kenney/tiny-town/
-          Copy-Item third_party/kenney/tiny-town/LICENSE.md dist/third_party/kenney/tiny-town/
-          if (Test-Path build/kenney_tiny_town_preview.png) { Copy-Item build/kenney_tiny_town_preview.png dist/ }
-          foreach ($pack in @('rpg-base','pixel-ui')) {
-            $source = "third_party/kenney/$pack"
-            if (Test-Path $source) {
-              New-Item -ItemType Directory -Force -Path "dist/third_party/kenney/$pack" | Out-Null
-              Copy-Item "$source/*" "dist/third_party/kenney/$pack/"
-            }
-          }
-          if (Test-Path build/art-review) {
-            New-Item -ItemType Directory -Force -Path dist/art-review | Out-Null
-            Copy-Item build/art-review/* dist/art-review/
-          }
-          if (Test-Path build/map-previews) {
-            New-Item -ItemType Directory -Force -Path dist/art-review/maps | Out-Null
-            Copy-Item build/map-previews/* dist/art-review/maps/
-          }
-          if (Test-Path ASSET_SOURCES_AND_LICENSES.md) { Copy-Item ASSET_SOURCES_AND_LICENSES.md dist/ }
-          if (Test-Path docs/HUB_SUBMAPS.md) { New-Item -ItemType Directory -Force -Path dist/docs | Out-Null; Copy-Item docs/HUB_SUBMAPS.md dist/docs/ }
-          if (Test-Path RUN_WINDOWS.bat) { Copy-Item RUN_WINDOWS.bat dist/ }
-      - name: Upload playable Windows build
+          python tools/package_release.py build --target windows-x64 --binary build/Release/mist_isle.exe --raylib-source build/_deps/raylib-src --output release-assets --commit $env:GITHUB_SHA
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/package_release.py verify --archive "release-assets/MistIsle-Windows-v$env:RELEASE_VERSION.zip" --commit $env:GITHUB_SHA --version $env:RELEASE_VERSION
+      - name: Upload verified Windows archive
         uses: actions/upload-artifact@v4
         with:
-          name: MistIsle-Windows-Playtest-v2
-          path: dist/
+          name: MistIsle-Windows-v${{ needs.release-plan.outputs.version }}
+          path: release-assets/*
+          compression-level: 0
           if-no-files-found: error
 
   build-raspberry-pi5:
+    needs: release-plan
     runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -230,18 +111,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential cmake git pkg-config libx11-dev libxext-dev libxcursor-dev libxinerama-dev libxrandr-dev libxi-dev libasound2-dev libgl1-mesa-dev libwayland-dev libxkbcommon-dev wayland-protocols
-      - name: Extract generated map art bundle when supplied
-        run: |
-          if [ -f MistIsle_MapArt_v8.zip ]; then unzip -o MistIsle_MapArt_v8.zip -d .; fi
-      - name: Extract approved art bundle when supplied
-        run: |
-          if [ -f MistIsle_ApprovedArt_v7.zip ]; then unzip -o MistIsle_ApprovedArt_v7.zip -d .; elif [ -f MistIsle_ApprovedArt_v6.zip ]; then unzip -o MistIsle_ApprovedArt_v6.zip -d .; elif [ -f MistIsle_ApprovedArt_v4.zip ]; then unzip -o MistIsle_ApprovedArt_v4.zip -d .; elif [ -f MistIsle_ApprovedArt_v3.zip ]; then unzip -o MistIsle_ApprovedArt_v3.zip -d .; fi
       - name: Generate art and validate Tiled maps
         run: |
-          python -m pip install pillow cairosvg
+          python -m pip install pillow
+          python tools/prepare_runtime_assets.py
           python tools/generate_pixel_assets.py
-          python tools/generate_heroine_highres.py
-          python tools/rasterize_assets.py
           python tools/generate_ground_atlas.py
           python tools/preview_kenney_pack.py
           python tools/build_kenney_runtime_atlas.py
@@ -250,17 +124,114 @@ jobs:
           python tools/validate_project.py
       - name: Configure Raspberry Pi 5 profile
         run: cmake -S . -B build-pi -DCMAKE_BUILD_TYPE=Release -DMISTISLE_PI_PROFILE=ON
+      - name: Verify music continuity and post-battle sequence
+        run: |
+          python tools/test_audio.py --raylib build-pi/_deps/raylib-src/src
+          python tools/test_postbattle.py --raylib build-pi/_deps/raylib-src/src
+          python tools/test_render_math.py --raylib build-pi/_deps/raylib-src/src
       - name: Build ARM64 executable
         run: cmake --build build-pi --parallel 4
-      - name: Package Raspberry Pi build
+      - name: Package and verify Raspberry Pi release
+        env:
+          RELEASE_VERSION: ${{ needs.release-plan.outputs.version }}
         run: |
-          mkdir -p dist-pi
-          cp build-pi/mist_isle dist-pi/
-          cp -a assets dist-pi/
-          cp README.md docs/RASPBERRY_PI5.md dist-pi/
-      - name: Upload Raspberry Pi 5 ARM64 build
+          python tools/package_release.py build --target raspberrypi5-arm64 --binary build-pi/mist_isle --raylib-source build-pi/_deps/raylib-src --output release-assets --commit "$GITHUB_SHA"
+          python tools/package_release.py verify --archive "release-assets/MistIsle-RaspberryPi5-ARM64-v${RELEASE_VERSION}.tar.gz" --commit "$GITHUB_SHA" --version "$RELEASE_VERSION"
+      - name: Upload verified Raspberry Pi archive
         uses: actions/upload-artifact@v4
         with:
-          name: MistIsle-RaspberryPi5-ARM64
-          path: dist-pi/
+          name: MistIsle-RaspberryPi5-ARM64-v${{ needs.release-plan.outputs.version }}
+          path: release-assets/*
+          compression-level: 0
           if-no-files-found: error
+
+  publish-release:
+    needs: [release-plan, build-windows, build-raspberry-pi5]
+    if: github.ref == 'refs/heads/main' && needs.release-plan.outputs.publish == 'true' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: mist-isle-release-v${{ needs.release-plan.outputs.version }}
+      cancel-in-progress: false
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      RELEASE_VERSION: ${{ needs.release-plan.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Leave existing tags and releases untouched
+        id: existing
+        run: |
+          python - <<'PY'
+          import json, os, subprocess
+          tag, repo = 'v' + os.environ['RELEASE_VERSION'], os.environ['GH_REPO']
+          refs = json.loads(subprocess.check_output(['gh', 'api', f'repos/{repo}/git/matching-refs/tags/{tag}'], text=True))
+          releases = subprocess.check_output(['gh', 'api', '--paginate', f'repos/{repo}/releases?per_page=100', '--jq', f'.[] | select(.tag_name == "{tag}") | .id'], text=True).strip()
+          exists = any(item['ref'] == f'refs/tags/{tag}' for item in refs) or bool(releases)
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write(f'create={str(not exists).lower()}\n')
+          if exists:
+              message = f'{tag} already has a tag or release; no upload, replacement, or publication was attempted.'
+              print(message)
+              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:
+                  summary.write(message + '\n')
+          PY
+      - uses: actions/download-artifact@v4
+        if: steps.existing.outputs.create == 'true'
+        with:
+          pattern: MistIsle-*-v${{ needs.release-plan.outputs.version }}
+          merge-multiple: true
+          path: release-assets
+      - name: Verify downloaded archives against this exact source
+        if: steps.existing.outputs.create == 'true'
+        run: |
+          python -m pip install pillow
+          python tools/package_release.py verify --archive "release-assets/MistIsle-Windows-v${RELEASE_VERSION}.zip" --commit "$GITHUB_SHA" --version "$RELEASE_VERSION"
+          python tools/package_release.py verify --archive "release-assets/MistIsle-RaspberryPi5-ARM64-v${RELEASE_VERSION}.tar.gz" --commit "$GITHUB_SHA" --version "$RELEASE_VERSION"
+          cd release-assets
+          sha256sum --check *.sha256
+          cat *.sha256 > SHA256SUMS
+      - name: Create immutable tag and fully uploaded draft
+        if: steps.existing.outputs.create == 'true'
+        run: |
+          tag="v${RELEASE_VERSION}"
+          # Non-forced creation fails if another publisher created this tag first.
+          gh api --method POST "repos/${GH_REPO}/git/refs" -f "ref=refs/tags/${tag}" -f "sha=${GITHUB_SHA}" > /dev/null
+          gh release create "$tag" --verify-tag --target "$GITHUB_SHA" --draft \
+            --title "雾屿回响 · Mist Isle ${tag}" --notes-file "docs/RELEASE_${tag}.md" \
+            "release-assets/MistIsle-Windows-${tag}.zip" \
+            "release-assets/MistIsle-RaspberryPi5-ARM64-${tag}.tar.gz" release-assets/SHA256SUMS
+      - name: Verify uploaded draft assets and publish
+        if: steps.existing.outputs.create == 'true'
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, subprocess, tempfile
+          from pathlib import Path
+          def digest(path):
+              with path.open('rb') as file:
+                  return hashlib.file_digest(file, 'sha256').hexdigest()
+          tag, repo, commit = 'v' + os.environ['RELEASE_VERSION'], os.environ['GH_REPO'], os.environ['GITHUB_SHA']
+          ref = json.loads(subprocess.check_output(['gh', 'api', f'repos/{repo}/git/ref/tags/{tag}'], text=True))
+          if ref['object']['type'] != 'commit' or ref['object']['sha'] != commit:
+              raise SystemExit('Tag does not point to the tested commit; draft remains unpublished.')
+          release = json.loads(subprocess.check_output(['gh', 'release', 'view', tag, '--json', 'isDraft,tagName,assets'], text=True))
+          expected = {f'MistIsle-Windows-{tag}.zip', f'MistIsle-RaspberryPi5-ARM64-{tag}.tar.gz', 'SHA256SUMS'}
+          if not release['isDraft'] or {asset['name'] for asset in release['assets']} != expected:
+              raise SystemExit('Unexpected draft/asset set; release remains unpublished.')
+          with tempfile.TemporaryDirectory(prefix='mist-isle-release-check-') as folder:
+              subprocess.run(['gh', 'release', 'download', tag, '--dir', folder], check=True)
+              for name in expected:
+                  if digest(Path(folder) / name) != digest(Path('release-assets') / name):
+                      raise SystemExit(f'Uploaded hash mismatch: {name}; draft remains unpublished.')
+          subprocess.run(['gh', 'release', 'edit', tag, '--verify-tag', '--draft=false', '--latest'], check=True)
+          url = f'https://github.com/{repo}/releases/tag/{tag}'
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:
+              summary.write(f'Published [{tag}]({url}) from `{commit}` with both verified archives and SHA256SUMS.\n')
+          print(url)
+          PY

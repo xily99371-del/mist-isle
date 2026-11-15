@@ -49,7 +49,7 @@ def main():
         lines.append("};")
     lines.append("#endif")
     out.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print(f"Generated {out.relative_to(ROOT)}")
+    print(f"Generated {out.relative_to(ROOT) if out.is_relative_to(ROOT) else out}")
 
 if __name__ == "__main__":
     main()

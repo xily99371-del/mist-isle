@@ -1,0 +1,193 @@
+{
+  "format_version": 1,
+  "source": "Five audio files supplied by the user for Mist Isle.",
+  "processing": "Two-pass loudnorm; 44.1 kHz stereo 192 kbps MP3; no trimming, tempo change, silence removal, or timeline offset.",
+  "playback_note": "Stream MP3. Keep Enemy continuous across courtyard entry, dialogue and combat. Boss victory stops all audio for a one-second black screen. Start victory at 73.0 seconds when post-battle dialogue begins; keep that same stream playing through the automatic ending animation.",
+  "tracks": [
+    {
+      "source_filename": "传说之下.mp3",
+      "source_sha256": "4e2270b7b2bf001407563af750840984f6188c99d40d7b77eac9623a2e9e6616",
+      "source_bytes": 1275309,
+      "source_duration_seconds": 79.68,
+      "output_path": "assets/audio/music/camp.mp3",
+      "output_sha256": "8528a9dfe783ba39d95b2ac2f0341d0d9a28782a056b590eb711394013f5e5b6",
+      "output_bytes": 1913460,
+      "output_duration_seconds": 79.699592,
+      "role": "主地图",
+      "initial_playback_seconds": 0.0,
+      "source_loudness": {
+        "input_i": -10.77,
+        "input_tp": 0.59,
+        "input_lra": 9.1,
+        "input_thresh": -21.02
+      },
+      "output_loudness": {
+        "input_i": -19.26,
+        "input_tp": -7.68,
+        "input_lra": 9.1,
+        "input_thresh": -29.5
+      },
+      "applied_normalization": {
+        "target_lufs": -19.0,
+        "target_true_peak_dbtp": -1.5,
+        "target_lra": 12.0,
+        "linear_requested": true,
+        "measured_offset_db": 0.51,
+        "nominal_gain_db": -8.23
+      },
+      "alignment_check": {
+        "method": "waveform correlation over seconds 1 to 7 at 8 kHz, +/-10 ms search",
+        "offset_seconds": 0.0,
+        "correlation": 0.999794
+      }
+    },
+    {
+      "source_filename": "Forest Mixtape.mp3",
+      "source_sha256": "cc0b1991d2c41e0e7f5848719c27adf54d3c7e48aeadd716ccf3b946f3333f8e",
+      "source_bytes": 2375853,
+      "source_duration_seconds": 148.464,
+      "output_path": "assets/audio/music/grove.mp3",
+      "output_sha256": "0588486d0e6dede5ac2b8f3a6f2fe137fb0cceaca99a44b5aa3dccb960b9b0e0",
+      "output_bytes": 3564190,
+      "output_duration_seconds": 148.48,
+      "role": "辉光林地",
+      "initial_playback_seconds": 0.0,
+      "source_loudness": {
+        "input_i": -10.6,
+        "input_tp": -0.01,
+        "input_lra": 5.3,
+        "input_thresh": -20.96
+      },
+      "output_loudness": {
+        "input_i": -19.26,
+        "input_tp": -8.68,
+        "input_lra": 5.3,
+        "input_thresh": -29.62
+      },
+      "applied_normalization": {
+        "target_lufs": -19.0,
+        "target_true_peak_dbtp": -1.5,
+        "target_lra": 12.0,
+        "linear_requested": true,
+        "measured_offset_db": -0.5,
+        "nominal_gain_db": -8.4
+      },
+      "alignment_check": {
+        "method": "waveform correlation over seconds 1 to 7 at 8 kHz, +/-10 ms search",
+        "offset_seconds": 0.0,
+        "correlation": 0.999908
+      }
+    },
+    {
+      "source_filename": "Sacred PlaySecret Place.mp3",
+      "source_sha256": "142be0657b77d82ae868eeba1fdce235864adb9a495bd663c8145954c4073c24",
+      "source_bytes": 2018733,
+      "source_duration_seconds": 126.144,
+      "output_path": "assets/audio/music/ruins.mp3",
+      "output_sha256": "702ce49cf023749d29513295785478d96da14121e1c7791ae0ce44dd70df08da",
+      "output_bytes": 3028784,
+      "output_duration_seconds": 126.171429,
+      "role": "潮汐遗迹",
+      "initial_playback_seconds": 0.0,
+      "source_loudness": {
+        "input_i": -27.04,
+        "input_tp": -11.55,
+        "input_lra": 11.2,
+        "input_thresh": -37.64
+      },
+      "output_loudness": {
+        "input_i": -19.27,
+        "input_tp": -3.76,
+        "input_lra": 11.2,
+        "input_thresh": -29.86
+      },
+      "applied_normalization": {
+        "target_lufs": -19.0,
+        "target_true_peak_dbtp": -1.5,
+        "target_lra": 12.0,
+        "linear_requested": true,
+        "measured_offset_db": -2.2,
+        "nominal_gain_db": 8.04
+      },
+      "alignment_check": {
+        "method": "waveform correlation over seconds 1 to 7 at 8 kHz, +/-10 ms search",
+        "offset_seconds": 0.0,
+        "correlation": 0.999991
+      }
+    },
+    {
+      "source_filename": "Imagine+Dragons&JID+-+Enemy.mp3",
+      "source_sha256": "fe069a3eee056056e49f1f45976fd1c2ab6b7989793ee0b3e2371a31382d4762",
+      "source_bytes": 6938249,
+      "source_duration_seconds": 173.426939,
+      "output_path": "assets/audio/music/enemy.mp3",
+      "output_sha256": "f6487ce75a8eb0982d5adc37a43687299907ad4f080c24548493d3921f460b81",
+      "output_bytes": 4162916,
+      "output_duration_seconds": 173.426939,
+      "role": "Boss 入场与战斗连续播放",
+      "initial_playback_seconds": 0.0,
+      "source_loudness": {
+        "input_i": -8.17,
+        "input_tp": 2.1,
+        "input_lra": 3.6,
+        "input_thresh": -18.31
+      },
+      "output_loudness": {
+        "input_i": -19.26,
+        "input_tp": -8.19,
+        "input_lra": 3.6,
+        "input_thresh": -29.38
+      },
+      "applied_normalization": {
+        "target_lufs": -19.0,
+        "target_true_peak_dbtp": -1.5,
+        "target_lra": 12.0,
+        "linear_requested": true,
+        "measured_offset_db": -0.57,
+        "nominal_gain_db": -10.83
+      },
+      "alignment_check": {
+        "method": "waveform correlation over seconds 1 to 7 at 8 kHz, +/-10 ms search",
+        "offset_seconds": 0.0,
+        "correlation": 0.999807
+      }
+    },
+    {
+      "source_filename": "蔡健雅 - 晨间新闻.mp3",
+      "source_sha256": "43edebcf8740d1713ee5b1a15f28d735b5b75b6cec3675a9190fdfd9b6a16a4e",
+      "source_bytes": 9310214,
+      "source_duration_seconds": 231.000816,
+      "output_path": "assets/audio/music/victory.mp3",
+      "output_sha256": "d98fd93254739c8a0270066b75e9389d697f035d40b08ccb1db64cbb9d467a4a",
+      "output_bytes": 5544689,
+      "output_duration_seconds": 231.000816,
+      "role": "Boss 胜利后",
+      "initial_playback_seconds": 73.0,
+      "source_loudness": {
+        "input_i": -9.29,
+        "input_tp": 0.87,
+        "input_lra": 4.7,
+        "input_thresh": -19.39
+      },
+      "output_loudness": {
+        "input_i": -19.25,
+        "input_tp": -9.24,
+        "input_lra": 4.8,
+        "input_thresh": -29.35
+      },
+      "applied_normalization": {
+        "target_lufs": -19.0,
+        "target_true_peak_dbtp": -1.5,
+        "target_lra": 12.0,
+        "linear_requested": true,
+        "measured_offset_db": -1.19,
+        "nominal_gain_db": -9.71
+      },
+      "alignment_check": {
+        "method": "waveform correlation over seconds 1 to 7 at 8 kHz, +/-10 ms search",
+        "offset_seconds": 0.0,
+        "correlation": 0.999732
+      }
+    }
+  ]
+}

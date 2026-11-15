@@ -6,13 +6,25 @@
 </p>
 
 <p align="center">
-  <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-7c9a83"/>
+  <img alt="Version" src="https://img.shields.io/badge/version-2.0.0-7c9a83"/>
   <img alt="Language" src="https://img.shields.io/badge/language-C-596b8a"/>
   <img alt="Graphics" src="https://img.shields.io/badge/graphics-raylib-6f8f72"/>
   <img alt="Platforms" src="https://img.shields.io/badge/platform-Windows%20%7C%20Raspberry%20Pi%205-8b789d"/>
 </p>
 
 ---
+
+## 下载与开始 / Download and Play — v2.0.0
+
+| 平台 / Platform | 下载 / Download |
+|---|---|
+| Windows x64 | [MistIsle-Windows-v2.0.0.zip](https://github.com/xily99371-del/mist-isle/releases/download/v2.0.0/MistIsle-Windows-v2.0.0.zip) |
+| Raspberry Pi 5 ARM64 | [MistIsle-RaspberryPi5-ARM64-v2.0.0.tar.gz](https://github.com/xily99371-del/mist-isle/releases/download/v2.0.0/MistIsle-RaspberryPi5-ARM64-v2.0.0.tar.gz) |
+| 文件校验 / Checksums | [SHA256SUMS](https://github.com/xily99371-del/mist-isle/releases/download/v2.0.0/SHA256SUMS) |
+
+Windows：完整解压到新文件夹，双击 `mist_isle.exe` 或 `RUN_WINDOWS.bat`；运行包已包含美术、音乐与字体，无需安装开发工具。发行说明及附件以 [v2.0.0 Release](https://github.com/xily99371-del/mist-isle/releases/tag/v2.0.0) 为准。
+
+Windows: extract the whole archive into a new folder and run `mist_isle.exe` or `RUN_WINDOWS.bat`. Art, audio and fonts are included; no build tools are required to play. See the [v2.0.0 Release](https://github.com/xily99371-del/mist-isle/releases/tag/v2.0.0) for notes and attachments.
 
 ## 最终地图素材 / Final Map Art — v8
 
@@ -42,7 +54,7 @@
 </p>
 <p align="center"><sub>三位伙伴的 v7 高清独立立绘 / Final v7 individual high-resolution companion portraits.</sub></p>
 
-## 游戏内像素形象 / In-Game Pixel Sprites
+## 正式版游戏内像素形象 / Official In-Game Pixel Sprites
 
 <p align="center">
   <img src="https://github.com/xily99371-del/mist-isle/blob/main/assets/characters/hero/heroine_pixel_4x4_64x80.png?raw=1" alt="Runtime heroine pixel sprite sheet loaded by the game" width="30%"/>
@@ -55,7 +67,7 @@
   <img src="https://github.com/xily99371-del/mist-isle/blob/main/assets/characters/companions/moatail_idle_64.png?raw=1" alt="Runtime Moatail sprite sheet" width="22%"/>
   <img src="https://github.com/xily99371-del/mist-isle/blob/main/assets/characters/companions/crystal_gecko_idle_64.png?raw=1" alt="Runtime Crystal Gecko sprite sheet" width="22%"/>
 </p>
-<p align="center"><sub>三位伙伴同样使用游戏运行时加载的独立四帧动画素材 / Companion strips are the exact four-frame runtime assets.</sub></p>
+<p align="center"><sub>角色保持正式 v1.0.0 的原始美术与显示比例；女主与守望者为64×80单帧，三伙伴为32×32单帧。 / Character artwork and display proportions match the official v1.0.0 release: 64×80 actor frames and 32×32 companion frames.</sub></p>
 <p align="center"><sub>高清对话立绘与游戏内像素动画分开展示。上述高清立绘来自 MistIsle_ApprovedArt_v7.zip，地图环境素材来自 MistIsle_MapArt_v8.zip。 / High-resolution dialogue portraits are shown separately from in-game pixel sprites. Portraits come from v7; environment art comes from v8.</sub></p>
 
 ## 中文
@@ -64,14 +76,23 @@
 
 《雾屿回响》（Mist Isle）是一款俯视角像素 RPG。你将从海岸营地出发，探索一座被遗忘的海岛，与岛上的小生灵结伴，逐步恢复失落灯塔的力量。
 
-v1.0.0 收录第一章完整旅程，包含四张相互连通的手工设计地图，以及从初次探索到灯塔最终仪式的章节流程。
+v2.0.0 收录第一章完整旅程，包含四张相互连通的手工设计地图，并完善区域音乐、交互音效、战后对话与灯塔结局演出。
+
+### v2.0.0 更新
+
+- 五首区域与剧情音乐、14 种音效；Enemy 双语字幕随播放进度同步，入场、对话与战斗连续播放。
+- Boss 胜利后静音黑屏 1 秒，接续四句战后对话；《晨间新闻》从 1:13 开始，随后持续伴随三镜头结局。
+- Windows 文字按实际显示像素绘制，改善中文、歌词和结局字幕的清晰度与对比度；修复 Shift 切换输入法后的移动问题。
+- 保留正式人物、地图和显示比例，修复辉光林地 120 个萤火光点的循环，以及开局和切图时的地面缓存。
+
+完整说明见 [v2.0.0 发行说明](docs/RELEASE_v2.0.0.md)。
 
 ### 第一章：失落的灯塔
 
 - **海岸营地**：旅程起点，也是各区域之间的枢纽。与守望者交谈、整理物品，并从这里前往其他区域。
 - **辉光林地**：在专属萤火天气中探索林地，帮助叶团、寻找果实，并与林地微光兽交锋。
 - **潮汐遗迹**：在持续降雨的遗迹中寻找潮汐贝壳与星晶，解开机关并让鸣晶蜥加入队伍。
-- **灯塔庭院**：穿过夜雾与幽蓝火光，挑战灯塔守卫，击败它后返回最终祭坛，触发章节结局。
+- **灯塔庭院**：穿过夜雾与幽蓝火光，挑战灯塔守卫；胜利后静音黑屏 1 秒，接续战后对话，再自动播放章节结局。已通关存档可在最终祭坛重播结局。
 
 ### 伙伴
 
@@ -92,12 +113,14 @@ v1.0.0 收录第一章完整旅程，包含四张相互连通的手工设计地�
 
 进入区域时会显示天气提示；离开后恢复对应区域的天气规则。
 
+Windows 的辉光林地保留正式版 120 个萤火光点；坐标越过屏幕上沿后会从下方循环进入，长时间游玩也不会逐渐消失。树莓派配置仍使用原有的 56 个光点。
+
 ### 操作说明
 
 | 按键 | 功能 |
 |---|---|
 | WASD / 方向键 | 移动 |
-| 左 Shift | 冲刺 |
+| 左 / 右 Shift 或 Space | 冲刺 |
 | E | 互动、对话、拾取、使用场景机关 |
 | Tab | 切换当前出战伙伴 |
 | J | 打开旅程手记 |
@@ -106,21 +129,52 @@ v1.0.0 收录第一章完整旅程，包含四张相互连通的手工设计地�
 | O | 收起 / 展开目标栏 |
 | F5 / F9 | 保存 / 读取存档 |
 | F7 | 天气调试切换 |
+| F6 | 开启 / 关闭 BGM 与音效 |
+| F8 | 开启 / 关闭 Enemy 双语字幕与边缘灯光 |
 | Esc | 关闭当前界面 |
 
 标题界面可使用 Enter 或鼠标开始游戏；战斗界面支持键盘与鼠标选择指令。
 
+### 音乐与音效
+
+海岸营地使用《传说之下》，辉光林地使用 Forest Mixtape，潮汐遗迹使用 Sacred Play, Secret Place。进入灯塔庭院即播放 Enemy，战前对话与战斗连续衔接；顶部按歌曲实际播放位置逐句显示**英文歌词与中文翻译**，屏幕两侧灯光随音乐变化，间奏只保留音乐波形。
+
+击败 Boss 后先**黑屏并完全静音 1 秒**，然后开始四句战后对话，同时从《晨间新闻》的 **1:13** 播放。最后一句对话结束即进入灯塔结局动画，**音乐保持原进度继续播放**。黑屏不能跳过；战斗结束前按住的键或鼠标必须先释放，避免误跳第一句。
+
+增加分地面脚步声、对话翻页、交互、碰撞、冲刺、拾取与战斗音效。音乐已统一响度；切出游戏窗口时暂停，返回后继续。Windows 游戏窗口会解除输入法关联，并读取独立按键状态，避免 Shift 切换中文输入法后无法移动；Space 也可冲刺。
+
+详细音轨与字幕格式见 [assets/audio/README.md](assets/audio/README.md)。
+
+字幕与界面使用随包提供的静态 SemiBold 中文字体。歌词放大并配深色底板与描边；结局旁白增加暗色渐变衬底，Boss 阶段提示置于歌词卡下方，保持文字清晰且互不遮挡。
+
+Windows 版按窗口实际像素渲染画面，并按文字最终显示尺寸生成字形；界面、对话、地图路牌、歌词和结局文字不再随 1280×720 画布二次放大。逻辑布局和像素素材比例保持不变，树莓派仍保留 720p 性能配置。本轮与正式版的核对结果见 [v1.0.0 对照审计](docs/V1_0_0_PARITY_AUDIT.md)。
+
+### 结局演出
+
+完整演出约 **28 秒**：旅人与伙伴沿石路走向灯塔 → 光点汇入灯芯、灯光扫过海面 → 镜头拉远、海雾退去 → 晨光中与伙伴同行收尾。使用三张1672×941新画面，实际运行人物参与行走，镜头推拉、灯光、海面反光和粒子持续变化；中文旁白由游戏字体绘制。
+
+播放期间 `Esc` 跳到完成页；完成后 `P` 重播、`Enter` 返回标题、`R` 开始新旅程。战后对话、演出和重播共用同一音乐流。
+
+只查看新结局（不会读取或修改存档）：
+
+```powershell
+.\RUN_WINDOWS.bat --ending-preview
+```
+
+<img src="https://github.com/xily99371-del/mist-isle/blob/main/assets/cinematics/ending_v9/03_homecoming.png?raw=1" alt="v9 ending illustration: the heroine and her three companions at sunrise" width="100%"/>
+
+
 ### Windows 运行
 
-推荐 Windows 10/11、CMake、Visual Studio C++ Build Tools 和 Python 3。
+直接游玩请使用上方 Windows 运行包。需要从源码构建时，准备 Windows 10/11、CMake、Visual Studio 2022 C++ Build Tools 和 Python 3。
 
 ```powershell
 git clone https://github.com/xily99371-del/mist-isle.git
 cd mist-isle
-.\\RUN_WINDOWS.bat
+.\RUN_WINDOWS.bat
 ```
 
-启动脚本会准备所需素材、配置 raylib 并编译游戏。也可以从 GitHub Actions 下载 Windows 构建产物。
+源码启动脚本会准备所需素材、配置 raylib 并编译游戏。已有工程的更新命令见 [LOCAL_SYNC.md](docs/LOCAL_SYNC.md)；正式运行包从 [Releases](https://github.com/xily99371-del/mist-isle/releases/tag/v2.0.0) 下载。
 
 ### Raspberry Pi 5
 
@@ -152,7 +206,7 @@ mist-isle/
 
 ### 素材与许可
 
-最终角色素材以 `MistIsle_ApprovedArt_v7.zip` 为准，四张地图的环境素材以 `MistIsle_MapArt_v8.zip` 为准。第三方素材来源与许可证见 [ASSET_SOURCES_AND_LICENSES.md](ASSET_SOURCES_AND_LICENSES.md) 及 `third_party/`。
+女主、守望者与三位伙伴使用正式 **v1.0.0** 的原始像素图，精确路径与内容哈希登记在 `assets/characters/runtime_art.json`。高清立绘与 Boss 像素图沿用 v7，四张地图场景素材沿用 v8。地面图集必须按正式版生成器生成连续地面与边缘遮罩，不能仅凭文件名和尺寸使用旧图。结局继续使用 `assets/cinematics/ending_v9/` 的三张新宽屏画面。第三方素材来源与许可证见 [ASSET_SOURCES_AND_LICENSES.md](ASSET_SOURCES_AND_LICENSES.md) 及 `third_party/`。
 
 ## English
 
@@ -160,14 +214,23 @@ mist-isle/
 
 **Mist Isle** is a top-down pixel-art RPG. Set out from a coastal camp, explore a forgotten island, befriend its small inhabitants, and restore the power of a lost lighthouse.
 
-Version 1.0.0 contains the complete first-chapter journey across four handcrafted, connected areas—from the first steps on the island to the final lighthouse ritual.
+Version 2.0.0 contains the complete first-chapter journey across four handcrafted, connected areas, with regional music, interaction sounds, post-battle dialogue and an expanded lighthouse finale.
+
+### What Is New in v2.0.0
+
+- Five music tracks and 14 sound effects; bilingual Enemy subtitles follow playback continuously through entry, dialogue and battle.
+- Boss victory leads to a one-second silent blackout, four lines of dialogue and a three-shot ending. Morning News starts at 01:13 and continues through the finale.
+- Native-resolution Windows text improves Chinese UI and subtitle clarity; window-scoped input addresses movement loss after Shift switches the IME.
+- Official character and map art remain in place, with fixes for the 120 desktop fireflies and ground caching at startup and map transitions.
+
+See the [v2.0.0 release notes](docs/RELEASE_v2.0.0.md).
 
 ### Chapter One: The Lost Lighthouse
 
 - **Coastal Camp** — The starting hub and connection between regions. Talk to the Watcher, manage your inventory, and set out for the island's other areas.
 - **Glowglade Grove** — Explore under its exclusive firefly weather, help Leafling, gather fruit, and face the Grove Mote.
 - **Tidal Ruins** — Search the rain-soaked ruins for a Tide Shell and Star Crystal, solve the shrine mechanism, and recruit Crystal Gecko.
-- **Lighthouse Courtyard** — Cross the night fog and blue flames, challenge the Lighthouse Guardian, then return to the final altar to trigger the chapter ending.
+- **Lighthouse Courtyard** — Cross the night fog and blue flames, challenge the Lighthouse Guardian, then experience a one-second silent blackout, post-battle dialogue, and the automatic chapter ending. Completed saves can replay the ending at the final altar.
 
 ### Companions
 
@@ -193,7 +256,7 @@ An on-screen notice announces each area transition and its weather. Each region 
 | Key | Action |
 |---|---|
 | WASD / Arrow keys | Move |
-| Left Shift | Dash |
+| Left / Right Shift or Space | Dash |
 | E | Interact, talk, pick up items and activate scene objects |
 | Tab | Switch active companion |
 | J | Open journal |
@@ -202,21 +265,43 @@ An on-screen notice announces each area transition and its weather. Each region 
 | O | Collapse / expand objectives |
 | F5 / F9 | Save / load |
 | F7 | Weather debug cycle |
+| F6 | Toggle BGM and sound effects |
+| F8 | Toggle Enemy bilingual lyrics and edge lights |
 | Esc | Close the current interface |
 
 Press Enter or click the mouse to start from the title screen. Battle commands can be selected with the keyboard or mouse.
 
-### Build on Windows
+### Music and Sound
 
-Recommended: Windows 10/11, CMake, Visual Studio C++ Build Tools and Python 3.
+The coastal hub plays the supplied Undertale track; Glowglade plays Forest Mixtape; the ruins play Sacred Play, Secret Place. Enemy starts on entering the Lighthouse Courtyard and continues through dialogue and battle without restarting. Actual English lyrics and matching Chinese translations follow the music playback clock, with music-responsive edge lighting; instrumental gaps show only the music waveform.
+
+Boss victory begins with a **one-second silent black screen**. Four lines of post-battle dialogue follow while Morning News starts at **01:13**. Closing the final line automatically starts the lighthouse ending animation; **the same music stream continues without restarting or seeking again**. The blackout cannot be skipped, and held confirmation inputs must be released before advancing the first line.
+
+The ending is a **28-second** sequence with walking actors, lantern ignition, a distant dawn view and a companion homecoming shot. Three 1672×941 illustrations combine with camera movement, shared runtime sprites, light, drifting mist and water reflections. Chinese captions are rendered by the game font. `Esc` skips to the completion frame; `P` replays, `Enter` returns to the title and `R` begins a new journey. Music continues through the whole sequence and replay.
+
+Preview directly without reading or changing a save:
+
+```powershell
+.\RUN_WINDOWS.bat --ending-preview
+```
+
+Surface-specific footsteps, dialogue, interactions, collisions, dash, pickups, and battle actions now have sound effects. F6 mutes/unmutes audio; F8 toggles Enemy lyrics and edge lights. Leaving the game window pauses gameplay and music. Windows input is scoped to the game window; Shift and Space both dash.
+
+The bundled static SemiBold Chinese font improves UI and subtitle readability. Larger outlined lyrics sit on a dark panel; ending captions use a soft dark scrim, and the Boss phase panel stays below the lyric card without overlap.
+
+The Windows build rasterizes at the physical window resolution and loads glyphs at their final displayed pixel size, including camera scaling for world labels. The logical layout and pixel-art proportions stay unchanged; the Pi profile retains its 720p canvas. Glowglade keeps the release's 120 desktop fireflies (56 on Pi), with positive coordinate wrapping so they remain visible during long sessions. See the [v1.0.0 parity audit](docs/V1_0_0_PARITY_AUDIT.md).
+
+### Play or Build on Windows
+
+To play, use the Windows archive linked above. To build from source, install CMake, Visual Studio 2022 C++ Build Tools and Python 3 on Windows 10/11.
 
 ```powershell
 git clone https://github.com/xily99371-del/mist-isle.git
 cd mist-isle
-.\\RUN_WINDOWS.bat
+.\RUN_WINDOWS.bat
 ```
 
-The launcher prepares required assets, configures raylib and builds the game. A packaged Windows build is also available from GitHub Actions.
+The source launcher prepares required assets, configures raylib and builds the game. See [LOCAL_SYNC.md](docs/LOCAL_SYNC.md) to update an existing checkout, or download the ready-to-play archive from [Releases](https://github.com/xily99371-del/mist-isle/releases/tag/v2.0.0).
 
 ### Raspberry Pi 5
 
@@ -248,8 +333,8 @@ mist-isle/
 
 ### Art Assets and Licenses
 
-The final character assets are defined by `MistIsle_ApprovedArt_v7.zip`; the four area-specific environment art sheets are defined by `MistIsle_MapArt_v8.zip`. Third-party asset sources and licenses are documented in [ASSET_SOURCES_AND_LICENSES.md](ASSET_SOURCES_AND_LICENSES.md) and `third_party/`.
+The active heroine, Watcher and three companion animations match the official **v1.0.0** release, including display proportions. Their exact paths and SHA256 hashes are pinned in `assets/characters/runtime_art.json`. Dialogue portraits and the Boss sheet retain v7; scene props retain v8. Ground textures must be regenerated with the release terrain/mask layout; matching filenames and dimensions are insufficient. Three new widescreen ending illustrations remain in `assets/cinematics/ending_v9/`. Third-party asset sources and licenses are documented in [ASSET_SOURCES_AND_LICENSES.md](ASSET_SOURCES_AND_LICENSES.md) and `third_party/`.
 
 ---
 
-<p align="center"><sub>雾屿回响 · Mist Isle — Version 1.0.0</sub></p>
+<p align="center"><sub>雾屿回响 · Mist Isle — Version 2.0.0</sub></p>

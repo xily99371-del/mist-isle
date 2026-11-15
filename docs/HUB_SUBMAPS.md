@@ -14,7 +14,7 @@ Each map is hand-authored in Tiled. Ground tiles, collision rectangles, scene-ob
 3. Return to the hub. The Tidal Ruins gate opens once Moss Lumi and Moatail are owned.
 4. Find a Tide Shell and Star Crystal in the ruins, recruit Crystal Gecko, and activate the shrine with all three companions.
 5. Return to the hub and enter Lighthouse Courtyard after the seal is lifted.
-6. Defeat the lighthouse guardian and return to the shrine in the courtyard for the ending sequence.
+6. Defeat the lighthouse guardian, wait through the one-second silent blackout, then advance the post-battle dialogue. The ending starts automatically while Morning News continues from its dialogue playback position. Completed saves can replay the ending at the courtyard shrine.
 
 ## Persistence
 - Save format v4 stores the active area and collected pickup flags separately for all four maps.

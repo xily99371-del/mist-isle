@@ -1,4 +1,9 @@
 #include "game.h"
+#include "ending.h"
+#include "audio.h"
+#include "ui_text.h"
+#include "rlgl.h"
+#include "weather.h"
 #include "area_maps.h"
 #include "atlas_bounds.h"
 #include <math.h>
@@ -6,39 +11,81 @@
 #include <stdlib.h>
 #include <string.h>
 static Font UI_FONT={0};
-static const int UI_CODEPOINTS[]={32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,183,8211,8212,8230,8592,8594,12289,12290,19968,19977,19978,19981,19982,19990,19996,20004,20013,20026,20027,20046,20063,20102,20107,20110,20113,20114,20132,20142,20154,20173,20174,20195,20197,20204,20214,20219,20237,20241,20249,20250,20260,20276,20284,20301,20307,20316,20320,20351,20379,20381,20391,20415,20445,20572,20799,20808,20809,20811,20837,20840,20849,20851,20860,20861,20877,20889,20914,20915,20986,20987,20999,21040,21046,21050,21069,21147,21152,21153,21160,21161,21191,21215,21253,21306,21319,21327,21335,21345,21355,21360,21457,21462,21463,21464,21475,21476,21482,21487,21488,21494,21507,21508,21512,21516,21518,21543,21560,21561,21629,21644,21709,21796,21890,21916,21943,22218,22238,22242,22270,22280,22312,22320,22495,22522,22612,22771,22788,22797,22806,22810,22825,22830,22833,22836,22987,23384,23427,23432,23433,23436,23450,23453,23454,23475,23478,23481,23494,23547,23548,23553,23558,23567,23578,23601,23614,23618,23637,23679,23707,23736,24038,24050,24102,24110,24182,24212,24231,24237,24320,24341,24359,24403,24405,24418,24448,24452,24453,24456,24471,24494,24515,24577,24674,24687,24819,24840,24847,24895,25104,25110,25112,25163,25165,25171,25214,25216,25226,25260,25307,25320,25321,25345,25353,25361,25377,25442,25506,25509,25552,25805,25910,25915,25918,25925,25928,25932,25937,25955,25972,25991,26007,26032,26041,26045,26049,26053,26080,26085,26087,26102,26143,26159,26174,26222,26228,26230,26263,26356,26368,26377,26391,26395,26410,26412,26426,26469,26519,26522,26524,26530,26597,26631,26639,26723,27425,27426,27491,27573,27668,27700,27719,27728,27773,27785,27809,27819,27835,27839,27861,27873,27922,27963,27969,27973,28014,28023,28145,28165,28287,28304,28418,28526,28608,28779,28781,28783,28784,28789,28857,29031,29060,29255,29256,29289,29366,29616,29702,29983,29992,30005,30028,30041,30333,30340,30446,30475,30528,30561,30707,30784,30830,30865,31181,31192,31227,31243,31456,31526,31532,31561,32034,32418,32441,32445,32447,32454,32456,32463,32469,32473,32487,32493,32622,32769,32773,32852,32972,33016,33021,33394,33410,33469,33487,33492,33719,33828,33829,33853,33976,34067,34255,34276,34411,34597,34892,34987,35013,35199,35201,35265,35299,35748,35753,35760,35835,35848,36125,36133,36164,36208,36215,36234,36291,36319,36335,36454,36530,36716,36731,36745,36793,36807,36817,36820,36824,36825,36827,36828,36857,36864,36873,36890,36896,36935,36947,36951,36973,37117,37266,37319,37324,37325,37327,38145,38190,38271,38378,38381,38388,38395,38431,38451,38459,38477,38498,38500,38505,38544,38598,38632,38654,38656,38706,38752,38754,39063,39064,39069,39118,39128,39295,39321,39564,40483,40736,65281,65292,65306,65307,35282,28796,30171,21407,25105,30452,24517,29420,33258,26463,21435,20303,19979,22826,20037,20309,35302,30896,22842,26366,25252,21534,21517,23383,37027,39318,39046,26680,32784,38454,22686,24378,20302,33988,31283,26029,20108,34259,20339,22823,23613,24230,26816,32047,32791,36814,36884,38543,26262,31359,38453,32858,25314,21183,28176,21387,20919,22812,28459,36880,38452,19987,21363,23646,24613,26292,28982,39588};;;
-static bool UIFontHasRequiredGlyphs(Font f) {
-    for(int i=0;i<(int)(sizeof(UI_CODEPOINTS)/sizeof(UI_CODEPOINTS[0]));i++) {
-        int cp=UI_CODEPOINTS[i];
+static float CANVAS_SCALE_X=1.0f,CANVAS_SCALE_Y=1.0f;
+static const Color UI_MUTED_ON_PAPER={65,82,69,255};
+static const int UI_CODEPOINTS[]={32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,183,233,8212,8230,8592,8594,12289,12290,19968,19977,19978,19979,19981,19982,19987,19990,19996,20004,20010,20013,20020,20026,20027,20037,20040,20046,20063,20081,20102,20105,20107,20108,20110,20113,20114,20123,20129,20132,20142,20146,20154,20160,20173,20174,20182,20195,20196,20197,20204,20214,20219,20237,20241,20249,20250,20256,20260,20276,20284,20301,20302,20307,20309,20316,20320,20339,20351,20379,20381,20391,20415,20445,20505,20542,20572,20687,20808,20809,20811,20837,20840,20849,20851,20860,20861,20877,20889,20914,20915,20919,20934,20986,20987,20998,20999,21040,21046,21050,21051,21069,21147,21152,21153,21160,21161,21191,21215,21253,21270,21306,21319,21327,21333,21335,21345,21355,21360,21363,21387,21435,21450,21457,21462,21463,21464,21475,21476,21477,21482,21487,21488,21494,21507,21508,21512,21516,21517,21518,21521,21534,21543,21548,21560,21571,21592,21619,21629,21644,21709,21796,21890,21916,21943,22066,22114,22218,22235,22238,22240,22242,22270,22280,22307,22312,22320,22330,22495,22522,22612,22681,22686,22721,22768,22771,22788,22791,22797,22806,22810,22812,22823,22825,22826,22830,22833,22836,22842,22868,22909,22914,22987,23383,23384,23396,23427,23431,23432,23433,23436,23450,23453,23454,23475,23478,23481,23490,23494,23545,23547,23548,23553,23558,23567,23578,23601,23613,23614,23618,23637,23646,23679,23707,23736,24038,24040,24049,24050,24076,24102,24110,24182,24212,24213,24230,24231,24237,24266,24320,24341,24359,24378,24402,24403,24405,24418,24448,24452,24453,24456,24471,24494,24515,24576,24577,24605,24613,24674,24687,24694,24717,24773,24778,24819,24840,24847,24895,24908,25104,25105,25110,25112,25152,25163,25165,25171,25214,25216,25226,25252,25260,25265,25307,25320,25321,25342,25345,25353,25361,25376,25377,25442,25472,25506,25509,25552,25773,25805,25810,25903,25910,25915,25918,25925,25928,25932,25937,25954,25955,25991,26007,26029,26032,26041,26045,26049,26053,26080,26087,26089,26102,26143,26159,26174,26195,26222,26228,26230,26262,26263,26292,26356,26366,26368,26377,26391,26395,26410,26412,26421,26426,26432,26463,26469,26519,26522,26524,26530,26550,26597,26631,26639,26680,26684,26694,26723,26816,27425,27426,27463,27491,27492,27573,27599,27668,27700,27704,27714,27719,27728,27773,27785,27809,27819,27833,27835,27839,27861,27873,27963,27969,27973,28014,28023,28040,28108,28151,28165,28176,28216,28287,28304,28363,28385,28418,28436,28526,28608,28779,28781,28783,28789,28796,28857,28982,29031,29060,29255,29256,29289,29366,29616,29645,29699,29702,29983,29992,30005,30028,30041,30130,30171,30333,30340,30424,30446,30452,30460,30475,30495,30524,30528,30561,30707,30772,30784,30830,30862,30865,30896,31048,31095,31163,31181,31192,31227,31243,31283,31354,31359,31455,31456,31471,31505,31526,31532,31561,31563,31639,31934,32034,32039,32047,32441,32445,32447,32456,32463,32469,32473,32477,32487,32490,32493,32622,32769,32773,32780,32784,32791,32819,32852,32972,33016,33021,33258,33293,33322,33324,33410,33469,33487,33492,33510,33633,33719,33828,33829,33853,33976,33988,34067,34255,34259,34276,34597,34892,34987,35013,35199,35201,35265,35272,35282,35299,35302,35475,35748,35753,35760,35768,35777,35805,35828,35835,35841,35848,35859,36125,36133,36148,36149,36164,36208,36215,36275,36300,36319,36335,36339,36393,36454,36523,36530,36716,36745,36793,36807,36814,36816,36817,36820,36824,36825,36827,36828,36857,36861,36864,36873,36884,36890,36896,36924,36935,36947,36951,36973,37027,37117,37266,37319,37324,37325,37327,38125,38145,38190,38271,38376,38378,38381,38388,38395,38431,38452,38453,38454,38459,38477,38498,38500,38505,38519,38543,38544,38598,38632,38654,38656,38706,38745,38752,38899,39030,39034,39044,39046,39063,39064,39069,39118,39295,39318,39321,39547,39564,39588,40483,40614,40736,65281,65288,65289,65292,65306,65307,65311};
+static bool UIFontHasRequiredGlyphs(Font f,const int *codepoints,int count) {
+    for(int i=0;i<count;i++) {
+        int cp=codepoints[i];
         bool cjk=(cp>=0x3400&&cp<=0x9FFF)||(cp>=0xF900&&cp<=0xFAFF)||
                  (cp>=0x3000&&cp<=0x303F)||(cp>=0xFF00&&cp<=0xFFEF);
-        if(cjk && GetGlyphIndex(f,cp)<=0) {
+        int glyph=GetGlyphIndex(f,cp);
+        if(cjk && (glyph<0||glyph>=f.glyphCount||f.glyphs[glyph].value!=cp)) {
             TraceLog(LOG_WARNING,"Mist Isle: font missing required Chinese glyph U+%04X",cp);
             return false;
         }
     }
     return true;
 }
+static int CompareCodepoints(const void *a,const void *b) {
+    int ca=*(const int*)a,cb=*(const int*)b;
+    return (ca>cb)-(ca<cb);
+}
+static int *LoadUIGlyphs(int *outCount) {
+    int baseCount=(int)(sizeof(UI_CODEPOINTS)/sizeof(UI_CODEPOINTS[0]));
+    int lyricCount=0;
+    char *lyrics=FileExists("assets/audio/enemy.tsv")?LoadFileText("assets/audio/enemy.tsv"):NULL;
+    int *lyricPoints=lyrics?LoadCodepoints(lyrics,&lyricCount):NULL;
+    int *points=malloc((size_t)(baseCount+lyricCount)*sizeof(*points));
+    if(!points) {
+        if(lyricPoints)UnloadCodepoints(lyricPoints);
+        if(lyrics)UnloadFileText(lyrics);
+        *outCount=0;
+        return NULL;
+    }
+    memcpy(points,UI_CODEPOINTS,(size_t)baseCount*sizeof(*points));
+    int count=baseCount;
+    for(int i=0;i<lyricCount;i++) {
+        int cp=lyricPoints[i];
+        if(cp>=32&&cp!=127&&cp!=0xFEFF)points[count++]=cp;
+    }
+    if(lyricPoints)UnloadCodepoints(lyricPoints);
+    if(lyrics)UnloadFileText(lyrics);
+    qsort(points,(size_t)count,sizeof(*points),CompareCodepoints);
+    int unique=0;
+    for(int i=0;i<count;i++)if(unique==0||points[i]!=points[unique-1])points[unique++]=points[i];
+    *outCount=unique;
+    return points;
+}
 static void LoadUIFont(void) {
+    // The bilingual lyric file supplies its own glyphs, so subtitles cannot
+    // silently lose Chinese characters that are absent from the game dialogue.
+    int glyphCount=0;
+    int *glyphs=LoadUIGlyphs(&glyphCount);
+    const int *points=glyphs?glyphs:UI_CODEPOINTS;
+    if(!glyphs)glyphCount=(int)(sizeof(UI_CODEPOINTS)/sizeof(UI_CODEPOINTS[0]));
     // Prefer standalone TTF files: raylib's stb_truetype path is more reliable with TTF than TTC collections.
-    const char *paths[]={"assets/fonts/NotoSansSC-VF.ttf","C:/Windows/Fonts/simhei.ttf","C:/Windows/Fonts/msyh.ttc","C:/Windows/Fonts/simsun.ttc"};
-    for(int i=0;i<4 && UI_FONT.texture.id==0;i++) {
+    // Ship actual SemiBold outlines: small Chinese UI and subtitles must stay
+    // legible after the 720p canvas is scaled by the desktop window.
+    const char *paths[]={"assets/fonts/NotoSansSC-SemiBold.ttf","assets/fonts/NotoSansSC-VF.ttf","C:/Windows/Fonts/simhei.ttf","C:/Windows/Fonts/msyh.ttc","C:/Windows/Fonts/simsun.ttc"};
+    for(int i=0;i<(int)(sizeof(paths)/sizeof(paths[0])) && UI_FONT.texture.id==0;i++) {
         if(!FileExists(paths[i]))continue;
-        Font candidate=LoadFontEx(paths[i],32,(int*)UI_CODEPOINTS,(int)(sizeof(UI_CODEPOINTS)/sizeof(UI_CODEPOINTS[0])));
-        if(candidate.texture.id && UIFontHasRequiredGlyphs(candidate)) {
+        Font candidate=LoadFontEx(paths[i],48,(int*)points,glyphCount);
+        if(candidate.texture.id && UIFontHasRequiredGlyphs(candidate,points,glyphCount)) {
             UI_FONT=candidate;
+            UITextConfigure(paths[i],points,glyphCount);
             SetTextureFilter(UI_FONT.texture,TEXTURE_FILTER_BILINEAR);
             TraceLog(LOG_INFO,"Mist Isle: validated Chinese UI font loaded from %s (%d glyphs)",paths[i],UI_FONT.glyphCount);
         } else if(candidate.texture.id) {
             UnloadFont(candidate);
         }
     }
+    free(glyphs);
     if(!UI_FONT.texture.id)TraceLog(LOG_ERROR,"Mist Isle: no usable Chinese UI font; all candidate fonts failed glyph validation.");
 }
-static void UnloadUIFont(void) { if(UI_FONT.texture.id)UnloadFont(UI_FONT); }
+static void UnloadUIFont(void) { UITextClose();if(UI_FONT.texture.id)UnloadFont(UI_FONT); }
 static void DrawUIText(const char *text,int x,int y,int size,Color tint) {
-    if(UI_FONT.texture.id)DrawTextEx(UI_FONT,text,(Vector2){(float)x,(float)y},(float)size,1.0f,tint);
-    else DrawText(text,x,y,size,tint);
+    UITextDraw(UI_FONT,text,(Vector2){(float)x,(float)y},(float)size,1.0f,tint);
 }
 static int Utf8CharLength(unsigned char c) {
     if(c<0x80)return 1;
@@ -61,7 +108,7 @@ static void DrawUITextWrapped(const char *text,int x,int y,int maxWidth,int size
         int n=Utf8CharLength(*p);
         if(used+n>=(int)sizeof(line))break;
         memcpy(line+used,p,(size_t)n);used+=n;line[used]='\0';
-        if(MeasureTextEx(UI_FONT,line,(float)size,1.0f).x>(float)maxWidth && used>n) {
+        if(UITextMeasure(UI_FONT,line,(float)size,1.0f).x>(float)maxWidth && used>n) {
             used-=n;line[used]='\0';
             DrawUIText(line,x,y+lines*(size+4),size,tint);lines++;
             if(lines>=maxLines)break;
@@ -74,15 +121,16 @@ static void DrawUITextWrapped(const char *text,int x,int y,int maxWidth,int size
 
 static Texture2D TEX_HERO={0}, TEX_LUMI={0}, TEX_MOATAIL={0}, TEX_GECKO={0}, TEX_KEEPER={0};
 static Texture2D TEX_HERO_PORTRAIT={0}, TEX_WATCHER_PORTRAIT={0}, TEX_GUARDIAN_PORTRAIT={0};
-static Texture2D TEX_HEROINE_APPROVED={0}, TEX_GUARDIAN_APPROVED={0};
+static Texture2D TEX_GUARDIAN_APPROVED={0};
 static Texture2D TEX_HEROINE_PIXEL={0}, TEX_WATCHER_PIXEL={0}, TEX_COASTAL_HOUSE={0};
-static Texture2D TEX_CHARACTER_PORTRAITS={0}, TEX_HEROINE_WORLD={0}, TEX_WATCHER_WORLD={0}, TEX_GROVE_COTTAGE={0};
+static Texture2D TEX_GROVE_COTTAGE={0};
 static Texture2D TEX_LUMI_ILLUSTRATION={0}, TEX_MOATAIL_ILLUSTRATION={0}, TEX_GECKO_ILLUSTRATION={0};
 static Texture2D TEX_HERO_PIXEL={0}, TEX_LUMI_PIXEL={0}, TEX_MOATAIL_PIXEL={0}, TEX_GECKO_PIXEL={0}, TEX_TILES={0}, TEX_PROPS={0};
-static Texture2D TEX_ISO_TILES={0}, TEX_HERO_WALK={0}, TEX_ENV_PROPS={0}, TEX_LEAFLING={0}, TEX_GROVE_MOTE={0}, TEX_AREA_PROPS={0}, TEX_TOPDOWN_TILES={0}, TEX_FLORA_ATLAS={0}, TEX_CLIFF_ATLAS={0}, TEX_STRUCTURE_ATLAS={0}, TEX_ORIGINAL_PROPS={0}, TEX_KENNEY_BUILDINGS={0}, TEX_ENDING_CG={0};
+static Texture2D TEX_ISO_TILES={0}, TEX_ENV_PROPS={0}, TEX_LEAFLING={0}, TEX_GROVE_MOTE={0}, TEX_AREA_PROPS={0}, TEX_TOPDOWN_TILES={0}, TEX_FLORA_ATLAS={0}, TEX_CLIFF_ATLAS={0}, TEX_STRUCTURE_ATLAS={0}, TEX_ORIGINAL_PROPS={0}, TEX_KENNEY_BUILDINGS={0};
 static Texture2D TEX_NATURE_SHEET={0}, TEX_GROVE_SHEET={0}, TEX_RUINS_SHEET={0}, TEX_LIGHTHOUSE_SHEET={0};
 static RenderTexture2D TEX_GROUND_CACHE={0};
 static int CACHED_GROUND_AREA=-1;
+static unsigned char CACHED_GROUND_TERRAIN[MAPH][MAPW];
 static void DrawPortrait(Texture2D tex, Vector2 p, float w, float h, float bob) {
     if (tex.id == 0) return;
     Rectangle src={0,0,(float)tex.width,(float)tex.height};
@@ -399,10 +447,6 @@ static void DrawGeneratedMapAsset(int index,Vector2 p,float scale) {
         DrawCircleV(flame,15.0f+3.0f*pulse,Fade((Color){112,201,255,255},.20f+.12f*pulse));
     }
 }
-static float WeatherNoise(int i,int salt) {
-    float v=sinf((float)(i*127+salt*311)*12.9898f)*43758.5453f;
-    return v-floorf(v);
-}
 static void DrawProp(int index,Vector2 p,float w,float h) {
     if(!TEX_PROPS.id||index<0||index>=12)return;
     const MistAtlasBounds *b=&PIXEL_PROPS_BOUNDS[index];
@@ -463,13 +507,10 @@ static void DrawLumi(Vector2 p,float t,float bob) {
     DrawEllipse((int)p.x,(int)footY,12,4,(Color){48,66,57,82});
     if(TEX_LUMI_PIXEL.id) {
         int frame=(int)(t*5.2f)%4;
-        Rectangle src={(float)(frame*32),0,32,32};
+        float cellW=(float)TEX_LUMI_PIXEL.width/4.0f,cellH=(float)TEX_LUMI_PIXEL.height;
+        Rectangle src={frame*cellW,0,cellW,cellH};
         Rectangle dst={p.x-22.0f,footY-48.0f-floatY,44.0f,48.0f};
         DrawTexturePro(TEX_LUMI_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
-    } else if(TEX_LUMI_ILLUSTRATION.id) {
-        Rectangle src={0,0,(float)TEX_LUMI_ILLUSTRATION.width,(float)TEX_LUMI_ILLUSTRATION.height};
-        Rectangle dst={p.x-22.0f,footY-48.0f-floatY,44.0f,48.0f};
-        DrawTexturePro(TEX_LUMI_ILLUSTRATION,src,dst,(Vector2){0,0},0,WHITE);
     }
 }
 static void DrawPlayer(Vector2 p,float t,bool moving,int facing) {
@@ -482,22 +523,9 @@ static void DrawPlayer(Vector2 p,float t,bool moving,int facing) {
         Rectangle src={(float)(frame*64),(float)(facing*80),64,80};
         Rectangle dst={roundf(p.x-19.0f),roundf(footY-60.0f-bob),38.0f,60.0f};
         DrawTexturePro(TEX_HEROINE_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
-    } else if(TEX_HEROINE_APPROVED.id) {
-        int frame=moving?((int)(t*10.0f)%8):0;
-        Rectangle src={(float)(frame*24),(float)(facing*32),24,32};
-        Rectangle dst={roundf(p.x-19.0f),roundf(footY-52.0f-bob),38.0f,52.0f};
-        DrawTexturePro(TEX_HEROINE_APPROVED,src,dst,(Vector2){0,0},0,WHITE);
-    } else if(TEX_HERO_WALK.id) {
-        int frame=moving?((int)(t*8.0f)%4):0;
-        Rectangle src={(float)(frame*32),(float)(facing*32),32,32};
-        Rectangle dst={roundf(p.x-19.0f),roundf(footY-40.0f-bob),38.0f,40.0f};
-        DrawTexturePro(TEX_HERO_WALK,src,dst,(Vector2){0,0},0,WHITE);
-    } else if(TEX_HERO_PORTRAIT.id) {
-        Rectangle src={0,0,(float)TEX_HERO_PORTRAIT.width,(float)TEX_HERO_PORTRAIT.height};
-        Rectangle dst={p.x-24.0f,footY-64.0f-bob,48.0f,64.0f};
-        DrawTexturePro(TEX_HERO_PORTRAIT,src,dst,(Vector2){0,0},0,WHITE);
     }
 }
+
 static void DrawShrine(Vector2 p,float t,bool solved,bool finalCore,bool lighthouseCore) {
     Color c=solved?C_GOLD:(Color){158,185,166,255};
     if(finalCore) {
@@ -601,13 +629,10 @@ static void DrawMoatail(Vector2 p,float t) {
     DrawEllipse((int)p.x,(int)footY,12,4,(Color){48,66,57,82});
     if(TEX_MOATAIL_PIXEL.id) {
         int frame=(int)(t*4.4f+1.0f)%4;
-        Rectangle src={(float)(frame*32),0,32,32};
+        float cellW=(float)TEX_MOATAIL_PIXEL.width/4.0f,cellH=(float)TEX_MOATAIL_PIXEL.height;
+        Rectangle src={frame*cellW,0,cellW,cellH};
         Rectangle dst={p.x-22.0f,footY-48.0f-bob,44.0f,48.0f};
         DrawTexturePro(TEX_MOATAIL_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
-    } else if(TEX_MOATAIL_ILLUSTRATION.id) {
-        Rectangle src={0,0,(float)TEX_MOATAIL_ILLUSTRATION.width,(float)TEX_MOATAIL_ILLUSTRATION.height};
-        Rectangle dst={p.x-22.0f,footY-48.0f-bob,44.0f,48.0f};
-        DrawTexturePro(TEX_MOATAIL_ILLUSTRATION,src,dst,(Vector2){0,0},0,WHITE);
     }
 }
 static void DrawGecko(Vector2 p,float t) {
@@ -616,13 +641,10 @@ static void DrawGecko(Vector2 p,float t) {
     DrawEllipse((int)p.x,(int)footY,18,6,(Color){48,66,57,82});
     if(TEX_GECKO_PIXEL.id) {
         int frame=(int)(t*5.0f+2.0f)%4;
-        Rectangle src={(float)(frame*32),0,32,32};
+        float cellW=(float)TEX_GECKO_PIXEL.width/4.0f,cellH=(float)TEX_GECKO_PIXEL.height;
+        Rectangle src={frame*cellW,0,cellW,cellH};
         Rectangle dst={p.x-22.0f,footY-48.0f-bob,44.0f,48.0f};
         DrawTexturePro(TEX_GECKO_PIXEL,src,dst,(Vector2){0,0},0,WHITE);
-    } else if(TEX_GECKO_ILLUSTRATION.id) {
-        Rectangle src={0,0,(float)TEX_GECKO_ILLUSTRATION.width,(float)TEX_GECKO_ILLUSTRATION.height};
-        Rectangle dst={p.x-22.0f,footY-48.0f-bob,44.0f,48.0f};
-        DrawTexturePro(TEX_GECKO_ILLUSTRATION,src,dst,(Vector2){0,0},0,WHITE);
     }
 }
 static void DrawLighthouseGuardian(Vector2 p,float t,float scale,bool attacking) {
@@ -820,9 +842,9 @@ static void DrawGateMarker(Game *g,int gateId,Vector2 grid) {
     Rectangle sign={p.x-84.0f,p.y-188.0f,168.0f,42.0f};
     DrawRectangleRounded(sign,.16f,6,(Color){8,27,43,242});
     DrawRectangleRoundedLinesEx(sign,.16f,6,1.6f,Fade(accent,locked?.42f:.88f));
-    float nameWidth=UI_FONT.texture.id?MeasureTextEx(UI_FONT,name,15.0f,1.0f).x:(float)MeasureText(name,15);
+    float nameWidth=UITextMeasure(UI_FONT,name,15.0f,1.0f).x;
     DrawUIText(name,(int)(p.x-nameWidth*.5f),(int)sign.y+4,15,(Color){248,239,211,255});
-    float statusWidth=UI_FONT.texture.id?MeasureTextEx(UI_FONT,status,11.0f,1.0f).x:(float)MeasureText(status,11);
+    float statusWidth=UITextMeasure(UI_FONT,status,11.0f,1.0f).x;
     DrawUIText(status,(int)(p.x-statusWidth*.5f),(int)sign.y+23,11,locked?(Color){201,190,161,255}:(nearby?(Color){255,226,154,255}:(Color){177,202,194,255}));
     if(nearby&&!locked) {
         DrawCircleV((Vector2){p.x,p.y-201.0f-sinf(g->time*4.0f)*3.0f},4.0f,C_GOLD);
@@ -878,8 +900,12 @@ static void DrawCoastalCliffs(Game *g,int terrainKinds[MAPH][MAPW],int minX,int 
 #define MISTISLE_RAIN_RIPPLES 28
 #define MISTISLE_FIREFLY_COUNT 120
 #endif
+static bool GroundCacheMatches(const Game *g) {
+    return TEX_GROUND_CACHE.id && CACHED_GROUND_AREA==(int)g->area &&
+        memcmp(CACHED_GROUND_TERRAIN,g->world.terrain,sizeof(CACHED_GROUND_TERRAIN))==0;
+}
 static void BuildGroundCache(Game *g) {
-    if(!TEX_GROUND_CACHE.id || CACHED_GROUND_AREA==(int)g->area)return;
+    if(!TEX_GROUND_CACHE.id || GroundCacheMatches(g))return;
     int terrainKinds[MAPH][MAPW]={{0}};
     for(int y=0;y<MAPH;y++)for(int x=0;x<MAPW;x++)
         terrainKinds[y][x]=TerrainKindFromAtlasIndex(g->world.terrain[y][x]);
@@ -927,16 +953,19 @@ static void BuildGroundCache(Game *g) {
     DrawCoastalCliffs(g,terrainKinds,0,0,MAPW-1,MAPH-1);
     EndTextureMode();
     CACHED_GROUND_AREA=(int)g->area;
+    memcpy(CACHED_GROUND_TERRAIN,g->world.terrain,sizeof(CACHED_GROUND_TERRAIN));
 }
 static void RenderWorld(Game *g) {
-    BuildGroundCache(g);
     int terrainKinds[MAPH][MAPW]={{0}};
     for(int y=0;y<MAPH;y++)for(int x=0;x<MAPW;x++)
         terrainKinds[y][x]=TerrainKindFromAtlasIndex(g->world.terrain[y][x]);
     int minX,minY,maxX,maxY;
     GetVisibleTileBounds(g,&minX,&minY,&maxX,&maxY);
     BeginMode2D(g->cam);
-    if(TEX_GROUND_CACHE.id) {
+    UITextSetRasterScale(CANVAS_SCALE_X*g->cam.zoom,CANVAS_SCALE_Y*g->cam.zoom);
+    UITextSetRasterOffset((g->cam.offset.x-g->cam.target.x*g->cam.zoom)*CANVAS_SCALE_X,
+                         (g->cam.offset.y-g->cam.target.y*g->cam.zoom)*CANVAS_SCALE_Y);
+    if(GroundCacheMatches(g)) {
         Rectangle src={0,0,(float)TEX_GROUND_CACHE.texture.width,-(float)TEX_GROUND_CACHE.texture.height};
         Rectangle dst={0,0,(float)WORLD_PIXEL_W,(float)WORLD_PIXEL_H};
         DrawTexturePro(TEX_GROUND_CACHE.texture,src,dst,(Vector2){0,0},0,WHITE);
@@ -1101,6 +1130,8 @@ static void RenderWorld(Game *g) {
         DrawCircleV(p->p,p->size*(p->life/p->maxLife),Fade(p->c,p->life/p->maxLife));
     }
     EndMode2D();
+    UITextSetRasterScale(CANVAS_SCALE_X,CANVAS_SCALE_Y);
+    UITextSetRasterOffset(0.0f,0.0f);
     float night=0.5f+0.5f*cosf(g->dayClock*PI2);
     if(night>0.62f)DrawRectangle(0,0,SW,SH,Fade((Color){25,39,68,255},(night-0.62f)*.30f));
     float weatherAlpha=fminf(1.0f,g->weatherFade);
@@ -1112,7 +1143,7 @@ static void RenderWorld(Game *g) {
         for(int i=0;i<30;i++) {
             float phase=WeatherNoise(i,17);
             float x=fmodf(phase*SW+g->time*(5.0f+WeatherNoise(i,18)*9.0f),SW);
-            float y=fmodf(WeatherNoise(i,19)*SH+ sinf(g->time*.42f+i)*22.0f,SH);
+            float y=WeatherWrap(WeatherNoise(i,19)*SH+ sinf(g->time*.42f+i)*22.0f,SH);
             DrawCircleV((Vector2){x,y},1.2f+WeatherNoise(i,20)*1.8f,Fade((Color){255,232,169,255},.42f*weatherAlpha));
         }
     } else if(g->weather==1) {
@@ -1152,12 +1183,10 @@ static void RenderWorld(Game *g) {
     } else if(g->weather==2) {
         DrawRectangle(0,0,SW,SH,Fade((Color){29,43,54,255},.16f*weatherAlpha));
         for(int i=0;i<MISTISLE_FIREFLY_COUNT;i++) {
-            float phase=WeatherNoise(i,41);
-            float x=fmodf(phase*SW+sinf(g->time*.55f+i)*25.0f,SW);
-            float y=fmodf(WeatherNoise(i,42)*SH-g->time*(9.0f+WeatherNoise(i,43)*18.0f),SH);
+            Vector2 mote=WeatherFireflyPosition(i,g->time,(float)SW,(float)SH);
+            float x=mote.x,y=mote.y;
             float pulse=.24f+.76f*(.5f+.5f*sinf(g->time*2.2f+i*1.37f));
             bool nearLayer=(i%5)==0;
-            Vector2 mote={x,y};
             float halo=nearLayer?15.0f:8.0f;
             float core=nearLayer?4.4f:2.8f;
             DrawCircleV(mote,halo+4.0f*pulse,Fade((Color){255,184,76,255},pulse*(nearLayer?.22f:.15f)*weatherAlpha));
@@ -1198,7 +1227,7 @@ static void RenderWorld(Game *g) {
         }
         for(int i=0;i<38;i++) {
             float x=fmodf(WeatherNoise(i,51)*SW+g->time*(2.5f+WeatherNoise(i,52)*7.0f),SW);
-            float y=fmodf(WeatherNoise(i,53)*SH+cosf(g->time*.22f+i)*15.0f,SH);
+            float y=WeatherWrap(WeatherNoise(i,53)*SH+cosf(g->time*.22f+i)*15.0f,SH);
             DrawCircleV((Vector2){x,y},1.2f+WeatherNoise(i,54)*1.8f,Fade((Color){186,225,220,255},(.40f+WeatherNoise(i,55)*.25f)*weatherAlpha));
         }
     }
@@ -1243,22 +1272,22 @@ static void RenderHUD(Game *g) {
         DrawUIText(objectiveTitle,(int)panel.x+15,(int)panel.y+14,14,(Color){246,239,217,255});
         DrawRectangleRounded(toggle,.18f,6,(Color){35,61,76,255});
         DrawRectangleRoundedLines(toggle,.18f,6,Fade(C_GOLD,.7f));
-        DrawUIText("O 展开",(int)toggle.x+8,(int)toggle.y+7,11,(Color){255,226,173,255});
+        DrawUIText("O 展开",(int)toggle.x+8,(int)toggle.y+6,14,(Color){255,236,196,255});
     } else {
-        Rectangle panel={SW-350.0f,18.0f,330.0f,116.0f};
+        Rectangle panel={SW-350.0f,18.0f,330.0f,138.0f};
         Rectangle toggle={SW-92.0f,26.0f,72.0f,28.0f};
         PanelDark(panel);
         DrawUIText("当前目标",(int)panel.x+18,(int)panel.y+10,14,(Color){205,214,198,255});
         DrawRectangleRounded(toggle,.18f,6,(Color){35,61,76,255});
         DrawRectangleRoundedLines(toggle,.18f,6,Fade(C_GOLD,.7f));
-        DrawUIText("O 收起",(int)toggle.x+7,(int)toggle.y+7,11,(Color){255,226,173,255});
+        DrawUIText("O 收起",(int)toggle.x+7,(int)toggle.y+6,14,(Color){255,236,196,255});
         DrawUIText(objectiveTitle,(int)panel.x+18,(int)panel.y+34,18,(Color){246,239,217,255});
-        DrawUITextWrapped(objectiveDetail,(int)panel.x+18,(int)panel.y+62,294,12,1,(Color){211,220,205,255});
-        DrawUIText(TextFormat("伙伴 %d/3  ·  %s Lv.%d",partyCount,activeName,active->level),(int)panel.x+18,(int)panel.y+91,11,(Color){172,193,184,255});
+        DrawUITextWrapped(objectiveDetail,(int)panel.x+18,(int)panel.y+62,294,14,2,(Color){233,239,225,255});
+        DrawUIText(TextFormat("伙伴 %d/3  ·  %s Lv.%d",partyCount,activeName,active->level),(int)panel.x+18,(int)panel.y+112,13,(Color){221,233,225,255});
     }
 
-    PanelDark((Rectangle){20,652,970,48});
-    DrawUIText("WASD 移动   SHIFT 冲刺   E 互动   TAB 伙伴   J 手记   I 背包   M 地图   O 任务栏   F7 天气   F5 保存",38,667,12,(Color){211,220,205,255});
+    PanelDark((Rectangle){20,652,1240,48});
+    DrawUIText("WASD 移动   Shift/空格 冲刺   E 互动   TAB 伙伴   J 手记   I 背包   M 地图   O 任务栏   F7 天气   F5 保存",38,666,14,(Color){233,239,225,255});
 
     if(g->area==AREA_CAMP && Dist(g->player.pos,g->world.groveGate)<1.6f) {
         PanelDark((Rectangle){530,585,220,40});DrawUIText("E  前往辉光林地",550,596,17,(Color){211,220,205,255});
@@ -1288,24 +1317,24 @@ static void RenderJournal(Game *g) {
     DrawRectangle(0,0,SW,SH,Fade((Color){35,55,48,255},.48f));
     Panel((Rectangle){250,105,780,510});
     DrawUIText("旅 人 手 记",300,135,34,(Color){74,105,83,255});
-    DrawUIText("CHAPTER 01  /  THE LOST LIGHTHOUSE",303,179,15,(Color){132,145,112,255});
+    DrawUIText("CHAPTER 01  /  THE LOST LIGHTHOUSE",303,179,15,UI_MUTED_ON_PAPER);
     DrawLine(300,207,980,207,(Color){220,211,183,255});
     const char *objectiveTitle,*objectiveDetail;
     Vector2 objectiveTarget;
     bool hasObjectiveTarget=false;
     GetCurrentObjective(g,&objectiveTitle,&objectiveDetail,&objectiveTarget,&hasObjectiveTarget);
-    DrawUIText("当前目标",303,230,21,(Color){104,135,94,255});
+    DrawUIText("当前目标",303,230,21,(Color){53,83,61,255});
     DrawUIText(objectiveTitle,303,265,21,C_INK);
     DrawUITextWrapped(objectiveDetail,303,298,620,16,2,C_INK);
-    DrawUIText("岛屿发现",303,320,21,(Color){104,135,94,255});
+    DrawUIText("岛屿发现",303,320,21,(Color){53,83,61,255});
     DrawUIText(g->fireflyDiscovered?"萤芽  —  已记录：会在林间微光处出现。":"萤芽  —  未发现：留意林地里漂浮的微光。",303,355,18,C_INK);
     DrawUIText(g->leaflingFed?"叶团  —  已帮助：它为你找到了隐藏星晶。":"叶团  —  未帮助：它似乎很喜欢岛屿果实。",303,388,18,C_INK);
     DrawUIText(g->groveMoteDefeated?"微光兽 — 已击退：林间小径恢复安全。":"微光兽 — 尚未击退：它守在林地旧路旁。",303,416,18,C_INK);
-    DrawUIText("伙伴同行",303,445,21,(Color){104,135,94,255});
+    DrawUIText("伙伴同行",303,445,21,(Color){53,83,61,255});
     DrawUIText(TextFormat("苔灯灵  %s       沫尾兽  %s       鸣晶蜥  %s",g->lumi.owned?"同行中":"未发现",g->splash.owned?"同行中":"未发现",g->spark.owned?"同行中":"未发现"),303,480,18,C_INK);
-    DrawUIText("资源",303,525,21,(Color){104,135,94,255});
+    DrawUIText("资源",303,525,21,(Color){53,83,61,255});
     DrawUIText(TextFormat("果实 %d     潮汐贝壳 %d     星晶 %d",g->player.berries,g->player.shells,g->player.crystals),303,560,18,C_INK);
-    DrawUIText("F5 保存   F9 读取   按 J 或 ESC 关闭",760,570,16,(Color){132,137,111,255});
+    DrawUIText("F5 保存   F9 读取   按 J 或 ESC 关闭",760,570,16,UI_MUTED_ON_PAPER);
 }
 static void RenderInventory(Game *g) {
     DrawRectangle(0,0,SW,SH,Fade((Color){35,55,48,255},.48f));
@@ -1316,9 +1345,9 @@ static void RenderInventory(Game *g) {
     DrawUIText(TextFormat("潮汐贝壳       x %d",g->player.shells),360,285,22,C_INK);
     DrawUIText(TextFormat("星晶           x %d",g->player.crystals),360,332,22,C_INK);
     DrawUIText(TextFormat("生命           %d / %d",(int)g->player.hp,(int)g->player.maxHp),360,379,22,C_INK);
-    DrawUIText("伙伴成长",360,432,22,(Color){104,135,94,255});
+    DrawUIText("伙伴成长",360,432,22,(Color){53,83,61,255});
     DrawUIText(TextFormat("苔灯灵 Lv.%d   沫尾兽 Lv.%d   鸣晶蜥 Lv.%d",g->lumi.level,g->splash.level,g->spark.level),360,470,19,C_INK);
-    DrawUIText("按 I / ESC 关闭",760,550,16,(Color){132,137,111,255});
+    DrawUIText("按 I / ESC 关闭",760,550,16,UI_MUTED_ON_PAPER);
 }
 static void RenderMap(Game *g) {
     DrawRectangle(0,0,SW,SH,Fade((Color){35,55,48,255},.48f));
@@ -1343,14 +1372,13 @@ static void RenderMap(Game *g) {
         DrawUIText(names[i],(int)pts[i].x-45,(int)pts[i].y+42,17,C_INK);
     }
     DrawCircleV((Vector2){342,551},6,(Color){231,82,76,255});
-    DrawUIText("当前位置",356,543,15,(Color){105,121,97,255});
+    DrawUIText("当前位置",356,543,15,UI_MUTED_ON_PAPER);
     DrawCircleV((Vector2){500,551},6,(Color){144,190,132,255});
-    DrawUIText("已开放",514,543,15,(Color){105,121,97,255});
+    DrawUIText("已开放",514,543,15,UI_MUTED_ON_PAPER);
     DrawCircleV((Vector2){640,551},6,(Color){181,184,164,255});
-    DrawUIText("未开放",654,543,15,(Color){105,121,97,255});
-    DrawUIText("主地图为枢纽；各区域通过入口往返。",320,580,17,(Color){105,121,97,255});
-    DrawUIText("按 M / ESC 关闭",800,580,16,(Color){132,137,111,255});
-    DrawUIText("按 M / ESC 关闭",800,580,16,(Color){132,137,111,255});
+    DrawUIText("未开放",654,543,15,UI_MUTED_ON_PAPER);
+    DrawUIText("主地图为枢纽；各区域通过入口往返。",320,580,17,UI_MUTED_ON_PAPER);
+    DrawUIText("按 M / ESC 关闭",800,580,16,UI_MUTED_ON_PAPER);
 }
 static void DrawDialoguePortrait(Game *g,int portrait,const char *speaker) {
     Rectangle card={22,372,246,314};
@@ -1364,14 +1392,10 @@ static void DrawDialoguePortrait(Game *g,int portrait,const char *speaker) {
         portrait==4?&TEX_MOATAIL_ILLUSTRATION:
         portrait==5?&TEX_GECKO_ILLUSTRATION:&TEX_HERO_PORTRAIT;
     Rectangle dst={38,382,214,285};
-    // Dedicated high-resolution illustrations always take priority over the old
-    // low-detail portrait atlas. Pixel walk sheets are never used as dialogue portraits.
+    // Dialogue portraits use the dedicated approved illustrations.
     if(fallback->id) {
         Rectangle src={0,0,(float)fallback->width,(float)fallback->height};
         DrawTexturePro(*fallback,src,dst,(Vector2){0,0},0,WHITE);
-    } else if(portrait>=0&&portrait<=2&&TEX_CHARACTER_PORTRAITS.id) {
-        Rectangle src={(float)(portrait*128),0,128,170};
-        DrawTexturePro(TEX_CHARACTER_PORTRAITS,src,dst,(Vector2){0,0},0,WHITE);
     }
     const char *label=(speaker&&speaker[0])?speaker:"旅人";
     DrawRectangleRounded((Rectangle){42,670,206,25},.2f,5,(Color){8,25,36,225});
@@ -1389,9 +1413,9 @@ static void RenderDialogue(Game *g) {
     DrawDialoguePortrait(g,portrait,speaker);
     DrawRectangleRounded((Rectangle){258,541,190,31},.16f,6,(Color){37,64,61,255});
     DrawUIText(speaker,274,547,17,(Color){255,224,165,255});
-    DrawUITextWrapped(g->dialogue[page],270,592,930,23,2,(Color){44,61,55,255});
+    DrawUITextWrapped(g->dialogue[page],270,580,930,25,2,(Color){32,48,41,255});
     DrawLineEx((Vector2){260,638},(Vector2){1210,638},1.0f,(Color){177,158,119,150});
-    DrawUIText("按 E / Enter / 鼠标左键继续",886,650,14,(Color){112,124,103,255});
+    DrawUIText("按 E / Enter / 鼠标左键继续",858,649,17,(Color){57,75,65,255});
 }
 static void RenderBattle(Game *g) {
     Enemy *e=&g->enemies[g->battleEnemy];
@@ -1422,15 +1446,15 @@ static void RenderBattle(Game *g) {
 
     const char *enemyName=e->type==ENEMY_MOTE?"林地微光兽":e->type==ENEMY_BOSS?"灯塔守卫":"遗迹守卫";
     Panel((Rectangle){28,22,350,112});
-    DrawUIText(isBoss?"首领战":"遭遇战",50,34,25,isBoss?(Color){255,220,168,255}:C_INK);
-    DrawUIText(TextFormat("第 %d 回合",g->battleRound),50,68,15,(Color){104,119,93,255});
+    DrawUIText(isBoss?"首领战":"遭遇战",50,34,25,isBoss?(Color){108,54,32,255}:C_INK);
+    DrawUIText(TextFormat("第 %d 回合",g->battleRound),50,68,15,UI_MUTED_ON_PAPER);
     DrawUIText(TextFormat("旅人生命  %d / %d",(int)g->player.hp,(int)g->player.maxHp),50,94,15,C_INK);
     DrawRectangle(210,97,142,12,(Color){218,213,193,255});
     DrawRectangle(210,97,(int)(142.0f*fmaxf(0.0f,g->player.hp/g->player.maxHp)),12,(Color){111,174,112,255});
 
     Panel((Rectangle){902,22,350,112});
     DrawUIText(enemyName,925,35,22,C_INK);
-    DrawUIText(TextFormat("%s  %d / %d",isBoss?"核心耐久":"生命",(int)fmaxf(0,e->hp),(int)e->maxHp),925,72,15,isBoss?(Color){235,197,143,255}:(Color){104,119,93,255});
+    DrawUIText(TextFormat("%s  %d / %d",isBoss?"核心耐久":"生命",(int)fmaxf(0,e->hp),(int)e->maxHp),925,72,17,isBoss?(Color){118,67,32,255}:UI_MUTED_ON_PAPER);
     DrawRectangle(925,99,295,13,(Color){218,213,193,255});
     if(isBoss)DrawRectangleGradientH(925,99,(int)(295.0f*fmaxf(0.0f,e->hp/e->maxHp)),13,(Color){255,201,104,255},(Color){174,66,55,255});
     else DrawRectangle(925,99,(int)(295.0f*fmaxf(0.0f,e->hp/e->maxHp)),13,C_PINK);
@@ -1438,14 +1462,15 @@ static void RenderBattle(Game *g) {
         int phase=e->hp<=50.0f?3:(e->hp<=100.0f?2:1);
         bool heavy=phase==3?(g->battleRound%2==0):(g->battleRound%3==0);
         const char *phaseLabel=phase==3?"阶段三 · 最后的灯火":(phase==2?"阶段二 · 共鸣增强":"阶段一 · 灯火苏醒");
-        DrawRectangleRounded((Rectangle){742,145,510,64},.18f,8,(Color){12,24,35,232});
-        DrawRectangleRoundedLines((Rectangle){742,145,510,64},.18f,8,Fade((Color){255,198,113,255},.7f));
-        DrawUIText(phaseLabel,760,151,17,(Color){255,219,166,255});
+        // Keep the phase notice below the lyric card and above the guardian.
+        DrawRectangleRounded((Rectangle){742,181,510,64},.18f,8,(Color){12,24,35,232});
+        DrawRectangleRoundedLines((Rectangle){742,181,510,64},.18f,8,Fade((Color){255,198,113,255},.7f));
+        DrawUIText(phaseLabel,760,187,17,(Color){255,219,166,255});
         const char *coreState=g->enemySoaked?"核心受潮：本次攻击伤害降低":
             (heavy?"核心蓄能：下一回合将发动重击":"核心稳定：可用潮湿技能打断");
         Color coreTint=g->enemySoaked?(Color){132,216,224,255}:
             (heavy?(Color){255,170,117,255}:(Color){154,220,211,255});
-        DrawUIText(coreState,760,178,14,coreTint);
+        DrawUIText(coreState,760,214,14,coreTint);
     }
 
     if(g->selectedBuddy==0 && g->lumi.owned)DrawLumi((Vector2){395,430},g->time,0);
@@ -1469,7 +1494,7 @@ static void RenderBattle(Game *g) {
 
     Panel((Rectangle){24,510,1232,185});
     DrawUIText("选择出战伙伴",50,520,20,C_INK);
-    DrawUIText(g->battleTurn==0?"选择技能并按 Enter 确认":"敌方正在行动，按 Enter 继续",830,520,16,(Color){104,119,93,255});
+    DrawUIText(g->battleTurn==0?"选择技能并按 Enter 确认":"敌方正在行动，按 Enter 继续",830,520,16,UI_MUTED_ON_PAPER);
     int ids[3]={0,1,2};
     bool owned[3]={g->lumi.owned&&g->lumi.hp>0.0f,g->splash.owned&&g->splash.hp>0.0f,g->spark.owned&&g->spark.hp>0.0f};
     int count=0;
@@ -1482,31 +1507,31 @@ static void RenderBattle(Game *g) {
         Color fill=slot==g->battleChoice?(Color){255,235,190,255}:(Color){247,245,226,245};
         DrawRectangleRounded(card,.12f,12,fill);
         DrawRectangleRoundedLines(card,.12f,12,slot==g->battleChoice?(Color){201,157,82,255}:(Color){220,214,188,255});
-        DrawUIText(TextFormat("%d",slot+1),(int)card.x+12,(int)card.y+10,15,(Color){127,145,111,255});
+        DrawUIText(TextFormat("%d",slot+1),(int)card.x+12,(int)card.y+10,15,UI_MUTED_ON_PAPER);
         if(id==0) {
             DrawIllustratedPortrait(TEX_LUMI_ILLUSTRATION,(Rectangle){card.x+10,card.y+17,56,75});
             DrawUIText("苔灯灵",(int)card.x+78,(int)card.y+22,17,C_INK);
-            DrawUIText("星光治愈",(int)card.x+78,(int)card.y+45,14,(Color){104,119,93,255});
-            DrawUIText("回复生命",(int)card.x+78,(int)card.y+63,13,(Color){104,119,93,255});
+            DrawUIText("星光治愈",(int)card.x+78,(int)card.y+45,14,UI_MUTED_ON_PAPER);
+            DrawUIText("回复生命",(int)card.x+78,(int)card.y+63,13,UI_MUTED_ON_PAPER);
         } else if(id==1) {
             DrawIllustratedPortrait(TEX_MOATAIL_ILLUSTRATION,(Rectangle){card.x+15,card.y+14,48,78});
             DrawUIText("沫尾兽",(int)card.x+78,(int)card.y+22,17,C_INK);
-            DrawUIText("泡泡水流",(int)card.x+78,(int)card.y+45,14,(Color){104,119,93,255});
-            DrawUIText("施加潮湿",(int)card.x+78,(int)card.y+63,13,(Color){104,119,93,255});
+            DrawUIText("泡泡水流",(int)card.x+78,(int)card.y+45,14,UI_MUTED_ON_PAPER);
+            DrawUIText("施加潮湿",(int)card.x+78,(int)card.y+63,13,UI_MUTED_ON_PAPER);
         } else if(id==2) {
             DrawIllustratedPortrait(TEX_GECKO_ILLUSTRATION,(Rectangle){card.x+15,card.y+14,48,78});
             DrawUIText("鸣晶蜥",(int)card.x+78,(int)card.y+22,17,C_INK);
-            DrawUIText("晶弧放电",(int)card.x+78,(int)card.y+45,14,(Color){104,119,93,255});
-            DrawUIText("克制潮湿",(int)card.x+78,(int)card.y+63,13,(Color){104,119,93,255});
+            DrawUIText("晶弧放电",(int)card.x+78,(int)card.y+45,14,UI_MUTED_ON_PAPER);
+            DrawUIText("克制潮湿",(int)card.x+78,(int)card.y+63,13,UI_MUTED_ON_PAPER);
         } else {
             DrawPlayer((Vector2){card.x+43,card.y+78},g->time,false,0);
             DrawUIText("旅人",(int)card.x+78,(int)card.y+22,17,C_INK);
-            DrawUIText("基础攻击",(int)card.x+78,(int)card.y+45,14,(Color){104,119,93,255});
-            DrawUIText("造成普通伤害",(int)card.x+78,(int)card.y+63,13,(Color){104,119,93,255});
+            DrawUIText("基础攻击",(int)card.x+78,(int)card.y+45,14,UI_MUTED_ON_PAPER);
+            DrawUIText("造成普通伤害",(int)card.x+78,(int)card.y+63,13,UI_MUTED_ON_PAPER);
         }
         if(id>=0) {
             Buddy *buddy=id==0?&g->lumi:(id==1?&g->splash:&g->spark);
-            DrawUIText(TextFormat("体力 %d/%d",(int)buddy->hp,(int)buddy->maxHp),(int)card.x+78,(int)card.y+81,11,(Color){104,119,93,255});
+            DrawUIText(TextFormat("体力 %d/%d",(int)buddy->hp,(int)buddy->maxHp),(int)card.x+78,(int)card.y+81,11,UI_MUTED_ON_PAPER);
             DrawRectangle((int)card.x+78,(int)card.y+98,132,6,(Color){215,211,193,255});
             DrawRectangle((int)card.x+78,(int)card.y+98,(int)(132.0f*fmaxf(0.0f,buddy->hp/buddy->maxHp)),6,
                           buddy->hp>35.0f?(Color){111,174,112,255}:(Color){205,112,91,255});
@@ -1517,8 +1542,180 @@ static void RenderBattle(Game *g) {
     DrawUIText(optionCount==1?"1 / 鼠标点击卡片":TextFormat("1-%d / ← → 选择伙伴",optionCount),838,594,15,C_INK);
     DrawUIText("Enter 确认   鼠标点击卡片选择",838,619,14,C_INK);
     const char *synergyHint=g->enemySoaked?"敌人处于潮湿状态":(g->splash.owned&&g->spark.owned?"联动：先喷水，再使用晶弧":"招募更多伙伴可解锁技能联动");
-    DrawUIText(synergyHint,838,644,14,(Color){104,119,93,255});
+    DrawUIText(synergyHint,838,644,14,UI_MUTED_ON_PAPER);
 }
+/* A narrow top-centre strip fits between both exploration and battle HUDs.
+   The music decoder owns the timeline; scene changes never reset this overlay. */
+#define SUBTITLE_MAX_LINES 12
+#define SUBTITLE_LINE_BYTES 256
+typedef struct {
+    char lines[SUBTITLE_MAX_LINES][SUBTITLE_LINE_BYTES];
+    int count;
+    int size;
+} SubtitleLayout;
+static float UITextWidth(const char *text,int size) {
+    return UITextMeasure(UI_FONT,text,(float)size,1.0f).x;
+}
+static int WrapSubtitleText(const char *text,int size,int maxWidth,SubtitleLayout *layout) {
+    const char *cursor=text?text:"";
+    const char *end=cursor+strlen(cursor);
+    int count=0;
+    while(cursor<end&&count<SUBTITLE_MAX_LINES) {
+        while(cursor<end&&(*cursor==' '||*cursor=='\t'||*cursor=='\n'||*cursor=='\r'))cursor++;
+        if(cursor==end)break;
+        const char *start=cursor;
+        char *line=layout->lines[count];
+        int used=0,lastSpace=-1;
+        line[0]='\0';
+        while(cursor<end&&*cursor!='\n'&&*cursor!='\r') {
+            int bytes=Utf8CharLength((unsigned char)*cursor);
+            if(bytes>end-cursor)bytes=1;
+            if(used+bytes>=SUBTITLE_LINE_BYTES)break;
+            memcpy(line+used,cursor,(size_t)bytes);
+            line[used+bytes]='\0';
+            if(used>0&&UITextWidth(line,size)>(float)maxWidth) {
+                if(lastSpace>0) {
+                    used=lastSpace;
+                    cursor=start+lastSpace;
+                }
+                line[used]='\0';
+                break;
+            }
+            if(*cursor==' ')lastSpace=used;
+            used+=bytes;
+            cursor+=bytes;
+        }
+        while(used>0&&(line[used-1]==' '||line[used-1]=='\t'))line[--used]='\0';
+        if(used>0)count++;
+        else if(cursor<end)cursor++; // Ensure malformed input cannot stall rendering.
+    }
+    layout->count=count;
+    layout->size=size;
+    return count;
+}
+static void FitSubtitleText(const char *text,int maxWidth,int preferred,int minimum,SubtitleLayout *out) {
+    memset(out,0,sizeof(*out));
+    for(int size=preferred;size>=minimum;size--) {
+        if(WrapSubtitleText(text,size,maxWidth,out)<=2)return;
+    }
+}
+static int SubtitlePageLines(const SubtitleLayout *layout,int page,int *first) {
+    if(layout->count==0){*first=0;return 0;}
+    *first=page*2;
+    if(*first>=layout->count)*first=((layout->count-1)/2)*2;
+    int count=layout->count-*first;
+    return count>2?2:count;
+}
+static void DrawSubtitleLines(const SubtitleLayout *layout,int first,int count,int y,int centreX,Color tint,float progress,bool highlight) {
+    for(int i=0;i<count;i++) {
+        const char *line=layout->lines[first+i];
+        int width=(int)ceilf(UITextWidth(line,layout->size));
+        int x=centreX-width/2;
+        int lineY=y+i*(layout->size+2);
+        // A restrained outline separates both scripts from the animated frame.
+        const Color outline={3,7,16,245};
+        DrawUIText(line,x-1,lineY,layout->size,outline);
+        DrawUIText(line,x+1,lineY,layout->size,outline);
+        DrawUIText(line,x,lineY-1,layout->size,outline);
+        DrawUIText(line,x,lineY+1,layout->size,outline);
+        DrawUIText(line,x,lineY,layout->size,tint);
+        if(highlight) {
+            float local=Clamp(progress*(float)count-(float)i,0.0f,1.0f);
+            int reveal=(int)((float)width*local);
+            if(reveal>0) {
+                int clipX=(int)floorf((float)x*CANVAS_SCALE_X);
+                int clipY=(int)floorf((float)lineY*CANVAS_SCALE_Y);
+                int clipRight=(int)ceilf((float)(x+reveal)*CANVAS_SCALE_X);
+                int clipBottom=(int)ceilf((float)(lineY+layout->size+3)*CANVAS_SCALE_Y);
+                BeginScissorMode(clipX,clipY,clipRight-clipX,clipBottom-clipY);
+                DrawUIText(line,x,lineY,layout->size,(Color){179,245,248,255});
+                EndScissorMode();
+            }
+        }
+    }
+}
+static void RenderBossSubtitles(const Game *g) {
+    if(g->area!=AREA_LIGHTHOUSE||g->bossDefeated||g->scene==SCENE_TITLE||g->scene==SCENE_END||
+       g->journalOpen||g->inventoryOpen||g->mapOpen||!AudioBossTrackActive()||!AudioSubtitlesEnabled())return;
+    AudioSubtitle cue={0};
+    bool hasCue=AudioGetSubtitle(&cue);
+    float time=AudioGetMusicTime();
+    float energy=Clamp(AudioGetBossEnergy(),0.0f,1.0f);
+    float intensity=hasCue?Clamp(cue.intensity,0.0f,1.0f):.35f;
+    float pulse=.5f+.5f*sinf(time*2.2f);
+    float pressure=.24f+.40f*energy+.16f*intensity;
+    Color cyan={102,222,235,255},red={233,78,106,255},violet={123,111,207,255};
+
+    // Decorative cuts stay in the outer screen margin, away from characters,
+    // health bars, dialogue portraits and the battle's selection cards.
+    for(int side=0;side<2;side++) {
+        int x=side==0?0:SW-18;
+        DrawRectangleGradientH(x,148,18,344,
+            Fade(side==0?red:cyan,side==0?.15f*pressure:0.0f),
+            Fade(side==0?red:cyan,side==0?0.0f:.15f*pressure));
+        float edge=side==0?4.0f:(float)SW-4.0f;
+        float inward=side==0?1.0f:-1.0f;
+        for(int i=0;i<4;i++) {
+            float y=175.0f+(float)i*82.0f+3.0f*sinf(time*.8f+(float)i);
+            Color accent=side==0?red:cyan;
+            DrawLineEx((Vector2){edge,y},(Vector2){edge+inward*9.0f,y+17.0f},2.0f,Fade(accent,pressure));
+            DrawLineEx((Vector2){edge+inward*9.0f,y+17.0f},(Vector2){edge+inward*9.0f,y+42.0f},1.0f,Fade(violet,.30f));
+        }
+    }
+
+    Rectangle card={436,18,454,148};
+    DrawRectangleRounded((Rectangle){card.x,card.y+3,card.width,card.height},.06f,6,Fade(BLACK,.24f));
+    DrawRectangleRounded(card,.06f,6,(Color){8,12,26,246});
+    DrawRectangleRoundedLines(card,.06f,6,Fade(violet,.28f+.14f*pulse));
+    DrawLineEx((Vector2){448,19},(Vector2){571,19},2.0f,Fade(red,.75f));
+    DrawLineEx((Vector2){759,19},(Vector2){878,19},2.0f,Fade(cyan,.82f));
+    DrawTriangle((Vector2){436,40},(Vector2){436,20},(Vector2){451,20},Fade(red,.76f));
+    DrawTriangle((Vector2){890,144},(Vector2){890,164},(Vector2){875,164},Fade(cyan,.72f));
+    DrawUIText("ENEMY",450,26,13,cyan);
+    DrawUIText("IMAGINE DRAGONS & JID",513,27,11,(Color){213,223,238,255});
+    DrawUIText("F8",858,27,11,(Color){213,223,238,255});
+
+    if(hasCue) {
+        SubtitleLayout english,chinese;
+        FitSubtitleText(cue.english,418,25,18,&english);
+        FitSubtitleText(cue.chinese,418,22,20,&chinese);
+        int pages=(english.count+1)/2;
+        if((chinese.count+1)/2>pages)pages=(chinese.count+1)/2;
+        if(pages<1)pages=1;
+        float cueProgress=Clamp(cue.progress,0.0f,.9999f);
+        int page=(int)(cueProgress*(float)pages);
+        float pageProgress=cueProgress*(float)pages-(float)page;
+        int englishFirst,chineseFirst;
+        int englishLines=SubtitlePageLines(&english,page,&englishFirst);
+        int chineseLines=SubtitlePageLines(&chinese,page,&chineseFirst);
+        // Long lines use the available width, then wrap. Exceptional long cues
+        // paginate by music progress rather than disappearing past the HUD.
+        int bodyHeight=englishLines*(english.size+2)+chineseLines*(chinese.size+2)+6;
+        if(bodyHeight>106) {
+            if(english.size>24)FitSubtitleText(cue.english,418,24,18,&english);
+            if(chinese.size>20)FitSubtitleText(cue.chinese,418,20,20,&chinese);
+            englishLines=SubtitlePageLines(&english,page,&englishFirst);
+            chineseLines=SubtitlePageLines(&chinese,page,&chineseFirst);
+            bodyHeight=englishLines*(english.size+2)+chineseLines*(chinese.size+2)+6;
+        }
+        int y=47+(106-bodyHeight)/2;
+        DrawSubtitleLines(&english,englishFirst,englishLines,y,663,(Color){251,250,255,255},pageProgress,true);
+        y+=englishLines*(english.size+2)+6;
+        DrawSubtitleLines(&chinese,chineseFirst,chineseLines,y,663,(Color){255,238,202,255},pageProgress,false);
+        DrawRectangle(451,162,424,1,Fade(violet,.45f));
+        DrawRectangleGradientH(451,162,(int)(424.0f*cueProgress),2,Fade(red,.85f),Fade(cyan,.98f));
+    } else {
+        // Instrumental gaps show only the music envelope. The song title is
+        // a small label above; the main subtitle area is reserved for lyrics.
+        DrawLineEx((Vector2){558,83},(Vector2){768,83},1.0f,Fade(violet,.42f));
+        for(int i=0;i<17;i++) {
+            float wave=.5f+.5f*sinf(time*3.0f+(float)i*.67f);
+            float height=3.0f+wave*(7.0f+14.0f*energy);
+            DrawRectangle(581+i*10,96-(int)height,3,(int)height,Fade(i<8?red:cyan,.48f+.23f*wave));
+        }
+    }
+}
+
 static void RenderTitle(Game *g) {
     Vector2 oldTarget=g->cam.target;
     g->cam.target=WorldToScreen(g->player.pos.x,g->player.pos.y);
@@ -1539,114 +1736,13 @@ static void RenderTitle(Game *g) {
     DrawUIText(FileExists("mist_isle_save.dat")?"F9 继续上次旅程":"F9 读取存档",560,520,17,(Color){225,220,193,255});
 }
 static void RenderEnd(Game *g) {
-    float t=g->endingTime;
-    float fadeIn=fminf(1.0f,t/.7f);
-    float pulse=.62f+.38f*sinf(t*3.1f);
-    ClearBackground((Color){7,17,31,255});
-    DrawRectangleGradientV(0,0,SW,SH,(Color){9,22,39,255},(Color){17,38,54,255});
-    for(int i=0;i<58;i++) {
-        float x=(float)((i*197+31)%SW);
-        float y=(float)((i*83+17)%(SH-92));
-        float a=.14f+.24f*(.5f+.5f*sinf(t*1.6f+i*1.37f));
-        DrawCircle((int)x,(int)y,1.0f+(i%3)*.4f,Fade((Color){229,222,190,255},a));
-    }
-    Rectangle scene={306,18,668,668};
-    if(TEX_ENDING_CG.id) {
-        Rectangle src={0,0,(float)TEX_ENDING_CG.width,(float)TEX_ENDING_CG.height};
-        DrawTexturePro(TEX_ENDING_CG,src,scene,(Vector2){0,0},0,WHITE);
-        // The lighthouse lantern sits near the upper centre of the illustration.
-        Vector2 lamp={scene.x+scene.width*.535f,scene.y+scene.height*.205f};
-        float sweep=sinf(t*.72f)*74.0f;
-        Vector2 beamA={scene.x+scene.width-4.0f,lamp.y-66.0f+sweep};
-        Vector2 beamB={scene.x+scene.width-4.0f,lamp.y+66.0f+sweep};
-        DrawTriangle(lamp,beamA,beamB,Fade((Color){255,224,151,255},.11f+.045f*pulse));
-        DrawTriangle(lamp,(Vector2){scene.x+scene.width-4.0f,lamp.y-27.0f+sweep*.72f},
-            (Vector2){scene.x+scene.width-4.0f,lamp.y+27.0f+sweep*.72f},Fade((Color){255,244,205,255},.16f+.06f*pulse));
-        DrawCircleV(lamp,43.0f,Fade((Color){255,222,148,255},.14f+.11f*pulse));
-        DrawCircleV(lamp,23.0f,Fade((Color){255,240,190,255},.25f+.16f*pulse));
-        DrawCircleV(lamp,9.0f,(Color){255,249,220,255});
-        for(int i=0;i<12;i++) {
-            float a=t*.8f+i*PI2/12.0f;
-            Vector2 mote={lamp.x+cosf(a)*(34.0f+5.0f*sinf(t*2.0f+i)),lamp.y+sinf(a)*(28.0f+4.0f*cosf(t*2.0f+i))};
-            DrawCircleV(mote,1.6f,Fade((Color){255,232,173,255},.55f));
-        }
-        DrawRectangleLinesEx((Rectangle){scene.x-4,scene.y-4,scene.width+8,scene.height+8},3.0f,Fade(C_GOLD,.82f));
-        DrawRectangleLinesEx((Rectangle){scene.x+2,scene.y+2,scene.width-4,scene.height-4},1.0f,Fade((Color){255,246,217,255},.32f));
-        // Place the traveller and companions on the path in the illustrated scene.
-        DrawPlayer((Vector2){420,620},t,false,3);
-        if(g->lumi.owned)DrawLumi((Vector2){485,620},t,0);
-        if(g->splash.owned)DrawMoatail((Vector2){550,620},t);
-        if(g->spark.owned)DrawGecko((Vector2){615,620},t);
-    } else {
-        DrawLighthouseBackdrop(t,true);
-        DrawUIText("灯塔重新亮起",510,325,30,(Color){255,238,198,255});
-    }
-    // Side panels keep the CG unobstructed and give the ending a deliberate editorial layout.
-    DrawRectangle(0,0,286,SH,(Color){8,20,36,242});
-    DrawRectangle(SW-286,0,286,SH,(Color){8,20,36,242});
-    DrawLineEx((Vector2){286,28},(Vector2){286,SH-28},2.0f,Fade(C_GOLD,.48f));
-    DrawLineEx((Vector2){SW-286,28},(Vector2){SW-286,SH-28},2.0f,Fade(C_GOLD,.48f));
-    DrawUIText("第一章",34,76,17,(Color){224,183,105,255});
-    DrawUIText("失落的灯塔",34,112,29,(Color){255,242,213,255});
-    DrawLineEx((Vector2){34,160},(Vector2){246,160},1.5f,Fade(C_GOLD,.55f));
-    DrawUITextWrapped("沉睡的灯火终于苏醒。",34,198,214,18,2,(Color){239,232,209,255});
-    DrawUITextWrapped("伙伴们的光，照亮了回家的路。",34,265,214,16,3,(Color){195,211,210,255});
-    DrawUIText("同行伙伴",SW-250,76,17,(Color){224,183,105,255});
-    int row=0;
-    if(g->lumi.owned){DrawIllustratedPortrait(TEX_LUMI_ILLUSTRATION,(Rectangle){SW-248,158,48,64});DrawUIText("苔灯灵",SW-192,174,17,(Color){244,239,217,255});row++;}
-    if(g->splash.owned){DrawIllustratedPortrait(TEX_MOATAIL_ILLUSTRATION,(Rectangle){SW-248,158+row*76,48,64});DrawUIText("沫尾兽",SW-192,174+row*76,17,(Color){244,239,217,255});row++;}
-    if(g->spark.owned){DrawIllustratedPortrait(TEX_GECKO_ILLUSTRATION,(Rectangle){SW-248,158+row*76,48,64});DrawUIText("鸣晶蜥",SW-192,174+row*76,17,(Color){244,239,217,255});row++;}
-    DrawLineEx((Vector2){SW-250,420},(Vector2){SW-34,420},1.5f,Fade(C_GOLD,.42f));
-    DrawUITextWrapped("一座灯塔，一段旅程。",SW-250,450,216,16,2,(Color){220,226,207,255});
-    DrawUITextWrapped("新的故事还在岛屿深处等待。",SW-250,506,216,15,3,(Color){188,207,203,255});
-    DrawRectangle(0,SH-72,SW,72,Fade((Color){5,15,27,255},.94f));
-    if(t<5.0f)DrawUIText("灯塔的光正在越过海面……",478,SH-47,18,(Color){255,232,181,255});
-    else DrawUIText("第一章完成   ·   Enter 返回标题   ·   R 再次探索",390,SH-47,18,(Color){255,232,181,255});
-    if(fadeIn<1.0f)DrawRectangle(0,0,SW,SH,Fade(BLACK,1.0f-fadeIn));
-}
-static int Base64Value(unsigned char c) {
-    if(c>='A'&&c<='Z')return c-'A';
-    if(c>='a'&&c<='z')return c-'a'+26;
-    if(c>='0'&&c<='9')return c-'0'+52;
-    if(c=='+')return 62;
-    if(c=='/')return 63;
-    return -1;
-}
-static unsigned char *DecodeBase64(const char *encoded,int *outSize) {
-    size_t n=strlen(encoded);
-    unsigned char *out=(unsigned char*)malloc(n*3/4+4);
-    if(!out)return NULL;
-    unsigned int acc=0;int bits=0,count=0;
-    for(size_t i=0;i<n;i++) {
-        unsigned char c=(unsigned char)encoded[i];
-        if(c=='=')break;
-        int v=Base64Value(c);if(v<0)continue;
-        acc=(acc<<6)|(unsigned int)v;bits+=6;
-        if(bits>=8){bits-=8;out[count++]=(unsigned char)((acc>>bits)&255u);}
-    }
-    *outSize=count;return out;
-}
-static void LoadEndingCG(void) {
-    char *encoded=LoadFileText("assets/cinematics/lighthouse_final_scene.jpg.b64");
-    if(!encoded){TraceLog(LOG_WARNING,"Mist Isle: lighthouse CG asset missing; using fallback ending.");return;}
-    int byteCount=0;unsigned char *bytes=DecodeBase64(encoded,&byteCount);
-    if(bytes&&byteCount>0) {
-        Image image=LoadImageFromMemory(".jpg",bytes,byteCount);
-        if(image.data) {
-            if(image.width==448&&image.height==448) {
-                TEX_ENDING_CG=LoadTextureFromImage(image);
-                if(TEX_ENDING_CG.id)SetTextureFilter(TEX_ENDING_CG,TEXTURE_FILTER_POINT);
-            } else TraceLog(LOG_WARNING,"Mist Isle: lighthouse CG illustration size mismatch (%dx%d).",image.width,image.height);
-            UnloadImage(image);
-        }
-    }
-    free(bytes);UnloadFileText(encoded);
-    if(!TEX_ENDING_CG.id)TraceLog(LOG_WARNING,"Mist Isle: lighthouse CG failed to load; using fallback ending.");
+    EndingCast cast = {TEX_HEROINE_PIXEL,
+        {TEX_LUMI_PIXEL, TEX_MOATAIL_PIXEL, TEX_GECKO_PIXEL}};
+    EndingDraw(g, UI_FONT, &cast);
 }
 void RenderInit(void) {
     LoadUIFont();
     const char *paths[]={
-        "assets/characters/hero/hero_walk_4dir_64.png",
         "assets/characters/companions/moss_lumi_idle_64.png",
         "assets/characters/companions/moatail_idle_64.png",
         "assets/characters/companions/crystal_gecko_idle_64.png",
@@ -1669,19 +1765,15 @@ void RenderInit(void) {
         "assets/characters/portraits/moss_lumi_portrait.png",
         "assets/characters/portraits/moatail_portrait.png",
         "assets/characters/portraits/crystal_gecko_portrait.png",
-        "assets/characters/hero/heroine_approved_8x4.png",
         "assets/characters/boss/lighthouse_guardian_4x2.png",
-        "assets/characters/portraits/character_portraits_atlas.jpg",
-        "assets/characters/png/heroine_world_4x4_64x80.png",
-        "assets/characters/portraits/watcher_world_cutout.png",
-        "assets/environment/glowglade_cottage_cutout.png"
+        "assets/environment/glowglade_cottage_cutout.png",
     };
-    Texture2D *targets[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS,&TEX_HERO_PORTRAIT,&TEX_WATCHER_PORTRAIT,&TEX_GUARDIAN_PORTRAIT,&TEX_LUMI_ILLUSTRATION,&TEX_MOATAIL_ILLUSTRATION,&TEX_GECKO_ILLUSTRATION,&TEX_HEROINE_APPROVED,&TEX_GUARDIAN_APPROVED,&TEX_CHARACTER_PORTRAITS,&TEX_HEROINE_WORLD,&TEX_WATCHER_WORLD,&TEX_GROVE_COTTAGE};
-    for(int i=0;i<29;i++) {
+    Texture2D *targets[]={&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS,&TEX_HERO_PORTRAIT,&TEX_WATCHER_PORTRAIT,&TEX_GUARDIAN_PORTRAIT,&TEX_LUMI_ILLUSTRATION,&TEX_MOATAIL_ILLUSTRATION,&TEX_GECKO_ILLUSTRATION,&TEX_GUARDIAN_APPROVED,&TEX_GROVE_COTTAGE};
+    for(int i=0;i<(int)(sizeof(targets)/sizeof(targets[0]));i++) {
         if(FileExists(paths[i])) {
             *targets[i]=LoadTexture(paths[i]);
             if(targets[i]->id) {
-                bool pixel=i<17||i==23||i==24||i==26||i==27;
+                bool pixel=strstr(paths[i],"/portraits/")==NULL;
                 SetTextureFilter(*targets[i],pixel?TEXTURE_FILTER_POINT:TEXTURE_FILTER_BILINEAR);
                 TraceLog(LOG_INFO,"Mist Isle asset loaded: %s (%dx%d)",paths[i],targets[i]->width,targets[i]->height);
             } else TraceLog(LOG_WARNING,"Mist Isle asset failed to load: %s",paths[i]);
@@ -1706,13 +1798,13 @@ void RenderInit(void) {
     if(FileExists("assets/characters/hero/heroine_pixel_4x4_64x80.png")) {
         TEX_HEROINE_PIXEL=LoadTexture("assets/characters/hero/heroine_pixel_4x4_64x80.png");
         if(TEX_HEROINE_PIXEL.id)SetTextureFilter(TEX_HEROINE_PIXEL,TEXTURE_FILTER_POINT);
-        else TraceLog(LOG_ERROR,"Mist Isle: approved heroine pixel sheet failed to load.");
+        else TraceLog(LOG_ERROR,"Mist Isle: release heroine pixel sheet failed to load.");
     } else TraceLog(LOG_ERROR,"Mist Isle: approved heroine pixel sheet missing; refusing silent generated-hero fallback.");
     if(FileExists("assets/characters/npc/watcher_pixel_4x4_64x80.png")) {
         TEX_WATCHER_PIXEL=LoadTexture("assets/characters/npc/watcher_pixel_4x4_64x80.png");
         if(TEX_WATCHER_PIXEL.id) {
             SetTextureFilter(TEX_WATCHER_PIXEL,TEXTURE_FILTER_POINT);
-            TraceLog(LOG_INFO,"Mist Isle: native pixel Watcher loaded (%dx%d).",TEX_WATCHER_PIXEL.width,TEX_WATCHER_PIXEL.height);
+            TraceLog(LOG_INFO,"Mist Isle: release pixel Watcher loaded (%dx%d).",TEX_WATCHER_PIXEL.width,TEX_WATCHER_PIXEL.height);
         } else TraceLog(LOG_ERROR,"Mist Isle: Watcher sheet exists but texture creation failed.");
     } else TraceLog(LOG_ERROR,"Mist Isle: Watcher pixel sheet missing; run the asset generator.");
     if(FileExists("assets/environment/coastal_keeper_house.png")) {
@@ -1740,7 +1832,7 @@ void RenderInit(void) {
     TEX_GROUND_CACHE=LoadRenderTexture((int)WORLD_PIXEL_W,(int)WORLD_PIXEL_H);
     if(TEX_GROUND_CACHE.id)SetTextureFilter(TEX_GROUND_CACHE.texture,TEXTURE_FILTER_POINT);
     CACHED_GROUND_AREA=-1;
-    LoadEndingCG();
+    EndingInit();
 }
 void RenderClose(void) {
     if(TEX_HEROINE_PIXEL.id)UnloadTexture(TEX_HEROINE_PIXEL);
@@ -1752,13 +1844,42 @@ void RenderClose(void) {
     for(int i=0;i<4;i++)if(mapArt[i]->id)UnloadTexture(*mapArt[i]);
     CACHED_GROUND_AREA=-1;
     UnloadUIFont();
-    Texture2D *textures[]={&TEX_HERO_WALK,&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS,&TEX_HERO_PORTRAIT,&TEX_WATCHER_PORTRAIT,&TEX_GUARDIAN_PORTRAIT,&TEX_LUMI_ILLUSTRATION,&TEX_MOATAIL_ILLUSTRATION,&TEX_GECKO_ILLUSTRATION,&TEX_HEROINE_APPROVED,&TEX_GUARDIAN_APPROVED,&TEX_CHARACTER_PORTRAITS,&TEX_HEROINE_WORLD,&TEX_WATCHER_WORLD,&TEX_GROVE_COTTAGE};
-    for(int i=0;i<29;i++)if(textures[i]->id)UnloadTexture(*textures[i]);
-    if(TEX_ENDING_CG.id)UnloadTexture(TEX_ENDING_CG);
+    Texture2D *textures[]={&TEX_LUMI_PIXEL,&TEX_MOATAIL_PIXEL,&TEX_GECKO_PIXEL,&TEX_LEAFLING,&TEX_GROVE_MOTE,&TEX_ENV_PROPS,&TEX_AREA_PROPS,&TEX_TOPDOWN_TILES,&TEX_FLORA_ATLAS,&TEX_CLIFF_ATLAS,&TEX_STRUCTURE_ATLAS,&TEX_ORIGINAL_PROPS,&TEX_KENNEY_BUILDINGS,&TEX_KEEPER,&TEX_ISO_TILES,&TEX_PROPS,&TEX_HERO_PORTRAIT,&TEX_WATCHER_PORTRAIT,&TEX_GUARDIAN_PORTRAIT,&TEX_LUMI_ILLUSTRATION,&TEX_MOATAIL_ILLUSTRATION,&TEX_GECKO_ILLUSTRATION,&TEX_GUARDIAN_APPROVED,&TEX_GROVE_COTTAGE};
+    for(int i=0;i<(int)(sizeof(textures)/sizeof(textures[0]));i++)if(textures[i]->id)UnloadTexture(*textures[i]);
+    EndingClose();
+}
+void RenderPrepareFrame(Game *g) {
+    if(g->scene==SCENE_TITLE||g->scene==SCENE_PLAY||g->scene==SCENE_DIALOGUE)BuildGroundCache(g);
+}
+void RenderBeginCanvas(RenderTexture2D canvas) {
+    BeginTextureMode(canvas);
+    CANVAS_SCALE_X=(float)canvas.texture.width/(float)SW;
+    CANVAS_SCALE_Y=(float)canvas.texture.height/(float)SH;
+    UITextSetRasterScale(CANVAS_SCALE_X,CANVAS_SCALE_Y);
+    UITextSetRasterOffset(0.0f,0.0f);
+    /* Logical layout remains 1280x720 while rasterization uses every physical
+     * pixel. World Camera2D changes modelview only, preserving this projection. */
+    rlMatrixMode(RL_PROJECTION);
+    rlLoadIdentity();
+    rlOrtho(0,SW,SH,0,0.0,1.0);
+    rlMatrixMode(RL_MODELVIEW);
+    rlLoadIdentity();
 }
 void GameRender(Game *g) {
+    if(g->scene==SCENE_POST_BATTLE_BLACKOUT) {
+        DrawRectangle(0,0,SW,SH,BLACK);
+        return;
+    }
     if(g->scene==SCENE_TITLE)RenderTitle(g);
     else if(g->scene==SCENE_BATTLE)RenderBattle(g);
     else if(g->scene==SCENE_END)RenderEnd(g);
-    else {RenderWorld(g);RenderHUD(g);if(g->scene==SCENE_DIALOGUE)RenderDialogue(g);if(g->journalOpen)RenderJournal(g);if(g->inventoryOpen)RenderInventory(g);if(g->mapOpen)RenderMap(g);}
+    else {
+        RenderWorld(g);
+        if(!(g->scene==SCENE_DIALOGUE&&g->dialogueStartsEnding))RenderHUD(g);
+        if(g->scene==SCENE_DIALOGUE)RenderDialogue(g);
+        if(g->journalOpen)RenderJournal(g);
+        if(g->inventoryOpen)RenderInventory(g);
+        if(g->mapOpen)RenderMap(g);
+    }
+    RenderBossSubtitles(g);
 }

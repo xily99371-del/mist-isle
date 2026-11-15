@@ -1,0 +1,73 @@
+{
+  "revision": "v1.0.0-approved",
+  "release_tag": "v1.0.0",
+  "release_commit": "2b94f92202f931909896288b27bf905bbdb05e09",
+  "frame_width": 64,
+  "frame_height": 80,
+  "columns": 4,
+  "rows": 4,
+  "row_directions": [
+    "south",
+    "west",
+    "east",
+    "north"
+  ],
+  "heroine": {
+    "runtime": "assets/characters/hero/heroine_pixel_4x4_64x80.png",
+    "sha256": "9d4477c4686a1bb9722ae006db17ed73b7035b563a51d38e2765c281e2539def",
+    "source": "MistIsle_ApprovedArt_v7.zip:assets/characters/hero/heroine_pixel_4x4_64x80.png",
+    "display_width": 38,
+    "display_height": 60
+  },
+  "watcher": {
+    "runtime": "assets/characters/npc/watcher_pixel_4x4_64x80.png",
+    "sha256": "3e36e0036095e9d71704b8585e09808f602207f4235a236ec5f3e226d2cf91f5",
+    "source": "MistIsle_ApprovedArt_v7.zip:assets/characters/npc/watcher_pixel_4x4_64x80.png",
+    "display_width": 42,
+    "display_height": 68
+  },
+  "companions": {
+    "moss_lumi": {
+      "runtime": "assets/characters/companions/moss_lumi_idle_64.png",
+      "sha256": "6fd959b9cb3fb65d39aa99260bc495408a7b26c438f0c36aa64a88b8c76fe5e5",
+      "source": "git:v1.0.0:assets/characters/companions/moss_lumi_idle_64.png",
+      "display_width": 44,
+      "display_height": 48,
+      "frame_width": 32,
+      "frame_height": 32,
+      "columns": 4,
+      "rows": 1
+    },
+    "moatail": {
+      "runtime": "assets/characters/companions/moatail_idle_64.png",
+      "sha256": "a21c8c7063ef77c0642e179ccafe922e3bd965a261077db885d6cd2d87b8390d",
+      "source": "git:v1.0.0:assets/characters/companions/moatail_idle_64.png",
+      "display_width": 44,
+      "display_height": 48,
+      "frame_width": 32,
+      "frame_height": 32,
+      "columns": 4,
+      "rows": 1
+    },
+    "crystal_gecko": {
+      "runtime": "assets/characters/companions/crystal_gecko_idle_64.png",
+      "sha256": "1e6c563590f41a4d3060796eecd0fb3dad155fc2986d339c91f087db25600a0d",
+      "source": "git:v1.0.0:assets/characters/companions/crystal_gecko_idle_64.png",
+      "display_width": 44,
+      "display_height": 48,
+      "frame_width": 32,
+      "frame_height": 32,
+      "columns": 4,
+      "rows": 1
+    }
+  },
+  "ground": {
+    "runtime": "assets/environment/topdown_terrain_atlas_v1.png",
+    "generated_by": "tools/generate_ground_atlas.py",
+    "rgba_sha256": "fafbdea4d677033544e3f1b52fc4ada0f1b23b4aecc5355214e61c2aa38dc542",
+    "cell_size": 56,
+    "columns": 4,
+    "rows": 12
+  },
+  "protection": "Character sheets are pinned to the official release by SHA256. The ground atlas is derived build output and must be regenerated using the release layout; equal dimensions alone do not identify it. Unapproved v9 character candidates are not loaded or packaged."
+}

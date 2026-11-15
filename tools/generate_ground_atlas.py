@@ -153,6 +153,10 @@ def make_edge_mask(material: int, column: int) -> Image.Image:
 
 
 def generate(output: Path) -> None:
+    # This is the release renderer's derived 4-column terrain/mask atlas.
+    # An older hand-painted sheet has the same filename and dimensions but a
+    # different layout. Always bake the canonical release output; preserving
+    # that older sheet produces separated grass squares and broken coastlines.
     atlas = Image.new("RGBA", (COLUMNS * SIZE, ROWS * SIZE), (0, 0, 0, 0))
     for material, rows in BASE_ROWS.items():
         for variant_row, row in enumerate(rows):

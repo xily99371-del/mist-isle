@@ -1,31 +1,62 @@
-# Project status — Mist Isle
+# 雾屿回响 · 当前开发交接
 
-## Implemented in repository
-- C11 + raylib 5.5 project and Windows-first CMake build.
-- First-chapter gameplay prototype: title, dialogue, exploration, companion recruitment, resources, cooperative ruin puzzle, short turn-based encounter, lighthouse ending.
-- Original SVG character concepts.
-- Original pixel-art walking sprite sheet: 4 directions × 4 frames, 32×32 cells.
-- Original two-frame idle sheets for Moss Lumi, Moatail and Crystal Gecko.
-- Original six-variant 64×32 isometric ground tile atlas.
-- Renderer loads pixel sprites and tile atlas with nearest-neighbor filtering; code-drawn fallback remains.
-- SVG rasterization tool and Windows GitHub Actions build workflow.
+继续本项目时先读本文件，再看 `git status` / `git log -3 --oneline`；不必重读全部历史对话或素材清单。
 
-## Asset preparation
-Run:
-```powershell
-python -m pip install cairosvg
-python tools/rasterize_assets.py
-```
-The rasterizer writes PNG files to `assets/characters/png/` and `assets/tiles/png/`.
+## 代码与版本
 
-A pre-rasterized PNG bundle is also available in ChatGPT Library:
-`/Game Projects/Mist Isle/MistIsle_Integrated_PixelAssets_v1.zip`.
+- 正式仓库：`https://github.com/xily99371-del/mist-isle`，使用 `main`。
+- 当前发行版本号：`2.0.0`，统一来源为根目录 `VERSION`；CMake、窗口标题与发布包使用同一版本号。发行内容见 `RELEASE_v2.0.0.md`。
+- 发布状态须读取远端确认：目标标签为 `v2.0.0`，Windows 与 ARM64 构建成功后才由工作流创建 Release、上传运行包及校验文件。仅本地版本号、提交或 Actions artifact 不代表 Release 已发布。
+- 本轮更新以 `c61fe8e` 为基线。音频/战后/字幕整合、正式美术恢复、原生文字/萤火/地面缓存修复的本地验证记录分别对应 `1275b30`、`854c194`、`5fdce0c`。同步时若通过已连接应用创建内容一致的文件树，远端提交号以对应 Release 标签和包内 `BUILD_INFO.json` 为准；本地验证号不要求出现在远端提交历史中。
+- C11 + raylib 5.5；Windows优先，另有Raspberry Pi 5配置。
+- Windows本地常用目录：`C:\Users\24017\Downloads\game_raspi\mist-isle`。
 
-## Verification status
-Repository files and source assets have been committed and read back from GitHub. The current container cannot resolve GitHub to fetch raylib, so local compilation and gameplay verification have not yet been completed. The Windows Actions workflow has been added, but must not be described as passed until an actual run result is observed.
+## 当前实际启用的美术
 
-## Next milestone
-- Import cohesive environment sprites and props.
-- Improve player/companion pixel animations and depth sorting.
-- Add map transitions, companion interactions, inventory and save/load.
-- Validate a full chapter playthrough on Windows, then perform Raspberry Pi 5 compatibility and performance checks.
+- 正式美术基线：`v1.0.0`（`2b94f92`）的运行效果；其地图、渲染逻辑与后续 `c61fe8e` 一致。
+- 女主：`assets/characters/hero/heroine_pixel_4x4_64x80.png`，屏幕尺寸38×60。
+- 守望者：`assets/characters/npc/watcher_pixel_4x4_64x80.png`，屏幕尺寸42×68（再乘场景scale）。
+- 两者均为256×320，4列×4行、单帧64×80；恢复正式版实际显示比例。
+- 三位伙伴：`assets/characters/companions/*_idle_64.png`，整图128×32、4帧32×32，屏幕尺寸44×48。文件名中的64不能用作切帧依据。
+- 高清立绘/Boss像素图使用v7，场景道具使用v8，四张Tiled地图及物件布局保持正式版。
+- **地面图集是构建产物**：`generate_ground_atlas.py` 必须生成正式4列×56像素的连续地面/边缘遮罩。此前保留同名224×672旧图造成棋盘草地，不能仅凭文件名或尺寸认定美术正确。
+- 正式角色内容哈希与正确地面的RGBA哈希登记在 `assets/characters/runtime_art.json`；构建准备和校验器均检查。
+- 未获认可的v9人物已移入 `assets/characters/source/v9/candidates/`，游戏不加载，发行包不包含。新的结局插图保留在 `assets/cinematics/ending_v9/`。
+
+## 本轮已实现
+
+- 五首音乐与14种音效已接入；Enemy从灯塔入场到对话/战斗连续播放，歌词跟随音乐时钟。
+- Boss胜利：1秒纯黑且静音 → 四句战后对话，同时《晨间新闻》从73秒开始 → 自动进入结局，音乐继续。
+- 结局：28秒、三张1672×941新宽屏画面，走近灯塔/灯芯点亮/海雾散去/晨光伙伴收尾；实际运行角色行走，镜头、灯光、海面和粒子动态。
+- `Esc`跳到完成页；完成后`P`重播、`Enter`返回标题、`R`新旅程。重播不重启音乐。
+- `--ending-preview`直接看结局，不读写存档；完成后确认退出。
+- Windows输入限定游戏窗口的IME和物理按键；Shift和Space都可冲刺。F6声音，F8歌词。
+- 中文字体随代码/歌词更新；README展示正式版实际运行素材，打包剔除v9人物候选图。
+- 可读性修复：使用真正的静态SemiBold字形；歌词放大并增加描边，结局字幕加暗色渐变衬底，浅色战斗面板文字调整对比度。
+- Boss阶段条已移到歌词卡下方，长歌词不再盖住阶段标题与核心状态。
+- Windows 使用实际物理像素尺寸的16:9画布，保留1280×720逻辑布局；中文按最终显示像素尺寸缓存，地图文字计入镜头缩放与平移，歌词裁剪与鼠标命中同步适配。Pi仍使用720p性能画布。
+- 保留原版Windows的120个萤火、Pi的56个萤火，仅修正负数取模导致光点离开屏幕后不再返回的问题；晴天/夜雾光点的边缘循环也采用同一修复。
+- 地面缓存提前在主画布绑定前生成，避免首帧切回默认帧缓冲；缓存同时核对区域和216字节地形数据，覆盖标题、首次开局、读档及同一区域重开。
+- 用户上传的正式包资源及标签代码逐项对照见 [V1_0_0_PARITY_AUDIT.md](V1_0_0_PARITY_AUDIT.md)。不要把本轮原生字体和缓存修复误判为换图或改地图布局。
+
+## 运行
+
+从 `v2.0.0` Release 下载 `MistIsle-Windows-v2.0.0.zip` 后完整解压，直接运行 `mist_isle.exe` 或 `RUN_WINDOWS.bat`。`PREVIEW_ENDING.bat` 可只看结局。包内 `BUILD_INFO.json` 记录实际源码提交、版本号及文件校验值；发布页 `SHA256SUMS` 对应压缩包校验值。
+
+保留旧进度时，先关闭游戏，再把旧目录中的 `mist_isle_save.dat` 复制到新版目录，标题页按 F9 读取。发行号与存档格式号独立；原有 v4/v5 存档读取逻辑保持不变。
+
+开发仓库的同步方法见 `LOCAL_SYNC.md`。拉取 `main` 后重新运行 `RUN_WINDOWS.bat` 构建；不要用旧运行包的素材覆盖更新后的工程。
+
+## 验证与边界
+
+- 美术恢复后的Linux构建和Windows MinGW交叉编译均通过。
+- 音频状态机1213项、实际MP3后端47项通过；真实解码起点73.000000秒，五首歌曲全流可解码。
+- 战后/结局/预览存档隔离65项通过；美术恢复后的真实渲染/字幕/音频/战后检查115项通过；四张地图及正式人物均已逐图复核。
+- 全部921600个像素确认黑屏纯黑；真实运行确认加载静态SemiBold字体，所有必需中文字形均存在。
+- 完整项目校验通过；发布前用仅含Git暂存文件的干净导出再次校验资源，避免漏交付未跟踪素材。
+- 本轮按1280×720、1600×900、1920×1080、2560×1440实际像素捕获文字；检查真实首帧与第二帧一致、标题到开局缓存失效、四地图切换及长时间萤火密度。测试说明和边界见对照审计。
+- Windows中文输入法切换、实际听感和树莓派帧率仍需对应机器试玩；不能把交叉编译称为Windows实机验证。
+
+## 后续工作方式
+
+优先依据当前修复分支和本文件，并读取远端提交确认发布状态；只按需读取函数片段。每轮结束明确提交哈希、已验证项、尚待实机项，不把“正在上传”说成“已推送”。素材和编译日志留在文件里，聊天只汇总必要结果。

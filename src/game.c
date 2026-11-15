@@ -1,4 +1,7 @@
 #include "game.h"
+#include "audio.h"
+#include "platform_input.h"
+#include "viewport.h"
 
 static Vector2 BuddyFollowOffset(int id,int facing);
 #include "area_maps.h"
@@ -44,13 +47,9 @@ static void UpdatePlayerCamera(Game *g,float dt) {
 }
 static Vector2 LogicalMousePosition(void) {
     Vector2 mouse=GetMousePosition();
-    float sx=(float)GetScreenWidth()/(float)SW;
-    float sy=(float)GetScreenHeight()/(float)SH;
-    float scale=sx<sy?sx:sy;
-    if(scale<0.001f)scale=1.0f;
-    float ox=((float)GetScreenWidth()-(float)SW*scale)*.5f;
-    float oy=((float)GetScreenHeight()-(float)SH*scale)*.5f;
-    return (Vector2){(mouse.x-ox)/scale,(mouse.y-oy)/scale};
+    Rectangle viewport=CurrentGameViewport().destination;
+    return (Vector2){(mouse.x-viewport.x)*(float)SW/viewport.width,
+                     (mouse.y-viewport.y)*(float)SH/viewport.height};
 }
 static void Toast(Game *g,const char *s) {
     snprintf(g->toast,sizeof(g->toast),"%s",s); g->toastTimer=2.4f;
@@ -81,6 +80,8 @@ static void SetDialogueSequence(Game *g,const char *const *speakers,const char *
     g->dialogueCount=count<4?count:4;
     g->dialoguePage=0;
     g->dialogueStartsBossBattle=startsBossBattle;
+    g->dialogueStartsEnding=false;
+    g->dialogueInputBlocked=false;
     for(int i=0;i<g->dialogueCount;i++) {
         const char *speaker=speakers&&speakers[i]?speakers[i]:"旁白";
         snprintf(g->dialogueLineSpeaker[i],sizeof(g->dialogueLineSpeaker[i]),"%s",speaker);
@@ -89,6 +90,7 @@ static void SetDialogueSequence(Game *g,const char *const *speakers,const char *
     }
     if(g->dialogueCount>0)snprintf(g->dialogueSpeaker,sizeof(g->dialogueSpeaker),"%s",g->dialogueLineSpeaker[0]);
     g->scene=SCENE_DIALOGUE;
+    AudioPlay(AUDIO_DIALOGUE);
 }
 static void SetDialogueAs(Game *g,const char *speaker,const char *a,const char *b,const char *c) {
     const char *speakers[3]={speaker?speaker:"旁白",speaker?speaker:"旁白",speaker?speaker:"旁白"};
@@ -274,6 +276,7 @@ static void AddEnemy(Game *g,EnemyType t,float x,float y,float hp) {
 }
 void GameReset(Game *g,int seed);
 void GameSave(Game *g) {
+    if(g->previewOnly)return;
     SaveData s={0};
     s.magic=0x4D495354; s.version=5; s.seed=g->lastSeed; s.area=(int)g->area;
     s.px=g->player.pos.x; s.py=g->player.pos.y; s.hp=g->player.hp;
@@ -514,20 +517,74 @@ static void EnterBattle(Game *g,int idx) {
     for(int slot=0;slot<OwnedBuddyCount(g);slot++)if(OwnedBuddyIdAt(g,slot)==g->selectedBuddy){g->battleChoice=slot;break;}
     g->scene=SCENE_BATTLE;
     g->battleMessage=0;
+    AudioPlay(AUDIO_INTERACT);
 }
 static void StartStoryBattle(Game *g) {
     AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,150);
     EnterBattle(g,g->enemyCount-1);
 }
+static void StartEnding(Game *g) {
+    g->journalOpen=false;g->inventoryOpen=false;g->mapOpen=false;
+    g->dialogueStartsBossBattle=false;g->dialogueStartsEnding=false;
+    g->dialogueInputBlocked=false;
+    g->endingTime=0.0f;
+    g->player.vel=(Vector2){0,0};
+    g->toastTimer=0.0f;
+    g->transition=0.0f;
+    g->scene=SCENE_END;
+    GameSave(g);
+}
+static void StartPostBattleDialogue(Game *g) {
+    const char *speakers[4]={"灯塔守卫","旅人","苔灯灵","灯塔守卫"};
+    const char *lines[4]={
+        "胸口的光……终于不再灼痛了。我听见了……海风的声音。",
+        "雾正在散去。你守了这么久，现在可以歇一歇了。",
+        "你看！我们的光，正顺着石阶往灯塔流去。",
+        "去吧，和你的伙伴一起。让这束光，照亮回家的路。"
+    };
+    SetDialogueSequence(g,speakers,lines,4,false);
+    g->dialogueStartsEnding=true;
+    /* A held killing click/key cannot dismiss the first post-battle line. */
+    g->dialogueInputBlocked=true;
+}
+static void StartPostBattleBlackout(Game *g) {
+    g->journalOpen=false;g->inventoryOpen=false;g->mapOpen=false;
+    g->dialogueStartsBossBattle=false;g->dialogueStartsEnding=false;
+    g->dialogueInputBlocked=true;
+    g->dialoguePage=0;g->dialogueCount=0;
+    g->player.vel=(Vector2){0,0};
+    g->toastTimer=0.0f;
+    g->transition=0.0f;
+    g->postBattleBlackoutTime=0.0f;
+    g->scene=SCENE_POST_BATTLE_BLACKOUT;
+    AudioResetMovement();
+}
 void GameUpdate(Game *g,float dt) {
     g->time+=dt;
+    if(g->scene==SCENE_POST_BATTLE_BLACKOUT) {
+        /* Advance through the normal frame loop: no input or UI can skip the
+         * one-second silent beat, and losing focus pauses it with the game. */
+        g->postBattleBlackoutTime+=fmaxf(0.0f,dt);
+        if(g->postBattleBlackoutTime>=1.0f)StartPostBattleDialogue(g);
+        return;
+    }
     if(g->scene==SCENE_END) {
-        g->endingTime+=dt;
-        if(IsKeyPressed(KEY_R)) {
+        g->endingTime+=fmaxf(0.0f,dt);
+        /* Ending controls cannot accidentally cut off the performance. The
+         * completed frame, replay, and whole film share the same music stream. */
+        if(g->endingTime<ENDING_DURATION) {
+            if(g->endingTime>=1.0f&&GameInputPressed(KEY_ESCAPE))
+                g->endingTime=ENDING_DURATION;
+            return;
+        }
+        if(GameInputPressed(KEY_P)) {
+            g->endingTime=0.0f;
+        } else if(GameInputPressed(KEY_R)) {
+            if(g->previewOnly) { g->scene=SCENE_TITLE; return; }
             int seed=g->lastSeed+1;
             GameReset(g,seed);
             GameStart(g);
-        } else if(g->endingTime>=5.0f&&(IsKeyPressed(KEY_ENTER)||IsKeyPressed(KEY_ESCAPE))) {
+        } else if(GameInputPressed(KEY_ENTER)||GameInputPressed(KEY_ESCAPE)) {
             g->scene=SCENE_TITLE;
             g->endingTime=0.0f;
         }
@@ -565,7 +622,7 @@ void GameUpdate(Game *g,float dt) {
         }
     }
     if(g->scene==SCENE_PLAY) {
-        if(IsKeyPressed(KEY_O))g->objectiveCollapsed=!g->objectiveCollapsed;
+        if(GameInputPressed(KEY_O))g->objectiveCollapsed=!g->objectiveCollapsed;
         if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             Vector2 mouse=LogicalMousePosition();
             Rectangle objectiveToggle=g->objectiveCollapsed
@@ -573,7 +630,7 @@ void GameUpdate(Game *g,float dt) {
                 :(Rectangle){SW-92.0f,26.0f,72.0f,28.0f};
             if(CheckCollisionPointRec(mouse,objectiveToggle))g->objectiveCollapsed=!g->objectiveCollapsed;
         }
-        if(IsKeyPressed(KEY_F7)) {
+        if(GameInputPressed(KEY_F7)) {
             if(g->area==AREA_GROVE) {
                 Toast(g,"辉光林地专属天气：萤火流光。");
             } else if(g->area==AREA_RUINS) {
@@ -594,27 +651,35 @@ void GameUpdate(Game *g,float dt) {
         }
     }
     if(g->journalOpen || g->inventoryOpen || g->mapOpen) {
-        if(IsKeyPressed(KEY_F5)){GameSave(g);Toast(g,"旅程已保存！");}
-        if(IsKeyPressed(KEY_F9))GameLoad(g);
-        if(IsKeyPressed(KEY_J)||IsKeyPressed(KEY_I)||IsKeyPressed(KEY_M)||IsKeyPressed(KEY_ESCAPE)) { g->journalOpen=false;g->inventoryOpen=false;g->mapOpen=false; }
+        if(GameInputPressed(KEY_F5)){GameSave(g);Toast(g,"旅程已保存！");}
+        if(GameInputPressed(KEY_F9))GameLoad(g);
+        if(GameInputPressed(KEY_J)||GameInputPressed(KEY_I)||GameInputPressed(KEY_M)||GameInputPressed(KEY_ESCAPE)) { g->journalOpen=false;g->inventoryOpen=false;g->mapOpen=false; }
         return;
     }
     for(int i=0;i<MAX_PARTICLES;i++) if(g->particles[i].life>0) {
         Particle *p=&g->particles[i];p->life-=dt;p->p=Vector2Add(p->p,Vector2Scale(p->v,dt));p->v.y-=0.3f*dt;
     }
     if(g->scene==SCENE_TITLE) {
-        if(IsKeyPressed(KEY_F9)) { if(GameLoad(g)) return; }
-        if(IsKeyPressed(KEY_ENTER)||IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) GameStart(g);
+        if(GameInputPressed(KEY_F9)) { if(GameLoad(g)) return; }
+        if(GameInputPressed(KEY_ENTER)||IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) GameStart(g);
         return;
     }
     if(g->scene==SCENE_DIALOGUE) {
-        if(IsKeyPressed(KEY_E)||IsKeyPressed(KEY_ENTER)||IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        if(g->dialogueInputBlocked) {
+            if(!GameInputDown(KEY_E)&&!GameInputDown(KEY_ENTER)&&
+               !IsMouseButtonDown(MOUSE_BUTTON_LEFT))g->dialogueInputBlocked=false;
+            return;
+        }
+        if(GameInputPressed(KEY_E)||GameInputPressed(KEY_ENTER)||IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            AudioPlay(AUDIO_DIALOGUE);
             g->dialoguePage++;
             if(g->dialoguePage>=g->dialogueCount) {
                 if(g->dialogueStartsBossBattle) {
                     g->dialogueStartsBossBattle=false;
                     AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,150);
                     EnterBattle(g,g->enemyCount-1);
+                } else if(g->dialogueStartsEnding) {
+                    StartEnding(g);
                 } else g->scene=SCENE_PLAY;
             } else {
                 snprintf(g->dialogueSpeaker,sizeof(g->dialogueSpeaker),"%s",g->dialogueLineSpeaker[g->dialoguePage]);
@@ -627,11 +692,11 @@ void GameUpdate(Game *g,float dt) {
         if(!e->alive){g->scene=SCENE_PLAY;return;}
         int buddyCount=OwnedBuddyCount(g);
         int optionCount=buddyCount>0?buddyCount:1;
-        if(IsKeyPressed(KEY_ONE)||IsKeyPressed(KEY_Q))g->battleChoice=0;
-        if((IsKeyPressed(KEY_TWO)||IsKeyPressed(KEY_W))&&optionCount>1)g->battleChoice=1;
-        if((IsKeyPressed(KEY_THREE)||IsKeyPressed(KEY_E))&&optionCount>2)g->battleChoice=2;
-        if(IsKeyPressed(KEY_LEFT)||IsKeyPressed(KEY_A))g->battleChoice=(g->battleChoice+optionCount-1)%optionCount;
-        if(IsKeyPressed(KEY_RIGHT)||IsKeyPressed(KEY_D))g->battleChoice=(g->battleChoice+1)%optionCount;
+        if(GameInputPressed(KEY_ONE)||GameInputPressed(KEY_Q))g->battleChoice=0;
+        if((GameInputPressed(KEY_TWO)||GameInputPressed(KEY_W))&&optionCount>1)g->battleChoice=1;
+        if((GameInputPressed(KEY_THREE)||GameInputPressed(KEY_E))&&optionCount>2)g->battleChoice=2;
+        if(GameInputPressed(KEY_LEFT)||GameInputPressed(KEY_A))g->battleChoice=(g->battleChoice+optionCount-1)%optionCount;
+        if(GameInputPressed(KEY_RIGHT)||GameInputPressed(KEY_D))g->battleChoice=(g->battleChoice+1)%optionCount;
         if(g->battleChoice>=optionCount)g->battleChoice=optionCount-1;
         int selectedId=buddyCount>0?OwnedBuddyIdAt(g,g->battleChoice):-1;
         if(selectedId>=0)g->selectedBuddy=selectedId;
@@ -650,7 +715,7 @@ void GameUpdate(Game *g,float dt) {
                 }
             }
         }
-        bool confirm=IsKeyPressed(KEY_ENTER)||(mousePressed&&!mouseSelected);
+        bool confirm=GameInputPressed(KEY_ENTER)||(mousePressed&&!mouseSelected);
         if(confirm) {
             if(g->battleTurn==0) {
                 Buddy *active=selectedId>=0?BuddyById(g,selectedId):NULL;
@@ -675,6 +740,7 @@ void GameUpdate(Game *g,float dt) {
                     Toast(g,"旅人发动普通攻击！");
                 }
                 e->hp-=damage;
+                AudioPlay(AUDIO_ATTACK);
                 g->battleTurn=1;
                 if(e->hp<=0) {
                     e->alive=false;g->battleTurn=0;g->scene=SCENE_PLAY;g->defeatedGuards++;
@@ -687,13 +753,7 @@ void GameUpdate(Game *g,float dt) {
                     if(e->type==ENEMY_MOTE){g->groveMoteDefeated=true;g->player.berries+=2;GameSave(g);Toast(g,"击退林地微光兽，获得2颗果实！");}
                     if(e->type==ENEMY_BOSS) {
                         g->bossDefeated=true;g->player.crystals+=3;g->player.shells+=2;GameSave(g);
-                        const char *speakers[3]={"灯塔守卫","旅人","灯塔守卫"};
-                        const char *lines[3]={
-                            "胸口的光……终于不再灼痛了。原来我一直在等待有人唤醒灯塔。",
-                            "你不必再独自守着这里了。让这束光照亮整座岛吧。",
-                            "去吧，旅人。灯火会记住你们。"
-                        };
-                        SetDialogueSequence(g,speakers,lines,3,false);
+                        StartPostBattleBlackout(g);
                     }
                 }
             } else {
@@ -710,6 +770,7 @@ void GameUpdate(Game *g,float dt) {
                 bool buddyTookHit=defender&&defender->owned&&defender->hp>0.0f;
                 if(buddyTookHit)defender->hp=fmaxf(0.0f,defender->hp-incoming);
                 else g->player.hp-=incoming;
+                AudioPlay(AUDIO_HURT);
                 Burst(g,WorldScreen(buddyTookHit?defender->pos:g->player.pos),bossHeavy?C_GOLD:C_PINK,bossHeavy?22:10);
                 g->battleTurn=0;g->battleRound++;
                 if(!buddyTookHit&&g->player.hp<=0){g->player.hp=55;g->scene=SCENE_PLAY;Toast(g,"伙伴把你带回营地，恢复了体力。");}
@@ -725,27 +786,36 @@ void GameUpdate(Game *g,float dt) {
 
     Player *p=&g->player;
     // Area identity is controlled by explicit entrance/exit gates.
-    if(IsKeyPressed(KEY_J)){g->journalOpen=true;return;}
-    if(IsKeyPressed(KEY_I)){g->inventoryOpen=true;return;}
-    if(IsKeyPressed(KEY_M)){g->mapOpen=true;return;}
-    if(IsKeyPressed(KEY_F5)){GameSave(g);Toast(g,"旅程已保存！");return;}
-    if(IsKeyPressed(KEY_F9)){GameLoad(g);return;}
+    if(GameInputPressed(KEY_J)){g->journalOpen=true;return;}
+    if(GameInputPressed(KEY_I)){g->inventoryOpen=true;return;}
+    if(GameInputPressed(KEY_M)){g->mapOpen=true;return;}
+    if(GameInputPressed(KEY_F5)){GameSave(g);Toast(g,"旅程已保存！");return;}
+    if(GameInputPressed(KEY_F9)){GameLoad(g);return;}
     p->dashCd=fmaxf(0,p->dashCd-dt);
     p->invuln=fmaxf(0,p->invuln-dt);
     Vector2 in={0,0};
-    if(IsKeyDown(KEY_W)||IsKeyDown(KEY_UP))in.y-=1;
-    if(IsKeyDown(KEY_S)||IsKeyDown(KEY_DOWN))in.y+=1;
-    if(IsKeyDown(KEY_A)||IsKeyDown(KEY_LEFT))in.x-=1;
-    if(IsKeyDown(KEY_D)||IsKeyDown(KEY_RIGHT))in.x+=1;
+    if(GameInputDown(KEY_W)||GameInputDown(KEY_UP))in.y-=1;
+    if(GameInputDown(KEY_S)||GameInputDown(KEY_DOWN))in.y+=1;
+    if(GameInputDown(KEY_A)||GameInputDown(KEY_LEFT))in.x-=1;
+    if(GameInputDown(KEY_D)||GameInputDown(KEY_RIGHT))in.x+=1;
     float l=Vector2Length(in);if(l>0.01f)in=Vector2Scale(in,1/l);
     float speed=3.65f;
-    if(IsKeyPressed(KEY_LEFT_SHIFT)&&p->dashCd<=0&&l>0.01f){speed=8.5f;p->dashCd=0.9f;p->invuln=0.18f;Burst(g,WorldScreen(p->pos),WHITE,8);}
+    if((GameInputPressed(KEY_LEFT_SHIFT)||GameInputPressed(KEY_RIGHT_SHIFT)||GameInputPressed(KEY_SPACE))&&p->dashCd<=0&&l>0.01f){speed=8.5f;p->dashCd=0.9f;p->invuln=0.18f;Burst(g,WorldScreen(p->pos),WHITE,8);AudioPlay(AUDIO_DASH);}
     Vector2 desired=Vector2Scale(in,speed);
     float response=(l>0.01f)?13.0f:18.0f;
     p->vel=Vector2Lerp(p->vel,desired,fminf(1.0f,dt*response));
     if (fabsf(in.x) > fabsf(in.y) && fabsf(in.x) > 0.01f) p->facing = in.x < 0 ? 1 : 2;
     else if (fabsf(in.y) > 0.01f) p->facing = in.y < 0 ? 3 : 0;
-    MovePlayerWithCollision(g,Vector2Scale(p->vel,dt));
+    Vector2 movementStart=p->pos;
+    Vector2 requestedMovement=Vector2Scale(p->vel,dt);
+    MovePlayerWithCollision(g,requestedMovement);
+    Vector2 actualMovement=Vector2Subtract(p->pos,movementStart);
+    bool blocked=Vector2Distance(actualMovement,requestedMovement)>0.001f;
+    int tileX=(int)floorf(p->pos.x+0.5f),tileY=(int)floorf(p->pos.y+0.5f);
+    int surface=g->area==AREA_RUINS?2:0;
+    if(surface==0&&tileX>=0&&tileX<MAPW&&tileY>=0&&tileY<MAPH&&
+       TerrainKindFromAtlasIndex(g->world.terrain[tileY][tileX])==3)surface=1;
+    AudioMovement(Vector2Length(actualMovement),blocked,surface,dt);
 
     Buddy *followers[3]={&g->lumi,&g->splash,&g->spark};
     for(int bi=0;bi<3;bi++) {
@@ -810,7 +880,8 @@ void GameUpdate(Game *g,float dt) {
     }
     for(int i=0;i<g->world.pickupCount;i++)g->world.pickups[i].phase+=dt*2.2f;
 
-    if(IsKeyPressed(KEY_TAB)) {
+    if(GameInputPressed(KEY_TAB)) {
+        AudioPlay(AUDIO_INTERACT);
         int start = g->selectedBuddy;
         for (int step=1; step<=3; ++step) {
             int candidate = (start + step) % 3;
@@ -820,17 +891,12 @@ void GameUpdate(Game *g,float dt) {
         const char *names[3]={"苔灯灵","沫尾兽","鸣晶蜥"};
         Toast(g,TextFormat("当前伙伴：%s",names[g->selectedBuddy]));
     }
-    if(IsKeyPressed(KEY_E)) {
-        // One authoritative final-story interaction. It is handled before exits, pickups and NPCs.
+    if(GameInputPressed(KEY_E)) {
+        AudioPlay(AUDIO_INTERACT);
+        // Replay/recovery route for an already won chapter, including old saves.
+        // The first ending now follows the post-battle dialogue automatically.
         if(g->area==AREA_LIGHTHOUSE && g->bossDefeated && Dist(p->pos,g->world.shrine)<3.8f) {
-            g->journalOpen=false;
-            g->inventoryOpen=false;
-            g->mapOpen=false;
-            g->endingTime=0.0f;
-            g->player.vel=(Vector2){0,0};
-            g->toastTimer=0.0f;
-            g->scene=SCENE_END;
-            GameSave(g);
+            StartEnding(g);
             return;
         }
         if(g->area==AREA_CAMP) {
@@ -847,7 +913,7 @@ void GameUpdate(Game *g,float dt) {
             SwitchArea(g,AREA_CAMP);GameSave(g);Toast(g,"返回海岸营地 · 天气转晴");return;
         }
     }
-    if(IsKeyPressed(KEY_E)) {
+    if(GameInputPressed(KEY_E)) {
         // Rescue Moss Lumi at the camp.
         if(g->area==AREA_CAMP&&!g->lumi.owned&&Dist(p->pos,(Vector2){6,8})<1.5f) {
             AddBuddyFriend(g,0);
@@ -873,6 +939,7 @@ void GameUpdate(Game *g,float dt) {
         for(int i=0;i<g->world.pickupCount;i++) {
             Pickup *q=&g->world.pickups[i];
             if(!q->taken&&Dist(p->pos,q->tile)<1.0f) {
+                AudioPlay(AUDIO_PICKUP);
                 q->taken=true; g->areaPickupTaken[(int)g->area][i]=1;
                 if(q->kind==0)p->berries++;
                 if(q->kind==1)p->shells++;
@@ -941,13 +1008,11 @@ void GameUpdate(Game *g,float dt) {
             SetDialogueSequence(g,speakers,lines,4,true);
             return;
         }
-        // Chapter finale: the player must explicitly activate the central beacon stone.
+        // Chapter finale replay: activate the central beacon stone.
         // The stone's collision footprint prevents standing on its centre, so use a generous
         // interaction radius and keep this check ahead of generic NPC/area interactions.
         if(g->area==AREA_LIGHTHOUSE&&g->bossDefeated&&Dist(p->pos,g->world.shrine)<3.0f) {
-            g->endingTime=0.0f;
-            g->scene=SCENE_END;
-            GameSave(g);
+            StartEnding(g);
             Burst(g,WorldScreen(g->world.shrine),C_GOLD,64);
             return;
         }
@@ -957,8 +1022,9 @@ void GameUpdate(Game *g,float dt) {
             return;
         }
     }
-    // The final scene is entered only through the explicit E interaction above.
-    if(g->shrineSolved&&g->enemyCount>0&&!g->enemies[g->enemyCount-1].alive)g->bossDefeated=true;
+    // Keep the cleared-guardian flag consistent for chapter replay and old saves.
+    if(g->shrineSolved&&g->enemyCount>0&&g->enemies[g->enemyCount-1].type==ENEMY_BOSS&&
+       !g->enemies[g->enemyCount-1].alive)g->bossDefeated=true;
 
     UpdatePlayerCamera(g,dt);
     if(g->toastTimer>0)g->toastTimer-=dt;
