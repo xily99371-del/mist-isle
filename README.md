@@ -45,8 +45,8 @@
 ## 游戏内像素形象 / In-Game Pixel Sprites
 
 <p align="center">
-  <img src="assets/characters/hero/heroine_pixel_4x4_64x80.png" alt="Approved heroine pixel sprite sheet" width="30%"/>
-  <img src="assets/characters/npc/watcher_pixel_4x4_64x80.png" alt="Approved Watcher pixel sprite sheet" width="30%"/>
+  <img src="assets/characters/hero/heroine_approved_8x4.png" alt="Approved heroine pixel sprite sheet" width="30%"/>
+  <img src="assets/characters/portraits/watcher_world_cutout.png" alt="Approved Watcher pixel sprite sheet" width="30%"/>
   <img src="assets/characters/boss/lighthouse_guardian_4x2.png" alt="Approved Lighthouse Guardian pixel sprite sheet" width="30%"/>
 </p>
 <p align="center">
@@ -55,6 +55,7 @@
   <img src="assets/characters/companions/crystal_gecko_idle_64.png" alt="Crystal Gecko pixel sprite" width="22%"/>
 </p>
 <p align="center"><sub>高清对话立绘与游戏内像素动画分开展示。上述高清立绘来自 MistIsle_ApprovedArt_v7.zip，地图环境素材来自 MistIsle_MapArt_v8.zip。 / High-resolution dialogue portraits are shown separately from in-game pixel sprites. Portraits come from v7; environment art comes from v8.</sub></p>
+
 ## 中文
 
 ### 关于游戏
@@ -82,16 +83,16 @@
 | 按键 | 功能 |
 |---|---|
 | WASD / 方向键 | 移动 |
-| E | 互动、对话、确认 |
+| E | 互动、对话、拾取 |
 | Shift | 冲刺 |
-| Tab | 切换伙伴 |
+| Tab | 切换当前出战伙伴 |
 | J | 旅程手记 |
 | I | 背包 |
 | M | 地图 |
 | F5 / F9 | 保存 / 读取 |
-| F7 | 天气调试切换 |
+| F7 | 天气调试切换（仅调试） |
 | O | 收起 / 展开目标栏 |
-| Esc | 返回 / 关闭界面 |
+| Esc | 关闭界面 / 返回 |
 
 ### Windows 运行
 
@@ -165,16 +166,16 @@
 | Key | Action |
 |---|---|
 | WASD / Arrow keys | Move |
-| E | Interact, talk, confirm |
+| E | Interact, talk, pick up |
 | Shift | Dash |
-| Tab | Switch companion |
+| Tab | Switch active companion |
 | J | Journal |
 | I | Inventory |
 | M | Map |
 | F5 / F9 | Save / Load |
-| F7 | Weather debug cycle |
+| F7 | Weather debug cycle (debug only) |
 | O | Collapse / expand objectives |
-| Esc | Back / close |
+| Esc | Back / close interface |
 
 ### Build on Windows
 
