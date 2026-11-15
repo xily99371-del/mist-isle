@@ -241,11 +241,11 @@ static void RenderBattle(Game *g) {
 
     /* Native-pixel HUD stays still while only the battle stage shakes. */
     PanelDark((Rectangle){24,22,354,120});
-    DrawUIText("宠物战斗 · IMPACT-02.2",43,35,17,(Color){247,224,179,255});
+    DrawUIText("伙伴战斗 · IMPACT-02.2",43,35,17,(Color){247,224,179,255});
     DrawUIText(TextFormat("第 %d 回合  /  %s",g->battleRound,boss?"首领战":"遭遇战"),43,63,16,(Color){183,203,216,255});
-    DrawUIText(TextFormat("可战斗宠物  %d / %d",BattleBuddyCount(g),
+    DrawUIText(TextFormat("可战斗伙伴  %d / %d",BattleBuddyCount(g),
         g->lumi.owned+g->splash.owned+g->spark.owned),43,90,16,(Color){226,238,229,255});
-    DrawUIText("星光治愈 · 全队宠物恢复",43,117,13,(Color){172,215,178,255});
+    DrawUIText("星光治愈 · 全队伙伴恢复",43,117,13,(Color){172,215,178,255});
     PanelDark((Rectangle){904,22,350,120});
     DrawUIText(boss?"灯塔守卫":"林地微光兽",925,35,24,(Color){255,229,185,255});
     DrawUIText(TextFormat("%s   %d / %d",boss?"核心耐久":"生命",(int)ceilf(b->enemyHp),(int)e->maxHp),925,76,17,(Color){206,222,232,255});
@@ -282,7 +282,7 @@ static void RenderBattle(Game *g) {
     DrawLine(24,538,1256,538,(Color){116,144,158,255});
     const char *label=b->phase==BATTLE_CHOOSE?"选择出战伙伴 · 点击卡片后确认":
         b->phase==BATTLE_PREVIEW_END?"战斗体验完成 · R 重来 / Esc 退出":
-        enemy?"敌方自动行动 · 无需按 Enter":b->phase==BATTLE_LOSS?"全队宠物体力耗尽 · 正在撤离":b->phase==BATTLE_DEFEAT?"战斗完成 · 灯火正在散去":"技能演出中 · 伤害在命中时生效";
+        enemy?"敌方自动行动 · 无需按 Enter":b->phase==BATTLE_LOSS?"全队伙伴体力耗尽 · 正在返回":b->phase==BATTLE_DEFEAT?"战斗完成 · 灯火正在散去":"技能演出中 · 伤害在命中时生效";
     DrawUIText(label,33,547,16,(Color){195,217,232,255});
     /* All three identities keep their own card, HP and number key even at 0 HP. */
     for(int id=0;id<3;id++) {

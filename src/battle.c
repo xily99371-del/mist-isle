@@ -63,8 +63,8 @@ void BattleInit(Game *g) {
     int count=BattleBuddyCount(g);g->battleChoice=0;
     for(int i=0;i<count;i++)if(BattleBuddyId(g,i)==g->selectedBuddy)g->battleChoice=i;
     g->selectedBuddy=count?BattleBuddyId(g,g->battleChoice):-1;
-    if(!count){PartyDefeated(g);Message(g,"全队宠物体力耗尽，正在撤回营地。");return;}
-    Message(g,"选择宠物技能，按 Enter 出招。只有宠物参与战斗。");
+    if(!count){PartyDefeated(g);Message(g,"全队伙伴体力耗尽，正在返回营地。");return;}
+    Message(g,"选择伙伴技能，按 Enter 出招。只有伙伴进行战斗。");
 }
 static void Action(Game *g,BattlePhase phase,BattleAction action,int actor) {
     BattleState *b=&g->battle;
@@ -88,7 +88,7 @@ bool BattleStartAction(Game *g,int actor) {
         case ACTION_GLOW:
             b->duration=1.60f;b->impactAt=.95f;
             b->damage=8+(level-1)*2;b->heal=18+(level-1)*3;
-            Message(g,"星光治愈 · 为全队宠物恢复体力。");break;
+            Message(g,"星光治愈 · 为全队伙伴恢复体力。");break;
         case ACTION_WATER:
             b->damage=20+(level-1)*3;
             Message(g,"泡泡水流 · 水流将使敌人潮湿。");break;

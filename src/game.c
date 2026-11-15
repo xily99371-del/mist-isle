@@ -579,7 +579,7 @@ void GameBattleVictory(Game *g,int actor) {
 }
 void GameBattleRetreat(Game *g) {
     SwitchArea(g,AREA_CAMP);g->scene=SCENE_PLAY;
-    Toast(g,"全队宠物体力耗尽，撤回营地。靠近守望者可恢复。");
+    Toast(g,"全队伙伴体力耗尽，返回营地。靠近守望者可恢复。");
 }
 void GameStartBattlePreview(Game *g) {
     GameReset(g,20261115);g->previewOnly=true;
