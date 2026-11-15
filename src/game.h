@@ -104,6 +104,7 @@ typedef struct {
     int battleTurn;
     int battleMessage;
     float battleTimer;
+    float battleDamage;
     int battleChoice;
     float time;
     float endingTime;
