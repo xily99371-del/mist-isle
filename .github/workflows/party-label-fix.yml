@@ -1,0 +1,56 @@
+name: Verify native party labels
+on:
+  push:
+    branches: [feature/animated-battle-v2]
+    paths: ['.github/workflows/party-label-fix.yml']
+permissions:
+  contents: write
+jobs:
+  labels:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install fonttools
+      - name: Apply and verify the three exact label-only edits
+        run: |
+          python - <<'PY'
+          import hashlib, re, subprocess
+          from pathlib import Path
+          from fontTools.ttLib import TTFont
+          assert subprocess.check_output(['git','rev-parse','HEAD^'],text=True).strip() == 'a033f1b446e6d3d9ab778c92fbabc875246a3afd'
+          edits = [
+              ('src/battle.c','73ba08bcf7efc90dbbc3b8b0e89cc423bb4a509c6c296588d28969e8b593032b','407712f821c531abdcb215649921ca7e6474da789ca87d419e0afcfa069f43c8'),
+              ('src/battle_render.inc','bcab559de61bc39b715d0b0cd9a281e6e998521ccfebabea0c9378ce33573405','35c55d51d989f02eff81da95011ac622e5a176b97c2343539228a3d2264df73d'),
+              ('src/game.c','b562072f1a458dc85e8dcaf01464bc470522695408b9a8e66fff6c89d723f640','03e4020fad1be88fb1985b6a242552a3d0d2f77be4888acbf1ede89f71c9e80f')]
+          writes=[]
+          for name,old,new in edits:
+              p=Path(name);data=p.read_bytes()
+              assert hashlib.sha256(data).hexdigest()==old,name
+              text=data.decode('utf-8')
+              for a,b in [('宠物','伙伴'),('撤回','返回'),('撤离','返回'),('参与','进行')]:text=text.replace(a,b)
+              result=text.encode('utf-8')
+              assert hashlib.sha256(result).hexdigest()==new,name
+              writes.append((p,result))
+          for p,result in writes:p.write_bytes(result)
+          cmap=TTFont('assets/fonts/NotoSansSC-SemiBold.ttf').getBestCmap()
+          for p in Path('src').iterdir():
+              if p.suffix not in ('.c','.h','.inc'):continue
+              tokens=re.findall(r'"(?:\\.|[^"\\])*"|//[^\n]*|/\*[\s\S]*?\*/',p.read_text(encoding='utf-8'))
+              missing={ch for token in tokens if token.startswith('"') for ch in token if '\u4e00'<=ch<='\u9fff' and ord(ch) not in cmap}
+              assert not missing,(str(p),missing)
+          print('Every CJK character in runtime source strings exists in the shipped font.')
+          PY
+      - name: Commit label-only changes to feature branch
+        run: |
+          git add -- src/battle.c src/battle_render.inc src/game.c
+          git diff --cached --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Use existing companion terminology so every native battle label renders'
+          git push origin HEAD:feature/animated-battle-v2
