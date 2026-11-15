@@ -7,7 +7,7 @@
 #include <string.h>
 #include <time.h>
 
-static const char WINDOW_TITLE[] = "雾屿回响 v" MISTISLE_VERSION " - 第一章：失落的灯塔";
+static const char WINDOW_TITLE[] = "雾屿回响 v" MISTISLE_VERSION " - 战斗演出版 IMPACT-02";
 
 static void LocateGameAssets(void) {
     if(FileExists("assets/characters/portraits/heroine_portrait.png"))return;
@@ -22,8 +22,9 @@ static void LocateGameAssets(void) {
 }
 
 int main(int argc,char **argv) {
-    bool endingPreview=false;
+    bool endingPreview=false,battlePreview=false;
     for(int i=1;i<argc;i++)if(strcmp(argv[i],"--ending-preview")==0)endingPreview=true;
+    for(int i=1;i<argc;i++)if(strcmp(argv[i],"--battle-preview")==0)battlePreview=true;
     LocateGameAssets();
 #if defined(MISTISLE_PI_PROFILE)
     // Raspberry Pi 5: 720p logical canvas, no MSAA, no forced maximization.
@@ -52,6 +53,7 @@ int main(int argc,char **argv) {
         g.lumi.owned=g.splash.owned=g.spark.owned=true;
         g.endingTime=0.0f;
     }
+    if(battlePreview)GameStartBattlePreview(&g);
     while(!WindowShouldClose()) {
         PlatformInputUpdate();
         bool focused=IsWindowFocused();
@@ -82,7 +84,8 @@ int main(int argc,char **argv) {
             // SCENE_END must pass through GameUpdate so the lighthouse sequence advances.
             GameUpdate(&g,dt);
         }
-        if(endingPreview&&g.scene!=SCENE_END)break;
+        if(endingPreview&&!battlePreview&&g.scene!=SCENE_END)break;
+        if(battlePreview&&g.scene==SCENE_TITLE)break;
         /* Keep the same music stream alive across exploration, dialogue and battle. */
         AudioUpdate(&g,dt,focused);
         GameViewport viewport=CurrentGameViewport();

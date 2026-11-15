@@ -40,7 +40,7 @@ def main():
         subprocess.run(compiler + [
             "-std=c11", "-O1", "-g", "-DRAYMATH_STATIC_INLINE",
             "-I", str(ROOT / "src"), "-I", str(raylib.resolve()), "-I", str(work),
-            str(ROOT / "src/game.c"), str(ROOT / "tools/tests/test_postbattle.c"),
+            str(ROOT / "src/game.c"), str(ROOT / "src/battle.c"), str(ROOT / "tools/tests/test_postbattle.c"),
             "-lm", "-o", str(exe),
         ], check=True)
         subprocess.run([str(exe)], cwd=work, check=True)

@@ -133,12 +133,15 @@ static Game BossFight(void) {
     g.lumi.owned=true;
     g.enemyCount=1;g.battleEnemy=0;g.battleChoice=0;
     g.enemies[0]=(Enemy){.pos={9,7},.type=ENEMY_BOSS,.hp=1,.maxHp=150,.alive=true};
+    BattleInit(&g);
     return g;
 }
 
 int main(void) {
     Game g=BossFight();g.shrineSolved=true;
     Confirm(&g);
+    CHECK(g.scene==SCENE_BATTLE&&NEAR(g.enemies[0].hp,1),"confirm does not deal damage before impact");
+    for(int frame=0;frame<300&&g.scene==SCENE_BATTLE;frame++)GameUpdate(&g,1.0f/60.0f);
     CHECK(g.scene==SCENE_POST_BATTLE_BLACKOUT,"Boss defeat enters blackout before any dialogue");
     CHECK(g.bossDefeated&&!g.enemies[0].alive,"Boss stays defeated");
     CHECK(g.player.crystals==3&&g.player.shells==2&&g.lumi.xp==20,"victory rewards are retained once");
@@ -185,6 +188,7 @@ int main(void) {
 
     Game ordinary=BossFight();ordinary.area=AREA_GROVE;ordinary.enemies[0].type=ENEMY_MOTE;
     Confirm(&ordinary);
+    for(int frame=0;frame<300&&ordinary.scene==SCENE_BATTLE;frame++)GameUpdate(&ordinary,1.0f/60.0f);
     CHECK(ordinary.scene==SCENE_PLAY&&!ordinary.bossDefeated&&ordinary.groveMoteDefeated,
           "ordinary fights retain their existing exploration flow");
     GameReset(&g,43);

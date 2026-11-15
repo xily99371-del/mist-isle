@@ -10,9 +10,10 @@ from PIL import Image
 from package_release import copy_runtime
 
 ROOT = Path(__file__).resolve().parents[1]
-RENDER = (ROOT / "src/render.c").read_text(encoding="utf-8")
+RENDER = (ROOT / "src/render.c").read_text(encoding="utf-8") + "\n" + (ROOT / "src/battle_render.inc").read_text(encoding="utf-8")
 ENDING = (ROOT / "src/ending.c").read_text(encoding="utf-8")
 GAME = (ROOT / "src/game.c").read_text(encoding="utf-8")
+BATTLE = (ROOT / "src/battle.c").read_text(encoding="utf-8")
 HEADER = (ROOT / "src/game.h").read_text(encoding="utf-8")
 MAIN = (ROOT / "src/main.c").read_text(encoding="utf-8")
 VIEWPORT = (ROOT / "src/viewport.h").read_text(encoding="utf-8")
@@ -249,12 +250,10 @@ require("InRect" in GAME and "const float r=.31f" in GAME and "distance/0.08f" i
         "player collision checks authored prop footprints with dense substeps")
 require("RENDER_BOSS" in RENDER and "DrawLighthouseGuardian" in RENDER,
         "lighthouse guardian is visible in the world and battle scene")
-require("bossPhase==3?(g->battleRound%2==0):(g->battleRound%3==0)" in GAME and "bossHeavy" in GAME,
-        "lighthouse guardian escalates from measured attacks to a telegraphed resonance strike")
-require("incoming*=e->type==ENEMY_BOSS?0.65f:0.8f" in GAME and "核心蓄能：下一回合将发动重击" in RENDER,
-        "wet status interrupts the guardian core and reduces its boss attack damage")
-require("g->enemySoaked=false; // Wetness interrupts one incoming attack" in GAME and "核心受潮：本次攻击伤害降低" in RENDER,
-        "wet status is consumed by one enemy attack and visibly dampens the guardian core")
+require("BattleUpdate(g,dt)" in GAME and "src/battle.c" in CMAKE,
+        "production gameplay uses the impact-timed battle controller")
+require("b->dampen=false" in BATTLE and "--b->wetTurns" in BATTLE,
+        "wet damage reduction is separate from next-turn conductive status")
 require("TEX_LUMI_PIXEL.id" in RENDER and "TEX_MOATAIL_PIXEL.id" in RENDER and "TEX_GECKO_PIXEL.id" in RENDER,
         "all three recruited companions use their four-frame authored pixel idle sheets")
 require("BuddyFollowOffset" in GAME and "static const Vector2 formation[4][3]" in GAME and "distance>3.8f?7.2f" in GAME,
@@ -263,7 +262,7 @@ require("当前位置" in RENDER and "DrawCircleLines((int)pts[i].x,(int)pts[i].
         "island map shows an explicit current-area marker and readable legend")
 require("attacking?((int)(t*8.0f)%4):((int)(t*2.0f)%4)" in RENDER and "attacking?80.0f:0.0f" in RENDER,
         "lighthouse guardian uses its dedicated attack animation row during the enemy turn")
-require('DrawUIText(isBoss?"首领战":"遭遇战"' in RENDER and "核心耐久" in RENDER,
+require('BattleStage(g)' in RENDER and '首领战' in RENDER and "核心耐久" in RENDER,
         "boss encounter has a distinct dark arena, boss title and lantern-core health bar")
 require("AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,150)" in GAME,
         "story lighthouse encounter creates the dedicated boss enemy type")
@@ -277,7 +276,7 @@ require("AREA_COLLISION" in GAME and "TerrainKindFromAtlasIndex(g->world.terrain
         "Tiled collision rectangles and water tiles drive substep movement collision")
 require("GetCurrentObjective" in GAME and "DrawObjectiveMarker" in RENDER,
         "chapter objective guidance and in-world waypoint marker are active")
-require("OwnedBuddyIdAt" in GAME and "optionCount" in GAME and "选择出战伙伴" in RENDER,
+require("BattleBuddyId" in BATTLE and "BattleBuddyCount" in BATTLE and "选择出战伙伴" in RENDER,
         "battle options are restricted to companions currently owned")
 require("!g->splash.owned" in RENDER and "!g->spark.owned" in RENDER,
         "unrecruited water and crystal companions are visible as world encounters")
@@ -321,7 +320,7 @@ if all((ROOT / p).exists() for p in approved_assets):
             runtime_actors["watcher"] in RENDER,
             "Watcher world actor uses the current native 64x80 pixel sheet")
     require('bossPixelPath="assets/characters/boss/lighthouse_guardian_4x2.png"' in RENDER and "TEX_GUARDIAN_APPROVED.width==256" in RENDER and
-        "DrawLighthouseGuardian((Vector2){880,454},g->time,1.5f,g->battleTurn!=0)" in RENDER and
+        "BattleActor(TEX_GUARDIAN_APPROVED" in RENDER and
             "else if(TEX_GUARDIAN_PORTRAIT.id)" not in RENDER,
             "boss exploration and battle scenes use the dedicated pixel animation; anime portrait is dialogue-only")
     require('SetDialogueAs(g,"沫尾兽"' in GAME and 'SetDialogueAs(g,"鸣晶蜥"' in GAME,
@@ -500,7 +499,7 @@ require("需要两位伙伴" in RENDER and "封印尚未解除" in RENDER,
 const_glyph_match = re.search(r"static const int UI_CODEPOINTS\[\]=\{([^}]+)\}", RENDER)
 require(const_glyph_match is not None, "UI font atlas has an explicit Unicode glyph set")
 font_codepoints = {int(value) for value in const_glyph_match.group(1).split(",") if value.strip()}
-source_cjk = {ord(ch) for ch in RENDER + GAME + ENDING if 0x3400 <= ord(ch) <= 0x9FFF}
+source_cjk = {ord(ch) for ch in RENDER + GAME + ENDING + BATTLE if 0x3400 <= ord(ch) <= 0x9FFF}
 require(source_cjk.issubset(font_codepoints),
         "font atlas contains every Chinese character used by gameplay, HUD and ending CG captions")
 
@@ -610,7 +609,7 @@ require('strcmp(speaker,"沫尾兽")==0' in GAME and 'strcmp(speaker,"沫尾")==
         "each recruited companion resolves to its own portrait ID")
 battle_renderer = function_body(RENDER, "RenderBattle")
 guardian_renderer = function_body(RENDER, "DrawLighthouseGuardian")
-require(bool(battle_renderer) and contains_call(battle_renderer, "DrawLighthouseGuardian") and
+require(bool(battle_renderer) and "BattleActor(TEX_GUARDIAN_APPROVED" in battle_renderer and
         not any(texture in battle_renderer for texture, _ in list(portrait_textures.values())[:3]) and
         "TEX_GUARDIAN_APPROVED" in guardian_renderer and
         re.search(r"DrawTexturePro\s*\(\s*TEX_GUARDIAN_APPROVED\s*,", guardian_renderer),
