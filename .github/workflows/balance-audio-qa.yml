@@ -4,28 +4,51 @@ on:
     branches: [feature/animated-battle-v2]
     paths: ['.github/workflows/balance-audio-qa.yml']
 permissions:
-  contents: read
+  contents: write
 jobs:
-  prepare:
+  tune-and-test:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          persist-credentials: false
-      - name: Export exact source
+          python-version: '3.12'
+      - name: Prepare licensed recordings and developer tools
         run: |
-          mkdir -p qa-input
-          git archive --format=tar.gz HEAD > qa-input/source.tar.gz
-          git rev-parse HEAD > qa-input/SOURCE_COMMIT
-      - name: Fetch CC0 grass and stone recordings
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg p7zip-full
+          python -m pip install pillow
+          mkdir -p third_party/audio/fantozzi
+          curl --fail --location --retry 2 --max-time 90 'https://opengameart.org/sites/default/files/Fantozzi-footsteps.7z' -o third_party/audio/fantozzi/source.7z
+          echo '415d360e0911c1c1c5355ee94023b772e6f4044f59b9b580610e7dbffd1840fd  third_party/audio/fantozzi/source.7z' | sha256sum --check
+          7z x third_party/audio/fantozzi/source.7z -o/tmp/footstep-source
+          git clone --depth 1 --branch 5.5 https://github.com/raysan5/raylib.git /tmp/raylib
+      - name: Apply reviewed source changes and import real footsteps
         run: |
-          curl --fail --location --retry 2 --max-time 90 'https://opengameart.org/sites/default/files/Fantozzi-footsteps.7z' -o qa-input/Fantozzi-footsteps.7z
-          sha256sum qa-input/* > qa-input/SHA256SUMS
+          python tools/apply_boss_steps.py .
+          python tools/import_footsteps.py --source-dir /tmp/footstep-source/Fantozzi-footsteps/flac
+      - name: Verify production gameplay, audio and packaged samples
+        run: |
+          python tools/test_battle.py --raylib /tmp/raylib/src
+          python tools/test_audio.py --raylib /tmp/raylib/src
+          python tools/test_postbattle.py --raylib /tmp/raylib/src
+          python tools/test_render_math.py --raylib /tmp/raylib/src
+          python tools/validate_project.py
+      - name: Commit only verified game changes to the feature branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- src/audio.c src/audio.h src/battle.c src/battle.h src/battle_render.inc src/game.c src/main.c tools/generate_audio_sfx.py tools/package_release.py tools/tests/test_audio.c tools/tests/test_battle.c tools/validate_project.py ASSET_SOURCES_AND_LICENSES.md assets/audio/README.md assets/audio/footsteps_manifest.json assets/audio/sfx/step_grass_*.wav assets/audio/sfx/step_stone_*.wav third_party/audio/fantozzi/source.7z third_party/audio/fantozzi/LICENSE.md docs/BATTLE_IMPACT_02_1.md
+          git diff --cached --stat
+          git commit -m 'Tune Boss to 450 HP with shared percentage phases and recorded grass/stone footsteps'
+          git push origin HEAD:feature/animated-battle-v2
+          git rev-parse HEAD >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
-        if: always()
         with:
-          name: boss-footsteps-qa-input
-          path: qa-input
-          retention-days: 3
-          compression-level: 0
+          name: tuned-footstep-samples
+          path: |
+            assets/audio/sfx/step_grass_*.wav
+            assets/audio/sfx/step_stone_*.wav
+            assets/audio/footsteps_manifest.json
+          retention-days: 7
