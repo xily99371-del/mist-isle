@@ -521,7 +521,7 @@ static void EnterBattle(Game *g,int idx) {
     AudioPlay(AUDIO_INTERACT);
 }
 static void StartStoryBattle(Game *g) {
-    AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,150);
+    AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,LIGHTHOUSE_BOSS_MAX_HP);
     EnterBattle(g,g->enemyCount-1);
 }
 static void StartEnding(Game *g) {
@@ -586,7 +586,7 @@ void GameStartBattlePreview(Game *g) {
     g->lumi.owned=g->splash.owned=g->spark.owned=true;
     g->shrineSolved=true;g->player.hp=70;
     SwitchArea(g,AREA_LIGHTHOUSE);
-    AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,150);
+    AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,LIGHTHOUSE_BOSS_MAX_HP);
     EnterBattle(g,0);
 }
 void GameUpdate(Game *g,float dt) {
@@ -707,7 +707,7 @@ void GameUpdate(Game *g,float dt) {
             if(g->dialoguePage>=g->dialogueCount) {
                 if(g->dialogueStartsBossBattle) {
                     g->dialogueStartsBossBattle=false;
-                    AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,150);
+                    AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,LIGHTHOUSE_BOSS_MAX_HP);
                     EnterBattle(g,g->enemyCount-1);
                 } else if(g->dialogueStartsEnding) {
                     StartEnding(g);
@@ -746,11 +746,7 @@ void GameUpdate(Game *g,float dt) {
     MovePlayerWithCollision(g,requestedMovement);
     Vector2 actualMovement=Vector2Subtract(p->pos,movementStart);
     bool blocked=Vector2Distance(actualMovement,requestedMovement)>0.001f;
-    int tileX=(int)floorf(p->pos.x+0.5f),tileY=(int)floorf(p->pos.y+0.5f);
-    int surface=g->area==AREA_RUINS?2:0;
-    if(surface==0&&tileX>=0&&tileX<MAPW&&tileY>=0&&tileY<MAPH&&
-       TerrainKindFromAtlasIndex(g->world.terrain[tileY][tileX])==3)surface=1;
-    AudioMovement(Vector2Length(actualMovement),blocked,surface,dt);
+    AudioMovement(Vector2Length(actualMovement),blocked,AudioFootstepSurface(g->area),dt);
 
     Buddy *followers[3]={&g->lumi,&g->splash,&g->spark};
     for(int bi=0;bi<3;bi++) {

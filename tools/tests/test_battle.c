@@ -19,7 +19,36 @@ static void ToEnemy(Game *g) {
     for(int i=0;i<1000&&g->battle.phase!=BATTLE_ENEMY;i++)GameUpdate(g,1.0f/120.0f);
     CHECK(g->battle.phase==BATTLE_ENEMY,"enemy begins automatically");
 }
+static void TestBossHealthScaling(void) {
+    const float maxima[]={150,450,900};
+    for(int i=0;i<3;i++) {
+        float m=maxima[i],third=m/3;
+        CHECK(BattleBossPhase(m,m)==1,"full health starts in phase one");
+        CHECK(BattleBossPhase(2*third+.01f,m)==1,"above two-thirds is phase one");
+        CHECK(BattleBossPhase(2*third,m)==2,"exact two-thirds begins phase two");
+        CHECK(BattleBossPhase(third+.01f,m)==2,"above one-third remains phase two");
+        CHECK(BattleBossPhase(third,m)==3,"exact one-third begins phase three");
+        CHECK(BattleBossPhase(0,m)==3,"depleted core retains final phase for defeat animation");
+        for(int phase=1;phase<=3;phase++) {
+            Game g=Fight();g.enemies[0].maxHp=m;
+            g.enemies[0].hp=phase==1?m:(phase==2?2*third+8:third+8);
+            g.battleRound=3;BattleInit(&g);BattleStartAction(&g,0);ToEnemy(&g);
+            CHECK(BattleBossPhase(g.enemies[0].hp,m)==phase,"attack logic enters ratio-selected phase");
+            float expected=phase==1?23:phase==2?26:20;
+            CHECK(NEAR(g.battle.damage,expected),"boss damage and heavy-attack cadence use percentage phase");
+        }
+    }
+    CHECK(BattleBossPhase(20,0)==1,"invalid maximum health is safe");
+    Release();Game g;GameStartBattlePreview(&g);
+    CHECK(NEAR(g.enemies[0].hp,450)&&NEAR(g.enemies[0].maxHp,450),"preview uses the new 450 HP baseline");
+    g.previewOnly=false;g.scene=SCENE_DIALOGUE;g.dialogueCount=1;g.dialoguePage=0;
+    g.dialogueStartsBossBattle=true;g.dialogueInputBlocked=false;g.enemyCount=0;
+    Confirm(&g);
+    CHECK(g.scene==SCENE_BATTLE&&NEAR(g.enemies[0].hp,450)&&NEAR(g.enemies[0].maxHp,450),
+          "normal story encounter shares the 450 HP baseline");
+}
 int main(void) {
+    TestBossHealthScaling();
     Game g=Fight();
     CHECK(BattleStartAction(&g,1),"water starts");
     CHECK(NEAR(g.enemies[0].hp,150)&&!g.enemySoaked,"command does not damage or wet the enemy");
@@ -86,7 +115,7 @@ int main(void) {
     for(int i=0;i<600&&g.battle.phase!=BATTLE_PREVIEW_END;i++)GameUpdate(&g,1.0f/120.0f);
     CHECK(g.battle.phase==BATTLE_PREVIEW_END&&g.previewOnly&&saveWrites==before,"preview completes without writing a save");
     Press(&g,KEY_R,.016f);
-    CHECK(g.scene==SCENE_BATTLE&&NEAR(g.enemies[0].hp,150)&&g.previewOnly,"preview replay starts a fresh isolated battle");
+    CHECK(g.scene==SCENE_BATTLE&&NEAR(g.enemies[0].hp,LIGHTHOUSE_BOSS_MAX_HP)&&g.previewOnly,"preview replay starts a fresh isolated battle");
     Press(&g,KEY_ESCAPE,.016f);CHECK(g.scene==SCENE_TITLE&&saveWrites==before,"preview exit remains isolated");
 
     g=Fight();BattleStartAction(&g,0);ToEnemy(&g);

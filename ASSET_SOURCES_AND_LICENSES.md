@@ -50,3 +50,11 @@ Original downloads are stored under `third_party/kenney/rpg-base/` and `third_pa
 
 ## User-provided art transfer
 The v6 original art archive is provided directly in the ChatGPT conversation. Download that attachment to the Windows PC and select it in the import script's file picker. No ChatGPT Library access is required.
+
+## Recorded footsteps / 录音脚步声
+
+Fantozzi's Footsteps (Grass/Sand & Stone), by Fantozzi; single-step cuts by qubodup.
+License: CC0-1.0. Source: https://opengameart.org/content/fantozzis-footsteps-grasssand-stone
+Original archive and hash: `third_party/audio/fantozzi/`; runtime provenance: `assets/audio/footsteps_manifest.json`.
+Project edits: mono conversion, EQ, onset/tail trimming, soft limiting and gain matching.
+Stardew Valley was a requested tonal reference only; none of its audio was copied.

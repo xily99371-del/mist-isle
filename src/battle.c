@@ -6,6 +6,12 @@
 #include <stdio.h>
 #include <string.h>
 
+int BattleBossPhase(float hp,float maxHp) {
+    if(!isfinite(hp)||!isfinite(maxHp)||maxHp<=0)return 1;
+    /* Compare cross-products, keeping exact 1/3 and 2/3 boundaries consistent. */
+    float scaled=fmaxf(0,hp)*3.0f;
+    return scaled<=maxHp?3:scaled<=maxHp*2.0f?2:1;
+}
 static Buddy *Partner(Game *g,int id) {
     return id==0?&g->lumi:id==1?&g->splash:id==2?&g->spark:NULL;
 }
@@ -85,7 +91,7 @@ bool BattleStartAction(Game *g,int actor) {
 static void EnemyAction(Game *g) {
     BattleState *b=&g->battle;Enemy *e=&g->enemies[g->battleEnemy];
     int defender=b->defender;
-    int phase=e->hp<=50?3:e->hp<=100?2:1;
+    int phase=BattleBossPhase(e->hp,e->maxHp);
     bool heavy=e->type==ENEMY_BOSS&&(phase==3?g->battleRound%2==0:g->battleRound%3==0);
     Action(g,BATTLE_ENEMY,heavy?ACTION_RESONANCE:ACTION_ENEMY,-1);
     b->defender=defender;

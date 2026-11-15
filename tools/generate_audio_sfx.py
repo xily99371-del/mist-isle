@@ -49,13 +49,9 @@ def main():
     SFX.mkdir(parents=True, exist_ok=True)
     for variation in range(2):
         suffix = "ab"[variation]
+        # Recorded grass/stone footsteps are maintained by import_footsteps.py.
+        # Never overwrite those approved recordings with synthesized impacts.
         pitch = 1 + 0.07 * variation
-        write(f"step_grass_{suffix}", 0.15,
-              lambda t, n, lo, bass: (0.55 * lo + 0.08 * n) * math.exp(-30 * t) +
-              0.16 * math.sin(math.tau * 96 * pitch * t) * math.exp(-46 * t), 0.31)
-        write(f"step_stone_{suffix}", 0.12,
-              lambda t, n, lo, bass: 0.35 * bass * math.exp(-32 * t) +
-              0.10 * n * math.exp(-90 * t) + 0.14 * note(t, 175 * pitch, 52), 0.34)
         write(f"step_wet_{suffix}", 0.19,
               lambda t, n, lo, bass: lo * math.exp(-23 * t) *
               (0.35 + 0.22 * math.sin(290 * t)**2) + 0.15 * note(t, 115 * pitch, 45), 0.32)
@@ -82,7 +78,7 @@ def main():
     write("victory", 0.72,
           lambda t, n, lo, bass: sum(0.18 * note(t - off, freq, 9)
           for off, freq in [(0, 523.25), (.06, 659.25), (.12, 783.99), (.20, 1046.50)] if t >= off), 0.28)
-    print(f"Generated 14 original PCM sound effects in {SFX.relative_to(ROOT)}")
+    print(f"Generated 10 original PCM sound effects; recorded footsteps preserved in {SFX.relative_to(ROOT)}")
 
     enemy = ROOT / "assets/audio/music/enemy.mp3"
     if not enemy.exists():

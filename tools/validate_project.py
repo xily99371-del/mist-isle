@@ -264,7 +264,7 @@ require("attacking?((int)(t*8.0f)%4):((int)(t*2.0f)%4)" in RENDER and "attacking
         "lighthouse guardian uses its dedicated attack animation row during the enemy turn")
 require('BattleStage(g)' in RENDER and '首领战' in RENDER and "核心耐久" in RENDER,
         "boss encounter has a distinct dark arena, boss title and lantern-core health bar")
-require("AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,150)" in GAME,
+require("AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,LIGHTHOUSE_BOSS_MAX_HP)" in GAME,
         "story lighthouse encounter creates the dedicated boss enemy type")
 require("DrawUITextWrapped" in RENDER and "UI_CODEPOINTS" in RENDER,
         "Chinese UI includes the complete source glyph set and wrapped objective text")
@@ -703,3 +703,6 @@ require(all(texture_paths.get(portrait_textures[index][0]) == portrait_textures[
         "high-resolution companion portrait texture load/unload lifecycle is complete")
 
 print(f"Validation complete. Imported art sheets checked: {present}/{len(assets)}.")
+
+import runpy
+runpy.run_path(str(ROOT / "tools/test_footstep_assets.py"), run_name="__main__")

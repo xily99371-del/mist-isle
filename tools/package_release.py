@@ -36,7 +36,8 @@ REQUIRED_RUNTIME = [
     'assets/audio/enemy.tsv', 'assets/audio/enemy_energy.tsv',
     *[f'assets/audio/music/{name}.mp3' for name in ('camp', 'grove', 'ruins', 'enemy', 'victory')],
     *[f'assets/audio/sfx/{name}.wav' for name in (
-        'step_grass_a', 'step_grass_b', 'step_stone_a', 'step_stone_b',
+        'step_grass_a', 'step_grass_b', 'step_grass_c', 'step_grass_d', 'step_grass_e', 'step_grass_f',
+        'step_stone_a', 'step_stone_b', 'step_stone_c', 'step_stone_d', 'step_stone_e', 'step_stone_f',
         'step_wet_a', 'step_wet_b', 'dialogue', 'interact', 'collision',
         'dash', 'pickup', 'attack', 'hurt', 'victory')],
     *[f'assets/cinematics/ending_v9/{name}.png' for name in (

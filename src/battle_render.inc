@@ -228,7 +228,7 @@ static void RenderBattle(Game *g) {
 
     /* Native-pixel HUD stays still while only the battle stage shakes. */
     PanelDark((Rectangle){24,22,354,120});
-    DrawUIText("战斗演出版 · IMPACT-02",43,35,17,(Color){247,224,179,255});
+    DrawUIText("战斗演出版 · IMPACT-02.1",43,35,17,(Color){247,224,179,255});
     DrawUIText(TextFormat("第 %d 回合  /  %s",g->battleRound,boss?"首领战":"遭遇战"),43,63,16,(Color){183,203,216,255});
     DrawUIText(TextFormat("旅人生命  %d / %d",(int)ceilf(b->playerHp),(int)g->player.maxHp),43,90,16,(Color){226,238,229,255});
     BattleBar((Rectangle){44,120,310,7},b->playerHp,g->player.maxHp,b->playerHp,C_GREEN);
@@ -237,7 +237,10 @@ static void RenderBattle(Game *g) {
     DrawUIText(TextFormat("%s   %d / %d",boss?"核心耐久":"生命",(int)ceilf(b->enemyHp),(int)e->maxHp),925,76,17,(Color){206,222,232,255});
     BattleBar((Rectangle){925,111,306,13},b->enemyHp,e->maxHp,b->enemyTrail,(Color){243,154,101,255});
     if(boss) {
-        int phase=e->hp<=50?3:e->hp<=100?2:1;
+        /* The ticks mark 1/3 and 2/3 HP, independent of balance changes. */
+        for(int i=1;i<=2;i++)DrawRectangle(925+i*102,109,2,17,(Color){23,32,43,235});
+        DrawUIText(TextFormat("%.0f%%",100.0f*Clamp(e->hp/fmaxf(1,e->maxHp),0,1)),1189,43,16,(Color){206,222,232,255});
+        int phase=BattleBossPhase(e->hp,e->maxHp);
         DrawRectangleRounded((Rectangle){790,178,464,65},.14f,6,(Color){12,24,37,236});
         DrawUIText(phase==3?"阶段三 · 最后的灯火":phase==2?"阶段二 · 共鸣增强":"阶段一 · 灯火苏醒",806,188,17,C_GOLD);
         DrawUIText(g->enemySoaked?"核心受潮：下回合可以触发导电":enemy&&b->action==ACTION_RESONANCE?"核心蓄能：共鸣重击即将命中":"核心稳定：可用潮湿技能打断",806,215,14,g->enemySoaked?C_BLUE:(Color){189,211,224,255});
@@ -286,5 +289,5 @@ static void RenderBattle(Game *g) {
     Rectangle confirm={838,613,392,56};bool ready=b->phase==BATTLE_CHOOSE;
     DrawRectangleRounded(confirm,.2f,8,ready?(Color){212,185,129,255}:(Color){39,56,71,255});
     DrawUIText(ready?"Enter / 点击此处出招":b->phase==BATTLE_PREVIEW_END?"R 重来   Esc 退出":"行动进行中",899,630,20,ready?(Color){22,40,44,255}:(Color){167,192,211,255});
-    DrawUIText(b->preview?"战斗体验 · 不读取或写入存档":"IMPACT-02  |  1-3 / 方向键选择  ·  Space 精准格挡",33,697,12,(Color){143,168,184,255});
+    DrawUIText(b->preview?"战斗体验 · 不读取或写入存档":"IMPACT-02.1  |  1-3 / 方向键选择  ·  Space 精准格挡",33,697,12,(Color){143,168,184,255});
 }
