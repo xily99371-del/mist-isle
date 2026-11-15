@@ -26,6 +26,17 @@ jobs:
           git clone --depth 1 --branch 5.5 https://github.com/raysan5/raylib.git /tmp/raylib
       - name: Apply reviewed source changes and import real footsteps
         run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          p=Path('tools/apply_boss_steps.py')
+          data=p.read_bytes()
+          old=b'tileX<MAPW&&tileY<MAPH&&'
+          assert data.count(old)==1
+          data=data.replace(old,b'tileX<MAPW&&tileY>=0&&tileY<MAPH&&')
+          assert hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()=='e236344cbdfeadac1e1855fa526788cfbee29081'
+          p.write_bytes(data)
+          PY
           python tools/apply_boss_steps.py .
           python tools/import_footsteps.py --source-dir /tmp/footstep-source/Fantozzi-footsteps/flac
       - name: Verify production gameplay, audio and packaged samples
