@@ -6,6 +6,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#if defined(_WIN32)
+void ApplyWindowsWindowTheme(void *nativeWindow);
+#endif
 
 static const char WINDOW_TITLE[] = "雾屿回响 v" MISTISLE_VERSION " · 第一章：失落的灯塔";
 
@@ -20,6 +23,7 @@ static void LocateGameAssets(void) {
         if(FileExists(probe)){ChangeDirectory(candidate);return;}
     }
 }
+
 
 int main(int argc,char **argv) {
     bool endingPreview=false,battlePreview=false;
@@ -38,6 +42,9 @@ int main(int argc,char **argv) {
     SetWindowState(FLAG_WINDOW_MAXIMIZED);
 #endif
     PlatformInputInit(GetWindowHandle());
+#if defined(_WIN32)
+    ApplyWindowsWindowTheme(GetWindowHandle());
+#endif
     RenderTexture2D canvas={0};
     RenderInit();
     AudioInit();

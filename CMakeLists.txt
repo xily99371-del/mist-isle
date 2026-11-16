@@ -5,6 +5,9 @@ if(NOT MISTISLE_VERSION MATCHES "^[0-9]+\\.[0-9]+\\.[0-9]+$")
   message(FATAL_ERROR "VERSION must contain a major.minor.patch release number")
 endif()
 project(MistIsle VERSION "${MISTISLE_VERSION}" LANGUAGES C)
+if(WIN32)
+  enable_language(RC)
+endif()
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/VERSION")
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -99,6 +102,11 @@ add_custom_command(
 )
 add_custom_target(generate_area_maps DEPENDS "${MISTISLE_MAP_HEADER}")
 
+if(WIN32)
+  set(MISTISLE_ICON_FILE "${CMAKE_SOURCE_DIR}/assets/ui/mist_isle.ico")
+  configure_file(src/mist_isle.rc.in "${MISTISLE_GENERATED_DIR}/mist_isle.rc" @ONLY)
+endif()
+
 add_executable(mist_isle
   src/main.c
   src/title_menu.c
@@ -109,6 +117,8 @@ add_executable(mist_isle
   src/ui_text.c
   src/audio.c
   src/platform_input.c
+  src/window_theme.c
+  $<$<BOOL:${WIN32}>:${MISTISLE_GENERATED_DIR}/mist_isle.rc>
   "${MISTISLE_MAP_HEADER}"
 )
 add_dependencies(mist_isle generate_area_maps)
@@ -118,7 +128,7 @@ target_include_directories(mist_isle PRIVATE src "${MISTISLE_GENERATED_DIR}")
 target_compile_definitions(mist_isle PRIVATE MISTISLE_VERSION="${MistIsle_VERSION}")
 target_link_libraries(mist_isle PRIVATE raylib)
 if(WIN32)
-  target_link_libraries(mist_isle PRIVATE imm32 user32)
+  target_link_libraries(mist_isle PRIVATE imm32 user32 dwmapi)
 endif()
 if(MSVC)
   target_compile_options(mist_isle PRIVATE /utf-8)

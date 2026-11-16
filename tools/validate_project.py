@@ -334,10 +334,11 @@ if all((ROOT / p).exists() for p in approved_assets):
 else:
     print("INFO: MistIsle_ApprovedArt_v7.zip is not installed; user-approved runtime artwork is not yet available.")
 
-require("type_id in (29,31,33)" in MAP_BUILD and "210-213 small stones" in MAP_BUILD and "type_id==229" not in MAP_BUILD,
-        "small stones, low shrubs and flowering props are non-blocking while structural bases remain solid")
-require("block_rect(cx-1,cy-1,cx+1,cy-1)" in MAP_BUILD and "compact one-row tent base" in MAP_BUILD,
-        "house and tent collision footprints are reduced to compact rear/base rows")
+require("type_id in (29,31)" in MAP_BUILD and "type_id==33" in MAP_BUILD and "210-213 small stones" in MAP_BUILD and "type_id==229" not in MAP_BUILD,
+        "small stones, low shrubs and flowering props remain non-blocking while structural bases remain solid")
+require("if type_id==302" in MAP_BUILD and "block_rect(cx-2,cy,cx+2,cy)" in MAP_BUILD and
+        "block_rect(cx-1,cy,cx+1,cy)" in MAP_BUILD and "compact one-row tent base" in MAP_BUILD,
+        "coastal house foundation, lighthouse base and tent use their authored ground footprints")
 
 require(all((ROOT / f"assets/characters/svg/{name}.svg").exists() for name in ("heroine_portrait","watcher_portrait","lighthouse_guardian_portrait")),
         "three authored static character portrait source illustrations are present")
@@ -413,7 +414,7 @@ require("def build_overlay" in MAP_AUTOTILE and "DIRECTIONS" in MAP_AUTOTILE and
         "the four-direction shoreline autotile helper is present for clean Windows and ARM64 builds")
 require("if type_id==32:" in MAP_BUILD and "collision[by][xx]=0" in MAP_BUILD,
         "Tiled bridge objects open a real walkable span through the water collision grid")
-require("Collision follows the visible object's ground footprint" in MAP_BUILD and "reduced rear-wall footprint" in MAP_BUILD,
+require("Collision follows the visible object's ground footprint" in MAP_BUILD and "foundation row" in MAP_BUILD and "lighthouse foundation spans three ground cells" in MAP_BUILD,
         "Tiled buildings, tree trunks, walls, pillars and altar bases compile into gameplay collision")
 require("Pokémon-Center-style recovery service" in GAME and "SetDialogueAs(g,\"守望者\"" in GAME and "g->lumi.hp=g->lumi.maxHp" in GAME,
         "Watcher heals the whole party before the overlapping campfire interaction")
@@ -441,7 +442,7 @@ require("nearest free, reachable tile" in GAME and "visual footprint of tall str
         "collectibles avoid both collision footprints and visually occluding large props")
 require("DrawCoastalHouse" in RENDER and "252.0f*scale,h=204.0f*scale" in RENDER and "252*scale,204*scale" in MAP_PREVIEW,
         "the approved coastal house uses matching grounded dimensions in runtime and map previews")
-require("DrawGroveCottage" in RENDER and "reduced rear-wall footprint" in MAP_BUILD,
+require("DrawGroveCottage" in RENDER and "type_id in (500,501)" in MAP_BUILD and "rear-wall footprint" in MAP_BUILD,
         "large cottage structures use the structure atlas with matching collision foundations")
 require('#include "area_maps.h"' in RENDER and "AREA_OVERLAY[(int)g->area][direction][y][x]" in RENDER and "direction*90" in RENDER,
         "renderer draws every directional shoreline mask from the generated Tiled map header")
