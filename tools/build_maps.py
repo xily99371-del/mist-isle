@@ -66,12 +66,8 @@ def parse(path):
                         collision[by][bx]=1
             if 1000<=type_id<1003 or 600<=type_id<=603:
                 block_rect(cx,cy,cx,cy)                 # tree trunk; canopy remains walk-under
-            elif type_id==302:
-                # Rendered coastal house is 252x204px (scaled); collision must
-                # follow its foundation row, not the old detached rear-wall row.
-                block_rect(cx-2,cy,cx+2,cy)
-            elif type_id in (500,501):
-                block_rect(cx-1,cy-1,cx+1,cy-1)        # rear-wall footprint; front approach remains walkable
+            elif type_id in (302,500,501):
+                block_rect(cx-1,cy-1,cx+1,cy-1)        # reduced rear-wall footprint; front approach remains walkable
             elif type_id==303:
                 block_rect(cx-1,cy,cx+1,cy)            # compact one-row tent base
             elif type_id==304:
@@ -79,10 +75,8 @@ def parse(path):
                 block_rect(cx+1,cy,cx+1,cy)            # arch posts; keep doorway open
             elif type_id==305:
                 block_rect(cx-1,cy-1,cx+1,cy)          # fountain plinth
-            elif type_id==33:
-                block_rect(cx-1,cy,cx+1,cy)              # lighthouse foundation spans three ground cells
-            elif type_id in (29,31):
-                block_rect(cx,cy,cx,cy)                 # structural pillar and altar
+            elif type_id in (29,31,33):
+                block_rect(cx,cy,cx,cy)                 # structural pillar, altar and lighthouse base
             elif type_id==20:
                 block_rect(cx-1,cy,cx+1,cy)              # dock deck; approach from its shore-facing edge
             elif type_id==21:

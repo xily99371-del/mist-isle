@@ -1,2 +1,0 @@
-#include <windows.h>
-IDI_MIST_ISLE_ICON ICON "@MISTISLE_ICON_FILE@"

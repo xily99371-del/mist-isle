@@ -117,6 +117,7 @@ add_executable(mist_isle
   src/ui_text.c
   src/audio.c
   src/platform_input.c
+  src/window_theme.c
   $<$<BOOL:${WIN32}>:${MISTISLE_GENERATED_DIR}/mist_isle.rc>
   "${MISTISLE_MAP_HEADER}"
 )
