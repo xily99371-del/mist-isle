@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a00319b365ca8a24db24b55ffc9ae37c, type: 3}
+  m_Name: berry-treat
+  m_EditorClassIdentifier: MistIsle.Runtime::MistIsle.Items.CampfireRecipe
+  recipeId: berry-treat
+  displayName: "\u8393\u679C\u56E2"
+  ingredients:
+  - itemId: berry
+    amount: 2
+  - itemId: dew
+    amount: 1
+  outputItemId: berry-treat
+  outputAmount: 1
+  discoveryHint: "\u5728\u6D77\u5CB8\u8425\u5730\u7684\u7BDD\u706B\u65C1\u5236\u4F5C\u3002"

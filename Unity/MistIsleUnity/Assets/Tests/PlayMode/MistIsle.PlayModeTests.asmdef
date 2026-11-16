@@ -1,0 +1,8 @@
+{
+  "name": "MistIsle.PlayModeTests",
+  "rootNamespace": "MistIsle.Tests",
+  "references": ["MistIsle.Runtime", "Unity.RenderPipelines.Universal.2D.Runtime"],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "autoReferenced": false,
+  "defineConstraints": ["UNITY_INCLUDE_TESTS"]
+}
