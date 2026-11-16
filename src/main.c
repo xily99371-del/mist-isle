@@ -72,14 +72,7 @@ int main(int argc,char **argv) {
         if(!focused) {
             g.player.vel=(Vector2){0,0};
         } else if(g.scene==SCENE_TITLE) {
-            g.time+=dt;
-            if(GameInputPressed(KEY_F9)) {
-                GameLoad(&g);
-            } else if(GameInputPressed(KEY_ENTER)||IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                int seed=g.lastSeed+1;
-                GameReset(&g,seed);
-                GameStart(&g);
-            }
+            if(TitleMenuUpdate(&g,dt))break;
         } else {
             // SCENE_END must pass through GameUpdate so the lighthouse sequence advances.
             GameUpdate(&g,dt);

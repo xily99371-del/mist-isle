@@ -22,7 +22,7 @@ def main():
                         help="Original Noto Sans SC variable TTF, licensed under OFL")
     args = parser.parse_args()
     points = set(range(32, 127))
-    sources = sorted((ROOT / "src").glob("*.[ch]"))
+    sources = sorted(p for p in (ROOT / "src").iterdir() if p.suffix in {".c", ".h", ".inc"})
     sources.append(ROOT / "assets/audio/enemy.tsv")
     for path in sources:
         points.update(ord(char) for char in path.read_text(encoding="utf-8")
