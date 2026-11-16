@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <img alt="Version" src="https://img.shields.io/badge/version-3.0.0-7c9a83"/>
+  <img alt="Version" src="https://img.shields.io/badge/version-3.0.1-7c9a83"/>
   <img alt="Language" src="https://img.shields.io/badge/language-C-596b8a"/>
   <img alt="Graphics" src="https://img.shields.io/badge/graphics-raylib-6f8f72"/>
   <img alt="Platforms" src="https://img.shields.io/badge/platform-Windows%20%7C%20Raspberry%20Pi%205-8b789d"/>
@@ -20,17 +20,17 @@
 
 ---
 
-## 下载与开始 / Download and Play — v3.0.0
+## 下载与开始 / Download and Play — v3.0.1
 
 | 平台 / Platform | 下载 / Download |
 |---|---|
-| Windows x64 | [MistIsle-Windows-v3.0.0.zip](https://github.com/xily99371-del/mist-isle/releases/download/v3.0.0/MistIsle-Windows-v3.0.0.zip) |
-| Raspberry Pi 5 ARM64 | [MistIsle-RaspberryPi5-ARM64-v3.0.0.tar.gz](https://github.com/xily99371-del/mist-isle/releases/download/v3.0.0/MistIsle-RaspberryPi5-ARM64-v3.0.0.tar.gz) |
-| 文件校验 / Checksums | [SHA256SUMS](https://github.com/xily99371-del/mist-isle/releases/download/v3.0.0/SHA256SUMS) |
+| Windows x64 | [MistIsle-Windows-v3.0.1.zip](https://github.com/xily99371-del/mist-isle/releases/download/v3.0.1/MistIsle-Windows-v3.0.1.zip) |
+| Raspberry Pi 5 ARM64 | [MistIsle-RaspberryPi5-ARM64-v3.0.1.tar.gz](https://github.com/xily99371-del/mist-isle/releases/download/v3.0.1/MistIsle-RaspberryPi5-ARM64-v3.0.1.tar.gz) |
+| 文件校验 / Checksums | [SHA256SUMS](https://github.com/xily99371-del/mist-isle/releases/download/v3.0.1/SHA256SUMS) |
 
-Windows：完整解压到新文件夹，双击 `mist_isle.exe` 或 `RUN_WINDOWS.bat`；运行包已包含美术、音乐与字体，无需安装开发工具。发行说明及附件以 [v3.0.0 Release](https://github.com/xily99371-del/mist-isle/releases/tag/v3.0.0) 为准。
+Windows：完整解压到新文件夹，双击 `mist_isle.exe` 或 `RUN_WINDOWS.bat`；运行包已包含美术、音乐与字体，无需安装开发工具。发行说明及附件以 [v3.0.1 Release](https://github.com/xily99371-del/mist-isle/releases/tag/v3.0.1) 为准。
 
-Windows: extract the whole archive into a new folder and run `mist_isle.exe` or `RUN_WINDOWS.bat`. Art, audio and fonts are included; no build tools are required to play. See the [v3.0.0 Release](https://github.com/xily99371-del/mist-isle/releases/tag/v3.0.0) for notes and attachments.
+Windows: extract the whole archive into a new folder and run `mist_isle.exe` or `RUN_WINDOWS.bat`. Art, audio and fonts are included; no build tools are required to play. See the [v3.0.1 Release](https://github.com/xily99371-del/mist-isle/releases/tag/v3.0.1) for notes and attachments.
 
 ## 最终地图素材 / Final Map Art — v8
 
@@ -82,9 +82,9 @@ Windows: extract the whole archive into a new folder and run `mist_isle.exe` or 
 
 《雾屿回响》（Mist Isle）是一款俯视角像素 RPG。你将从海岸营地出发，探索一座被遗忘的海岛，与岛上的小生灵结伴，逐步恢复失落灯塔的力量。
 
-v3.0.0 将已验收的最终音效与宠物战斗系统正式接入 v2.0.0 完整旅程。四张地图、探索任务、伙伴招募、音乐和灯塔结局全部保留，不是独立战斗演示。
+v3.0.1 将已验收的最终音效与宠物战斗系统正式接入 v2.0.0 完整旅程。四张地图、探索任务、伙伴招募、音乐和灯塔结局全部保留，不是独立战斗演示。
 
-### v3.0.0 更新
+### v3.0.1 更新
 
 - **三宠战斗**：旅人只指挥，三位伙伴同场并各有固定血条；全队体力耗尽即战败。
 - **完整动作反馈**：蓄力、出招、命中、收招；伤害和治疗在命中时结算，敌人自动反击。
@@ -92,7 +92,7 @@ v3.0.0 将已验收的最终音效与宠物战斗系统正式接入 v2.0.0 完�
 - **450 HP 首领**：按 2/3、1/3 血量划分三阶段，普通攻击逐步升级为 1/2/3 连击，共鸣重击为 2/3/4 连击；逐击 Space 格挡，光圈尺寸和节奏变化，后期判定更严格。
 - **最终脚步声**：主地图、辉光林地使用踩草素材；潮汐遗迹、灯塔庭院使用干净硬石路素材，不叠加沙子或碎石层。
 
-详细数值、操作与存档迁移见 [v3.0.0 发行说明](docs/RELEASE_v3.0.0.md)。Windows 运行包附带 `PREVIEW_BATTLE.bat`，也可用 `RUN_WINDOWS.bat --battle-preview` 直接体验 Boss 战；此入口不读写旅程存档。
+详细数值、操作与存档迁移见 [v3.0.1 发行说明](docs/RELEASE_v3.0.1.md)。Windows 运行包附带 `PREVIEW_BATTLE.bat`，也可用 `RUN_WINDOWS.bat --battle-preview` 直接体验 Boss 战；此入口不读写旅程存档。
 
 ### 沿用 v2.0.0 的内容
 
@@ -192,7 +192,7 @@ cd mist-isle
 .\RUN_WINDOWS.bat
 ```
 
-源码启动脚本会准备所需素材、配置 raylib 并编译游戏。已有工程的更新命令见 [LOCAL_SYNC.md](docs/LOCAL_SYNC.md)；正式运行包从 [Releases](https://github.com/xily99371-del/mist-isle/releases/tag/v3.0.0) 下载。
+源码启动脚本会准备所需素材、配置 raylib 并编译游戏。已有工程的更新命令见 [LOCAL_SYNC.md](docs/LOCAL_SYNC.md)；正式运行包从 [Releases](https://github.com/xily99371-del/mist-isle/releases/tag/v3.0.1) 下载。
 
 ### Raspberry Pi 5
 
@@ -234,7 +234,7 @@ mist-isle/
 
 Version 3.0.0 integrates the accepted final footsteps and pet-only combat into the complete v2.0 journey: all four areas, quests, recruitment, music and the lighthouse finale remain included. This is the full game, not a standalone battle demo.
 
-### What Is New in v3.0.0
+### What Is New in v3.0.1
 
 - Three-pet combat with fixed party HP cards. The traveller only commands; total party exhaustion ends the battle.
 - Wind-up, attacks, impact-timed damage/healing, recoil and automatic enemy retaliation.
@@ -242,7 +242,7 @@ Version 3.0.0 integrates the accepted final footsteps and pet-only combat into t
 - A 450-HP Boss uses relative 2/3 and 1/3 thresholds. Normal attacks progress from 1 to 3 hits; resonance attacks from 2 to 4. Each hit has an independent Space guard and variable timing rings.
 - Final grass recordings for Camp/Grove and clean hard-surface recordings for Ruins/Lighthouse, without sand or gravel layers.
 
-See the [v3.0.0 release notes](docs/RELEASE_v3.0.0.md) for damage values, controls and save migration. `PREVIEW_BATTLE.bat` or `RUN_WINDOWS.bat --battle-preview` starts an isolated Boss encounter without reading or writing journey saves.
+See the [v3.0.1 release notes](docs/RELEASE_v3.0.1.md) for damage values, controls and save migration. `PREVIEW_BATTLE.bat` or `RUN_WINDOWS.bat --battle-preview` starts an isolated Boss encounter without reading or writing journey saves.
 
 ### Retained from v2.0.0
 
@@ -331,7 +331,7 @@ cd mist-isle
 .\RUN_WINDOWS.bat
 ```
 
-The source launcher prepares required assets, configures raylib and builds the game. See [LOCAL_SYNC.md](docs/LOCAL_SYNC.md) to update an existing checkout, or download the ready-to-play archive from [Releases](https://github.com/xily99371-del/mist-isle/releases/tag/v3.0.0).
+The source launcher prepares required assets, configures raylib and builds the game. See [LOCAL_SYNC.md](docs/LOCAL_SYNC.md) to update an existing checkout, or download the ready-to-play archive from [Releases](https://github.com/xily99371-del/mist-isle/releases/tag/v3.0.1).
 
 ### Raspberry Pi 5
 
