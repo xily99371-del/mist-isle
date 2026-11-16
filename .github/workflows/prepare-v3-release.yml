@@ -1,0 +1,54 @@
+name: Prepare accepted v3 release
+on:
+  push:
+    branches: [feature/animated-battle-v2]
+    paths: ['.github/workflows/prepare-v3-release.yml', 'tools/prepare_v3_release.py']
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare release identity without modifying accepted gameplay
+        run: |
+          python tools/prepare_v3_release.py
+          git diff --exit-code 7d99ab4fd29f10d3fbffb4bc59fa7e88a664deb4 -- src/game.c src/game.h src/battle.c src/battle.h src/audio.c src/audio.h assets maps third_party
+          python -m py_compile tools/package_release.py tools/test_battle_visuals.py
+      - name: Verify final combat audio and package launchers
+        run: |
+          python -m pip install pillow
+          git clone --depth 1 --branch 5.5 https://github.com/raysan5/raylib.git /tmp/raylib
+          python tools/test_battle.py --raylib /tmp/raylib/src
+          python tools/test_audio.py --raylib /tmp/raylib/src
+          python tools/test_postbattle.py --raylib /tmp/raylib/src
+          python tools/test_render_math.py --raylib /tmp/raylib/src
+          python tools/test_footstep_assets.py
+          python tools/validate_project.py
+          python - <<'PY'
+          import importlib.util, tempfile
+          from pathlib import Path
+          spec=importlib.util.spec_from_file_location('pack','tools/package_release.py')
+          m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+          for target in ('windows-x64','raspberrypi5-arm64'):
+              with tempfile.TemporaryDirectory() as temp:
+                  p=Path(temp);m.write_instructions(p,target,'3.0.0',None)
+                  assert '1/2/3' in (p/'START_HERE.txt').read_text(encoding='utf-8-sig')
+                  if target=='windows-x64':
+                      assert '--battle-preview' in (p/'PREVIEW_BATTLE.bat').read_text()
+          print('Windows and ARM64 release-launcher checks passed.')
+          PY
+      - name: Commit verified release preparation on the feature branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- VERSION README.md docs/PROJECT_STATUS.md src/main.c src/battle_render.inc tools/package_release.py tools/test_battle_visuals.py
+          git rm -- tools/prepare_v3_release.py
+          git commit -m 'Prepare v3.0.0 full-game release of accepted final audio and pet combat'
+          git push origin HEAD:feature/animated-battle-v2
