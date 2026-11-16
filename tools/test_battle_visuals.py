@@ -14,8 +14,9 @@ if not raylib.is_dir():raylib=ROOT/'vendor/raylib/src'
 libs=list((b/'_deps').rglob('libraylib.a'))
 if not libs:raise SystemExit('Build the Linux game before visual QA.')
 exe=b/'battle-visual-qa'
+version=(ROOT/'VERSION').read_text(encoding='utf-8').strip()
 sources=['tools/battle_visual_qa.c','src/game.c','src/battle.c','src/render.c','src/ending.c','src/ui_text.c']
-subprocess.run(['cc','-std=c11','-O2','-DRAYMATH_STATIC_INLINE','-I'+str(ROOT/'src'),'-I'+str(raylib),'-I'+str(b/'generated'),
+subprocess.run(['cc',f'-DMISTISLE_VERSION="{version}"','-std=c11','-O2','-DRAYMATH_STATIC_INLINE','-I'+str(ROOT/'src'),'-I'+str(raylib),'-I'+str(b/'generated'),
                 *[str(ROOT/f) for f in sources],str(libs[0]),'-lm','-lpthread','-ldl','-lrt','-lX11','-o',str(exe)],check=True)
 subprocess.run(['xvfb-run','-a',str(exe),str(out)]+(['--boss-combo'] if a.boss_combo else []),cwd=ROOT,check=True)
 if shutil.which('ffmpeg'):

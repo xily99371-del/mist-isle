@@ -34,6 +34,7 @@ REQUIRED_RUNTIME = [
     'assets/tiles/png/environment_props.png', 'assets/tiles/png/island_iso_tiles.png',
     'assets/fonts/NotoSansSC-SemiBold.ttf', 'assets/fonts/OFL.txt',
     'assets/audio/enemy.tsv', 'assets/audio/enemy_energy.tsv',
+    'assets/audio/footsteps_manifest.json', 'assets/audio/FOOTSTEP_CREDITS.md',
     *[f'assets/audio/music/{name}.mp3' for name in ('camp', 'grove', 'ruins', 'enemy', 'victory')],
     *[f'assets/audio/sfx/{name}.wav' for name in (
         'step_grass_a', 'step_grass_b', 'step_grass_c', 'step_grass_d', 'step_grass_e', 'step_grass_f',
@@ -135,20 +136,23 @@ def write_instructions(package, target, version, glibc):
         'WASD 移动；Shift / 空格冲刺；E 互动；F5 保存；F9 在标题读取存档；\n'
         'F6 切换声音；F8 切换 Enemy 字幕；F3 显示帧率。\n\n'
         '保留旧进度：关闭游戏，把旧目录中的 mist_isle_save.dat 复制到本包目录。\n'
-        '此包不附带测试存档。预览结局不会读取或修改旅程存档。\n\n'
+        '战斗：1/2/3 选择宠物，Enter 出招；Space 逐击格挡，每次按后松开。\n'
+        '此包不附带测试存档。战斗与结局预览均不读取或修改旅程存档。\n\n'
         f'版本说明：docs/RELEASE_v{version}.md\n'
         '源码提交、构建环境和文件校验值：BUILD_INFO.json / SHA256SUMS。\n'
     )
     if target == 'windows-x64':
         shutil.copy2(ROOT / 'RUN_WINDOWS.bat', package / 'RUN_WINDOWS.bat')
+        shutil.copy2(ROOT / 'PREVIEW_BATTLE.bat', package / 'PREVIEW_BATTLE.bat')
         (package / 'PREVIEW_ENDING.bat').write_bytes(
             b'@echo off\r\ncd /d "%~dp0"\r\nstart "" "%~dp0mist_isle.exe" --ending-preview\r\n')
-        launch = 'Windows x64：双击 RUN_WINDOWS.bat 或 mist_isle.exe。\nPREVIEW_ENDING.bat 可直接预览结局。\n\n'
+        launch = 'Windows x64：双击 RUN_WINDOWS.bat 或 mist_isle.exe。\nPREVIEW_BATTLE.bat 可直接体验 Boss 战；PREVIEW_ENDING.bat 可预览结局。\n\n'
     else:
         (package / 'RUN_RASPBERRY_PI.sh').write_text(
             '#!/bin/sh\nset -eu\ncd -- "$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"\nexec ./mist_isle "$@"\n', encoding='utf-8')
         (package / 'RUN_RASPBERRY_PI.sh').chmod(0o755)
         launch = ('ARM64 Linux 桌面：在解压目录运行 ./RUN_RASPBERRY_PI.sh。\n'
+                  '战斗预览：./RUN_RASPBERRY_PI.sh --battle-preview。\n'
                   '结局预览：./RUN_RASPBERRY_PI.sh --ending-preview。\n')
         if glibc:
             launch += f'可执行文件要求 glibc >= {glibc}；旧系统请参考 docs/RASPBERRY_PI5.md 本机构建。\n'
@@ -184,7 +188,8 @@ def build(args):
         for filename in ('VERSION', 'README.md', 'ASSET_SOURCES_AND_LICENSES.md'):
             shutil.copy2(ROOT / filename, package / filename)
         (package / 'docs').mkdir()
-        for filename in (f'RELEASE_v{version}.md', 'HUB_SUBMAPS.md', 'V1_0_0_PARITY_AUDIT.md'):
+        for filename in (f'RELEASE_v{version}.md', 'HUB_SUBMAPS.md', 'V1_0_0_PARITY_AUDIT.md',
+                         'BATTLE_IMPACT_02_2.md', 'BATTLE_IMPACT_02_3.md', 'LOCAL_SYNC.md'):
             shutil.copy2(ROOT / 'docs' / filename, package / 'docs' / filename)
         if args.target == 'raspberrypi5-arm64':
             shutil.copy2(ROOT / 'docs/RASPBERRY_PI5.md', package / 'docs/RASPBERRY_PI5.md')
@@ -279,6 +284,15 @@ def verify_archive(path, commit, version):
         require({item['path'] for item in entries} == relative_names - {'SHA256SUMS', 'BUILD_INFO.json'}, 'BUILD_INFO coverage mismatch.')
         for item in entries:
             require(actual[item['path']] == item['sha256'], f'BUILD_INFO hash mismatch: {item["path"]}')
+        steps = json.loads(read('assets/audio/footsteps_manifest.json'))
+        require(steps['format_version'] == 2 and len(steps['files']) == 12,
+                'Final grass/stone footstep manifest is required.')
+        for item in steps['files']:
+            require(actual.get(item['path']) == item['sha256'], 'Final footstep sample mismatch: ' + item['path'])
+        if info['target'] == 'windows-x64':
+            require('PREVIEW_BATTLE.bat' in relative_names and b'--battle-preview' in read('PREVIEW_BATTLE.bat'),
+                    'Battle preview launcher is missing.')
+        require(f'docs/RELEASE_v{version}.md' in relative_names, 'Release notes are missing.')
         art = json.loads(read('assets/characters/runtime_art.json'))
         for definition in [art['heroine'], art['watcher'], *art['companions'].values()]:
             require(actual[definition['runtime']] == definition['sha256'], 'Archive art differs from approved art.')

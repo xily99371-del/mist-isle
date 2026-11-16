@@ -233,7 +233,7 @@ static void RenderBattle(Game *g) {
 
     /* Native-pixel HUD stays still while only the battle stage shakes. */
     PanelDark((Rectangle){24,22,354,120});
-    DrawUIText("伙伴战斗 · IMPACT-02.3",43,35,17,(Color){247,224,179,255});
+    DrawUIText("伙伴战斗 · v" MISTISLE_VERSION,43,35,17,(Color){247,224,179,255});
     DrawUIText(TextFormat("第 %d 回合  /  %s",g->battleRound,boss?"首领战":"遭遇战"),43,63,16,(Color){183,203,216,255});
     DrawUIText(TextFormat("可战斗伙伴  %d / %d",BattleBuddyCount(g),
         g->lumi.owned+g->splash.owned+g->spark.owned),43,90,16,(Color){226,238,229,255});
