@@ -517,10 +517,11 @@ static void EnterBattle(Game *g,int idx) {
     for(int slot=0;slot<OwnedBuddyCount(g);slot++)if(OwnedBuddyIdAt(g,slot)==g->selectedBuddy){g->battleChoice=slot;break;}
     g->scene=SCENE_BATTLE;
     g->battleMessage=0;
+    BattleInit(g);
     AudioPlay(AUDIO_INTERACT);
 }
 static void StartStoryBattle(Game *g) {
-    AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,150);
+    AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,LIGHTHOUSE_BOSS_MAX_HP);
     EnterBattle(g,g->enemyCount-1);
 }
 static void StartEnding(Game *g) {
@@ -559,7 +560,37 @@ static void StartPostBattleBlackout(Game *g) {
     g->scene=SCENE_POST_BATTLE_BLACKOUT;
     AudioResetMovement();
 }
+/* Called once, after the finishing hit and defeat animation have completed. */
+void GameBattleVictory(Game *g,int actor) {
+    Enemy *e=&g->enemies[g->battleEnemy];
+    if(!e->alive)return;
+    e->alive=false;g->defeatedGuards++;g->battleTurn=0;
+    Buddy *p=BuddyById(g,actor);
+    if(p&&p->owned) {
+        p->xp+=20;
+        if(p->xp>=50){p->xp-=50;p->level++;}
+    }
+    g->scene=SCENE_PLAY;
+    if(e->type==ENEMY_MOTE){g->groveMoteDefeated=true;g->player.berries+=2;}
+    if(e->type==ENEMY_BOSS){g->bossDefeated=true;g->player.crystals+=3;g->player.shells+=2;}
+    GameSave(g);
+    if(e->type==ENEMY_BOSS)StartPostBattleBlackout(g);
+    else Toast(g,"敌人被击退！伙伴获得经验，继续探索吧。");
+}
+void GameBattleRetreat(Game *g) {
+    SwitchArea(g,AREA_CAMP);g->scene=SCENE_PLAY;
+    Toast(g,"全队伙伴体力耗尽，返回营地。靠近守望者可恢复。");
+}
+void GameStartBattlePreview(Game *g) {
+    GameReset(g,20261115);g->previewOnly=true;
+    g->lumi.owned=g->splash.owned=g->spark.owned=true;
+    g->shrineSolved=true;g->player.hp=70;
+    SwitchArea(g,AREA_LIGHTHOUSE);
+    AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,LIGHTHOUSE_BOSS_MAX_HP);
+    EnterBattle(g,0);
+}
 void GameUpdate(Game *g,float dt) {
+    if(g->scene==SCENE_BATTLE){BattleUpdate(g,dt);return;}
     g->time+=dt;
     if(g->scene==SCENE_POST_BATTLE_BLACKOUT) {
         /* Advance through the normal frame loop: no input or UI can skip the
@@ -676,109 +707,13 @@ void GameUpdate(Game *g,float dt) {
             if(g->dialoguePage>=g->dialogueCount) {
                 if(g->dialogueStartsBossBattle) {
                     g->dialogueStartsBossBattle=false;
-                    AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,150);
+                    AddEnemy(g,ENEMY_BOSS,g->world.bossPos.x,g->world.bossPos.y,LIGHTHOUSE_BOSS_MAX_HP);
                     EnterBattle(g,g->enemyCount-1);
                 } else if(g->dialogueStartsEnding) {
                     StartEnding(g);
                 } else g->scene=SCENE_PLAY;
             } else {
                 snprintf(g->dialogueSpeaker,sizeof(g->dialogueSpeaker),"%s",g->dialogueLineSpeaker[g->dialoguePage]);
-            }
-        }
-        return;
-    }
-    if(g->scene==SCENE_BATTLE) {
-        Enemy *e=&g->enemies[g->battleEnemy];
-        if(!e->alive){g->scene=SCENE_PLAY;return;}
-        int buddyCount=OwnedBuddyCount(g);
-        int optionCount=buddyCount>0?buddyCount:1;
-        if(GameInputPressed(KEY_ONE)||GameInputPressed(KEY_Q))g->battleChoice=0;
-        if((GameInputPressed(KEY_TWO)||GameInputPressed(KEY_W))&&optionCount>1)g->battleChoice=1;
-        if((GameInputPressed(KEY_THREE)||GameInputPressed(KEY_E))&&optionCount>2)g->battleChoice=2;
-        if(GameInputPressed(KEY_LEFT)||GameInputPressed(KEY_A))g->battleChoice=(g->battleChoice+optionCount-1)%optionCount;
-        if(GameInputPressed(KEY_RIGHT)||GameInputPressed(KEY_D))g->battleChoice=(g->battleChoice+1)%optionCount;
-        if(g->battleChoice>=optionCount)g->battleChoice=optionCount-1;
-        int selectedId=buddyCount>0?OwnedBuddyIdAt(g,g->battleChoice):-1;
-        if(selectedId>=0)g->selectedBuddy=selectedId;
-        bool mousePressed=IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
-        bool mouseSelected=false;
-        if(mousePressed) {
-            Vector2 mouse=LogicalMousePosition();
-            for(int slot=0;slot<optionCount;slot++) {
-                Rectangle card={(float)(50+slot*245),555,230,112};
-                if(CheckCollisionPointRec(mouse,card)) {
-                    g->battleChoice=slot;
-                    selectedId=buddyCount>0?OwnedBuddyIdAt(g,slot):-1;
-                    if(selectedId>=0)g->selectedBuddy=selectedId;
-                    mouseSelected=true;
-                    break;
-                }
-            }
-        }
-        bool confirm=GameInputPressed(KEY_ENTER)||(mousePressed&&!mouseSelected);
-        if(confirm) {
-            if(g->battleTurn==0) {
-                Buddy *active=selectedId>=0?BuddyById(g,selectedId):NULL;
-                float damage=10.0f;
-                if(selectedId==0 && active) {
-                    g->player.hp=fminf(g->player.maxHp,g->player.hp+18.0f+(active->level-1)*3.0f);
-                    damage=8.0f+(active->level-1)*2.0f;
-                    Burst(g,WorldScreen(g->player.pos),C_GOLD,16);
-                    Toast(g,"苔灯灵：星光治愈，恢复生命并造成微光伤害。");
-                } else if(selectedId==1 && active) {
-                    damage=20.0f+(active->level-1)*3.0f;
-                    g->enemySoaked=true;
-                    Burst(g,WorldScreen(e->pos),C_BLUE,22);
-                    Toast(g,"沫尾兽：泡泡水流，敌人进入潮湿状态！");
-                } else if(selectedId==2 && active) {
-                    bool boosted=g->enemySoaked;
-                    damage=(boosted?38.0f:26.0f)+(active->level-1)*4.0f;
-                    Burst(g,WorldScreen(e->pos),C_LILAC,26);
-                    Toast(g,boosted?"鸣晶蜥：潮湿导电！造成额外伤害！":"鸣晶蜥：晶弧放电！");
-                    g->enemySoaked=false;
-                } else {
-                    Toast(g,"旅人发动普通攻击！");
-                }
-                e->hp-=damage;
-                AudioPlay(AUDIO_ATTACK);
-                g->battleTurn=1;
-                if(e->hp<=0) {
-                    e->alive=false;g->battleTurn=0;g->scene=SCENE_PLAY;g->defeatedGuards++;
-                    if(active) {
-                        active->xp+=20;
-                        if(active->xp>=50){active->xp-=50;active->level++;Toast(g,"伙伴成长了！技能效果也得到提升。");}
-                        else Toast(g,"敌人被击退！出战伙伴获得20点经验。");
-                    } else Toast(g,"敌人被击退！");
-                    GameSave(g);
-                    if(e->type==ENEMY_MOTE){g->groveMoteDefeated=true;g->player.berries+=2;GameSave(g);Toast(g,"击退林地微光兽，获得2颗果实！");}
-                    if(e->type==ENEMY_BOSS) {
-                        g->bossDefeated=true;g->player.crystals+=3;g->player.shells+=2;GameSave(g);
-                        StartPostBattleBlackout(g);
-                    }
-                }
-            } else {
-                int bossPhase=e->hp<=50.0f?3:(e->hp<=100.0f?2:1);
-                bool bossHeavy=e->type==ENEMY_BOSS &&
-                    (bossPhase==3?(g->battleRound%2==0):(g->battleRound%3==0));
-                float incoming=e->type==ENEMY_BOSS?(bossPhase==3?20.0f:(bossPhase==2?17.0f:14.0f)):10.0f;
-                if(bossHeavy)incoming+=(bossPhase==3?12.0f:9.0f);
-                // Wetting the guardian's core interrupts its resonance and softens the next blow.
-                bool damped=g->enemySoaked;
-                if(damped)incoming*=e->type==ENEMY_BOSS?0.65f:0.8f;
-                g->enemySoaked=false; // Wetness interrupts one incoming attack, then dissipates.
-                Buddy *defender=BuddyById(g,g->selectedBuddy);
-                bool buddyTookHit=defender&&defender->owned&&defender->hp>0.0f;
-                if(buddyTookHit)defender->hp=fmaxf(0.0f,defender->hp-incoming);
-                else g->player.hp-=incoming;
-                AudioPlay(AUDIO_HURT);
-                Burst(g,WorldScreen(buddyTookHit?defender->pos:g->player.pos),bossHeavy?C_GOLD:C_PINK,bossHeavy?22:10);
-                g->battleTurn=0;g->battleRound++;
-                if(!buddyTookHit&&g->player.hp<=0){g->player.hp=55;g->scene=SCENE_PLAY;Toast(g,"伙伴把你带回营地，恢复了体力。");}
-                else if(buddyTookHit&&defender->hp<=0)Toast(g,TextFormat("%s体力耗尽！回到守望者处可以恢复。",g->selectedBuddy==0?"苔灯灵":g->selectedBuddy==1?"沫尾兽":"鸣晶蜥"));
-                else if(damped&&e->type==ENEMY_BOSS)Toast(g,TextFormat("CORE DISRUPTED! DAMAGE REDUCED TO %.0f.",incoming));
-                else if(bossHeavy)Toast(g,TextFormat("RESONANCE STRIKE! %.0f damage.",incoming));
-                else if(e->type==ENEMY_BOSS)Toast(g,TextFormat("LIGHTHOUSE GUARDIAN ATTACK! %.0f damage.",incoming));
-                else Toast(g,TextFormat("敌人发动攻击！受到 %.0f 点伤害。",incoming));
             }
         }
         return;
@@ -811,11 +746,7 @@ void GameUpdate(Game *g,float dt) {
     MovePlayerWithCollision(g,requestedMovement);
     Vector2 actualMovement=Vector2Subtract(p->pos,movementStart);
     bool blocked=Vector2Distance(actualMovement,requestedMovement)>0.001f;
-    int tileX=(int)floorf(p->pos.x+0.5f),tileY=(int)floorf(p->pos.y+0.5f);
-    int surface=g->area==AREA_RUINS?2:0;
-    if(surface==0&&tileX>=0&&tileX<MAPW&&tileY>=0&&tileY<MAPH&&
-       TerrainKindFromAtlasIndex(g->world.terrain[tileY][tileX])==3)surface=1;
-    AudioMovement(Vector2Length(actualMovement),blocked,surface,dt);
+    AudioMovement(Vector2Length(actualMovement),blocked,AudioFootstepSurface(g->area),dt);
 
     Buddy *followers[3]={&g->lumi,&g->splash,&g->spark};
     for(int bi=0;bi<3;bi++) {

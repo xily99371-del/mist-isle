@@ -10,6 +10,8 @@ enum { TRACK_NONE=-1, TRACK_CAMP, TRACK_GROVE, TRACK_RUINS, TRACK_ENEMY, TRACK_V
 #define MAX_ENERGY_SAMPLES 12000
 #define MUSIC_VOLUME 0.76f
 #define CROSSFADE_SECONDS 0.65f
+#define FOOTSTEP_STRIDE 1.12f
+#define FOOTSTEP_MIN_INTERVAL 0.20f
 #define VICTORY_START_SECONDS 73.0f
 
 typedef struct {
@@ -29,6 +31,8 @@ typedef struct {
     float stepDistance, idleTime, clearWallTime;
     bool wallContact;
     unsigned int stepIndex, random;
+    int stepTakes[2][2];
+    float lastFootstep;
     LyricCue lyrics[MAX_LYRIC_CUES];
     int lyricCount;
     float energy[MAX_ENERGY_SAMPLES];
@@ -44,9 +48,41 @@ static const char *const MUSIC_PATHS[TRACK_COUNT]={
 static const char *const SOUND_NAMES[AUDIO_CUE_COUNT]={
     "step_grass_a", "step_grass_b", "step_stone_a", "step_stone_b",
     "step_wet_a", "step_wet_b", "dialogue", "interact", "collision",
-    "dash", "pickup", "attack", "hurt", "victory"
+    "dash", "pickup", "attack", "hurt", "victory",
+    "step_grass_c", "step_grass_d", "step_grass_e", "step_grass_f",
+    "step_stone_c", "step_stone_d", "step_stone_e", "step_stone_f"
 };
 
+static bool IsFootstep(AudioCue cue) {
+    return (cue>=AUDIO_STEP_GRASS_A&&cue<=AUDIO_STEP_WET_B)||
+           (cue>=AUDIO_STEP_GRASS_C&&cue<=AUDIO_STEP_STONE_F);
+}
+static bool IsGrassStep(AudioCue cue) {
+    return cue==AUDIO_STEP_GRASS_A||cue==AUDIO_STEP_GRASS_B||
+           (cue>=AUDIO_STEP_GRASS_C&&cue<=AUDIO_STEP_GRASS_F);
+}
+static const AudioCue FOOTSTEPS[2][2][3]={
+    {{AUDIO_STEP_GRASS_A,AUDIO_STEP_GRASS_C,AUDIO_STEP_GRASS_E},
+     {AUDIO_STEP_GRASS_B,AUDIO_STEP_GRASS_D,AUDIO_STEP_GRASS_F}},
+    {{AUDIO_STEP_STONE_A,AUDIO_STEP_STONE_C,AUDIO_STEP_STONE_E},
+     {AUDIO_STEP_STONE_B,AUDIO_STEP_STONE_D,AUDIO_STEP_STONE_F}}
+};
+static void PlayFootstep(int surface) {
+    unsigned int foot=audioState.stepIndex++%2;
+    if(surface==2) { AudioPlay((AudioCue)(AUDIO_STEP_WET_A+foot)); return; }
+    int previous=audioState.stepTakes[surface][foot];
+    audioState.random=audioState.random*1664525u+1013904223u;
+    int take=previous<0?0:(previous+1+(int)((audioState.random>>16)%2u))%3;
+    /* Missing optional variants fall back within the same surface only. */
+    for(int n=0;n<3;n++) {
+        int index=(take+n)%3;
+        AudioCue cue=FOOTSTEPS[surface][foot][index];
+        if(audioState.soundReady[cue]) {
+            audioState.stepTakes[surface][foot]=index;
+            AudioPlay(cue);return;
+        }
+    }
+}
 static float Clamp01(float value) { return fminf(1.0f,fmaxf(0.0f,value)); }
 
 static void LoadLyrics(void)
@@ -108,6 +144,9 @@ void AudioInit(void)
     audioState.current=audioState.outgoing=audioState.requested=TRACK_NONE;
     audioState.subtitles=true;
     audioState.random=0x4d495354u;
+    audioState.lastFootstep=-100.0f;
+    for(int surface=0;surface<2;surface++)for(int foot=0;foot<2;foot++)
+        audioState.stepTakes[surface][foot]=-1;
     for(int i=0;i<AUDIO_CUE_COUNT;i++)audioState.lastSound[i]=-100.0f;
     LoadLyrics();LoadEnergy();
     InitAudioDevice();
@@ -256,14 +295,18 @@ void AudioPlay(AudioCue cue)
 {
     if(cue<0||cue>=AUDIO_CUE_COUNT||!audioState.ready||audioState.paused||
        audioState.muted||audioState.silentTransition||!audioState.soundReady[cue])return;
-    float cooldown=(cue==AUDIO_COLLISION)?0.30f:((cue<=AUDIO_STEP_WET_B)?0.13f:0.055f);
+    bool step=IsFootstep(cue);
+    float cooldown=(cue==AUDIO_COLLISION)?0.30f:(step?0.13f:0.055f);
     if(audioState.clock-audioState.lastSound[cue]<cooldown)return;
     audioState.lastSound[cue]=audioState.clock;
     audioState.random=audioState.random*1664525u+1013904223u;
-    float pitch=0.97f+(float)((audioState.random>>16)%61u)*0.001f;
+    float pitch=step?0.985f+(float)((audioState.random>>16)%31u)*0.001f:
+                     0.97f+(float)((audioState.random>>16)%61u)*0.001f;
     if(cue==AUDIO_VICTORY||cue==AUDIO_PICKUP||cue==AUDIO_INTERACT)pitch=1.0f;
     SetSoundPitch(audioState.sounds[cue],pitch);
-    SetSoundVolume(audioState.sounds[cue],cue<=AUDIO_STEP_WET_B?0.68f:0.76f);
+    float volume=step?(IsGrassStep(cue)?0.60f:0.64f):0.76f;
+    if(step)volume*=0.94f+(float)((audioState.random>>8)%61u)*0.001f;
+    SetSoundVolume(audioState.sounds[cue],volume);
     PlaySound(audioState.sounds[cue]);
 }
 
@@ -275,7 +318,9 @@ void AudioResetMovement(void)
 
 void AudioMovement(float distance,bool blocked,int surface,float dt)
 {
-    if(!audioState.ready)return;
+    if(!audioState.ready||audioState.paused||audioState.muted||audioState.silentTransition) {
+        AudioResetMovement();return;
+    }
     if(blocked) {
         if(!audioState.wallContact)AudioPlay(AUDIO_COLLISION);
         audioState.wallContact=true;audioState.clearWallTime=0.0f;
@@ -286,10 +331,12 @@ void AudioMovement(float distance,bool blocked,int surface,float dt)
     if(distance>0.0001f&&distance<1.0f) {
         audioState.idleTime=0.0f;
         audioState.stepDistance+=distance;
-        if(audioState.stepDistance>=0.94f) {
-            audioState.stepDistance=fmodf(audioState.stepDistance,0.94f);
+        if(audioState.stepDistance>=FOOTSTEP_STRIDE&&
+           audioState.clock-audioState.lastFootstep>=FOOTSTEP_MIN_INTERVAL) {
+            audioState.stepDistance=fmodf(audioState.stepDistance,FOOTSTEP_STRIDE);
+            audioState.lastFootstep=audioState.clock;
             if(surface<0||surface>2)surface=0;
-            AudioPlay((AudioCue)(surface*2+(audioState.stepIndex++%2)));
+            PlayFootstep(surface);
         }
     } else {
         audioState.idleTime+=dt;

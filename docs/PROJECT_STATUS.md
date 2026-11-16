@@ -5,8 +5,8 @@
 ## 代码与版本
 
 - 正式仓库：`https://github.com/xily99371-del/mist-isle`，使用 `main`。
-- 当前发行版本号：`2.0.0`，统一来源为根目录 `VERSION`；CMake、窗口标题与发布包使用同一版本号。发行内容见 `RELEASE_v2.0.0.md`。
-- 发布状态须读取远端确认：目标标签为 `v2.0.0`，Windows 与 ARM64 构建成功后才由工作流创建 Release、上传运行包及校验文件。仅本地版本号、提交或 Actions artifact 不代表 Release 已发布。
+- 当前发行版本号：`3.0.0`，统一来源为根目录 `VERSION`；CMake、窗口标题与发布包使用同一版本号。发行内容见 `RELEASE_v3.0.0.md`。
+- 发布状态须读取远端确认：目标标签为 `v3.0.0`，Windows 与 ARM64 构建成功后才由工作流创建 Release、上传运行包及校验文件。仅本地版本号、提交或 Actions artifact 不代表 Release 已发布。
 - 本轮更新以 `c61fe8e` 为基线。音频/战后/字幕整合、正式美术恢复、原生文字/萤火/地面缓存修复的本地验证记录分别对应 `1275b30`、`854c194`、`5fdce0c`。同步时若通过已连接应用创建内容一致的文件树，远端提交号以对应 Release 标签和包内 `BUILD_INFO.json` 为准；本地验证号不要求出现在远端提交历史中。
 - C11 + raylib 5.5；Windows优先，另有Raspberry Pi 5配置。
 - Windows本地常用目录：`C:\Users\24017\Downloads\game_raspi\mist-isle`。
@@ -23,7 +23,15 @@
 - 正式角色内容哈希与正确地面的RGBA哈希登记在 `assets/characters/runtime_art.json`；构建准备和校验器均检查。
 - 未获认可的v9人物已移入 `assets/characters/source/v9/candidates/`，游戏不加载，发行包不包含。新的结局插图保留在 `assets/cinematics/ending_v9/`。
 
-## 本轮已实现
+## v3.0.0 正式整合
+
+- 最终战斗基线为 `7d99ab4fd29f10d3fbffb4bc59fa7e88a664deb4`（IMPACT-02.3），音效采用最终 IMPACT-02.2 分离材质版本。发布准备不更改已验收的规则或 WAV。
+- 三宠同场、旅人仅指挥、全队治疗、450 HP 百分比三阶段、逐击连击与变化光圈格挡均用于完整旅程。
+- 游戏窗口、战斗 HUD、源码 VERSION、README 与运行包统一为 v3.0.0。
+- PREVIEW_BATTLE.bat 是不触碰旅程存档的独立入口；正常 RUN_WINDOWS.bat 仍启动完整游戏。
+- 发布说明见 RELEASE_v3.0.0.md，更新和旧工作目录迁移见 LOCAL_SYNC.md。v2.0.0 标签与原附件保留，不覆盖。
+
+## 沿用的 v2.0 音画与结局实现
 
 - 五首音乐与14种音效已接入；Enemy从灯塔入场到对话/战斗连续播放，歌词跟随音乐时钟。
 - Boss胜利：1秒纯黑且静音 → 四句战后对话，同时《晨间新闻》从73秒开始 → 自动进入结局，音乐继续。
@@ -41,7 +49,7 @@
 
 ## 运行
 
-从 `v2.0.0` Release 下载 `MistIsle-Windows-v2.0.0.zip` 后完整解压，直接运行 `mist_isle.exe` 或 `RUN_WINDOWS.bat`。`PREVIEW_ENDING.bat` 可只看结局。包内 `BUILD_INFO.json` 记录实际源码提交、版本号及文件校验值；发布页 `SHA256SUMS` 对应压缩包校验值。
+从 `v3.0.0` Release 下载 `MistIsle-Windows-v3.0.0.zip` 后完整解压，直接运行 `mist_isle.exe` 或 `RUN_WINDOWS.bat`。`PREVIEW_ENDING.bat` 可只看结局。包内 `BUILD_INFO.json` 记录实际源码提交、版本号及文件校验值；发布页 `SHA256SUMS` 对应压缩包校验值。
 
 保留旧进度时，先关闭游戏，再把旧目录中的 `mist_isle_save.dat` 复制到新版目录，标题页按 F9 读取。发行号与存档格式号独立；原有 v4/v5 存档读取逻辑保持不变。
 

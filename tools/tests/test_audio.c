@@ -20,7 +20,7 @@ static FakeSound sounds[AUDIO_CUE_COUNT];
 static bool available[TEST_TRACKS],soundAvailable[AUDIO_CUE_COUNT],deviceAvailable;
 static int invalidTrack=-1,deviceInits,deviceCloses,checks;
 static const char *trackNames[]={"camp.mp3","grove.mp3","ruins.mp3","enemy.mp3","victory.mp3"};
-static const char *soundNames[]={"step_grass_a.wav","step_grass_b.wav","step_stone_a.wav","step_stone_b.wav","step_wet_a.wav","step_wet_b.wav","dialogue.wav","interact.wav","collision.wav","dash.wav","pickup.wav","attack.wav","hurt.wav","victory.wav"};
+static const char *soundNames[]={"step_grass_a.wav","step_grass_b.wav","step_stone_a.wav","step_stone_b.wav","step_wet_a.wav","step_wet_b.wav","dialogue.wav","interact.wav","collision.wav","dash.wav","pickup.wav","attack.wav","hurt.wav","victory.wav","step_grass_c.wav","step_grass_d.wav","step_grass_e.wav","step_grass_f.wav","step_stone_c.wav","step_stone_d.wav","step_stone_e.wav","step_stone_f.wav"};
 #define CHECK(condition,message) do { checks++; if(!(condition)){fprintf(stderr,"FAIL line %d: %s\n",__LINE__,message);exit(1);} } while(0)
 #define NEAR(a,b) (fabsf((a)-(b))<0.002f)
 static int MusicId(const char *path) { for(int i=0;i<TEST_TRACKS;i++)if(strstr(path,trackNames[i]))return i;return -1; }
@@ -107,7 +107,7 @@ static void Advance(float seconds) {
 }
 static void Tick(Game *game,float seconds,bool focused) { Advance(seconds);AudioUpdate(game,seconds,focused); }
 static void Settle(Game *game) { for(int i=0;i<15;i++)Tick(game,.05f,true); }
-static int StepCount(void) { int total=0;for(int i=0;i<=AUDIO_STEP_WET_B;i++)total+=sounds[i].plays;return total; }
+static int StepCount(void) { int total=0;for(int i=0;i<AUDIO_CUE_COUNT;i++)if(i<=AUDIO_STEP_WET_B||i>=AUDIO_STEP_GRASS_C)total+=sounds[i].plays;return total; }
 static int PlayingTracks(void) { int total=0;for(int i=0;i<TEST_TRACKS;i++)total+=tracks[i].playing;return total; }
 static int PlayingEffects(void) { int total=0;for(int i=0;i<AUDIO_CUE_COUNT;i++)total+=sounds[i].playing;return total; }
 
@@ -226,10 +226,10 @@ static void TestMovementAndContact(void) {
     for(int i=0;i<60;i++){AudioMovement(0,false,0,.05f);Tick(&game,.05f,true);}
     CHECK(StepCount()==0,"standing still never creates footsteps");
     AudioResetMovement();
-    for(int i=0;i<4;i++){AudioMovement(.2f,false,0,.05f);Tick(&game,.05f,true);}
+    for(int i=0;i<4;i++){AudioMovement(.24f,false,0,.05f);Tick(&game,.05f,true);}
     CHECK(StepCount()==0,"footsteps wait for real travelled distance");
-    AudioMovement(.2f,false,0,.05f);Tick(&game,.05f,true);CHECK(sounds[AUDIO_STEP_GRASS_A].plays==1,"first grass step follows travel threshold");
-    for(int i=0;i<5;i++){AudioMovement(.2f,false,0,.05f);Tick(&game,.05f,true);}
+    AudioMovement(.24f,false,0,.05f);Tick(&game,.05f,true);CHECK(sounds[AUDIO_STEP_GRASS_A].plays==1,"first grass step follows travel threshold");
+    for(int i=0;i<5;i++){AudioMovement(.24f,false,0,.05f);Tick(&game,.05f,true);}
     CHECK(sounds[AUDIO_STEP_GRASS_B].plays==1,"left/right footstep variants alternate");
     int steps=StepCount();AudioResetMovement();
     for(int i=0;i<25;i++){AudioMovement(0,true,0,.05f);Tick(&game,.05f,true);}
@@ -240,14 +240,41 @@ static void TestMovementAndContact(void) {
     for(int i=0;i<4;i++){AudioMovement(0,false,0,.05f);Tick(&game,.05f,true);}
     AudioMovement(0,true,0,.05f);Tick(&game,.05f,true);
     CHECK(sounds[AUDIO_COLLISION].plays==2,"leaving then contacting a wall permits the next impact");
-    AudioResetMovement();AudioMovement(.95f,false,1,.05f);Tick(&game,.05f,true);
+    AudioResetMovement();Tick(&game,.1f,true);Tick(&game,.1f,true);Tick(&game,.1f,true);AudioMovement(.6f,false,1,.05f);AudioMovement(.6f,false,1,.05f);Tick(&game,.05f,true);
     CHECK(sounds[AUDIO_STEP_STONE_A].plays+sounds[AUDIO_STEP_STONE_B].plays==1,"stone surface chooses stone effects");
-    AudioResetMovement();AudioMovement(.95f,false,2,.05f);Tick(&game,.05f,true);
+    AudioResetMovement();Tick(&game,.1f,true);Tick(&game,.1f,true);Tick(&game,.1f,true);AudioMovement(.6f,false,2,.05f);AudioMovement(.6f,false,2,.05f);Tick(&game,.05f,true);
     CHECK(sounds[AUDIO_STEP_WET_A].plays+sounds[AUDIO_STEP_WET_B].plays==1,"wet surface chooses wet effects");
     steps=StepCount();AudioResetMovement();AudioMovement(8,false,0,.05f);Tick(&game,.05f,true);
     CHECK(StepCount()==steps,"teleport-size position changes do not generate footsteps");
     AudioPlay(AUDIO_DIALOGUE);AudioPlay(AUDIO_DIALOGUE);CHECK(sounds[AUDIO_DIALOGUE].plays==1,"same-frame dialogue events are debounced");
     Tick(&game,.1f,true);AudioPlay(AUDIO_DIALOGUE);CHECK(sounds[AUDIO_DIALOGUE].plays==2,"later dialogue advance remains audible");
+}
+static void TestRecordedFootsteps(void) {
+    CHECK(AudioFootstepSurface(AREA_CAMP)==0&&AudioFootstepSurface(AREA_GROVE)==0,"camp and grove use grass regardless of weather");
+    CHECK(AudioFootstepSurface(AREA_RUINS)==1&&AudioFootstepSurface(AREA_LIGHTHOUSE)==1,"ruins and boss courtyard use stone");
+    const int banks[2][6]={{AUDIO_STEP_GRASS_A,AUDIO_STEP_GRASS_B,AUDIO_STEP_GRASS_C,AUDIO_STEP_GRASS_D,AUDIO_STEP_GRASS_E,AUDIO_STEP_GRASS_F},
+        {AUDIO_STEP_STONE_A,AUDIO_STEP_STONE_B,AUDIO_STEP_STONE_C,AUDIO_STEP_STONE_D,AUDIO_STEP_STONE_E,AUDIO_STEP_STONE_F}};
+    for(int surface=0;surface<2;surface++) {
+        ResetBackend();AudioInit();Game game=PlayingGame(surface?AREA_RUINS:AREA_GROVE);Settle(&game);
+        int last[2]={-1,-1};bool seen[6]={0};
+        for(int step=0;step<40;step++) {
+            int before[6];for(int i=0;i<6;i++)before[i]=sounds[banks[surface][i]].plays;
+            for(int tick=0;tick<4;tick++){Tick(&game,.08f,true);}
+            AudioResetMovement();
+            AudioMovement(.6f,false,surface,.05f);AudioMovement(.6f,false,surface,.05f);
+            int picked=-1,total=0;
+            for(int i=0;i<6;i++)if(sounds[banks[surface][i]].plays>before[i]){picked=i;total++;}
+            CHECK(total==1,"one travel stride plays exactly one recorded step");
+            CHECK(picked%2==step%2,"left and right recordings alternate");
+            CHECK(picked!=last[step%2],"the same foot does not repeat its previous take");
+            last[step%2]=picked;seen[picked]=true;
+            CHECK(sounds[banks[surface][picked]].volume<=.64f,"footsteps stay below dialogue/impact volume");
+            int count=StepCount();AudioMovement(.6f,false,surface,.001f);AudioMovement(.6f,false,surface,.001f);
+            CHECK(StepCount()==count,"global cadence prevents rapid variant stacking");
+        }
+        for(int i=0;i<6;i++)CHECK(seen[i],"all six takes are reachable");
+        AudioClose();
+    }
 }
 static void TestMissingAssetsAndDevice(void) {
     ResetBackend();available[TEST_ENEMY]=false;invalidTrack=TEST_VICTORY;soundAvailable[AUDIO_COLLISION]=false;AudioInit();
@@ -262,6 +289,6 @@ static void TestMissingAssetsAndDevice(void) {
     for(int i=0;i<TEST_TRACKS;i++)CHECK(tracks[i].loads==0,"no device means no decoder allocation");
 }
 int main(void) {
-    TestMapSelectionAndCrossfade();TestBossContinuityAndVictory();TestBlackoutCrossfadeAndFocus();TestFocusMuteAndSubtitles();TestMovementAndContact();TestMissingAssetsAndDevice();
+    TestMapSelectionAndCrossfade();TestBossContinuityAndVictory();TestBlackoutCrossfadeAndFocus();TestFocusMuteAndSubtitles();TestMovementAndContact();TestRecordedFootsteps();TestMissingAssetsAndDevice();
     printf("Audio contract tests passed (%d checks).\n",checks);return 0;
 }

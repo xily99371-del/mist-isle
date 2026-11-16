@@ -1,0 +1,201 @@
+{
+  "format_version": 2,
+  "revision": "IMPACT-02.2-clean-materials",
+  "sources": [
+    {
+      "surface": "grass",
+      "author": "Blender Foundation",
+      "work": "Yo Frankie! - Grass Foot Step Sounds",
+      "license": "CC-BY-3.0",
+      "page": "https://opengameart.org/content/grass-foot-step-sounds-yo-frankie",
+      "license_url": "https://creativecommons.org/licenses/by/3.0/",
+      "files": [
+        "sfx_step_grass_l.flac",
+        "sfx_step_grass_r.flac"
+      ]
+    },
+    {
+      "surface": "stone",
+      "author": "Kenney",
+      "work": "Impact Sounds - concrete footsteps",
+      "license": "CC0-1.0",
+      "page": "https://kenney.nl/assets/impact-sounds",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "mirror": "https://github.com/Mcamento8/open-game-sfx-index",
+      "mirror_commit": "34bbe8b525b5ceff3804915ea745532af11f6055",
+      "files": [
+        "footstep_concrete_000.ogg",
+        "footstep_concrete_001.ogg",
+        "footstep_concrete_002.ogg",
+        "footstep_concrete_003.ogg",
+        "footstep_concrete_004.ogg"
+      ]
+    }
+  ],
+  "processing": "No mixed sand/gravel sources. Mono PCM16 22050 Hz; 70 Hz high-pass; grass 1750-2050 Hz low-pass and 255 ms soft tail; concrete 3200-3700 Hz low-pass and original short tap; linear RMS matching, peak ceiling 0.28, click-free fades. No synthetic noise added.",
+  "variation_note": "Six playback variations per material, not six independent L/R recordings. Grass derives from two true L/R steps; stone from five concrete steps. Reused source variations differ in EQ/level. Foot denotes playback lane.",
+  "routing": {
+    "coastal_camp": "grass",
+    "glowglade_grove": "grass",
+    "tidal_ruins": "stone",
+    "lighthouse_courtyard": "stone"
+  },
+  "files": [
+    {
+      "path": "assets/audio/sfx/step_grass_a.wav",
+      "source": "sfx_step_grass_l.flac",
+      "source_sha256": "69361acad4d2fdad1bb50910fa87e39f5bfdd5d7a6532915bc2ce47b7bbc3101",
+      "sha256": "c9c7685a0d88dd77c5c50244a4b8b0c137d2d17627bada1d7b92ccee2889777d",
+      "foot": "L",
+      "take": 1,
+      "surface": "grass",
+      "license": "CC-BY-3.0",
+      "seconds": 0.25501133786848074,
+      "peak": 0.28,
+      "rms": 0.03519023347477583
+    },
+    {
+      "path": "assets/audio/sfx/step_grass_b.wav",
+      "source": "sfx_step_grass_r.flac",
+      "source_sha256": "1121c8f1dc97db5fcaf8832fc8078c24e7cbc16656c13bf02358d7b353a5ec59",
+      "sha256": "1cf8e8bb9f4906961bbcb8ceec499712dbd7c6b9b1b1dbca19ba782532cb6974",
+      "foot": "R",
+      "take": 1,
+      "surface": "grass",
+      "license": "CC-BY-3.0",
+      "seconds": 0.25501133786848074,
+      "peak": 0.28,
+      "rms": 0.0326803264521225
+    },
+    {
+      "path": "assets/audio/sfx/step_grass_c.wav",
+      "source": "sfx_step_grass_l.flac",
+      "source_sha256": "69361acad4d2fdad1bb50910fa87e39f5bfdd5d7a6532915bc2ce47b7bbc3101",
+      "sha256": "b215e3d6eacb4dd9483b5d036879f15a209558739a5af5425babef2dbbd112d6",
+      "foot": "L",
+      "take": 2,
+      "surface": "grass",
+      "license": "CC-BY-3.0",
+      "seconds": 0.25501133786848074,
+      "peak": 0.28,
+      "rms": 0.03488865649811582
+    },
+    {
+      "path": "assets/audio/sfx/step_grass_d.wav",
+      "source": "sfx_step_grass_r.flac",
+      "source_sha256": "1121c8f1dc97db5fcaf8832fc8078c24e7cbc16656c13bf02358d7b353a5ec59",
+      "sha256": "fb6533423f9e234cf62780df9c489965a92ece6b33052248d6ba08c82b8fb9df",
+      "foot": "R",
+      "take": 2,
+      "surface": "grass",
+      "license": "CC-BY-3.0",
+      "seconds": 0.25501133786848074,
+      "peak": 0.28,
+      "rms": 0.03235019685284948
+    },
+    {
+      "path": "assets/audio/sfx/step_grass_e.wav",
+      "source": "sfx_step_grass_l.flac",
+      "source_sha256": "69361acad4d2fdad1bb50910fa87e39f5bfdd5d7a6532915bc2ce47b7bbc3101",
+      "sha256": "bc1003d5972ff1ba64eb76ceddbb297cbf014051d334d50eddd4cc57d6047e04",
+      "foot": "L",
+      "take": 3,
+      "surface": "grass",
+      "license": "CC-BY-3.0",
+      "seconds": 0.25501133786848074,
+      "peak": 0.28,
+      "rms": 0.03584759699305769
+    },
+    {
+      "path": "assets/audio/sfx/step_grass_f.wav",
+      "source": "sfx_step_grass_r.flac",
+      "source_sha256": "1121c8f1dc97db5fcaf8832fc8078c24e7cbc16656c13bf02358d7b353a5ec59",
+      "sha256": "0a8fc16bf75a45b1bbc6fb86e2bd6b6db02cc28a678fee8e5f8457e06c2b0bb5",
+      "foot": "R",
+      "take": 3,
+      "surface": "grass",
+      "license": "CC-BY-3.0",
+      "seconds": 0.25501133786848074,
+      "peak": 0.28,
+      "rms": 0.033253318461372625
+    },
+    {
+      "path": "assets/audio/sfx/step_stone_a.wav",
+      "source": "footstep_concrete_000.ogg",
+      "source_sha256": "d7267e183067757c92c169de2a379abea592cfca6b39bb2e8feea15221ad79fe",
+      "sha256": "b6094f483b63e204cf769766c1d23e2a522dd96dfa140bd1b4e8c7e3c959e99d",
+      "foot": "L",
+      "take": 1,
+      "surface": "stone",
+      "license": "CC0-1.0",
+      "seconds": 0.10303854875283447,
+      "peak": 0.28,
+      "rms": 0.03734757869138367
+    },
+    {
+      "path": "assets/audio/sfx/step_stone_b.wav",
+      "source": "footstep_concrete_001.ogg",
+      "source_sha256": "507a75eb19b897087855a3be3cf11a12d7fa37d143ad535eeebe0b8031c7325d",
+      "sha256": "8b0e2f424103a96a80b4cce0f58d6618b4e60a000c842ef104662ead7405b0f8",
+      "foot": "R",
+      "take": 1,
+      "surface": "stone",
+      "license": "CC0-1.0",
+      "seconds": 0.10476190476190476,
+      "peak": 0.28,
+      "rms": 0.03766409026435082
+    },
+    {
+      "path": "assets/audio/sfx/step_stone_c.wav",
+      "source": "footstep_concrete_002.ogg",
+      "source_sha256": "b21fa546d74941196b25da8a20b7010abd8c05c4fcf93545d1f344e66a664e13",
+      "sha256": "2aa5134cc23b0acabbcf64fb0fb8b9f79c98beb291703277033945959bfc3763",
+      "foot": "L",
+      "take": 2,
+      "surface": "stone",
+      "license": "CC0-1.0",
+      "seconds": 0.10988662131519275,
+      "peak": 0.28,
+      "rms": 0.04047854886899503
+    },
+    {
+      "path": "assets/audio/sfx/step_stone_d.wav",
+      "source": "footstep_concrete_003.ogg",
+      "source_sha256": "8b513c2f0316324060b9174b8f28df6c2147418c506e6a53b77f18e149a5547b",
+      "sha256": "ffd0622b6d3a4d0ed1a9a98decf5329ec0012157de63cce5a6e4e6d8664e3a85",
+      "foot": "R",
+      "take": 2,
+      "surface": "stone",
+      "license": "CC0-1.0",
+      "seconds": 0.10761904761904761,
+      "peak": 0.28,
+      "rms": 0.04521002691255815
+    },
+    {
+      "path": "assets/audio/sfx/step_stone_e.wav",
+      "source": "footstep_concrete_004.ogg",
+      "source_sha256": "24dd8db2413e5b81ad181e1205c12a1c7801da5f85715d471b92a4b2f632e45e",
+      "sha256": "2bc4bc6cd2d37a58a62cd4e4403a7fd9381ab02e6bbee1e7383f979f93612f72",
+      "foot": "L",
+      "take": 3,
+      "surface": "stone",
+      "license": "CC0-1.0",
+      "seconds": 0.11147392290249433,
+      "peak": 0.28,
+      "rms": 0.03555097566321702
+    },
+    {
+      "path": "assets/audio/sfx/step_stone_f.wav",
+      "source": "footstep_concrete_000.ogg",
+      "source_sha256": "d7267e183067757c92c169de2a379abea592cfca6b39bb2e8feea15221ad79fe",
+      "sha256": "5bf503186a50997ad2905f11c88da0b17e9783d12c180df9ea1091ba8284e3bb",
+      "foot": "R",
+      "take": 3,
+      "surface": "stone",
+      "license": "CC0-1.0",
+      "seconds": 0.10303854875283447,
+      "peak": 0.28,
+      "rms": 0.037333929339916846
+    }
+  ]
+}

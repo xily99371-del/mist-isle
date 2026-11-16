@@ -3,6 +3,7 @@
 #include "raylib.h"
 #include "raymath.h"
 #include <stdbool.h>
+#include "battle.h"
 #define SW 1280
 #define SH 720
 #define ENDING_DURATION 28.0f
@@ -100,10 +101,12 @@ typedef struct {
     bool dialogueStartsBossBattle;
     bool dialogueStartsEnding;
     bool dialogueInputBlocked;
+    BattleState battle;
     int battleEnemy;
     int battleTurn;
     int battleMessage;
     float battleTimer;
+    float battleDamage;
     int battleChoice;
     float time;
     float endingTime;
@@ -148,4 +151,12 @@ void GameStart(Game *g);
 Buddy *CurrentBuddy(Game *g);
 void GetCurrentObjective(Game *g,const char **title,const char **detail,Vector2 *target,bool *hasTarget);
 float Dist(Vector2 a,Vector2 b);
+void BattleInit(Game *g);
+void BattleUpdate(Game *g,float dt);
+bool BattleStartAction(Game *g,int actor);
+int BattleBuddyCount(const Game *g);
+int BattleBuddyId(const Game *g,int slot);
+void GameBattleVictory(Game *g,int actor);
+void GameBattleRetreat(Game *g);
+void GameStartBattlePreview(Game *g);
 #endif
