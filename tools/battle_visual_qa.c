@@ -13,6 +13,7 @@ bool GameInputDown(int key){(void)key;return false;}
 void AudioPlay(AudioCue c){(void)c;}
 void AudioMovement(float d,bool b,int s,float dt){(void)d;(void)b;(void)s;(void)dt;}
 void AudioResetMovement(void){}
+bool AudioIsMuted(void){return false;}
 bool AudioSubtitlesEnabled(void){return true;}
 bool AudioBossTrackActive(void){return true;}
 float AudioGetMusicTime(void){return 8;}

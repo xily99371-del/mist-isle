@@ -1,6 +1,12 @@
 # 雾屿回响 · Mist Isle
 
 <p align="center">
+  <img src="assets/ui/title_cover.png" alt="雾屿回响：月夜遗迹入口封面" width="100%"/>
+</p>
+<p align="center"><em>月光照亮遗迹，灯塔指引归途。 / Under the moonlit ruins, the lighthouse guides the way home.</em></p>
+
+
+<p align="center">
   <strong>一段关于海岛、伙伴与失落灯塔的像素冒险。</strong><br/>
   <em>A handcrafted pixel-art adventure about an island, companions, and a lost lighthouse.</em>
 </p>

@@ -4,6 +4,7 @@
 #include "raymath.h"
 #include <stdbool.h>
 #include "battle.h"
+#include "title_menu.h"
 #define SW 1280
 #define SH 720
 #define ENDING_DURATION 28.0f
@@ -82,6 +83,7 @@ typedef struct {
 
 typedef struct {
     Scene scene;
+    TitleMenu title;
     bool previewOnly;
     Area area;
     Player player;
@@ -148,6 +150,7 @@ void RenderClose(void);
 void GameSave(Game *g);
 bool GameLoad(Game *g);
 void GameStart(Game *g);
+bool TitleMenuUpdate(Game *g,float dt);
 Buddy *CurrentBuddy(Game *g);
 void GetCurrentObjective(Game *g,const char **title,const char **detail,Vector2 *target,bool *hasTarget);
 float Dist(Vector2 a,Vector2 b);

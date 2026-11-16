@@ -101,6 +101,7 @@ add_custom_target(generate_area_maps DEPENDS "${MISTISLE_MAP_HEADER}")
 
 add_executable(mist_isle
   src/main.c
+  src/title_menu.c
   src/game.c
   src/battle.c
   src/render.c
