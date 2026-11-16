@@ -78,6 +78,7 @@ jobs:
           cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
           cmake --build build --parallel 4
           python tools/validate_project.py
+          python tools/test_map_collision.py
           python tools/test_battle.py --raylib build/_deps/raylib-src/src
           python tools/test_audio.py --raylib build/_deps/raylib-src/src
           python tools/test_postbattle.py --raylib build/_deps/raylib-src/src

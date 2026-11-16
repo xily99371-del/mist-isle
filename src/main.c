@@ -6,6 +6,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#if defined(_WIN32)
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <dwmapi.h>
+#define IDI_MIST_ISLE_ICON 101
+#endif
 
 static const char WINDOW_TITLE[] = "雾屿回响 v" MISTISLE_VERSION " · 第一章：失落的灯塔";
 
@@ -21,6 +27,21 @@ static void LocateGameAssets(void) {
     }
 }
 
+#if defined(_WIN32)
+static void ApplyWindowsWindowTheme(void) {
+    HWND hwnd=(HWND)GetWindowHandle();
+    if(!hwnd)return;
+    BOOL darkMode=TRUE;
+    HRESULT hr=DwmSetWindowAttribute(hwnd,20,&darkMode,sizeof(darkMode));
+    if(FAILED(hr))DwmSetWindowAttribute(hwnd,19,&darkMode,sizeof(darkMode));
+    COLORREF caption=RGB(15,27,43), captionText=RGB(244,232,211), border=RGB(58,82,105);
+    DwmSetWindowAttribute(hwnd,35,&caption,sizeof(caption));
+    DwmSetWindowAttribute(hwnd,36,&captionText,sizeof(captionText));
+    DwmSetWindowAttribute(hwnd,34,&border,sizeof(border));
+    HICON icon=(HICON)LoadImageW(GetModuleHandleW(NULL),MAKEINTRESOURCEW(IDI_MIST_ISLE_ICON),IMAGE_ICON,0,0,LR_DEFAULTSIZE|LR_SHARED);
+    if(icon) { SendMessageW(hwnd,WM_SETICON,ICON_BIG,(LPARAM)icon); SendMessageW(hwnd,WM_SETICON,ICON_SMALL,(LPARAM)icon); }
+}
+#endif
 int main(int argc,char **argv) {
     bool endingPreview=false,battlePreview=false;
     for(int i=1;i<argc;i++)if(strcmp(argv[i],"--ending-preview")==0)endingPreview=true;
@@ -38,6 +59,9 @@ int main(int argc,char **argv) {
     SetWindowState(FLAG_WINDOW_MAXIMIZED);
 #endif
     PlatformInputInit(GetWindowHandle());
+#if defined(_WIN32)
+    ApplyWindowsWindowTheme();
+#endif
     RenderTexture2D canvas={0};
     RenderInit();
     AudioInit();
