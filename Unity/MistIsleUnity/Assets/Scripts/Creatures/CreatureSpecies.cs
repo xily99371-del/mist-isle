@@ -11,6 +11,12 @@ namespace MistIsle.Creatures
         public string displayName;
         [TextArea] public string fieldLore;
         public ElementType primaryElement;
+        public string artKey;
+        public string spriteResourcePath;
+        public bool isStarterSpecies;
+        public bool capturable = true;
+        public bool contentReady = true;
+        public bool designApprovalPending;
 
         [Header("Growth")]
         [Min(1)] public int baseMaxHp = 30;

@@ -1,5 +1,7 @@
 # Mist Isle Unity reboot — vertical-slice plan
 
+> 2026-11-17 handoff update: the active target is the full first chapter. Watcher is retained for recovery and storage; Shiguang remains a separate capture guide. The four guardians are forest, tide, crystal and lighthouse. The lighthouse Observer also serves as the final boss after the fourth seal battle. The smaller milestones below are historical planning steps, not a claim that content or playthrough duration has been completed. See CHAPTER_ONE_STATUS.md for actual implementation and verification.
+
 ## Product direction
 The v3.0.1 C/raylib build is the preserved course edition. The Unity reboot is a separate product line intended to become a substantial portfolio project: a polished original creature-collecting exploration RPG, not a larger copy of the old one-screen demo.
 

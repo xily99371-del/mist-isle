@@ -14,6 +14,10 @@ namespace MistIsle.Creatures
         public int currentHp;
         public int bond;
         public bool isStarter;
+        public int evolutionStage;
+        public bool awakened;
+
+        public CreatureInstance() { }
 
         public CreatureInstance(CreatureSpecies species, int startingLevel, bool starter)
         {
@@ -32,5 +36,10 @@ namespace MistIsle.Creatures
         {
             return species.baseMaxHp + Mathf.Max(0, level - 1) * 3;
         }
+
+        public int Attack(CreatureSpecies species) => Mathf.RoundToInt(
+            (species.baseAttack + Mathf.Max(0, level - 1) * 2) * (awakened ? 1.7f : 1f));
+        public int Defense(CreatureSpecies species) => Mathf.RoundToInt(
+            (species.baseDefense + Mathf.Max(0, level - 1)) * (awakened ? 1.25f : 1f));
     }
 }

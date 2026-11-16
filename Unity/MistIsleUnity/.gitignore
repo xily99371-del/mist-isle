@@ -1,0 +1,14 @@
+/Library/
+/Temp/
+/Obj/
+/Logs/
+/UserSettings/
+/Builds/
+/Recordings/
+/*.csproj
+/*.sln
+/*.slnx
+/*.pidb
+/*.unityproj
+/.vs/
+/.idea/

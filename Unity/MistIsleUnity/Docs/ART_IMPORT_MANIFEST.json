@@ -1,0 +1,872 @@
+{
+  "schema_version": 1,
+  "imported_on_client_date": "2026-11-17",
+  "tool": "built-in image_gen.imagegen; no image-editing CLI or Python image editing",
+  "importer": "Assets/Editor/ApprovedArtImporter.cs",
+  "import_entrypoint": "MistIsle.Editor.ApprovedArtImporter.ImportApprovedArt",
+  "validation_entrypoint": "MistIsle.Editor.ApprovedArtImporter.ValidateImportedArt",
+  "original_art_policy": "Original user boards and frozen course-edition assets were copied without modification. Reference boards are outside Resources and are never used as runtime sprite sheets.",
+  "review_status": "Playable integration candidates. Approved designs remain canonical; AI extraction outputs require final pixel/style review. New wild-07 through wild-12 are newly authorized original candidates, not user-approved final character designs.",
+  "production_limitations": [
+    "Creature and guardian artwork currently consists of one static image each; directional, idle, attack, capture and evolution animations are incomplete.",
+    "Imagegen extraction is not pixel-identical lossless extraction; do not describe the resulting candidate cutouts as final approved production pixels.",
+    "Traveler movement currently reuses the frozen edition's existing transparent four-direction sprites; needs full accessory-by-accessory comparison with the newer art bible.",
+    "Only authorized-source short sound effects were copied. The course edition's commercial music files were excluded from the Unity content copy.",
+    "No Unity editor, test runner, or build was run by the art task. Main integration agent owns actual import/build/play verification."
+  ],
+  "import_settings": {
+    "pixels_per_unit": 64,
+    "filter": "Point",
+    "mipmaps": false,
+    "compression": "Uncompressed",
+    "wrap": "Clamp",
+    "pivot_actors_props_creatures": [
+      0.5,
+      0
+    ],
+    "pivot_ground": [
+      0.5,
+      0.5
+    ],
+    "alpha_is_transparency": true,
+    "npot_scale": "None"
+  },
+  "deterministic_processing": "Unity Texture2D.GetPixels crops independent PNG resources. For already-transparent cutouts, rectangular bounds ignore alpha values below 16/255 when locating the crop; retained pixels are copied unchanged. There is no scripted recoloring, painting, background segmentation, or invented frame generation.",
+  "animation_sources": [
+    {
+      "resource": "Art/Actors/Traveler",
+      "source": "Assets/Art/SourceReference/TravelerLegacy.png",
+      "frame_size": [
+        64,
+        80
+      ],
+      "columns": 4,
+      "rows": 4,
+      "direction_rows": [
+        "south",
+        "west",
+        "east",
+        "north"
+      ],
+      "resource_filenames": "Traveler_00.png through Traveler_15.png",
+      "status": "existing approved course-edition movement; provisional for new art bible"
+    },
+    {
+      "resource": "Art/Actors/Watcher",
+      "source": "Assets/Art/SourceReference/Watcher.png",
+      "frame_size": [
+        64,
+        80
+      ],
+      "columns": 4,
+      "rows": 4,
+      "direction_rows": [
+        "south",
+        "west",
+        "east",
+        "north"
+      ],
+      "resource_filenames": "Watcher_00.png through Watcher_15.png",
+      "role": "camp restoration and party services; separate from Shiguang"
+    }
+  ],
+  "terrain": {
+    "resource": "Art/Tiles/Ground",
+    "source": "Assets/Art/SourceReference/Ground.png",
+    "frame_size": [
+      56,
+      56
+    ],
+    "columns": 4,
+    "rows": 12,
+    "index_order": "top row to bottom row, left to right, Ground_00 through Ground_47",
+    "full_fill_tiles": {
+      "grass": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "sand": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "stone": [
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "water": [
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43
+      ]
+    },
+    "edge_tiles": {
+      "grass": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "sand": [
+        20,
+        21,
+        22,
+        23
+      ],
+      "stone": [
+        32,
+        33,
+        34,
+        35
+      ],
+      "water": [
+        44,
+        45,
+        46,
+        47
+      ]
+    }
+  },
+  "environment": [
+    {
+      "resource": "Art/Environment/House",
+      "source": "House.png",
+      "rect_top_left": [
+        0,
+        0,
+        360,
+        291
+      ]
+    },
+    {
+      "resource": "Art/Environment/Tree",
+      "source": "Environment96.png",
+      "rect_top_left": [
+        0,
+        0,
+        96,
+        96
+      ]
+    },
+    {
+      "resource": "Art/Environment/Fence",
+      "source": "Environment96.png",
+      "rect_top_left": [
+        1056,
+        0,
+        96,
+        96
+      ]
+    },
+    {
+      "resource": "Art/Environment/Signpost",
+      "source": "Environment96.png",
+      "rect_top_left": [
+        480,
+        0,
+        96,
+        96
+      ]
+    },
+    {
+      "resource": "Art/Environment/Campfire",
+      "source": "PixelProps64.png",
+      "rect_top_left": [
+        512,
+        0,
+        64,
+        64
+      ]
+    }
+  ],
+  "font": {
+    "resource": "Art/Fonts/NotoSansSC",
+    "source": "assets/fonts/NotoSansSC-SemiBold.ttf",
+    "license": "Assets/Resources/Art/Fonts/OFL.txt"
+  },
+  "audio": {
+    "resource_prefix": "Art/Audio/",
+    "source": "assets/audio/sfx/*.wav",
+    "credits": "Assets/Resources/Art/Audio/FOOTSTEP_CREDITS.txt"
+  },
+  "prompt_set": {
+    "extraction_template": "Edit the attached approved Mist Isle design board; extract only the identified existing character; preserve approved silhouette, colors, proportions, anatomy, accessories and pose. Remove the board, text, other characters, ground shadow and decorations. Output one isolated full-body pixel game-art character on a genuinely transparent background with clear margins. Do not redesign.",
+    "new_creature_template": "Create one newly authorized original candidate creature for the Mist Isle coastal fantasy pixel RPG with the specified species silhouette and element. Single complete isolated front three-quarter full-body pose, genuinely transparent background, no ground shadow, text, interface or scenery. Cozy chibi pixel game sprite with crisp outlines and restrained warm natural palette. No existing franchise characters.",
+    "exact_requests": "The conversation tool calls retain the complete per-image prompt text; the per-asset parameters below identify the source subjects or authorized new design descriptions."
+  },
+  "source_copies": [
+    {
+      "path": "Assets/Art/SourceReference/boss.png",
+      "width": 1448,
+      "height": 1086,
+      "sha256": "bd6497209665880de18b790769e7510a6e5fa0b8dddf5a6b9f55423aaf2396e3"
+    },
+    {
+      "path": "Assets/Art/SourceReference/boss_set.png",
+      "width": 1448,
+      "height": 1086,
+      "sha256": "33014ba1b7e37cf6bcaeb55504a2612d7e80528da392283dc2094b7e7403bcb4"
+    },
+    {
+      "path": "Assets/Art/SourceReference/Environment96.png",
+      "width": 1152,
+      "height": 96,
+      "sha256": "7096ef0a48f71c975d568be5eecdfe02e45e7f50e2d5f8c2166fd2f6fa3a6b4d"
+    },
+    {
+      "path": "Assets/Art/SourceReference/Flora128.png",
+      "width": 1024,
+      "height": 768,
+      "sha256": "7677f28bcc9e1deb5bfad466ba8515c91e662242accead2f543e0a7b8c6f1ab5"
+    },
+    {
+      "path": "Assets/Art/SourceReference/Ground.png",
+      "width": 224,
+      "height": 672,
+      "sha256": "e64f9c80a2b5a19b2bc76815fb930b8706c000e31c7460c065bdf3e80e4b41f8"
+    },
+    {
+      "path": "Assets/Art/SourceReference/guide_character_design_sketch.png",
+      "width": 896,
+      "height": 1216,
+      "sha256": "eca8c593c79f312a764aee6889b18ddb3f52980a465de1e82ef9113e1b585974"
+    },
+    {
+      "path": "Assets/Art/SourceReference/House.png",
+      "width": 360,
+      "height": 291,
+      "sha256": "b4dc01c8152f68f1e7b07310cce8bac2b777eb31d4556bc8c410cfc64100a83d"
+    },
+    {
+      "path": "Assets/Art/SourceReference/initial_companition.png",
+      "width": 1448,
+      "height": 1086,
+      "sha256": "b0122924a439393e2e5a8259249d94f1f180ef3dd4c8638633cb1d5b2c290bc4"
+    },
+    {
+      "path": "Assets/Art/SourceReference/LegacyLighthouseBoss.png",
+      "width": 256,
+      "height": 160,
+      "sha256": "3dd581921ebb923800078f16ccb2b15ee414d443e5afd8659a008fcfc5fbaeea"
+    },
+    {
+      "path": "Assets/Art/SourceReference/main_character_design_sketch.png",
+      "width": 896,
+      "height": 1216,
+      "sha256": "188d81a1da63f79fe701fd87f2cb52c898e5bb505ee923d73ab64b71bad56a65"
+    },
+    {
+      "path": "Assets/Art/SourceReference/pixel_initial_companition.png",
+      "width": 1448,
+      "height": 1086,
+      "sha256": "5119edbefa0414e57b0e4d3f52baeda9a8b6497b8bb0821aa53a63ae8a3f558c"
+    },
+    {
+      "path": "Assets/Art/SourceReference/pixel_other.png",
+      "width": 1448,
+      "height": 1086,
+      "sha256": "161d1920968719f1c30bdfd1183d3e5253dd8f7a084a0b85e6fdcf46ccf8cb6d"
+    },
+    {
+      "path": "Assets/Art/SourceReference/pixel_people.png",
+      "width": 1484,
+      "height": 1060,
+      "sha256": "84474e5507c7c25589a8de99f3dea33db198de0b05d7939c57c058425e628256"
+    },
+    {
+      "path": "Assets/Art/SourceReference/PixelProps64.png",
+      "width": 1024,
+      "height": 64,
+      "sha256": "658b67bb9785dab19dbdb1fd4b86c6b1a63795b054af54836da4f4504b5fc89b"
+    },
+    {
+      "path": "Assets/Art/SourceReference/TravelerLegacy.png",
+      "width": 256,
+      "height": 320,
+      "sha256": "9d4477c4686a1bb9722ae006db17ed73b7035b563a51d38e2765c281e2539def"
+    },
+    {
+      "path": "Assets/Art/SourceReference/Watcher.png",
+      "width": 256,
+      "height": 320,
+      "sha256": "3e36e0036095e9d71704b8585e09808f602207f4235a236ec5f3e226d2cf91f5"
+    }
+  ],
+  "prepared_cutouts": [
+    {
+      "key": "crystal-gecko-evolved",
+      "path": "Assets/Art/Prepared/crystal-gecko-evolved.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha_min": 0,
+      "alpha_max": 254,
+      "fully_transparent_pixels": 977338,
+      "reviewed_crop_bounds_at_alpha_16": [
+        206,
+        126,
+        1342,
+        874
+      ],
+      "sha256": "19c95880bae185a622fa190a0896483171aab725162ee0749ff788418c094c04",
+      "display_name": "霆晶龙蜥",
+      "source_board": "Assets/Art/SourceReference/pixel_initial_companition.png",
+      "source_selection": "evolved form near x=1030,y=997",
+      "status": "approved-design extraction candidate",
+      "runtime_resources": [
+        "Art/Creatures/crystal-gecko-evolved"
+      ],
+      "generated_original": "C:\\Users\\24017\\.codex\\generated_images\\01a1e558-23a2-7f70-86ba-cdeecfb35d5e\\exec-f54dc779-b6e7-4c0b-995b-2d4cd41b4292.png"
+    },
+    {
+      "key": "crystal-gecko",
+      "path": "Assets/Art/Prepared/crystal-gecko.png",
+      "width": 1312,
+      "height": 1199,
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "fully_transparent_pixels": 1435659,
+      "reviewed_crop_bounds_at_alpha_16": [
+        457,
+        389,
+        848,
+        824
+      ],
+      "sha256": "6668cda5df9480bc7d4295c32db3b74eb13a4c80616d25386b564f3aff16c8d7",
+      "display_name": "鸣晶蜥",
+      "source_board": "Assets/Art/SourceReference/pixel_initial_companition.png",
+      "source_selection": "base-form front sprite near x=297,y=998",
+      "status": "approved-design extraction candidate",
+      "runtime_resources": [
+        "Art/Creatures/crystal-gecko"
+      ],
+      "generated_original": "C:\\Users\\24017\\.codex\\generated_images\\01a1e558-23a2-7f70-86ba-cdeecfb35d5e\\exec-ecc79c88-d9de-4d03-85f8-f988f9d04914.png"
+    },
+    {
+      "key": "guardian-crystal",
+      "path": "Assets/Art/Prepared/guardian-crystal.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha_min": 0,
+      "alpha_max": 254,
+      "fully_transparent_pixels": 1320224,
+      "reviewed_crop_bounds_at_alpha_16": [
+        386,
+        287,
+        1138,
+        792
+      ],
+      "sha256": "d5d47727567bee9ad841203c3c826b032621ecfc95f707a13744b71aa15a252c",
+      "display_name": "辉棘蜥王",
+      "source_board": "Assets/Art/SourceReference/boss.png",
+      "source_selection": "small pixel sprite near x=614,y=800",
+      "status": "approved-design extraction candidate",
+      "runtime_resources": [
+        "Art/Creatures/GuardianCrystal",
+        "Art/Creatures/crystal-warden"
+      ],
+      "generated_original": "C:\\Users\\24017\\.codex\\generated_images\\01a1e558-23a2-7f70-86ba-cdeecfb35d5e\\exec-dcf78370-12b5-446d-a128-f3f4db7a971f.png"
+    },
+    {
+      "key": "guardian-grove",
+      "path": "Assets/Art/Prepared/guardian-grove.png",
+      "width": 1452,
+      "height": 1083,
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "fully_transparent_pixels": 1146295,
+      "reviewed_crop_bounds_at_alpha_16": [
+        283,
+        99,
+        1164,
+        977
+      ],
+      "sha256": "9bcb3a2db157269bf285326bd86d793d8095b0c254c24646c9be7fe37c795992",
+      "display_name": "花冠鹿灵",
+      "source_board": "Assets/Art/SourceReference/boss.png",
+      "source_selection": "small pixel sprite near x=614,y=327",
+      "status": "approved-design extraction candidate",
+      "runtime_resources": [
+        "Art/Creatures/GuardianGrove",
+        "Art/Creatures/glowglade-warden"
+      ],
+      "generated_original": "C:\\Users\\24017\\.codex\\generated_images\\01a1e558-23a2-7f70-86ba-cdeecfb35d5e\\exec-6ba393a7-6bab-4189-95f8-4e2f4385ba71.png"
+    },
+    {
+      "key": "guardian-lighthouse",
+      "path": "Assets/Art/Prepared/guardian-lighthouse.png",
+      "width": 1312,
+      "height": 1199,
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "fully_transparent_pixels": 1197201,
+      "reviewed_crop_bounds_at_alpha_16": [
+        260,
+        149,
+        1034,
+        1024
+      ],
+      "sha256": "1899e0bae2c8d6fde92912620101d47a4b8ee203c587fd065ab92d175b9ad4f8",
+      "display_name": "回响观测者",
+      "source_board": "Assets/Art/SourceReference/boss.png",
+      "source_selection": "small pixel sprite near x=1355,y=803",
+      "status": "approved-design extraction candidate",
+      "runtime_resources": [
+        "Art/Creatures/GuardianLighthouse",
+        "Art/Creatures/lighthouse-warden",
+        "Art/Creatures/FinalBoss",
+        "Art/Creatures/final-boss"
+      ],
+      "generated_original": "C:\\Users\\24017\\.codex\\generated_images\\01a1e558-23a2-7f70-86ba-cdeecfb35d5e\\exec-0eff9057-9680-41c3-b133-070bfbf17836.png"
+    },
+    {
+      "key": "guardian-tide",
+      "path": "Assets/Art/Prepared/guardian-tide.png",
+      "width": 1448,
+      "height": 1086,
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "fully_transparent_pixels": 1159717,
+      "reviewed_crop_bounds_at_alpha_16": [
+        283,
+        158,
+        1166,
+        911
+      ],
+      "sha256": "bb060c2c0b0b74674bf63c02c2f7735425cb12d0b29f1806ce2506d1c7b5b38c",
+      "display_name": "断潮蟹王",
+      "source_board": "Assets/Art/SourceReference/boss.png",
+      "source_selection": "small pixel sprite near x=1356,y=335",
+      "status": "approved-design extraction candidate",
+      "runtime_resources": [
+        "Art/Creatures/GuardianTide",
+        "Art/Creatures/tidal-warden"
+      ],
+      "generated_original": "C:\\Users\\24017\\.codex\\generated_images\\01a1e558-23a2-7f70-86ba-cdeecfb35d5e\\exec-5c1cbfd2-9b72-4c7f-b087-03d4adddffc9.png"
+    },
+    {
+      "key": "moatail-evolved",
+      "path": "Assets/Art/Prepared/moatail-evolved.png",
+      "width": 1629,
+      "height": 965,
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "fully_transparent_pixels": 914704,
+      "reviewed_crop_bounds_at_alpha_16": [
+        218,
+        95,
+        1377,
+        893
+      ],
+      "sha256": "a6817bf7034a5acb9a5a64982a509f2712f1edd7140b0715949c8f83974c4c32",
+      "display_name": "潮澜狐",
+      "source_board": "Assets/Art/SourceReference/pixel_initial_companition.png",
+      "source_selection": "evolved form near x=1030,y=680",
+      "status": "approved-design extraction candidate",
+      "runtime_resources": [
+        "Art/Creatures/moatail-evolved"
+      ],
+      "generated_original": "C:\\Users\\24017\\.codex\\generated_images\\01a1e558-23a2-7f70-86ba-cdeecfb35d5e\\exec-7d48d614-9dc0-41f8-992d-b1fd345f762d.png"
+    },
+    {
+      "key": "moatail",
+      "path": "Assets/Art/Prepared/moatail.png",
+      "width": 1263,
+      "height": 1245,
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "fully_transparent_pixels": 1317223,
+      "reviewed_crop_bounds_at_alpha_16": [
+        347,
+        335,
+        938,
+        909
+      ],
+      "sha256": "ea10857fd82b929098e49ff76546f0ca486d1d43546afecaf23813186c35c93e",
+      "display_name": "沫尾兽",
+      "source_board": "Assets/Art/SourceReference/pixel_initial_companition.png",
+      "source_selection": "base-form front sprite near x=297,y=680",
+      "status": "approved-design extraction candidate",
+      "runtime_resources": [
+        "Art/Creatures/moatail"
+      ],
+      "generated_original": "C:\\Users\\24017\\.codex\\generated_images\\01a1e558-23a2-7f70-86ba-cdeecfb35d5e\\exec-c3b8e062-fa51-43db-87d1-28469ed3355b.png"
+    },
+    {
+      "key": "moss-lumi-evolved",
+      "path": "Assets/Art/Prepared/moss-lumi-evolved.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha_min": 0,
+      "alpha_max": 254,
+      "fully_transparent_pixels": 946403,
+      "reviewed_crop_bounds_at_alpha_16": [
+        205,
+        83,
+        1325,
+        959
+      ],
+      "sha256": "064e769ee89187c32f99c63baae74e10a4c130ff6d4d26bc972d4bb19acf78d3",
+      "display_name": "苔辉灵",
+      "source_board": "Assets/Art/SourceReference/pixel_initial_companition.png",
+      "source_selection": "evolved form near x=1030,y=361",
+      "status": "approved-design extraction candidate",
+      "runtime_resources": [
+        "Art/Creatures/moss-lumi-evolved"
+      ],
+      "generated_original": "C:\\Users\\24017\\.codex\\generated_images\\01a1e558-23a2-7f70-86ba-cdeecfb35d5e\\exec-bac98a44-174a-408d-9a94-4163ec142e86.png"
+    },
+    {
+      "key": "moss-lumi",
+      "path": "Assets/Art/Prepared/moss-lumi.png",
+      "width": 1199,
+      "height": 1312,
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "fully_transparent_pixels": 1067893,
+      "reviewed_crop_bounds_at_alpha_16": [
+        170,
+        137,
+        1029,
+        1118
+      ],
+      "sha256": "77b638de770a7a6140eca13921538a7edea692c589f6ffeb7013b675a43abdc1",
+      "display_name": "苔藓灵",
+      "source_board": "Assets/Art/SourceReference/pixel_initial_companition.png",
+      "source_selection": "base-form front sprite near x=298,y=369",
+      "status": "approved-design extraction candidate",
+      "runtime_resources": [
+        "Art/Creatures/moss-lumi"
+      ],
+      "generated_original": "C:\\Users\\24017\\.codex\\generated_images\\01a1e558-23a2-7f70-86ba-cdeecfb35d5e\\exec-be7be55c-8431-4879-a0f6-d3a54af60bea.png"
+    },
+    {
+      "key": "Shiguang",
+      "path": "Assets/Art/Prepared/Shiguang.png",
+      "width": 1122,
+      "height": 1402,
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "fully_transparent_pixels": 1246730,
+      "reviewed_crop_bounds_at_alpha_16": [
+        295,
+        280,
+        835,
+        1195
+      ],
+      "sha256": "25d845e14a0ca69b1028bbf1f94711db2323cae7c0c6ef39f91efb29b06de5ae",
+      "display_name": "Shiguang",
+      "source_board": "Assets/Art/SourceReference/pixel_people.png",
+      "source_selection": "front NPC sprite near x=475,y=415; reference rect (428,338)-(524,482)",
+      "role": "capture guide",
+      "status": "approved-design extraction candidate",
+      "runtime_resources": [
+        "Art/Actors/Shiguang",
+        "Art/Portraits/Shiguang"
+      ]
+    },
+    {
+      "key": "wild-01",
+      "path": "Assets/Art/Prepared/wild-01.png",
+      "width": 1312,
+      "height": 1199,
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "fully_transparent_pixels": 1024617,
+      "reviewed_crop_bounds_at_alpha_16": [
+        240,
+        132,
+        1072,
+        1057
+      ],
+      "sha256": "e657d773a2db7c262348c9c5c1e95a5d5a70555a2bd5fb10735f9e181b4da239",
+      "display_name": "露栗团鼠",
+      "source_board": "Assets/Art/SourceReference/pixel_other.png",
+      "source_selection": "front sprite near x=478,y=153",
+      "status": "approved-design extraction candidate",
+      "runtime_resources": [
+        "Art/Creatures/wild-01"
+      ],
+      "generated_original": "C:\\Users\\24017\\.codex\\generated_images\\01a1e558-23a2-7f70-86ba-cdeecfb35d5e\\exec-16064698-d938-4f3b-a99b-a1b6806c7f41.png"
+    },
+    {
+      "key": "wild-02",
+      "path": "Assets/Art/Prepared/wild-02.png",
+      "width": 1312,
+      "height": 1199,
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "fully_transparent_pixels": 1462633,
+      "reviewed_crop_bounds_at_alpha_16": [
+        450,
+        352,
+        861,
+        817
+      ],
+      "sha256": "9e1cd6ffefd3afdd7e3b4439ad17740822174bfba5d3249857cb05ee997f808e",
+      "display_name": "萤羽雀",
+      "source_board": "Assets/Art/SourceReference/pixel_other.png",
+      "source_selection": "front sprite near x=1192,y=145",
+      "status": "approved-design extraction candidate",
+      "runtime_resources": [
+        "Art/Creatures/wild-02"
+      ],
+      "generated_original": "C:\\Users\\24017\\.codex\\generated_images\\01a1e558-23a2-7f70-86ba-cdeecfb35d5e\\exec-e3db0b6f-30b6-41c0-be14-9731717d398e.png"
+    },
+    {
+      "key": "wild-03",
+      "path": "Assets/Art/Prepared/wild-03.png",
+      "width": 1312,
+      "height": 1199,
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "fully_transparent_pixels": 981914,
+      "reviewed_crop_bounds_at_alpha_16": [
+        202,
+        161,
+        1099,
+        1046
+      ],
+      "sha256": "c56e4c7ce595c3db44e189414d4e5546158750fe000978e3d0d33c7bf52d6506",
+      "display_name": "潮壳蟹",
+      "source_board": "Assets/Art/SourceReference/pixel_other.png",
+      "source_selection": "front sprite near x=480,y=470",
+      "status": "approved-design extraction candidate",
+      "runtime_resources": [
+        "Art/Creatures/wild-03"
+      ],
+      "generated_original": "C:\\Users\\24017\\.codex\\generated_images\\01a1e558-23a2-7f70-86ba-cdeecfb35d5e\\exec-4a05c4a7-1718-4c2d-8746-ed8f69dce3ef.png"
+    },
+    {
+      "key": "wild-04",
+      "path": "Assets/Art/Prepared/wild-04.png",
+      "width": 1312,
+      "height": 1199,
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "fully_transparent_pixels": 1146537,
+      "reviewed_crop_bounds_at_alpha_16": [
+        232,
+        188,
+        1125,
+        947
+      ],
+      "sha256": "1ae63d67f9c431c732743b7f8271b1dbf4ed4e857a4e03b7d785adb77a0bfec6",
+      "display_name": "雾棘蝠",
+      "source_board": "Assets/Art/SourceReference/pixel_other.png",
+      "source_selection": "front sprite near x=1190,y=470",
+      "status": "approved-design extraction candidate",
+      "runtime_resources": [
+        "Art/Creatures/wild-04"
+      ],
+      "generated_original": "C:\\Users\\24017\\.codex\\generated_images\\01a1e558-23a2-7f70-86ba-cdeecfb35d5e\\exec-1850841f-cf9f-4d79-9297-f717481194bc.png"
+    },
+    {
+      "key": "wild-05",
+      "path": "Assets/Art/Prepared/wild-05.png",
+      "width": 1203,
+      "height": 1308,
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "fully_transparent_pixels": 1119747,
+      "reviewed_crop_bounds_at_alpha_16": [
+        290,
+        115,
+        1009,
+        1116
+      ],
+      "sha256": "238d59229a08376e76eb1c30ff89f831a5226b039f1fc24570f17e9738721f28",
+      "display_name": "藤角鹿",
+      "source_board": "Assets/Art/SourceReference/pixel_other.png",
+      "source_selection": "front sprite near x=478,y=780",
+      "status": "approved-design extraction candidate",
+      "runtime_resources": [
+        "Art/Creatures/wild-05"
+      ],
+      "generated_original": "C:\\Users\\24017\\.codex\\generated_images\\01a1e558-23a2-7f70-86ba-cdeecfb35d5e\\exec-e1c3926a-8a0e-4658-b9d4-62954bfbea4e.png"
+    },
+    {
+      "key": "wild-06",
+      "path": "Assets/Art/Prepared/wild-06.png",
+      "width": 1312,
+      "height": 1199,
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "fully_transparent_pixels": 1192193,
+      "reviewed_crop_bounds_at_alpha_16": [
+        302,
+        155,
+        1009,
+        1045
+      ],
+      "sha256": "e59c135cb654fa126991e2cd5fe572163ac9bc4de0563e4bbb9a091cc7ff5161",
+      "display_name": "碎光水母",
+      "source_board": "Assets/Art/SourceReference/pixel_other.png",
+      "source_selection": "front sprite near x=1190,y=780",
+      "status": "approved-design extraction candidate",
+      "runtime_resources": [
+        "Art/Creatures/wild-06"
+      ],
+      "generated_original": "C:\\Users\\24017\\.codex\\generated_images\\01a1e558-23a2-7f70-86ba-cdeecfb35d5e\\exec-173d7d99-6777-4bea-9dc4-20c94034f8c8.png"
+    },
+    {
+      "key": "wild-07",
+      "path": "Assets/Art/Prepared/wild-07.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "fully_transparent_pixels": 1148987,
+      "reviewed_crop_bounds_at_alpha_16": [
+        318,
+        63,
+        1147,
+        929
+      ],
+      "sha256": "af29183d9befb81f8020f00d935a6c6ddad5e045764c947fdc8e55d0ff9fb87f",
+      "display_name": "露芽绵羊",
+      "source_board": null,
+      "status": "new design candidate; approval pending",
+      "runtime_resources": [
+        "Art/Creatures/wild-07"
+      ],
+      "generated_original": "C:\\Users\\24017\\.codex\\generated_images\\01a1e558-23a2-7f70-86ba-cdeecfb35d5e\\exec-601574e9-22af-4f48-8881-18a6bd50c348.png"
+    },
+    {
+      "key": "wild-08",
+      "path": "Assets/Art/Prepared/wild-08.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "fully_transparent_pixels": 1220039,
+      "reviewed_crop_bounds_at_alpha_16": [
+        382,
+        123,
+        1081,
+        920
+      ],
+      "sha256": "baab156955539a4609c4c33b1b53a5b3328052a87fbcf79f0f672e6c84512c58",
+      "display_name": "潮泡海獭",
+      "source_board": null,
+      "status": "new design candidate; approval pending",
+      "runtime_resources": [
+        "Art/Creatures/wild-08"
+      ],
+      "generated_original": "C:\\Users\\24017\\.codex\\generated_images\\01a1e558-23a2-7f70-86ba-cdeecfb35d5e\\exec-f179b3a5-91e9-4d91-8d69-2f1bb05cab89.png"
+    },
+    {
+      "key": "wild-09",
+      "path": "Assets/Art/Prepared/wild-09.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha_min": 0,
+      "alpha_max": 254,
+      "fully_transparent_pixels": 1117587,
+      "reviewed_crop_bounds_at_alpha_16": [
+        308,
+        160,
+        1181,
+        898
+      ],
+      "sha256": "f606972957cb7539850e623a68b26fe6e58d595cddf68b6024a9655de6407244",
+      "display_name": "晶角蜗牛",
+      "source_board": null,
+      "status": "new design candidate; approval pending",
+      "runtime_resources": [
+        "Art/Creatures/wild-09"
+      ],
+      "generated_original": "C:\\Users\\24017\\.codex\\generated_images\\01a1e558-23a2-7f70-86ba-cdeecfb35d5e\\exec-72b891f9-db52-41b8-8eb7-0bfcfa8050d9.png"
+    },
+    {
+      "key": "wild-10",
+      "path": "Assets/Art/Prepared/wild-10.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha_min": 0,
+      "alpha_max": 254,
+      "fully_transparent_pixels": 1087178,
+      "reviewed_crop_bounds_at_alpha_16": [
+        247,
+        62,
+        1238,
+        942
+      ],
+      "sha256": "aecec20b56795158a042492324bb110936ff36e95ccdb85997031a0ff4178879",
+      "display_name": "余烬小狐",
+      "source_board": null,
+      "status": "new design candidate; approval pending",
+      "runtime_resources": [
+        "Art/Creatures/wild-10"
+      ],
+      "generated_original": "C:\\Users\\24017\\.codex\\generated_images\\01a1e558-23a2-7f70-86ba-cdeecfb35d5e\\exec-9cbe14cb-4545-42a1-b467-a198615b5d47.png"
+    },
+    {
+      "key": "wild-11",
+      "path": "Assets/Art/Prepared/wild-11.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha_min": 0,
+      "alpha_max": 254,
+      "fully_transparent_pixels": 992523,
+      "reviewed_crop_bounds_at_alpha_16": [
+        181,
+        114,
+        1323,
+        886
+      ],
+      "sha256": "79433b20229e5b222afe1917f0c594d3127802e6e9049efd338f02d876b5da03",
+      "display_name": "风铃飞蛾",
+      "source_board": null,
+      "status": "new design candidate; approval pending",
+      "runtime_resources": [
+        "Art/Creatures/wild-11"
+      ],
+      "generated_original": "C:\\Users\\24017\\.codex\\generated_images\\01a1e558-23a2-7f70-86ba-cdeecfb35d5e\\exec-ee513040-d4b6-4b6b-ab32-7004853599ad.png"
+    },
+    {
+      "key": "wild-12",
+      "path": "Assets/Art/Prepared/wild-12.png",
+      "width": 1536,
+      "height": 1024,
+      "alpha_min": 0,
+      "alpha_max": 254,
+      "fully_transparent_pixels": 1079787,
+      "reviewed_crop_bounds_at_alpha_16": [
+        323,
+        184,
+        1248,
+        887
+      ],
+      "sha256": "17a22a7f94f128dcda9c7e0870fe1cf94673748278c5ef6a5977d38a28fd8447",
+      "display_name": "礁岩石龟",
+      "source_board": null,
+      "status": "new design candidate; approval pending",
+      "runtime_resources": [
+        "Art/Creatures/wild-12"
+      ],
+      "generated_original": "C:\\Users\\24017\\.codex\\generated_images\\01a1e558-23a2-7f70-86ba-cdeecfb35d5e\\exec-53d93027-1ff4-4832-9dc1-bee37cc50c49.png"
+    }
+  ]
+}

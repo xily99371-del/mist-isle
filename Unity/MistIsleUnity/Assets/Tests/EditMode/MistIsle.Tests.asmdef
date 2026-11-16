@@ -1,0 +1,7 @@
+{
+  "name": "MistIsle.Tests",
+  "rootNamespace": "MistIsle.Tests",
+  "references": ["MistIsle.Runtime"],
+  "includePlatforms": ["Editor"],
+  "optionalUnityReferences": ["TestAssemblies"]
+}
