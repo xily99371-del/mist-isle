@@ -44,7 +44,6 @@ jobs:
                       publish = previous.returncode != 0 or previous.stdout.strip() != version
                   else:
                       publish = True
-                  # Retry a version whose earlier build failed before its tag was created.
                   tag = subprocess.run(['git', 'show-ref', '--verify', '--quiet', f'refs/tags/v{version}'])
                   if tag.returncode not in (0, 1):
                       raise SystemExit('Could not determine whether the release tag exists.')
@@ -55,8 +54,50 @@ jobs:
               output.write(f'version={version}\npublish={str(publish).lower()}\n')
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:
               summary.write(f'Version **{version}** · source `{os.environ["GITHUB_SHA"]}`\n\n')
-              summary.write('Release requested after both builds pass.\n' if publish else 'Build and package verification only.\n')
+              summary.write('Release requested after platform builds and gameplay QA pass.\n' if publish else 'Build and package verification only.\n')
           PY
+
+  verify-gameplay:
+    needs: release-plan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare production rendering dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake libx11-dev libxrandr-dev libxi-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libasound2-dev xvfb ffmpeg
+          python -m pip install pillow
+      - name: Build and verify final pet combat and audio
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --parallel 4
+          python tools/validate_project.py
+          python tools/test_battle.py --raylib build/_deps/raylib-src/src
+          python tools/test_audio.py --raylib build/_deps/raylib-src/src
+          python tools/test_postbattle.py --raylib build/_deps/raylib-src/src
+          python tools/test_render_math.py --raylib build/_deps/raylib-src/src
+          python tools/test_footstep_assets.py
+      - name: Capture actual party healing and Boss guard combo
+        run: |
+          python tools/test_battle_visuals.py --build build
+          python tools/test_battle_visuals.py --build build --boss-combo --output build/boss-guard-frames
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Gameplay-QA-v${{ needs.release-plan.outputs.version }}
+          path: |
+            build/battle-impact-02.mp4
+            build/boss-guard-combo.mp4
+            build/battle-frames/frame-0181.png
+            build/boss-guard-frames/frame-0100.png
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
 
   build-windows:
     needs: release-plan
@@ -82,6 +123,8 @@ jobs:
             python tools/preview_cc0_packs.py
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
+          python tools/test_footstep_assets.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python tools/validate_project.py
       - name: Configure standalone Windows executable
         run: cmake -S . -B build -A x64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
@@ -126,11 +169,13 @@ jobs:
           python tools/build_kenney_runtime_atlas.py
           python tools/preview_tiled_maps.py --output build/map-previews
           if [ -f third_party/kenney/rpg-base/KenneyRPGpack.zip ]; then python tools/preview_cc0_packs.py; fi
+          python tools/test_footstep_assets.py
           python tools/validate_project.py
       - name: Configure Raspberry Pi 5 profile
         run: cmake -S . -B build-pi -DCMAKE_BUILD_TYPE=Release -DMISTISLE_PI_PROFILE=ON
-      - name: Verify music continuity and post-battle sequence
+      - name: Verify pet combat music continuity and post-battle sequence
         run: |
+          python tools/test_battle.py --raylib build-pi/_deps/raylib-src/src
           python tools/test_audio.py --raylib build-pi/_deps/raylib-src/src
           python tools/test_postbattle.py --raylib build-pi/_deps/raylib-src/src
           python tools/test_render_math.py --raylib build-pi/_deps/raylib-src/src
@@ -151,7 +196,7 @@ jobs:
           if-no-files-found: error
 
   publish-release:
-    needs: [release-plan, build-windows, build-raspberry-pi5]
+    needs: [release-plan, build-windows, build-raspberry-pi5, verify-gameplay]
     if: github.ref == 'refs/heads/main' && needs.release-plan.outputs.publish == 'true' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     permissions:
@@ -206,7 +251,6 @@ jobs:
         if: steps.existing.outputs.create == 'true'
         run: |
           tag="v${RELEASE_VERSION}"
-          # Non-forced creation fails if another publisher created this tag first.
           gh api --method POST "repos/${GH_REPO}/git/refs" -f "ref=refs/tags/${tag}" -f "sha=${GITHUB_SHA}" > /dev/null
           gh release create "$tag" --verify-tag --target "$GITHUB_SHA" --draft \
             --title "雾屿回响 · Mist Isle ${tag}" --notes-file "docs/RELEASE_${tag}.md" \
