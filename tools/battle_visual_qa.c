@@ -6,6 +6,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 static bool guard;
 bool GameInputPressed(int key){return key==KEY_SPACE&&guard;}
 bool GameInputDown(int key){(void)key;return false;}
@@ -28,14 +29,21 @@ int main(int argc,char **argv){
     RenderInit();RenderTexture2D canvas=LoadRenderTexture(SW,SH);
     Game g;GameStartBattlePreview(&g);
     g.lumi.hp=61;g.splash.hp=45;g.spark.hp=67;BattleInit(&g);
+    bool comboCheck=argc>2&&strcmp(argv[2],"--boss-combo")==0;
+    if(comboCheck){g.enemies[0].hp=150;g.battleRound=2;BattleInit(&g);}
     int action=0,frame=0;float rest=0;
     for(int tick=0;tick<630;tick++) {
         guard=false;
         if(g.battle.phase==BATTLE_CHOOSE){
             rest+=1.0f/60;
-            if(rest>.55f&&action<3){BattleStartAction(&g,action==0?1:action==1?2:0);action++;rest=0;}
+            if(rest>.55f&&action<3){BattleStartAction(&g,comboCheck? action:action==0?1:action==1?2:0);action++;rest=0;}
         }
-        if(g.battle.phase==BATTLE_ENEMY&&!g.battle.guardAttempted&&g.battle.clock>g.battle.impactAt-.14f)guard=true;
+        if(g.battle.phase==BATTLE_ENEMY&&!g.battle.impacted&&!g.battle.guardAttempted) {
+            /* One early miss in the combo preview shows per-hit recovery;
+             * the other strikes use the real stage-specific judge window. */
+            guard=comboCheck&&g.battle.strikeIndex==1 ? g.battle.clock>.12f :
+                g.battle.clock>g.battle.impactAt-g.battle.guardWindow*.5f;
+        }
         GameUpdate(&g,1.0f/60);
         BeginDrawing();ClearBackground(BLACK);RenderBeginCanvas(canvas);ClearBackground(BLACK);
         GameRender(&g);EndTextureMode();EndDrawing();

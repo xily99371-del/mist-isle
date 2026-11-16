@@ -12,6 +12,20 @@ int BattleBossPhase(float hp,float maxHp) {
     float scaled=fmaxf(0,hp)*3.0f;
     return scaled<=maxHp?3:scaled<=maxHp*2.0f?2:1;
 }
+int BattleBossHitCount(int phase,bool heavy) {
+    phase=phase<1?1:phase>3?3:phase;
+    return phase+(heavy?1:0);
+}
+float BattleBossAttackDamage(int phase,bool heavy) {
+    const float normal[3]={18,26,34},resonance[3]={28,42,60};
+    phase=phase<1?1:phase>3?3:phase;
+    return heavy?resonance[phase-1]:normal[phase-1];
+}
+float BattleGuardRingRadius(const BattleState *b,float clock) {
+    float t=b->impactAt>0?fmaxf(0,fminf(1,clock/b->impactAt)):1;
+    return b->guardTargetRadius+(b->guardOuterRadius-b->guardTargetRadius)*
+           (1-powf(t,fmaxf(.1f,b->guardCurve)));
+}
 static Buddy *Partner(Game *g,int id) {
     return id==0?&g->lumi:id==1?&g->splash:id==2?&g->spark:NULL;
 }
@@ -72,6 +86,10 @@ static void Action(Game *g,BattlePhase phase,BattleAction action,int actor) {
     b->clock=0;b->hitStop=0;b->impacted=false;b->guarded=false;b->guardAttempted=false;
     b->combo=false;b->damped=false;b->damage=0;b->heal=0;
     memset(b->healByBuddy,0,sizeof(b->healByBuddy));
+    b->strikeIndex=b->strikesDone=b->guardsSucceeded=0;b->strikeCount=1;
+    b->attackPhase=1;b->attackDamage=0;b->guardWindow=.20f;
+    b->guardNeedsRelease=false;
+    memset(b->guardResults,0,sizeof(b->guardResults));
     g->battleTurn=phase==BATTLE_ENEMY?1:0;
 }
 bool BattleStartAction(Game *g,int actor) {
@@ -101,21 +119,45 @@ bool BattleStartAction(Game *g,int actor) {
     AudioPlay(AUDIO_DASH);
     return true;
 }
+static void EnemyStrike(Game *g) {
+    BattleState *b=&g->battle;
+    bool boss=g->enemies[g->battleEnemy].type==ENEMY_BOSS;
+    bool heavy=b->action==ACTION_RESONANCE;
+    int stage=b->attackPhase;
+    /* Stable variation is independent of global RNG, frame rate and rendering.
+     * Each cue is fully visible for >=0.60 s and has one fixed target ring. */
+    unsigned int seed=(unsigned int)g->battleRound*7u+(unsigned int)stage*11u+
+                      (unsigned int)b->strikeIndex*13u+(heavy?5u:0u);
+    const float rhythms[5]={.00f,.08f,-.04f,.12f,.03f};
+    float lead=heavy?(stage==3?.80f:stage==2?.94f:1.10f):
+                      (stage==3?.68f:stage==2?.80f:.94f);
+    b->clock=0;b->hitStop=0;b->impacted=false;
+    b->guarded=false;b->guardAttempted=false;b->guardNeedsRelease=GameInputDown(KEY_SPACE);
+    b->impactAt=boss?lead+rhythms[seed%5u]:.88f;
+    b->duration=b->impactAt+(heavy?.30f:.26f);
+    b->guardWindow=boss?(stage==3?.12f:stage==2?.16f:.20f):.20f;
+    b->guardTargetRadius=28.0f+(float)(seed%5u)*4.0f;
+    b->guardOuterRadius=b->guardTargetRadius+40.0f+(float)((seed/5u)%4u)*5.0f;
+    b->guardCurve=.85f+(float)((seed/3u)%4u)*.13f;
+    b->damage=b->attackDamage/(float)b->strikeCount;
+    Message(g,TextFormat("%s · 第 %d / %d 击，看准光圈按 Space！",
+        heavy?"共鸣重击":"守卫出击",b->strikeIndex+1,b->strikeCount));
+}
 static void EnemyAction(Game *g) {
     BattleState *b=&g->battle;Enemy *e=&g->enemies[g->battleEnemy];
     int defender=b->defender;
     if(!CanAct(g,defender))defender=BattleBuddyId(g,0);
     if(defender<0){PartyDefeated(g);return;}
     int phase=BattleBossPhase(e->hp,e->maxHp);
-    bool heavy=e->type==ENEMY_BOSS&&(phase==3?g->battleRound%2==0:g->battleRound%3==0);
+    bool boss=e->type==ENEMY_BOSS;
+    bool heavy=boss&&(phase==3?g->battleRound%2==0:g->battleRound%3==0);
     Action(g,BATTLE_ENEMY,heavy?ACTION_RESONANCE:ACTION_ENEMY,-1);
-    b->defender=defender;
-    b->duration=heavy?1.95f:1.45f;b->impactAt=heavy?1.20f:.88f;
-    b->damage=e->type==ENEMY_BOSS?(phase==3?20:phase==2?17:14):10;
-    if(heavy)b->damage+=phase==3?12:9;
+    b->defender=defender;b->attackPhase=phase;
+    b->strikeCount=boss?BattleBossHitCount(phase,heavy):1;
+    b->attackDamage=boss?BattleBossAttackDamage(phase,heavy):10;
     b->damped=b->dampen;
-    if(b->damped)b->damage*=e->type==ENEMY_BOSS?.65f:.8f;
-    Message(g,heavy?"共鸣重击 · 光圈接近中心时按 Space 格挡！":"敌方攻击 · 光圈接近中心时按 Space 格挡！");
+    if(b->damped)b->attackDamage*=boss?.65f:.8f;
+    EnemyStrike(g);
 }
 static void Impact(Game *g) {
     BattleState *b=&g->battle;Enemy *e=&g->enemies[g->battleEnemy];
@@ -145,7 +187,9 @@ static void Impact(Game *g) {
         }
         AudioPlay(AUDIO_ATTACK);
     } else {
-        if(b->guarded)b->damage*=.45f;
+        if(b->guarded){b->damage*=.45f;b->guardsSucceeded++;}
+        b->guardResults[b->strikeIndex]=b->guarded?1:-1;
+        b->strikesDone++;
         Buddy *p=Partner(g,b->defender);
         if(p&&p->owned&&p->hp>0)p->hp=fmaxf(0,p->hp-b->damage);
         else b->damage=0; /* A vanished pet target never redirects to traveller. */
@@ -199,9 +243,14 @@ void BattleUpdate(Game *g,float dt) {
     if(b->phase==BATTLE_CHOOSE){ChooseInput(g);return;}
     /* Guard input does not select partners or queue another command. Only
        one deliberate press is evaluated, before the hit is committed. */
-    if(b->phase==BATTLE_ENEMY&&!b->impacted&&!b->guardAttempted&&GameInputPressed(KEY_SPACE)) {
-        b->guardAttempted=true;
-        b->guarded=b->clock>=b->impactAt-.20f&&b->clock<=b->impactAt;
+    if(b->phase==BATTLE_ENEMY) {
+        if(!GameInputDown(KEY_SPACE))b->guardNeedsRelease=false;
+        if(!b->impacted&&!b->guardAttempted&&!b->guardNeedsRelease&&GameInputPressed(KEY_SPACE)) {
+            b->guardAttempted=true;
+            /* Use the clock the player actually saw, not clock+dt. A key on
+             * the last visible frame must not become late due to this frame. */
+            b->guarded=b->clock>=b->impactAt-b->guardWindow&&b->clock<=b->impactAt;
+        }
     }
     if(b->hitStop>0) {
         float used=fminf(b->hitStop,dt);b->hitStop-=used;dt-=used;
@@ -213,6 +262,11 @@ void BattleUpdate(Game *g,float dt) {
         if(e->hp<=0){b->phase=BATTLE_DEFEAT;b->clock=0;b->duration=.70f;b->hitStop=0;}
         else EnemyAction(g);
     } else if(b->phase==BATTLE_ENEMY) {
+        /* Keep the target locked for the whole combo. When it falls, cancel
+         * remaining hits; never redirect damage to another pet or traveller. */
+        if(b->strikeIndex+1<b->strikeCount&&CanAct(g,b->defender)) {
+            b->strikeIndex++;EnemyStrike(g);return;
+        }
         if(BattleBuddyCount(g)==0){PartyDefeated(g);return;}
         if(b->wetTurns>0&&--b->wetTurns==0)g->enemySoaked=false;
         g->battleRound++;g->battleTurn=0;b->phase=BATTLE_CHOOSE;b->clock=0;b->inputBlocked=Held();

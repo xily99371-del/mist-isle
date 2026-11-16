@@ -226,14 +226,6 @@ static void RenderBattle(Game *g) {
             DrawRing(target,28,65,40,250,24,Fade(skill,impact*.7f));
         }
         if(b->impacted)BattleBurst(target,skill,age,b->action);
-        if(enemy&&!b->impacted) {
-            /* Contracting timing circle reaches the fixed target at impact.
-             * It is a timing aid, never an area attack or movement mechanic. */
-            float left=Clamp((b->impactAt-b->clock)/.7f,0,1);
-            DrawCircleLinesV(target,42,Fade(C_BLUE,.75f));
-            DrawCircleLinesV(target,42+left*80,Fade(b->guarded?C_BLUE:skill,.9f));
-            if(b->guarded)BattleGlow(target,70,C_BLUE,.25f);
-        }
         if(enemy&&b->guarded&&b->impacted)DrawRing(target,45,51,-90,90,32,Fade(C_BLUE,impact));
     }
     if(b->phase==BATTLE_DEFEAT)BattleBurst((Vector2){foe.x,foe.y-100},C_GOLD,b->clock,3);
@@ -241,7 +233,7 @@ static void RenderBattle(Game *g) {
 
     /* Native-pixel HUD stays still while only the battle stage shakes. */
     PanelDark((Rectangle){24,22,354,120});
-    DrawUIText("伙伴战斗 · IMPACT-02.2",43,35,17,(Color){247,224,179,255});
+    DrawUIText("伙伴战斗 · IMPACT-02.3",43,35,17,(Color){247,224,179,255});
     DrawUIText(TextFormat("第 %d 回合  /  %s",g->battleRound,boss?"首领战":"遭遇战"),43,63,16,(Color){183,203,216,255});
     DrawUIText(TextFormat("可战斗伙伴  %d / %d",BattleBuddyCount(g),
         g->lumi.owned+g->splash.owned+g->spark.owned),43,90,16,(Color){226,238,229,255});
@@ -257,7 +249,10 @@ static void RenderBattle(Game *g) {
         int phase=BattleBossPhase(e->hp,e->maxHp);
         DrawRectangleRounded((Rectangle){790,178,464,65},.14f,6,(Color){12,24,37,236});
         DrawUIText(phase==3?"阶段三 · 最后的灯火":phase==2?"阶段二 · 共鸣增强":"阶段一 · 灯火苏醒",806,188,17,C_GOLD);
-        DrawUIText(g->enemySoaked?"核心受潮：下回合可以触发导电":enemy&&b->action==ACTION_RESONANCE?"核心蓄能：共鸣重击即将命中":"核心稳定：可用潮湿技能打断",806,215,14,g->enemySoaked?C_BLUE:(Color){189,211,224,255});
+        bool nextHeavy=phase==3?g->battleRound%2==0:g->battleRound%3==0;
+        const char *intent=enemy?TextFormat("%d 次攻击 · 格挡 %d 次%s",b->strikeCount,b->guardsSucceeded,b->damped?" · 核心受潮":""):
+            TextFormat("%s · %d 次攻击%s",nextHeavy?"核心蓄能":"核心稳定",BattleBossHitCount(phase,nextHeavy),g->enemySoaked?" · 核心受潮":"");
+        DrawUIText(intent,806,215,14,g->enemySoaked?C_BLUE:(Color){189,211,224,255});
     }
     if(action) {
         DrawRectangleRounded((Rectangle){34,181,640,59},.12f,6,(Color){9,20,33,225});
@@ -266,6 +261,7 @@ static void RenderBattle(Game *g) {
         const char *caption=b->impacted?(b->guarded?"精准格挡！":b->combo?"潮湿导电 · 共鸣命中！":"命中！"):
             (b->clock<b->impactAt*.5f?"蓄力":"出招");
         DrawUIText(caption,288,197,17,(Color){225,235,243,255});
+        if(enemy)DrawUIText(TextFormat("第 %d / %d 击",b->strikeIndex+1,b->strikeCount),532,198,18,skill);
     }
     if(action&&b->impacted&&age<.65f) {
         float alpha=1-Clamp(age/.65f,0,1),y=target.y-42-age*48;
@@ -276,8 +272,40 @@ static void RenderBattle(Game *g) {
             DrawUIText(TextFormat("+%.0f",b->healByBuddy[id]),(int)petFeet[id].x-22,
                 (int)(petFeet[id].y-126-age*32),28,Fade(C_GREEN,alpha));
     }
-    if(enemy&&!b->impacted)DrawUIText(b->guardAttempted?(b->guarded?"格挡生效":"过早格挡"):
-        "光圈接近中心时按 Space",350,492,19,b->guarded?C_BLUE:C_GOLD);
+    if(enemy) {
+        /* Fixed HUD position, variable ring geometry, no shake on the input
+         * target. The shaded annulus is EXACTLY the valid time window. */
+        Vector2 cue={657,389};
+        Color good={126,240,205,255},bad={245,134,119,255};
+        Color cueColor=b->guardAttempted?(b->guarded?good:bad):skill;
+        DrawRectangleRounded((Rectangle){530,250,254,272},.10f,8,(Color){8,19,32,205});
+        DrawUIText(TextFormat("多次格挡  %d / %d",b->strikeIndex+1,b->strikeCount),554,261,21,(Color){240,228,198,255});
+        for(int i=0;i<b->strikeCount;i++) {
+            Color dot=b->guardResults[i]>0?good:b->guardResults[i]<0?bad:(Color){84,111,132,255};
+            DrawCircle(657+i*20-(b->strikeCount-1)*10,286,5,dot);
+            if(i==b->strikeIndex)DrawCircleLines(657+i*20-(b->strikeCount-1)*10,286,8,skill);
+        }
+        float r=b->guardTargetRadius;
+        if(!b->impacted) {
+            float band=BattleGuardRingRadius(b,b->impactAt-b->guardWindow);
+            DrawRing(cue,r-2,band+2,0,360,48,Fade(good,.22f));
+            DrawCircleLinesV(cue,r,Fade(good,.95f));
+            float moving=BattleGuardRingRadius(b,b->clock);
+            DrawRing(cue,moving-2,moving+2,0,360,48,cueColor);
+            bool now=b->clock>=b->impactAt-b->guardWindow&&!b->guardAttempted;
+            DrawCircleV(cue,r-5,now?Fade(good,.34f):(Color){22,42,58,245});
+            DrawUIText(b->guardAttempted?(b->guarded?"生效":"过早"):"SPACE",
+                (int)cue.x-(b->guardAttempted?21:26),(int)cue.y-8,17,now?WHITE:cueColor);
+            DrawUIText(b->guardNeedsRelease?"放开空格，准备下一击":b->guardAttempted?
+                (b->guarded?"本击格挡生效":"本击过早，准备下一击"):
+                now?"现在按！":"外圈与光圈重合时按",548,497,17,now?good:(Color){216,230,239,255});
+        } else {
+            BattleGlow(cue,75,cueColor,.20f);
+            DrawRing(cue,r-2,r+4,0,360,40,b->guarded?good:bad);
+            DrawUIText(b->guarded?"格挡！":"受击",cue.x-30,cue.y-12,23,b->guarded?good:bad);
+            DrawUIText(b->strikeIndex+1<b->strikeCount?"放开空格 · 下一击":"攻击完成",564,497,17,(Color){216,230,239,255});
+        }
+    }
     DrawRectangle(0,537,SW,183,(Color){11,23,35,252});
     DrawLine(24,538,1256,538,(Color){116,144,158,255});
     const char *label=b->phase==BATTLE_CHOOSE?"选择出战伙伴 · 点击卡片后确认":
@@ -310,5 +338,5 @@ static void RenderBattle(Game *g) {
     Rectangle confirm={838,613,392,56};bool ready=b->phase==BATTLE_CHOOSE&&BattleBuddyCount(g)>0;
     DrawRectangleRounded(confirm,.2f,8,ready?(Color){212,185,129,255}:(Color){39,56,71,255});
     DrawUIText(ready?"Enter / 点击此处出招":b->phase==BATTLE_PREVIEW_END?"R 重来   Esc 退出":"行动进行中",899,630,20,ready?(Color){22,40,44,255}:(Color){167,192,211,255});
-    DrawUIText(b->preview?"战斗体验 · 不读取或写入存档":"IMPACT-02.2  |  1-3 / 方向键选择  ·  Space 精准格挡",33,697,12,(Color){143,168,184,255});
+    DrawUIText(b->preview?"战斗体验 · 不读取或写入存档":"IMPACT-02.3  |  1-3 / 方向键选择  ·  Space 精准格挡",33,697,12,(Color){143,168,184,255});
 }

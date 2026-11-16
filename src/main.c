@@ -7,7 +7,7 @@
 #include <string.h>
 #include <time.h>
 
-static const char WINDOW_TITLE[] = "雾屿回响 v" MISTISLE_VERSION " - 战斗演出版 IMPACT-02.2";
+static const char WINDOW_TITLE[] = "雾屿回响 v" MISTISLE_VERSION " - 战斗演出版 IMPACT-02.3";
 
 static void LocateGameAssets(void) {
     if(FileExists("assets/characters/portraits/heroine_portrait.png"))return;
