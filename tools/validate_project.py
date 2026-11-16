@@ -334,10 +334,11 @@ if all((ROOT / p).exists() for p in approved_assets):
 else:
     print("INFO: MistIsle_ApprovedArt_v7.zip is not installed; user-approved runtime artwork is not yet available.")
 
-require("type_id in (29,31,33)" in MAP_BUILD and "210-213 small stones" in MAP_BUILD and "type_id==229" not in MAP_BUILD,
-        "small stones, low shrubs and flowering props are non-blocking while structural bases remain solid")
-require("block_rect(cx-1,cy-1,cx+1,cy-1)" in MAP_BUILD and "compact one-row tent base" in MAP_BUILD,
-        "house and tent collision footprints are reduced to compact rear/base rows")
+require("type_id in (29,31)" in MAP_BUILD and "type_id==33" in MAP_BUILD and "210-213 small stones" in MAP_BUILD and "type_id==229" not in MAP_BUILD,
+        "small stones, low shrubs and flowering props remain non-blocking while structural bases remain solid")
+require("if type_id==302" in MAP_BUILD and "block_rect(cx-2,cy,cx+2,cy)" in MAP_BUILD and
+        "block_rect(cx-1,cy,cx+1,cy)" in MAP_BUILD and "compact one-row tent base" in MAP_BUILD,
+        "coastal house foundation, lighthouse base and tent use their authored ground footprints")
 
 require(all((ROOT / f"assets/characters/svg/{name}.svg").exists() for name in ("heroine_portrait","watcher_portrait","lighthouse_guardian_portrait")),
         "three authored static character portrait source illustrations are present")
