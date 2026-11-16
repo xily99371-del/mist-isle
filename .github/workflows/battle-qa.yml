@@ -31,11 +31,19 @@ jobs:
           python tools/test_render_math.py --raylib build/_deps/raylib-src/src
       - name: Capture production battle sequence
         run: python tools/test_battle_visuals.py --build build
+      - name: Capture third-stage Boss guard combo
+        run: python tools/test_battle_visuals.py --build build --boss-combo --output build/boss-guard-frames
       - uses: actions/upload-artifact@v4
         with:
           name: battle-impact-02-visual-qa
           path: |
             build/battle-frames
             build/battle-impact-02.mp4
+            build/boss-guard-combo.mp4
+            build/boss-guard-frames/frame-0050.png
+            build/boss-guard-frames/frame-0080.png
+            build/boss-guard-frames/frame-0100.png
+            build/boss-guard-frames/frame-0120.png
+            build/boss-guard-frames/frame-0140.png
           retention-days: 7
           compression-level: 0
