@@ -1,0 +1,25 @@
+name: Boss combo workspace
+on:
+  push:
+    branches: [feature/animated-battle-v2]
+    paths: ['.github/workflows/boss-combo-workspace.yml']
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: |
+          mkdir -p qa-source
+          git archive --format=tar.gz HEAD > qa-source/source.tar.gz
+          git rev-parse HEAD > qa-source/SOURCE_COMMIT
+      - uses: actions/upload-artifact@v4
+        with:
+          name: boss-combo-workspace
+          path: qa-source
+          retention-days: 2
+          compression-level: 0
