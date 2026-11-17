@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using MistIsle.World;
+using MistIsle.Player;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -70,15 +71,25 @@ namespace MistIsle.Editor
 
                 var traveler = CreatePreviewTraveler(worldRoot.transform);
                 traveler.position=world.GetSpawn("camp-0");
-                traveler.GetComponent<SpriteRenderer>().sortingOrder=Mathf.RoundToInt(-traveler.position.y*100f);
+                traveler.GetComponentInChildren<SpriteRenderer>().sortingOrder=Mathf.RoundToInt(-traveler.position.y*100f);
                 SetActorDepth(world);
                 SaveRoom(camera,world.GetBounds("camp-0"),Path.Combine(directory,"OpeningMap-camp0-world-only.png"));
+                traveler.position=world.GetLandmarkPosition("starter-meeting")+Vector2.down*.8f;
+                SetTravelerDepth(traveler);
+                SavePlayerView(camera,world.GetBounds("camp-0"),world.GetLandmarkPosition("shiguang-approach"),
+                    Path.Combine(directory,"OpeningMap-courtyard-player-world-only.png"));
+                traveler.position=world.GetLandmarkPosition("campfire-approach");
+                SetTravelerDepth(traveler);
+                SavePlayerView(camera,world.GetBounds("camp-0"),traveler.position,
+                    Path.Combine(directory,"OpeningMap-hearth-player-world-only.png"));
 
                 world.MoveActorFacing("shiguang",world.GetLandmarkPosition("tutorial-viewpoint"),Vector2.down);
                 traveler.position=world.GetLandmarkPosition("tutorial-viewpoint")+Vector2.left*1.2f;
-                traveler.GetComponent<SpriteRenderer>().sortingOrder=Mathf.RoundToInt(-traveler.position.y*100f);
+                traveler.GetComponentInChildren<SpriteRenderer>().sortingOrder=Mathf.RoundToInt(-traveler.position.y*100f);
                 SetActorDepth(world);
                 SaveRoom(camera,world.GetBounds("coast-0"),Path.Combine(directory,"OpeningMap-coast0-world-only.png"));
+                SavePlayerView(camera,world.GetBounds("coast-0"),world.GetLandmarkPosition("tutorial-viewpoint"),
+                    Path.Combine(directory,"OpeningMap-cove-player-world-only.png"));
                 File.WriteAllText(Path.Combine(directory,"OpeningMap-preview-kind.txt"),
                     "WORLD ONLY. Isolated temporary preview scene rendered through Camera.Render to a RenderTexture.\n"+
                     "No GameSession, no IMGUI/HUD, no story progression or real keyboard interaction was tested.\n"+
@@ -99,12 +110,14 @@ namespace MistIsle.Editor
             var frames=Resources.LoadAll<Sprite>("Art/Actors/ApprovedTraveler");
             Array.Sort(frames,(a,b)=>string.CompareOrdinal(a.name,b.name));
             if(frames.Length==0) throw new InvalidOperationException("Original approved traveler frames have not been imported.");
-            var traveler=new GameObject("PreviewTraveler",typeof(SpriteRenderer));
+            var traveler=new GameObject("PreviewTraveler");
             traveler.transform.SetParent(parent,false);
-            var renderer=traveler.GetComponent<SpriteRenderer>();
+            var sprite=new GameObject("Sprite",typeof(SpriteRenderer));
+            sprite.transform.SetParent(traveler.transform,false);
+            var renderer=sprite.GetComponent<SpriteRenderer>();
             renderer.sprite=frames[0];
             renderer.sharedMaterial=Resources.Load<Material>("Settings/MistIsleSpriteLit");
-            traveler.transform.localScale=Vector3.one*(1.8f/Mathf.Max(.01f,frames[0].bounds.size.y));
+            ActorVisualSizing.ApplyHuman(renderer,frames[0]);
             return traveler.transform;
         }
 
@@ -121,17 +134,37 @@ namespace MistIsle.Editor
 
         private static void SaveRoom(Camera camera,Rect bounds,string path)
         {
+            camera.orthographicSize=10.4f;
+            camera.aspect=1.6f;
             camera.transform.position=new Vector3(bounds.center.x,bounds.center.y,-10f);
-            var target=RenderTexture.GetTemporary(1600,1000,24,RenderTextureFormat.ARGB32,RenderTextureReadWrite.sRGB);
+            SaveFrame(camera,1600,1000,path);
+        }
+
+        private static void SetTravelerDepth(Transform traveler)
+            => traveler.GetComponentInChildren<SpriteRenderer>().sortingOrder=Mathf.RoundToInt(-traveler.position.y*100f);
+
+        private static void SavePlayerView(Camera camera,Rect bounds,Vector2 focus,string path)
+        {
+            camera.orthographicSize=5.6f;
+            camera.aspect=16f/9f;
+            float halfWidth=camera.orthographicSize*camera.aspect;
+            camera.transform.position=new Vector3(Mathf.Clamp(focus.x,bounds.xMin+halfWidth,bounds.xMax-halfWidth),
+                Mathf.Clamp(focus.y,bounds.yMin+camera.orthographicSize,bounds.yMax-camera.orthographicSize),-10f);
+            SaveFrame(camera,1600,900,path);
+        }
+
+        private static void SaveFrame(Camera camera,int width,int height,string path)
+        {
+            var target=RenderTexture.GetTemporary(width,height,24,RenderTextureFormat.ARGB32,RenderTextureReadWrite.sRGB);
             var previousActive=RenderTexture.active;
             var previousTarget=camera.targetTexture;
-            var texture=new Texture2D(1600,1000,TextureFormat.RGB24,false);
+            var texture=new Texture2D(width,height,TextureFormat.RGB24,false);
             try
             {
                 camera.targetTexture=target;
                 camera.Render();
                 RenderTexture.active=target;
-                texture.ReadPixels(new Rect(0,0,1600,1000),0,0);
+                texture.ReadPixels(new Rect(0,0,width,height),0,0);
                 texture.Apply();
                 File.WriteAllBytes(path,texture.EncodeToPNG());
                 Debug.Log("MIST_ISLE_WORLD_ONLY_CAPTURE: "+path);

@@ -86,11 +86,8 @@ namespace MistIsle.Runtime
             var sprite = visual.GetComponent<SpriteRenderer>();
             var frames = Resources.LoadAll<Sprite>("Art/Actors/ApprovedTraveler");
             if (frames.Length == 0) throw new InvalidOperationException("The approved pixel_people traveler frames must be imported before play.");
-            Array.Sort(frames, (a, b) => {
-                int.TryParse(a.name.Substring(a.name.LastIndexOf('_') + 1), out var ai);
-                int.TryParse(b.name.Substring(b.name.LastIndexOf('_') + 1), out var bi);
-                return ai.CompareTo(bi);
-            });
+            // Approved frame names are zero padded; a Unity sprite subasset may also append "_0".
+            Array.Sort(frames, (a, b) => string.CompareOrdinal(a.name, b.name));
             sprite.sharedMaterial = Resources.Load<Material>("Settings/MistIsleSpriteLit");
             var animation = player.AddComponent<TravelerPresentation>();
             if (frames.Length >= 12)
@@ -105,8 +102,7 @@ namespace MistIsle.Runtime
             if (frames.Length > 0)
             {
                 sprite.sprite = frames[0];
-                float height = frames[0].bounds.size.y;
-                visual.transform.localScale = Vector3.one * (1.62f / Mathf.Max(.01f, height));
+                ActorVisualSizing.ApplyHuman(sprite, frames[0]);
             }
         }
 

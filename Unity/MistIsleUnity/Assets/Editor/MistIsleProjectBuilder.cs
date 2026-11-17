@@ -46,6 +46,7 @@ namespace MistIsle.Editor
             method?.Invoke(null, null);
             importer?.GetMethod("ValidateImportedArt", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)?.Invoke(null, null);
             importer?.GetMethod("ValidateOriginalPixelActors", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)?.Invoke(null, null);
+            importer?.GetMethod("ValidateApprovedPortraits", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)?.Invoke(null, null);
         }
 
         private static void ConfigureRendering()
@@ -105,7 +106,7 @@ namespace MistIsle.Editor
         {
             PlayerSettings.companyName = "MistIsle";
             PlayerSettings.productName = "Mist Isle — 雾屿回响";
-            PlayerSettings.bundleVersion = "0.2.2";
+            PlayerSettings.bundleVersion = "0.3.0";
             PlayerSettings.defaultScreenWidth = 1280;
             PlayerSettings.defaultScreenHeight = 720;
             PlayerSettings.fullScreenMode = FullScreenMode.Windowed;

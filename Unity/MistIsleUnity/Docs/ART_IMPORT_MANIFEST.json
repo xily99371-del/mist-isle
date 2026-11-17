@@ -1104,5 +1104,276 @@
         "visual_review": "Actual independent output PNG and actual camp/coast world-only render inspected; original full prop/cliff component retained without neighboring source prop."
       }
     }
+  ],
+  "approved_dialogue_portraits": {
+    "import_entrypoint": "MistIsle.Editor.ApprovedArtImporter.ImportApprovedPortraits",
+    "rebuild_entrypoint": "MistIsle.Editor.ApprovedArtImporter.RebuildApprovedPortraitsWithBackup",
+    "validation_entrypoint": "MistIsle.Editor.ApprovedArtImporter.ValidateApprovedPortraits",
+    "filter_mode": "Bilinear (original HD illustrations)",
+    "mipmaps": false,
+    "compression": "Uncompressed",
+    "backup_policy": "Back up existing derived portrait PNG and meta files before rebuilding; never modify any original painting or source copy.",
+    "character_identity_policy": "Traveler brown hair and blue ribbon, Shiguang champagne-blonde hair and yellow ribbon/goggles/scarf retained from original paintings. No AI redraw or world-pixel upscaling.",
+    "watcher_source_note": "The current E:/Projects/art-reference folder has no separate Watcher painting; the previously approved repository high-resolution Watcher portrait is retained, with root agent authorization. concept_design.png is a Shiguang/creature board and is not imported as a portrait.",
+    "portraits": [
+      {
+        "key": "Art/Portraits/TravelerApproved",
+        "source_copy": "Assets/Art/SourceReference/PortraitTravelerOriginal.png",
+        "original_source": "E:/Projects/美术设定/main_character_design_sketch.png",
+        "source_sha256": "188d81a1da63f79fe701fd87f2cb52c898e5bb505ee923d73ab64b71bad56a65",
+        "source_rect_top_left": [
+          30,
+          0,
+          740,
+          1216
+        ],
+        "output_canvas_size": [
+          740,
+          1216
+        ],
+        "source_is_single_character_painting": true,
+        "source_is_world_pixel_actor": false,
+        "transparency_mode": "original-paper portrait card; every original RGBA pixel preserved",
+        "reason_for_original_paper_card": "Original painting has paper scenery connected to boots and open pale edges; edge-only cleanup cannot safely separate all scenery without risking confirmed clothing or hair. Original-paper cards are the authorized fallback.",
+        "suggested_upper_body_ui_source_rect_top_left": [
+          0,
+          0,
+          740,
+          948
+        ],
+        "repainted": false,
+        "resampled": false,
+        "verification_status": "Actual independent PNG visually inspected. Old QA initial import and ValidateApprovedPortraits completed with Unity exit 0. Original visible RGBA comparison passed; no AI redraw or resampling.",
+        "display_top_fraction": 0.78,
+        "verified_output": {
+          "qa_project": "E:\\Projects\\MistIsle-Verification-20261117",
+          "size": [
+            740,
+            1216
+          ],
+          "alpha_bbox_top_left": [
+            0,
+            0,
+            740,
+            1216
+          ],
+          "sha256": "6fc90030c327d32c87b62107f649899cfa8201e81aa9ba1c3ff641b792021045",
+          "visible_original_rgba_changed": 0,
+          "hidden_rgb_in_transparent_pixels": 0
+        }
+      },
+      {
+        "key": "Art/Portraits/ShiguangApproved",
+        "source_copy": "Assets/Art/SourceReference/PortraitShiguangOriginal.png",
+        "original_source": "E:/Projects/美术设定/guide_character_design_sketch.png",
+        "source_sha256": "eca8c593c79f312a764aee6889b18ddb3f52980a465de1e82ef9113e1b585974",
+        "source_rect_top_left": [
+          178,
+          34,
+          568,
+          1100
+        ],
+        "output_canvas_size": [
+          568,
+          1100
+        ],
+        "source_is_single_character_painting": true,
+        "source_is_world_pixel_actor": false,
+        "transparency_mode": "original-paper portrait card; every original RGBA pixel preserved",
+        "reason_for_original_paper_card": "Original painting has paper scenery connected to boots and open pale edges; edge-only cleanup cannot safely separate all scenery without risking confirmed clothing or hair. Original-paper cards are the authorized fallback.",
+        "suggested_upper_body_ui_source_rect_top_left": [
+          0,
+          0,
+          568,
+          748
+        ],
+        "repainted": false,
+        "resampled": false,
+        "verification_status": "Actual independent PNG visually inspected. Old QA initial import and ValidateApprovedPortraits completed with Unity exit 0. Original visible RGBA comparison passed; no AI redraw or resampling.",
+        "display_top_fraction": 0.68,
+        "verified_output": {
+          "qa_project": "E:\\Projects\\MistIsle-Verification-20261117",
+          "size": [
+            568,
+            1100
+          ],
+          "alpha_bbox_top_left": [
+            0,
+            0,
+            568,
+            1100
+          ],
+          "sha256": "7084572f639392f2cb3722a2769fad1c1cbce4163a0f03398f8bea7b50e14d8b",
+          "visible_original_rgba_changed": 0,
+          "hidden_rgb_in_transparent_pixels": 0
+        }
+      },
+      {
+        "key": "Art/Portraits/WatcherApproved",
+        "source_copy": "Assets/Art/SourceReference/PortraitWatcherLegacyApproved.png",
+        "original_source": "assets/characters/portraits/watcher_portrait.png",
+        "source_sha256": "ab45733b9f12ffb781799413eed3d4e317b39bf3192e2aa91d559a3e70024a78",
+        "source_rect_top_left": [
+          0,
+          0,
+          1086,
+          1448
+        ],
+        "output_canvas_size": [
+          1086,
+          1448
+        ],
+        "source_is_single_character_painting": true,
+        "source_is_world_pixel_actor": false,
+        "transparency_mode": "boundary-connected white background cleanup, preserve subject component",
+        "reason_for_original_paper_card": null,
+        "suggested_upper_body_ui_source_rect_top_left": [
+          0,
+          0,
+          1086,
+          1448
+        ],
+        "repainted": false,
+        "resampled": false,
+        "verification_status": "Actual independent PNG visually inspected. Old QA initial import and ValidateApprovedPortraits completed with Unity exit 0. Original visible RGBA comparison passed; no AI redraw or resampling.",
+        "display_top_fraction": 1.0,
+        "reviewed_enclosed_paper_void_seeds_top_left": [
+          [
+            310,
+            330
+          ],
+          [
+            735,
+            750
+          ],
+          [
+            790,
+            755
+          ]
+        ],
+        "character_landmarks_retained_top_left": [
+          [
+            500,
+            225
+          ],
+          [
+            118,
+            510
+          ],
+          [
+            930,
+            590
+          ],
+          [
+            583,
+            95
+          ],
+          [
+            668,
+            51
+          ],
+          [
+            335,
+            1050
+          ],
+          [
+            565,
+            974
+          ],
+          [
+            794,
+            1050
+          ]
+        ],
+        "read_only_mask_analysis": "All 8 face/sleeve/flower/feather/lantern/compass/rope sample landmarks retained; three manually reviewed near-white arm/waist negative-space components removed. Final PNG still needs actual visual inspection.",
+        "verified_output": {
+          "qa_project": "E:\\Projects\\MistIsle-Verification-20261117",
+          "size": [
+            1086,
+            1448
+          ],
+          "alpha_bbox_top_left": [
+            38,
+            0,
+            1047,
+            1448
+          ],
+          "sha256": "f365f46032ef374863046ee5428025b66e97ec5e8380156352f848ca69dad0e5",
+          "visible_original_rgba_changed": 0,
+          "hidden_rgb_in_transparent_pixels": 0
+        }
+      }
+    ],
+    "display_container_pixels": [
+      260,
+      340
+    ],
+    "display_frame": "Shared original-paper/gold-line frame, controlled by runtime UI; no artwork recoloring.",
+    "actual_visual_review": "Traveler/Shiguang original-paper cards inspected: hair, ribbons, goggles, pale clothing, hands, bag and lantern retained. Shiguang scarf reaches source x737 and hand x738; crop right edge746 retains 8px/7px paper margin. Watcher inspected against dark preview: face, pale sleeves, flower, feather, lantern, compass and rope sample landmarks retained. Three reviewed arm/waist paper voids cleared.",
+    "approved_final_mask_scope": "Keep exactly the three arm/waist void seeds; no additional rope/hair gap cleaning. Root reviewed the in-game portrait and requested no further matte expansion.",
+    "backup_guard_note": "A second old-QA rebuild exposed a missing backup-directory creation. Importer now creates portraitRebuildBackup before copying existing derived PNG/meta. Main integration agent owns the final repeat rebuild verification.",
+    "verification_log": "E:/Projects/MistIsle-Verification-20261117/Logs/ApprovedPortraitImport-20261117.log"
+  },
+  "latest_opening_environment_crops": [
+    {
+      "key": "Art/Environment/HarborBoat",
+      "source_copy": "Assets/Art/SourceReference/Area96.png",
+      "rect_top_left": [
+        96,
+        0,
+        96,
+        96
+      ]
+    },
+    {
+      "key": "Art/Environment/DockPlatform",
+      "source_copy": "Assets/Art/SourceReference/Area96.png",
+      "rect_top_left": [
+        0,
+        0,
+        96,
+        96
+      ]
+    },
+    {
+      "key": "Art/Environment/CampSupply",
+      "source_copy": "Assets/Art/SourceReference/Area96.png",
+      "rect_top_left": [
+        192,
+        0,
+        96,
+        96
+      ]
+    },
+    {
+      "key": "Art/Environment/CampfireRing",
+      "source_copy": "Assets/Art/SourceReference/Structures128.png",
+      "rect_top_left": [
+        768,
+        0,
+        128,
+        128
+      ]
+    },
+    {
+      "key": "Art/Environment/FireSeat",
+      "source_copy": "Assets/Art/SourceReference/Structures128.png",
+      "rect_top_left": [
+        896,
+        0,
+        128,
+        128
+      ]
+    },
+    {
+      "key": "Art/Environment/StoneWall",
+      "source_copy": "Assets/Art/SourceReference/Structures128.png",
+      "rect_top_left": [
+        0,
+        0,
+        128,
+        128
+      ]
+    }
   ]
 }

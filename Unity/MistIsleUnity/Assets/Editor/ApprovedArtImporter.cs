@@ -14,6 +14,188 @@ namespace MistIsle.Editor
         private const string Output = "Assets/Resources/Art/";
         private static string preparedRebuildBackup;
         private static string originalPixelRebuildBackup;
+        private static string portraitRebuildBackup;
+        private static readonly Vector2Int[] WatcherPaperVoidSeeds = {
+            new Vector2Int(310, 330), new Vector2Int(735, 750), new Vector2Int(790, 755)
+        };
+
+        [MenuItem("Mist Isle/Rebuild Approved Portraits With Backup")]
+        public static void RebuildApprovedPortraitsWithBackup()
+        {
+            portraitRebuildBackup = Path.Combine("Builds", "ArtBackups", "approved-portraits-" + DateTime.UtcNow.ToString("yyyyMMdd-HHmmssfff"));
+            try
+            {
+                ImportApprovedPortraits();
+                ValidateApprovedPortraits();
+                Debug.Log("MIST_ISLE_APPROVED_PORTRAIT_BACKUP: " + portraitRebuildBackup);
+            }
+            finally { portraitRebuildBackup = null; }
+        }
+
+        [MenuItem("Mist Isle/Import Approved Portraits")]
+        public static void ImportApprovedPortraits()
+        {
+            // Fixed canvases preserve stable source coordinates for the dialogue upper-body windows.
+            ImportPortrait("PortraitTravelerOriginal.png", new RectInt(30, 0, 740, 1216), new Vector2Int(380, 520), 0, "TravelerApproved");
+            ImportPortrait("PortraitShiguangOriginal.png", new RectInt(178, 34, 568, 1100), new Vector2Int(272, 426), 1, "ShiguangApproved");
+            // The current art-reference folder has no Watcher painting; retain the previously approved legacy portrait.
+            ImportPortrait("PortraitWatcherLegacyApproved.png", new RectInt(0, 0, 1086, 1448), new Vector2Int(560, 810), 2, "WatcherApproved");
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+            Debug.Log("MIST_ISLE_APPROVED_PORTRAITS_IMPORTED: original high-resolution Traveler, Shiguang and previously approved Watcher; no pixel actor enlargements, repainting or resampling.");
+        }
+
+        private static void ImportPortrait(string source, RectInt crop, Vector2Int subjectSeedTopLeft, int paperProfile, string name)
+        {
+            Texture2D board = ReadTexture(Source + source);
+            try
+            {
+                Color32[] pixels = ReadTopLeftPixels(board, crop);
+                // The Traveler/guide paintings have scenery physically joined to the boots and open
+                // pale edges. Keep their original paper cards rather than damage a confirmed drawing.
+                // The legacy Watcher has a closed outline against plain white and can be separated.
+                if (paperProfile == 2)
+                {
+                    ClearWatcherPaper(pixels, crop.width, crop.height);
+                    RetainPortraitSubject(pixels, crop.width, crop.height, subjectSeedTopLeft);
+                }
+                string path = Output + "Portraits/" + name + ".png";
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+                if (portraitRebuildBackup != null && File.Exists(path))
+                {
+                    Directory.CreateDirectory(portraitRebuildBackup);
+                    string backup = Path.Combine(portraitRebuildBackup, name + ".png");
+                    if (!File.Exists(backup)) File.Copy(path, backup, false);
+                    if (File.Exists(path + ".meta") && !File.Exists(backup + ".meta")) File.Copy(path + ".meta", backup + ".meta", false);
+                }
+                if (!File.Exists(path) || portraitRebuildBackup != null)
+                {
+                    var portrait = new Texture2D(crop.width, crop.height, TextureFormat.RGBA32, false);
+                    try
+                    {
+                        portrait.SetPixels32(pixels); portrait.Apply(false);
+                        File.WriteAllBytes(path, portrait.EncodeToPNG());
+                    }
+                    finally { UnityEngine.Object.DestroyImmediate(portrait); }
+                }
+                ConfigureSprite(path, false);
+                var importer = (TextureImporter)AssetImporter.GetAtPath(path);
+                importer.filterMode = FilterMode.Bilinear; // These are original HD paintings, not world pixel sprites.
+                importer.SaveAndReimport();
+            }
+            finally { UnityEngine.Object.DestroyImmediate(board); }
+        }
+
+        private static void ClearWatcherPaper(Color32[] pixels, int width, int height)
+        {
+            var visited = new bool[pixels.Length];
+            var queue = new int[pixels.Length];
+            int read = 0, write = 0;
+            bool IsPaper(Color32 p)
+            {
+                if (p.a == 0) return true;
+                int min = Mathf.Min(p.r, Mathf.Min(p.g, p.b));
+                int max = Mathf.Max(p.r, Mathf.Max(p.g, p.b));
+                return min >= 238 && max - min <= 16;
+            }
+            void Enqueue(int index)
+            {
+                if (visited[index]) return;
+                visited[index] = true;
+                if (!IsPaper(pixels[index])) return;
+                pixels[index] = new Color32(0, 0, 0, 0);
+                queue[write++] = index;
+            }
+            for (int x = 0; x < width; x++) { Enqueue(x); Enqueue((height - 1) * width + x); }
+            for (int y = 1; y < height - 1; y++) { Enqueue(y * width); Enqueue(y * width + width - 1); }
+            // Manually reviewed white-paper components enclosed by arms, hair curls and rope loops.
+            // These seeds are outside the body/clothing, not highlights on the pale shirt or hair.
+            foreach (Vector2Int point in WatcherPaperVoidSeeds)
+                if (point.x < width && point.y < height) Enqueue((height - 1 - point.y) * width + point.x);
+            while (read < write)
+            {
+                int index = queue[read++], x = index % width, y = index / width;
+                if (x > 0) Enqueue(index - 1);
+                if (x + 1 < width) Enqueue(index + 1);
+                if (y > 0) Enqueue(index - width);
+                if (y + 1 < height) Enqueue(index + width);
+            }
+        }
+
+        private static void RetainPortraitSubject(Color32[] pixels, int width, int height, Vector2Int seedTopLeft)
+        {
+            int seed = (height - 1 - seedTopLeft.y) * width + seedTopLeft.x;
+            if (seed < 0 || seed >= pixels.Length || pixels[seed].a == 0)
+                throw new InvalidDataException("Portrait subject anchor was removed; inspect the original illustration before proceeding.");
+            var retained = new bool[pixels.Length];
+            var queue = new int[pixels.Length];
+            int read = 0, write = 1;
+            queue[0] = seed; retained[seed] = true;
+            // Eight-neighbour connectivity retains thin diagonal hair strands, straps and fingers.
+            while (read < write)
+            {
+                int index = queue[read++], x = index % width, y = index / width;
+                for (int dy = -1; dy <= 1; dy++) for (int dx = -1; dx <= 1; dx++)
+                {
+                    int nx = x + dx, ny = y + dy;
+                    if ((dx == 0 && dy == 0) || nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
+                    int next = ny * width + nx;
+                    if (retained[next] || pixels[next].a == 0) continue;
+                    retained[next] = true; queue[write++] = next;
+                }
+            }
+            for (int i = 0; i < pixels.Length; i++) if (!retained[i]) pixels[i] = new Color32(0, 0, 0, 0);
+        }
+
+        [MenuItem("Mist Isle/Validate Approved Portraits")]
+        public static void ValidateApprovedPortraits()
+        {
+            ValidatePortrait("PortraitTravelerOriginal.png", new RectInt(30, 0, 740, 1216), "TravelerApproved", false);
+            ValidatePortrait("PortraitShiguangOriginal.png", new RectInt(178, 34, 568, 1100), "ShiguangApproved", false);
+            ValidatePortrait("PortraitWatcherLegacyApproved.png", new RectInt(0, 0, 1086, 1448), "WatcherApproved", true);
+            Debug.Log("MIST_ISLE_APPROVED_PORTRAITS_VALIDATED: Traveler and Shiguang use exact original-paper portrait cards; Watcher uses a transparent background. Character RGB is unchanged. Actual visual review remains required.");
+        }
+
+        private static void ValidatePortrait(string sourceName, RectInt crop, string name, bool requiresTransparency)
+        {
+            Texture2D source = ReadTexture(Source + sourceName);
+            Texture2D output = ReadTexture(Output + "Portraits/" + name + ".png");
+            try
+            {
+                Color32[] original = ReadTopLeftPixels(source, crop), actual = output.GetPixels32();
+                if (output.width != crop.width || output.height != crop.height || original.Length != actual.Length)
+                    throw new InvalidDataException("Approved portrait canvas differs from its reviewed source crop: " + name);
+                int retained = 0, transparent = 0;
+                for (int i = 0; i < actual.Length; i++)
+                {
+                    Color32 p = actual[i], s = original[i];
+                    if (p.a != 0)
+                    {
+                        retained++;
+                        if (p.r != s.r || p.g != s.g || p.b != s.b || p.a != s.a)
+                            throw new InvalidDataException("Approved portrait character colors were altered: " + name);
+                    }
+                    else
+                    {
+                        transparent++;
+                        if (p.r != 0 || p.g != 0 || p.b != 0) throw new InvalidDataException("Approved portrait has hidden paper RGB: " + name);
+                    }
+                }
+                if (retained < actual.Length / 8 || (requiresTransparency && transparent < actual.Length / 20)
+                    || (!requiresTransparency && transparent != 0))
+                    throw new InvalidDataException("Approved portrait matte appears empty or opaque; inspect it before delivery: " + name);
+                if (requiresTransparency)
+                {
+                    foreach (Vector2Int point in new[] { new Vector2Int(500, 225), new Vector2Int(118, 510), new Vector2Int(930, 590),
+                        new Vector2Int(583, 95), new Vector2Int(668, 51), new Vector2Int(335, 1050), new Vector2Int(565, 974), new Vector2Int(794, 1050) })
+                        if (actual[(crop.height - 1 - point.y) * crop.width + point.x].a == 0)
+                            throw new InvalidDataException("Watcher face, sleeve or accessory landmark was removed: " + point);
+                    foreach (Vector2Int point in WatcherPaperVoidSeeds)
+                        if (actual[(crop.height - 1 - point.y) * crop.width + point.x].a != 0)
+                            throw new InvalidDataException("Watcher arm negative space still contains paper: " + point);
+                }
+            }
+            finally { UnityEngine.Object.DestroyImmediate(source); UnityEngine.Object.DestroyImmediate(output); }
+        }
 
         [MenuItem("Mist Isle/Rebuild Original Pixel Actors With Backup")]
         public static void RebuildOriginalPixelActorsWithBackup()
@@ -43,6 +225,7 @@ namespace MistIsle.Editor
         {
             ImportApprovedPixelActors();
             ImportOriginalOpeningEnvironment();
+            ImportApprovedPortraits();
             ConfigureTitleTextures();
             ImportFrames("TravelerLegacy.png", "Actors/Traveler", "Traveler", 64, 80, 4, 4);
             ImportFrames("Watcher.png", "Actors/Watcher", "Watcher", 64, 80, 4, 4);
@@ -180,6 +363,12 @@ namespace MistIsle.Editor
             Crop(Source + "CliffsAndFencesSource.png", new RectInt(852, 160, 162, 64), "Environment/FenceTimber.png", true);
             Crop(Source + "CliffsAndFencesSource.png", new RectInt(8, 17, 124, 125), "Environment/GrassCliff.png", true);
             Crop(Source + "CliffsAndFencesSource.png", new RectInt(131, 17, 109, 125), "Environment/GrassCliffCorner.png", true);
+            Crop(Source + "Area96.png", new RectInt(96, 0, 96, 96), "Environment/HarborBoat.png", true);
+            Crop(Source + "Area96.png", new RectInt(0, 0, 96, 96), "Environment/DockPlatform.png", true);
+            Crop(Source + "Area96.png", new RectInt(192, 0, 96, 96), "Environment/CampSupply.png", true);
+            Crop(Source + "Structures128.png", new RectInt(768, 0, 128, 128), "Environment/CampfireRing.png", true);
+            Crop(Source + "Structures128.png", new RectInt(896, 0, 128, 128), "Environment/FireSeat.png", true);
+            Crop(Source + "Structures128.png", new RectInt(0, 0, 128, 128), "Environment/StoneWall.png", true);
             Crop(Source + "OriginalProps16.png", new RectInt(32, 0, 32, 32), "Environment/Boat.png", true);
             Crop(Source + "CampRuinsLighthouseSource.png", new RectInt(5, 27, 330, 232), "Environment/Tent.png", true);
             Crop(Source + "FloraAndPropsSource.png", new RectInt(17, 60, 128, 91), "Environment/BushPink.png", true);
@@ -199,7 +388,7 @@ namespace MistIsle.Editor
             // This is a different column layout from pixel_initial_companition: never reuse its x442 crop.
             ImportOriginalBoardSprite("pixel_other.png", new RectInt(485, 435, 72, 72), "Creatures/PixelWildCrab.png");
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
-            Debug.Log("MIST_ISLE_ORIGINAL_OPENING_ART: 16 environment cutouts and 4 original pixel creature cutouts imported without repainting.");
+            Debug.Log("MIST_ISLE_ORIGINAL_OPENING_ART: 22 environment cutouts and 4 original pixel creature cutouts imported without repainting.");
         }
 
         private static void ImportOriginalBoardSprite(string sourceName, RectInt rect, string relative)

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using MistIsle.Player;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.Tilemaps;
@@ -13,6 +14,10 @@ namespace MistIsle.World
         public const float RoomHeight = 20f;
         private static readonly string[] Regions = { "camp", "coast", "glowglade", "tidal", "crystal", "lighthouse" };
         private static readonly Dictionary<string, Sprite> MarkerSprites = new Dictionary<string, Sprite>();
+        private static readonly Vector2[] CampShore = {new Vector2(-16f,-.8f),new Vector2(-13f,-1.2f),new Vector2(-9f,-4.2f),
+            new Vector2(-5f,-6.1f),new Vector2(3f,-7f),new Vector2(10f,-7.8f),new Vector2(16f,-6.6f)};
+        private static readonly Vector2[] CoastShore = {new Vector2(-16f,-5f),new Vector2(-10f,-5.4f),new Vector2(-4f,-6.2f),
+            new Vector2(2f,-5.2f),new Vector2(7f,-6f),new Vector2(11f,-5f),new Vector2(16f,-4.2f)};
         private static readonly string[,] Names = {
             { "海岸营地 · 归航之火", "营地后坡 · 旧果园", "观潮栈桥 · 远海来信" },
             { "潮风海岸 · 漂流驿站", "贝壳浅湾 · 潮线小径", "风蚀石台 · 林地前哨" },
@@ -103,48 +108,69 @@ namespace MistIsle.World
             var sea = CreateMap(parent,"BayWater",-30020,art.LitMaterial);
             var substrate = CreateMap(parent,"CoastalSubstrate",-30015,art.LitMaterial);
             var land = CreateMap(parent,"CoastalGround",-30010,art.LitMaterial);
+            var waterPhysics = CreateMap(parent,"WaterCollision",-30030,null);
+            sea.transform.localScale=substrate.transform.localScale=land.transform.localScale=new Vector3(.5f,.5f,1f);
+            waterPhysics.transform.localScale=new Vector3(.5f,.5f,1f);
+            waterPhysics.GetComponent<TilemapRenderer>().enabled=false;
+            var waterCellCollider=ScriptableObject.CreateInstance<Tile>();
+            waterCellCollider.colliderType=Tile.ColliderType.Grid;
             var trail = CreateMap(parent,"WornFootpaths",-30000,art.LitMaterial);
-            trail.transform.localScale=new Vector3(.5f,.5f,1f);
-            var water = new Tile[8];
-            var solidWater = new Tile[8];
-            var grass = new Tile[8];
-            var sand = new Tile[8];
-            var grassEdge = new Tile[4];
-            var sandEdge = new Tile[4];
-            var fineSand = new Tile[32];
+            trail.transform.localScale=new Vector3(.25f,.25f,1f);
+            var water = new Tile[32];
+            var grass = new Tile[32];
+            var sand = new Tile[32];
+            var grassEdge = new Tile[8];
+            var sandEdge = new Tile[8];
+            var fineSand = new Tile[128];
+            var fineStone = new Tile[128];
+            var fineWood = new Tile[16];
             for (int i=0;i<8;i++)
             {
-                water[i] = MakeTile(art.Ground(36+i),Color.white);
-                solidWater[i] = MakeTile(art.Ground(36+i),Color.white);
-                solidWater[i].colliderType = Tile.ColliderType.Grid;
-                grass[i] = MakeTile(art.Ground(i),Color.white);
-                sand[i] = MakeTile(art.Ground(12+i),Color.white);
-                for(int quarter=0;quarter<4;quarter++) fineSand[i*4+quarter]=MakeFinePathTile(art.Ground(12+i),quarter);
+                for(int quarter=0;quarter<4;quarter++)
+                {
+                    int index=i*4+quarter;
+                    water[index]=MakeFinePathTile(art.Ground(36+i),quarter);
+                    grass[index]=MakeFinePathTile(art.Ground(i),quarter);
+                    sand[index]=MakeFinePathTile(art.Ground(12+i),quarter);
+                }
+                for(int piece=0;piece<16;piece++)
+                {
+                    fineSand[i*16+piece]=MakeFinePathTile(art.Ground(12+i),piece,4);
+                    fineStone[i*16+piece]=MakeFinePathTile(art.Ground(24+i),piece,4);
+                }
             }
+            for(int piece=0;piece<16;piece++) fineWood[piece]=MakeFinePathTile(art.WoodPlankTile??art.Ground(24),piece,4);
             for (int i=0;i<4;i++)
             {
-                grassEdge[i] = MakeTile(art.Ground(8+i),Color.white);
-                sandEdge[i] = MakeTile(art.Ground(20+i),Color.white);
-            }
-            for (int x=-16;x<16;x++)
-                for (int y=-10;y<10;y++)
+                for(int half=0;half<2;half++)
                 {
-                    int variant = ((x+48)*13+(y+24)*7)%8;
-                    int shoreline = Shoreline(x,camp);
-                    bool waterCell = y < shoreline;
-                    bool dock = camp && x>=-12 && x<=-10 && y>=-9 && y<=-3;
-                    sea.SetTile(new Vector3Int(x,y,0),waterCell&&!dock ? solidWater[variant] : water[variant]);
+                    grassEdge[i*2+half]=MakeFinePathTile(art.Ground(8+i),half);
+                    sandEdge[i*2+half]=MakeFinePathTile(art.Ground(20+i),half);
+                }
+            }
+            for (int x=-32;x<32;x++)
+                for (int y=-20;y<20;y++)
+                {
+                    Vector2 point=new Vector2((x+.5f)*.5f,(y+.5f)*.5f);
+                    int variant = ((x+64)*13+(y+32)*7)%32;
+                    float shoreline = Shoreline(point.x,camp);
+                    bool waterCell = point.y < shoreline || IsOpeningWater(point,camp);
+                    bool dock = camp && point.x>=-12f && point.x<=-9f && point.y>=-9f && point.y<=-2.8f;
+                    sea.SetTile(new Vector3Int(x,y,0),water[variant]);
+                    if(waterCell&&!dock) waterPhysics.SetTile(new Vector3Int(x,y,0),waterCellCollider);
                     if (waterCell) continue;
-                    if(y>shoreline) substrate.SetTile(new Vector3Int(x,y,0),sand[variant]);
-                    Tile tile = y==shoreline ? sandEdge[(x+32)%4] : y<shoreline+3 ? sand[variant] :
-                        y==shoreline+3 ? grassEdge[(x+32)%4] : grass[variant];
+                    if(point.y>=shoreline+.5f) substrate.SetTile(new Vector3Int(x,y,0),sand[variant]);
+                    Tile tile = point.y<shoreline+.5f ? sandEdge[(x+64)%8] : point.y<shoreline+1.5f ? sand[variant] :
+                        point.y<shoreline+2f ? grassEdge[(x+64)%8] : grass[variant];
                     land.SetTile(new Vector3Int(x,y,0),tile);
                 }
-            var body = sea.gameObject.AddComponent<Rigidbody2D>();
+            // Render tiles normalize their cropped sprite UVs using a scale matrix. Keep the
+            // physical grid separate and unscaled per-cell, or that matrix inflates shore collision.
+            var body = waterPhysics.gameObject.AddComponent<Rigidbody2D>();
             body.bodyType = RigidbodyType2D.Static;
-            var composite = sea.gameObject.AddComponent<CompositeCollider2D>();
+            var composite = waterPhysics.gameObject.AddComponent<CompositeCollider2D>();
             composite.geometryType = CompositeCollider2D.GeometryType.Polygons;
-            var waterCollider = sea.gameObject.AddComponent<TilemapCollider2D>();
+            var waterCollider = waterPhysics.gameObject.AddComponent<TilemapCollider2D>();
             waterCollider.compositeOperation = Collider2D.CompositeOperation.Merge;
             waterCollider.ProcessTilemapChanges();
             composite.GenerateGeometry();
@@ -153,33 +179,81 @@ namespace MistIsle.World
                 new[] {new Vector2(-10.5f,-3.5f),new Vector2(-8.5f,-1.4f),new Vector2(-5f,-1f),new Vector2(-2f,-1.1f),new Vector2(1.5f,0f),new Vector2(5.6f,-.3f),new Vector2(9.3f,.7f),new Vector2(13.5f,1.3f)},
                 new[] {new Vector2(-6.7f,-1f),new Vector2(-6.7f,2.8f)},
                 new[] {new Vector2(1.5f,0f),new Vector2(.3f,3.8f)},
-                new[] {new Vector2(4.2f,.1f),new Vector2(4.2f,2.5f),new Vector2(9.2f,2.5f)},
+                new[] {new Vector2(4.2f,.1f),new Vector2(5.4f,1.5f),new Vector2(6.6f,1.7f),new Vector2(9.2f,1.7f)},
                 new[] {new Vector2(5.3f,-.3f),new Vector2(5f,-3.2f),new Vector2(4f,-6.5f)},
                 new[] {new Vector2(-8.5f,-1.4f),new Vector2(-12f,-1f)}
             } : new[] {
                 new[] {new Vector2(-13.5f,1.2f),new Vector2(-9f,0f),new Vector2(-5f,1f),new Vector2(-2f,2.8f),new Vector2(2f,2.5f),new Vector2(5f,.8f),new Vector2(7f,-1.7f),new Vector2(10f,-.7f),new Vector2(13.5f,0f)},
                 new[] {new Vector2(7f,-1.7f),new Vector2(7.5f,-3.2f)}
             };
-            for (int x=-30;x<30;x++)
-                for (int y=-18;y<18;y++)
+            for (int x=-60;x<60;x++)
+                for (int y=-36;y<36;y++)
                 {
-                    Vector2 cell = new Vector2((x+.5f)*.5f,(y+.5f)*.5f);
-                    if (cell.y<Shoreline(Mathf.FloorToInt(cell.x),camp)) continue;
-                    bool onTrail = camp && Vector2.Distance(cell,new Vector2(-1.6f,-1.2f))<2.25f;
+                    Vector2 cell = new Vector2((x+.5f)*.25f,(y+.5f)*.25f);
+                    if (cell.y<Shoreline(cell.x,camp)||IsOpeningWater(cell,camp)) continue;
+                    bool onTrail = false;
                     foreach (var path in paths)
                         for (int i=1;i<path.Length&&!onTrail;i++)
-                            onTrail = DistanceToSegment(cell,path[i-1],path[i]) < .70f;
-                    if (onTrail) trail.SetTile(new Vector3Int(x,y,0),fineSand[((x+64)*3+(y+32)*5)%32]);
+                            onTrail = DistanceToSegment(cell,path[i-1],path[i]) < .48f;
+                    int surface=OpeningSurface(cell,camp);
+                    int variant=((x+128)*3+(y+64)*5)%128;
+                    if(surface==2) trail.SetTile(new Vector3Int(x,y,0),fineStone[variant]);
+                    else if(surface==3) trail.SetTile(new Vector3Int(x,y,0),fineWood[variant%16]);
+                    else if(surface==1||onTrail) trail.SetTile(new Vector3Int(x,y,0),fineSand[variant]);
                 }
         }
 
-        private static Tile MakeFinePathTile(Sprite source,int quarter)
+        private static bool IsOpeningWater(Vector2 point,bool camp)
+        {
+            if(camp) return Ellipse(point,new Vector2(6.6f,-4.25f),new Vector2(1.3f,.85f));
+            return Ellipse(point,new Vector2(.1f,-2.2f),new Vector2(3.2f,1.45f)) ||
+                (point.x>-.9f&&point.x<1.1f&&point.y< -2.2f&&point.y> -5.5f);
+        }
+
+        private static int OpeningSurface(Vector2 point,bool camp)
+        {
+            if(camp)
+            {
+                if(Ellipse(point,new Vector2(-1.6f,-1.5f),new Vector2(3.1f,2f))) return 2;
+                if(RoundedRect(point,new Rect(-10.1f,.1f,5.8f,3.2f),.55f)) return 2;
+                if(RoundedRect(point,new Rect(-1.6f,2f,4.4f,2.8f),.2f)) return 3;
+                if(Ellipse(point,new Vector2(6.2f,2.65f),new Vector2(.72f,.58f)) ||
+                    Ellipse(point,new Vector2(9f,2.65f),new Vector2(.72f,.58f)) ||
+                    Ellipse(point,new Vector2(7.6f,.7f),new Vector2(.65f,.48f))) return 2;
+                if(Ellipse(point,new Vector2(6.6f,-4.25f),new Vector2(1.8f,1.25f))) return 2;
+                if(RoundedRect(point,new Rect(-12.7f,-3.8f,4.3f,1.2f),.25f)) return 3;
+                for(int i=0;i<3;i++)
+                    if(RoundedRect(point,new Rect(1.7f+i*.9f,-2.7f,.65f,1.6f),.16f)) return 1;
+            }
+            else
+            {
+                if(RoundedRect(point,new Rect(-12.4f,2.0f,4.0f,2.2f),.35f)) return 2;
+                if(Ellipse(point,new Vector2(.1f,-2.2f),new Vector2(3.7f,1.95f))) return 2;
+                if(Ellipse(point,new Vector2(7.5f,-3.35f),new Vector2(2.2f,1.25f))) return 1;
+            }
+            return 0;
+        }
+
+        private static bool Ellipse(Vector2 point,Vector2 center,Vector2 radii)
+        {
+            Vector2 p=point-center;
+            return p.x*p.x/(radii.x*radii.x)+p.y*p.y/(radii.y*radii.y)<1f;
+        }
+
+        private static bool RoundedRect(Vector2 point,Rect rect,float radius)
+        {
+            float x=Mathf.Max(rect.xMin+radius-point.x,0f,point.x-(rect.xMax-radius));
+            float y=Mathf.Max(rect.yMin+radius-point.y,0f,point.y-(rect.yMax-radius));
+            return x*x+y*y<radius*radius;
+        }
+
+        private static Tile MakeFinePathTile(Sprite source,int quarter,int divisions=2)
         {
             // Quarter-crops retain the original ground pixels at the same density. They allow
             // half-cell bends without shrinking a complete tile's texture or painting new art.
             Rect rect=source.rect;
-            float width=rect.width*.5f,height=rect.height*.5f;
-            var crop=Sprite.Create(source.texture,new Rect(rect.x+(quarter%2)*width,rect.y+(quarter/2)*height,width,height),
+            float width=rect.width/divisions,height=rect.height/divisions;
+            var crop=Sprite.Create(source.texture,new Rect(rect.x+(quarter%divisions)*width,rect.y+(quarter/divisions)*height,width,height),
                 new Vector2(.5f,0f),source.pixelsPerUnit,0,SpriteMeshType.FullRect);
             return MakeTile(crop,Color.white);
         }
@@ -202,10 +276,12 @@ namespace MistIsle.World
             return map;
         }
 
-        private static int Shoreline(int x,bool camp)
+        private static float Shoreline(float x,bool camp)
         {
-            if(camp) return x < -13 ? -1 : x < -9 ? -4 : x < -5 ? -6 : x < 3 ? -7 : x < 10 ? -8 : -7;
-            return x < -10 ? -5 : x < -4 ? -6 : x < 2 ? -5 : x < 7 ? -6 : x < 11 ? -5 : -4;
+            Vector2[] points=camp?CampShore:CoastShore;
+            for(int i=1;i<points.Length;i++)
+                if(x<=points[i].x) return Mathf.Lerp(points[i-1].y,points[i].y,Mathf.InverseLerp(points[i-1].x,points[i].x,x))+.12f*Mathf.Sin(x*1.4f);
+            return points[points.Length-1].y;
         }
 
         private static float DistanceToSegment(Vector2 point,Vector2 from,Vector2 to)
@@ -228,7 +304,8 @@ namespace MistIsle.World
                     var deck=Prop(parent,"ArrivalDockDeck",art.Dock??art.Fence,new Vector2(-10.5f,-8.4f+i*1.1f),3f);
                     if(deck!=null) deck.GetComponent<SpriteRenderer>().sortingOrder=-29000;
                 }
-                Prop(parent,"MooredBoat",art.Boat,new Vector2(-13.3f,-7.9f),2.2f);
+                Prop(parent,"MooredHarborBoat",art.HarborBoat,new Vector2(-13.35f,-6.8f),2.6f);
+                Prop(parent,"ArrivalQuay",art.DockPlatform,new Vector2(-10.5f,-3.8f),3.7f);
                 Prop(parent,"ArrivalLantern",art.Lantern,new Vector2(-11.9f,-5.1f),.6f);
                 Prop(parent,"DockRopeCrate",art.Crate,new Vector2(-9.4f,-3.2f),.8f);
                 Prop(parent,"HouseSupplies",art.Crate,new Vector2(-9.1f,2.1f),.9f);
@@ -251,6 +328,7 @@ namespace MistIsle.World
                 Prop(parent,"CampTideStone",art.RockSmall,new Vector2(9.9f,-6.7f),1f);
                 ScatterOpeningPlants(parent,art,new[] {new Vector2(-8.5f,-.05f),new Vector2(-7.8f,-2.4f),
                     new Vector2(.05f,-2.9f),new Vector2(2.8f,1.1f),new Vector2(4.5f,-1.5f),new Vector2(10.9f,2.0f)});
+                BuildCampWorkAndCareZones(parent,art);
             }
             else
             {
@@ -273,18 +351,88 @@ namespace MistIsle.World
                 ScatterOpeningPlants(parent,art,new[] {new Vector2(-10.4f,1.2f),new Vector2(-6.4f,-.2f),
                     new Vector2(-3.1f,1.1f),new Vector2(-.5f,3.9f),new Vector2(3.6f,1.1f),
                     new Vector2(5.6f,-.7f),new Vector2(8.8f,.25f)});
+                BuildCoastalSurveyAndCove(parent,art);
             }
+        }
+
+        private static void BuildCampWorkAndCareZones(Transform parent,WorldArt art)
+        {
+            // The care-house court, supply deck and hearth each have a different floor and use.
+            LowStoneWall(parent,art,new Vector2(-9.6f,.4f),2.1f);
+            LowStoneWall(parent,art,new Vector2(-4.5f,.4f),1.6f);
+            SolidProp(parent,"CareHouseMedicineChest",art.Crate,new Vector2(-9.55f,2.3f),.85f);
+            Prop(parent,"CareHouseLamp",art.Lantern,new Vector2(-4.6f,1.6f),.7f);
+            Prop(parent,"HouseGardenWhiteFlowers",art.BushWhite,new Vector2(-10.2f,1.1f),1.4f);
+            SolidProp(parent,"HarborCargoStack",art.Crate,new Vector2(-8.6f,-3.7f),1.05f);
+            SolidProp(parent,"HarborCargoBarrel",art.Barrel,new Vector2(-8.25f,-2.65f),.72f);
+            Prop(parent,"CargoRopePost",art.Lantern,new Vector2(-11.9f,-2.65f),.55f);
+
+            SolidProp(parent,"SupplyDeckLeftCrates",art.Crate,new Vector2(-1.2f,3.8f),.9f);
+            SolidProp(parent,"SupplyDeckRightCrates",art.Crate,new Vector2(2.05f,3.95f),.9f);
+            SolidProp(parent,"SupplyDeckBarrel",art.Barrel,new Vector2(2.05f,2.7f),.75f);
+            LowStoneWall(parent,art,new Vector2(-2.6f,-3.45f),2.0f);
+            Prop(parent,"HearthSeatWest",art.FireSeat,new Vector2(-3.1f,-2.7f),.65f);
+            Prop(parent,"HearthSeatEast",art.FireSeat,new Vector2(.1f,-2.6f),.65f);
+            Prop(parent,"HearthSeatNorth",art.FireSeat,new Vector2(-.05f,-.5f),.6f);
+            Prop(parent,"HearthWoodSupply",art.Log,new Vector2(-4.15f,-3.0f),1.25f);
+            for(int row=0;row<3;row++)
+            {
+                float x=2f+row*.9f;
+                Prop(parent,"KitchenHerbBed",row==1?art.FlowerBlue:art.FlowerWhite,new Vector2(x,-2.25f),.55f);
+                Prop(parent,"KitchenHerbBed",row==1?art.FlowerWhite:art.FlowerBlue,new Vector2(x,-1.6f),.5f);
+            }
+            Prop(parent,"WaterGardenReeds",art.FlowerBlue,new Vector2(7.6f,-4.5f),1.05f);
+            Prop(parent,"WaterGardenReeds",art.BushWhite,new Vector2(6.7f,-3.25f),1.15f);
+            Prop(parent,"WaterGardenBankStone",art.RockSmall,new Vector2(5.3f,-3.65f),.9f);
+            Prop(parent,"WaterGardenBankStone",art.RockSmall,new Vector2(7.25f,-5.1f),.8f);
+            Prop(parent,"CompanionGardenLantern",art.Lantern,new Vector2(3.35f,3.4f),.7f);
+            Prop(parent,"CompanionGardenFlowerBed",art.BushWhite,new Vector2(8f,4.6f),1.2f);
+        }
+
+        private static void BuildCoastalSurveyAndCove(Transform parent,WorldArt art)
+        {
+            Prop(parent,"AbandonedCoastalSurveyShelter",art.CampSupply,new Vector2(-10.5f,3.9f),3.1f);
+            AddBox(parent,"SurveyShelterFootprint",new Vector2(-10.5f,4.15f),new Vector2(2.1f,.5f));
+            SolidProp(parent,"SurveyEquipmentCrate",art.Crate,new Vector2(-12f,2.8f),.8f);
+            Prop(parent,"SurveyCampLamp",art.Lantern,new Vector2(-8.75f,3.2f),.7f);
+            LowStoneWall(parent,art,new Vector2(-12.9f,3.25f),1.4f);
+
+            // The route bends around a connected tidal inlet, rather than crossing empty grass.
+            Prop(parent,"InletWestRockShelf",art.GrassCliffCorner,new Vector2(-3.6f,-1.8f),2.05f);
+            AddBox(parent,"InletShelfFootprint",new Vector2(-3.6f,-1.55f),new Vector2(1.3f,.5f));
+            Prop(parent,"InletEastRockShelf",art.GrassCliff,new Vector2(3.6f,-3f),1.75f);
+            AddBox(parent,"InletEastShelfFootprint",new Vector2(3.6f,-2.8f),new Vector2(1.05f,.4f));
+            Prop(parent,"TidePoolBankReeds",art.FlowerBlue,new Vector2(-2.6f,-.6f),1f);
+            Prop(parent,"TidePoolBankFlowers",art.BushWhite,new Vector2(2.9f,-.45f),1.15f);
+            Prop(parent,"TidePoolRock",art.RockLarge,new Vector2(.7f,-4.6f),1.45f);
+            Prop(parent,"ShelteredCoveRock",art.RockLarge,new Vector2(5.05f,-3.8f),1.7f);
+            Prop(parent,"ShelteredCoveRock",art.RockLarge,new Vector2(10.2f,-3.1f),1.55f);
+            Prop(parent,"CoveSeaFlowers",art.FlowerBlue,new Vector2(10.35f,-2.1f),.85f);
+            SolidProp(parent,"FishermensReturnCrate",art.Crate,new Vector2(11.3f,2.35f),.8f);
+            Prop(parent,"FishingTrailLamp",art.Lantern,new Vector2(12.8f,2f),.65f);
+        }
+
+        private static void LowStoneWall(Transform parent,WorldArt art,Vector2 position,float width)
+        {
+            Prop(parent,"CampRetainingWall",art.StoneWall,position,width);
+            AddBox(parent,"RetainingWallFootprint",position+Vector2.up*.12f,new Vector2(width,.24f));
+        }
+
+        private static void SolidProp(Transform parent,string name,Sprite sprite,Vector2 position,float width)
+        {
+            Prop(parent,name,sprite,position,width);
+            AddBox(parent,name+"Body",position+Vector2.up*.12f,new Vector2(width*.65f,.24f));
         }
 
         private static void BuildNorthernForestEdge(Transform parent,WorldArt art,bool camp)
         {
-            float[] ledges=camp?new[] {6.3f,6.5f,6.9f,7.1f,6.7f,6.4f,6.3f,6.5f}:
-                new[] {6.2f,6.4f,6.7f,6.8f,6.5f,6.3f,6.4f,6.2f};
+            float[] ledges=camp?new[] {6.3f,7.4f,6.8f,7.8f,7.2f,6.4f,7.3f,6.5f}:
+                new[] {6.2f,7.2f,6.7f,7.6f,6.5f,7.3f,6.4f,6.2f};
             for(int i=0;i<16;i++)
             {
                 float x=-15f+i*2f,ledge=ledges[i/2];
                 Prop(parent,"NorthernGrassCliff",i%5==2?art.GrassCliffCorner:art.GrassCliff,new Vector2(x,ledge),2.1f);
-                AddBox(parent,"NorthernCliffFootprint",new Vector2(x,ledge+.38f),new Vector2(2.1f,.76f));
+                AddBox(parent,"NorthernCliffFootprint",new Vector2(x,ledge+.75f),new Vector2(2.1f,1.5f));
                 if(i%2==0)
                 {
                     Prop(parent,"CliffFootFern",art.BushWhite,new Vector2(x+.6f,ledge-.13f),1.05f);
@@ -515,7 +663,7 @@ namespace MistIsle.World
                 for(int i=0;i<species.Length;i++)
                     CreateActor(parent,layout,species[i],new[] {art.Starter(i)},positions[i],.95f,
                         "starter","认识"+petNames[i]+" · 初始伙伴",onInteract);
-                var fire=Prop(parent,"Campfire",art.Campfire,new Vector2(-1.6f,-1.9f),1.35f);
+                var fire=Prop(parent,"Campfire",art.CampfireRing,new Vector2(-1.6f,-1.9f),2.15f);
                 var fireBody=AddBox(parent,"CampfireFootprint",new Vector2(-1.6f,-1.75f),new Vector2(.7f,.4f));
                 var fireInteraction=AddInteraction(parent,layout,"campfire","campfire-camp-0","篝火工作台 · 烹饪与合成",
                     new Vector2(-1.6f,-1.5f),.8f,onInteract,fire);
@@ -526,6 +674,8 @@ namespace MistIsle.World
                 AddOpeningResource(parent,art,layout,"pollen-camp-0-2","pollen",new Vector2(10.5f,3.9f),onInteract,wasCollected);
                 AddOpeningSign(parent,art,layout,new Vector2(-9f,-2f),
                     "海湾码头 · 沿沙地小径进入营地。Watcher 的照护屋在北边，拾光与三只伙伴在东侧小院。",onInteract);
+                AddOpeningSign(parent,art,layout,new Vector2(2.8f,3.6f),
+                    "补给登记：野莓与露水可以制作莓果团。晶尘和花粉能稳定共鸣。篝火旁的小苗圃由营地轮流照料，池边叶尖的露水会在清晨收集。",onInteract);
                 layout.AddLandmark("dock-arrival",parent.TransformPoint(new Vector2(-10.5f,-6.5f)));
                 layout.AddLandmark("watcher-home",parent.TransformPoint(new Vector2(-6.7f,1.3f)));
                 layout.AddLandmark("shiguang-home",parent.TransformPoint(new Vector2(4.2f,1.3f)));
@@ -546,6 +696,8 @@ namespace MistIsle.World
                 AddOpeningResource(parent,art,layout,"pollen-coast-0-2","pollen",new Vector2(6f,-1.8f),onInteract,wasCollected);
                 CreateActor(parent,layout,"tutorial-coast-crab",new[] {art.TutorialCrab},new Vector2(7.5f,-3.2f),1.1f,
                     "encounter","受困的潮壳蟹 · 观察它的状态",onInteract);
+                AddOpeningSign(parent,art,layout,new Vector2(-8.5f,2f),
+                    "旧勘测站：涨潮时，中间水道会连上海湾。沿北侧干燥的小径绕行。受惊的小生灵常躲在东边的漂木与礁石之间，不要突然冲过去。",onInteract);
                 layout.AddLandmark("coast-arrival",parent.TransformPoint(new Vector2(-13f,1.2f)));
                 layout.AddLandmark("coast-waypoint-1",parent.TransformPoint(new Vector2(-9f,0f)));
                 layout.AddLandmark("coast-waypoint-2",parent.TransformPoint(new Vector2(-2f,2.8f)));
@@ -566,6 +718,7 @@ namespace MistIsle.World
             light.intensity=.48f;
             light.pointLightOuterRadius=2.1f;
             light.pointLightInnerRadius=.18f;
+            obj.AddComponent<HearthLightFlicker>();
         }
 
         private static void AddOpeningResource(Transform parent,WorldArt art,CoastalWorldLayout layout,string id,
@@ -599,7 +752,8 @@ namespace MistIsle.World
             var renderer=spriteObject.GetComponent<SpriteRenderer>();
             renderer.sprite=frames[0];
             renderer.sharedMaterial=Resources.Load<Material>("Settings/MistIsleSpriteLit");
-            spriteObject.transform.localScale=Vector3.one*(height/Mathf.Max(.01f,frames[0].bounds.size.y));
+            if(kind=="npc") ActorVisualSizing.ApplyHuman(renderer,frames[0]);
+            else spriteObject.transform.localScale=Vector3.one*(height/Mathf.Max(.01f,frames[0].bounds.size.y));
             var footprint=actor.AddComponent<CapsuleCollider2D>();
             footprint.size=kind=="starter"?new Vector2(.34f,.24f):new Vector2(.45f,.32f);
             footprint.offset=new Vector2(0f,footprint.size.y*.5f);
@@ -789,6 +943,13 @@ namespace MistIsle.World
             public readonly Sprite Campfire = Load("Environment/Campfire");
             public readonly Sprite Dock = Load("Environment/Dock");
             public readonly Sprite Boat = Load("Environment/Boat");
+            public readonly Sprite HarborBoat = Load("Environment/HarborBoat");
+            public readonly Sprite DockPlatform = Load("Environment/DockPlatform");
+            public readonly Sprite CampfireRing = Load("Environment/CampfireRing");
+            public readonly Sprite FireSeat = Load("Environment/FireSeat");
+            public readonly Sprite StoneWall = Load("Environment/StoneWall");
+            public readonly Sprite CampSupply = Load("Environment/CampSupply");
+            public readonly Sprite WoodPlankTile = MakeWoodTile();
             public readonly Sprite Tent = Load("Environment/Tent");
             public readonly Sprite BushPink = Load("Environment/BushPink");
             public readonly Sprite BushWhite = Load("Environment/BushWhite");
@@ -825,6 +986,15 @@ namespace MistIsle.World
                 return int.TryParse(name.Substring(name.LastIndexOf('_')+1),out int index) ? index : 0;
             }
             private static Sprite Load(string path) => Resources.Load<Sprite>("Art/" + path);
+            private static Sprite MakeWoodTile()
+            {
+                Sprite deck=Load("Environment/Dock");
+                if(deck==null) return null;
+                Rect rect=deck.rect;
+                float side=Mathf.Min(56f,rect.width,rect.height);
+                return Sprite.Create(deck.texture,new Rect(rect.x+(rect.width-side)*.5f,rect.y+(rect.height-side)*.5f,side,side),
+                    new Vector2(.5f,0f),deck.pixelsPerUnit,0,SpriteMeshType.FullRect);
+            }
             private static Sprite[] Frames(string path)
             {
                 var sprites=Resources.LoadAll<Sprite>("Art/"+path);
@@ -877,8 +1047,11 @@ namespace MistIsle.World
         public void MoveActorFacing(string id,Vector2 position,Vector2 facing)
         {
             if(!actors.TryGetValue(id??"",out var actor)) return;
+            bool teleport=Vector2.Distance(actor.position,position)>4f;
             actor.position=position;
-            actor.GetComponent<WorldActorPresentation>()?.Face(facing);
+            var presentation=actor.GetComponent<WorldActorPresentation>();
+            if(teleport) presentation?.ResetAfterTeleport();
+            presentation?.Face(facing);
         }
         public void SetCollected(string id)
         {
@@ -914,28 +1087,32 @@ namespace MistIsle.World
     public sealed class WorldActorPresentation : MonoBehaviour
     {
         private SpriteRenderer sprite;
-        private Sprite[] frames;
-        private int direction;
-        private Vector3 previousPosition;
-        private float walkTime;
+        private SpriteFrameAnimator animator;
         public void Configure(SpriteRenderer renderer,Sprite[] animationFrames)
-        { sprite=renderer; frames=animationFrames; previousPosition=transform.position; }
-        public void Face(Vector2 facing)
         {
-            if(facing.sqrMagnitude<.001f) return;
-            direction=Mathf.Abs(facing.x)>Mathf.Abs(facing.y)?facing.x<0f?1:2:facing.y>0f?3:0;
+            sprite=renderer;
+            if(animationFrames!=null&&(animationFrames.Length==12||animationFrames.Length==16))
+            {
+                animator=gameObject.AddComponent<SpriteFrameAnimator>();
+                animator.Configure(renderer,animationFrames,animationFrames.Length/4,8f,true);
+            }
         }
+        public void Face(Vector2 facing) => animator?.Face(facing);
+        public void ResetAfterTeleport() => animator?.ResetAfterTeleport();
         private void LateUpdate()
         {
-            if(sprite==null||frames==null||frames.Length==0) return;
-            Vector2 movement=transform.position-previousPosition;
-            bool moving=movement.sqrMagnitude>.00001f;
-            if(moving) { Face(movement); walkTime+=Time.deltaTime; } else walkTime=0f;
-            int perDirection=frames.Length>=12?frames.Length/4:1;
-            int frame=moving?(int)(walkTime*9f)%perDirection:0;
-            sprite.sprite=frames.Length>=12?frames[Mathf.Clamp(direction*perDirection+frame,0,frames.Length-1)]:frames[0];
-            sprite.sortingOrder=Mathf.RoundToInt(-transform.position.y*100f);
-            previousPosition=transform.position;
+            if(sprite!=null) sprite.sortingOrder=Mathf.RoundToInt(-transform.position.y*100f);
+        }
+    }
+
+    public sealed class HearthLightFlicker : MonoBehaviour
+    {
+        private Light2D lightSource;
+        private void Awake() => lightSource=GetComponent<Light2D>();
+        private void Update()
+        {
+            if(lightSource!=null) lightSource.intensity=.44f+Mathf.Sin(Time.unscaledTime*4.7f)*.035f+
+                Mathf.Sin(Time.unscaledTime*7.3f)*.018f;
         }
     }
 

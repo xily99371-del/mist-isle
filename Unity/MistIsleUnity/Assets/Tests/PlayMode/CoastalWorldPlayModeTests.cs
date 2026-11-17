@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using MistIsle.World;
+using MistIsle.Player;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -189,7 +190,7 @@ namespace MistIsle.Tests
                 shape is CompositeCollider2D&&shape.transform.IsChildOf(root.transform)),Is.True,
                 "The bay is visually water but does not physically stop the player.");
             string[] campTargets={"dock-end","watcher-approach","campfire-approach","shiguang-approach",
-                "starter-meeting","berry-camp-0-0","dew-camp-0-1","pollen-camp-0-2","guide-camp-waypoint","coast-exit"};
+                "starter-meeting","berry-camp-0-0","dew-camp-0-1","pollen-camp-0-2","guide-camp-waypoint","guide-exit-wait","coast-exit"};
             foreach(string id in campTargets)
                 Assert.That(HasWalkingPath(world.GetSpawn("camp-0"),world.GetLandmarkPosition(id),world.GetBounds("camp-0")),
                     Is.True,"The opening route cannot reach "+id+" with the player's footprint.");
@@ -214,6 +215,13 @@ namespace MistIsle.Tests
         {
             var actor=world.GetActor("shiguang");
             Assert.That(actor,Is.Not.Null);
+            foreach(string id in new[] {"watcher","shiguang"})
+            {
+                var humanRenderer=world.GetActor(id).GetComponentInChildren<SpriteRenderer>();
+                Assert.That(ActorVisualSizing.GetVisibleWorldHeight(humanRenderer),
+                    Is.EqualTo(ActorVisualSizing.HumanVisibleHeight).Within(.015f),
+                    "Transparent canvas margins changed the visible height of "+id);
+            }
             var footprint=actor.GetComponent<CapsuleCollider2D>();
             Assert.That(footprint,Is.Not.Null);
             var interaction=world.Interactions.Single(item=>item.Kind=="npc"&&item.Id=="shiguang");
@@ -234,6 +242,31 @@ namespace MistIsle.Tests
                 starter.Interact();
                 Assert.That(events,Does.Contain("starter:"+id));
             }
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator GuideWaypointsRemainClearForPhysicalWalkingAfterTheCampAndCoastRebuild()
+        {
+            Vector2[] campRoute={world.GetLandmarkPosition("campfire-approach")+new Vector2(1.6f,1.1f),world.GetLandmarkPosition("guide-camp-waypoint"),
+                world.GetLandmarkPosition("guide-exit-wait")};
+            Vector2[] coastRoute={world.GetLandmarkPosition("coast-arrival")+new Vector2(1.3f,.5f),world.GetLandmarkPosition("coast-waypoint-1"),
+                world.GetLandmarkPosition("coast-waypoint-2"),world.GetLandmarkPosition("coast-waypoint-3"),
+                world.GetLandmarkPosition("tutorial-viewpoint")};
+            Transform guide=world.GetActor("shiguang");
+            foreach(var route in new[] {campRoute,coastRoute})
+                for(int index=1;index<route.Length;index++)
+                {
+                    Vector2 from=route[index-1]+Vector2.up*.16f,to=route[index]+Vector2.up*.16f;
+                    var circleHits=Physics2D.CircleCastAll(from,.16f,(to-from).normalized,Vector2.Distance(from,to));
+                    var capsuleHits=Physics2D.CapsuleCastAll(from,new Vector2(.45f,.32f),CapsuleDirection2D.Horizontal,0f,
+                        (to-from).normalized,Vector2.Distance(from,to));
+                    var obstacles=circleHits.Concat(capsuleHits)
+                        .Where(hit=>!hit.collider.isTrigger&&hit.collider.transform.IsChildOf(root.transform)&&
+                            !hit.collider.transform.IsChildOf(guide)).ToArray();
+                    Assert.That(obstacles,Is.Empty,"The guide's authored straight segment crosses physical geometry: "+
+                        route[index-1]+" -> "+route[index]);
+                }
             yield return null;
         }
 

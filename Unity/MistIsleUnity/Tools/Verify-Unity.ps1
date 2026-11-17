@@ -19,7 +19,8 @@ function Invoke-UnityStage([string]$name, [string[]]$stageArguments) {
     Write-Output "$name passed: $log"
 }
 Invoke-UnityStage 'content' @('-nographics','-quit','-executeMethod','MistIsle.Editor.MistIsleProjectBuilder.BuildContent')
-Invoke-UnityStage 'editmode' @('-nographics','-runTests','-testPlatform','EditMode','-testResults',('"' + (Join-Path $outputDirectory 'editmode.xml') + '"'))
+# Imported human-alpha checks require a graphics device for unreadable texture inspection.
+Invoke-UnityStage 'editmode' @('-runTests','-testPlatform','EditMode','-testResults',('"' + (Join-Path $outputDirectory 'editmode.xml') + '"'))
 $env:MIST_ISLE_CAPTURE_DIR = Join-Path $outputDirectory 'Captures'
 Invoke-UnityStage 'playmode' @('-runTests','-testPlatform','PlayMode','-testResults',('"' + (Join-Path $outputDirectory 'playmode.xml') + '"'))
 if ($VisualReplay) {

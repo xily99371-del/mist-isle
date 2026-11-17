@@ -205,8 +205,8 @@ namespace MistIsle.Runtime
 
         private void DrawDialogue()
         {
-            bool hasSpeaker = DrawSpeaker(Session.DialogueSpeakerId, new Rect(62, 343, 196, 316));
-            float left = hasSpeaker ? 245f : 91f;
+            bool hasSpeaker = DrawSpeaker(Session.DialogueSpeakerId, new Rect(38, 237, 260, 430));
+            float left = hasSpeaker ? 310f : 91f;
             GUI.DrawTexture(new Rect(left, 460, 1189 - left, 207), dark);
             DrawRule(new Rect(left + 2, 460, 1185 - left, 2), new Color(.83f, .71f, .45f));
             GUI.Label(new Rect(left + 27, 473, 785, 35), Session.DialogueTitle, dialogueName);
@@ -414,9 +414,9 @@ namespace MistIsle.Runtime
             string key = (id ?? "").Trim().ToLowerInvariant();
             if (string.IsNullOrEmpty(key) || key == "narrator" || key == "narration") return false;
             if (Session.Catalog.ContainsKey(key)) { DrawCreature(key, rect); return true; }
-            string resource = key == "shiguang" || key == "拾光" ? "Art/Actors/ShiguangPixel/ShiguangPixel_00"
-                : key == "traveler" || key == "traveller" || key == "旅人" ? "Art/Actors/ApprovedTraveler/ApprovedTraveler_00"
-                : key == "watcher" ? "Art/Actors/Watcher/Watcher_00" : null;
+            string resource = key == "shiguang" || key == "拾光" ? "Art/Portraits/ShiguangApproved"
+                : key == "traveler" || key == "traveller" || key == "旅人" ? "Art/Portraits/TravelerApproved"
+                : key == "watcher" ? "Art/Portraits/WatcherApproved" : null;
             if (resource == null) return false;
             string cacheKey = "$speaker:" + resource;
             if (!portraits.TryGetValue(cacheKey, out var sprite))
@@ -426,9 +426,22 @@ namespace MistIsle.Runtime
             }
             if (sprite == null) return false;
             Rect source = sprite.textureRect;
+            // Keep the complete approved artwork on disk. Dialogue uses a consistent upper-body view.
+            float upperBody = resource.EndsWith("TravelerApproved", StringComparison.Ordinal) ? .78f
+                : resource.EndsWith("ShiguangApproved", StringComparison.Ordinal) ? .68f : 1f;
+            source.y += source.height * (1f - upperBody);
+            source.height *= upperBody;
             float factor = Mathf.Min(rect.width / source.width, rect.height / source.height);
             Rect draw = new Rect(rect.center.x - source.width * factor * .5f,
                 rect.yMax - source.height * factor, source.width * factor, source.height * factor);
+            Rect frame = new Rect(draw.x - 5f, draw.y - 5f, draw.width + 10f, draw.height + 10f);
+            GUI.DrawTexture(new Rect(frame.x + 3f, frame.y + 3f, frame.width, frame.height), dark);
+            GUI.DrawTexture(frame, paper);
+            var border = new Color(.72f, .59f, .35f, .9f);
+            DrawRule(new Rect(frame.x, frame.y, frame.width, 1f), border);
+            DrawRule(new Rect(frame.x, frame.yMax - 1f, frame.width, 1f), border);
+            DrawRule(new Rect(frame.x, frame.y, 1f, frame.height), border);
+            DrawRule(new Rect(frame.xMax - 1f, frame.y, 1f, frame.height), border);
             GUI.DrawTextureWithTexCoords(draw, sprite.texture,
                 new Rect(source.x / sprite.texture.width, source.y / sprite.texture.height,
                     source.width / sprite.texture.width, source.height / sprite.texture.height), true);

@@ -24,6 +24,7 @@ namespace MistIsle.Player
         public FacingDirection Facing => facing;
         public bool IsMoving => moving;
         public int FrameCount => frames == null ? 0 : frames.Length;
+        public int CurrentFrameIndex { get; private set; }
 
         private void Awake()
         {
@@ -38,9 +39,9 @@ namespace MistIsle.Player
             if (renderer == null) throw new ArgumentNullException(nameof(renderer));
             if (authoredFrames == null || authoredFrames.Length != directionFrameCount * 4)
                 throw new ArgumentException("Four direction rows of authored frames are required.", nameof(authoredFrames));
+            if (!ReferenceEquals(target, renderer)) ActorVisualSizing.RemoveHuman(target);
             target = renderer;
             frames = (Sprite[])authoredFrames.Clone();
-            Array.Sort(frames, (a, b) => string.CompareOrdinal(a == null ? string.Empty : a.name, b == null ? string.Empty : b.name));
             framesPerDirection = directionFrameCount;
             walkFramesPerSecond = Mathf.Max(.1f, framesPerSecond);
             inferMotionFromTransform = automaticMovement;
@@ -50,20 +51,23 @@ namespace MistIsle.Player
             ApplyFrame();
         }
 
+        private void OnDestroy()
+        {
+            ActorVisualSizing.RemoveHuman(target);
+        }
+
         public void Face(Vector2 direction)
         {
             if (direction.sqrMagnitude <= .00001f) return;
             FacingDirection next = Mathf.Abs(direction.x) > Mathf.Abs(direction.y)
                 ? direction.x < 0 ? FacingDirection.West : FacingDirection.East
                 : direction.y > 0 ? FacingDirection.North : FacingDirection.South;
-            if (next != facing) elapsed = 0f;
             facing = next;
             ApplyFrame();
         }
 
         public void Face(FacingDirection direction)
         {
-            if (facing != direction) elapsed = 0f;
             facing = direction;
             ApplyFrame();
         }
@@ -113,9 +117,22 @@ namespace MistIsle.Player
         private void ApplyFrame()
         {
             if (target == null || frames == null || framesPerDirection <= 0) return;
-            int index = (int)facing * framesPerDirection + (moving
-                ? Mathf.FloorToInt(elapsed * walkFramesPerSecond) % framesPerDirection
-                : Mathf.Clamp(idleFrame, 0, framesPerDirection - 1));
+            int localFrame = Mathf.Clamp(idleFrame, 0, framesPerDirection - 1);
+            if (moving)
+            {
+                int step = Mathf.FloorToInt(elapsed * walkFramesPerSecond);
+                // Authored three-column sheets: neutral, first support step, opposite support step.
+                // Passing through neutral between supports avoids a 2 -> 0 -> 1 asymmetric hop.
+                if (framesPerDirection == 3)
+                {
+                    int phase = step % 4;
+                    localFrame = phase == 1 ? 1 : phase == 3 ? 2 : 0;
+                }
+                else localFrame = step % framesPerDirection;
+            }
+            int index = (int)facing * framesPerDirection + localFrame;
+            CurrentFrameIndex = index;
+            ActorVisualSizing.ApplyFacingReference(target, frames[(int)facing * framesPerDirection]);
             if (index >= 0 && index < frames.Length && frames[index] != null) target.sprite = frames[index];
         }
     }
