@@ -47,7 +47,7 @@
                    "protectedAreas":  "Traveler lies left of patch; logo is above patch; actual distant lighthouse lies right of patch. They remain original pixels.",
                    "originalAssetsOverwritten":  false,
                    "manualUnityGuiAcceptancePending":  true,
-                   "pendingReason":  "Physical keyboard/mouse walkthrough is still pending because the Windows desktop is locked; normal Editor application-frame replay and image review are completed.",
+                   "pendingReason":  "Window-keyboard traversal reached the first companion meeting. Windows automatically locked again before confirmation, crafting, capture and return. Full window input acceptance remains pending.",
                    "normalEditorUiReplay":  {
                                                 "Passed":  true,
                                                 "BatchMode":  false,
@@ -95,6 +95,6 @@
                     "style":  "Programmatically rendered chamfered navy plates, gold double-line trim, ivory text; only focused plate has warm gold fill and dark text.",
                     "focus":  "Mouse and W/S or up/down arrows; Enter/Space activates.",
                     "fallback":  "If the cleaned backdrop is unavailable, display the original complete approved cover and original hit areas.",
-                    "tests":  "49 EditMode and 17 PlayMode tests passed; normal Editor Play Mode visual replay passed separately with 13 verified UI captures. Title input hit areas reviewed in code and actual image; physical keyboard/mouse walkthrough remains pending."
+                    "tests":  "0.2.1: 49 EditMode, 19 PlayMode passed; separate normal Editor replay passed with 13 UI frames. Native foreground-window keyboard traversal covered title, dock, Watcher, Shiguang and gecko first meeting; remaining full opening input traversal is pending after a second automatic lock."
                 }
 }

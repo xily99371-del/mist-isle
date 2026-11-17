@@ -151,6 +151,7 @@ namespace MistIsle.Runtime
                 if (input.keyCode == KeyCode.LeftArrow || input.keyCode == KeyCode.A) { starterSelection = (starterSelection + 2) % 3; input.Use(); }
                 else if (input.keyCode == KeyCode.RightArrow || input.keyCode == KeyCode.D) { starterSelection = (starterSelection + 1) % 3; input.Use(); }
                 else if (input.keyCode == KeyCode.Return) { Session.ChooseStarter(ids[starterSelection]); input.Use(); }
+                else if (input.keyCode == KeyCode.Escape) { Session.ClearStoryFocus(); Session.SetPanel(GamePanel.Explore); input.Use(); }
             }
             for (int i = 0; i < 3; i++)
             {
@@ -168,6 +169,8 @@ namespace MistIsle.Runtime
             GUI.Label(new Rect(340, 631, 533, 38), "未选择的伙伴，仍可在后续旅程中重逢。", small);
             bool wasEnabled = GUI.enabled;
             GUI.enabled = Time.unscaledTime - panelOpenedAt > .3f;
+            if (GUI.Button(new Rect(82, 618, 214, 45), "再看看其他伙伴", button))
+            { Session.ClearStoryFocus(); Session.SetPanel(GamePanel.Explore); }
             if (GUI.Button(new Rect(917, 618, 271, 45), "确认 · 与" + Session.Catalog[ids[starterSelection]].displayName + "同行", button))
                 Session.ChooseStarter(ids[starterSelection]);
             GUI.enabled = wasEnabled;
@@ -207,7 +210,7 @@ namespace MistIsle.Runtime
             GUI.DrawTexture(new Rect(left, 460, 1189 - left, 207), dark);
             DrawRule(new Rect(left + 2, 460, 1185 - left, 2), new Color(.83f, .71f, .45f));
             GUI.Label(new Rect(left + 27, 473, 785, 35), Session.DialogueTitle, dialogueName);
-            GUI.Label(new Rect(left + 29, 518, 870 - (left - 91f), 108), Session.DialogueText, dialogueBody);
+            GUI.Label(new Rect(left + 29, 518, 1129 - left, 108), Session.DialogueText, dialogueBody);
             GUI.Label(new Rect(left + 29, 636, 620, 24), "Space / E · 继续", accent);
             int page = Mathf.Clamp(Session.DialoguePageIndex + 1, 1, Mathf.Max(1, Session.DialoguePageCount));
             GUI.Label(new Rect(971, 638, 70, 24), page + " / " + Mathf.Max(1, Session.DialoguePageCount), accent);

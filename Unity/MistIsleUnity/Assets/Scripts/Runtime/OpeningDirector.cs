@@ -12,7 +12,7 @@ namespace MistIsle.Runtime
         private OpeningStory story;
         private string guideRoom;
         private int guideWaypoint;
-        private static readonly string[] CampGuideRoute = { "guide-camp-waypoint", "coast-exit" };
+        private static readonly string[] CampGuideRoute = { "guide-camp-waypoint", "guide-exit-wait" };
         private static readonly string[] CoastGuideRoute = { "coast-waypoint-1", "coast-waypoint-2", "coast-waypoint-3", "tutorial-viewpoint" };
         private CompanionTrail companion;
         private OpeningStage Stage => session.OpeningPhase;
@@ -77,6 +77,7 @@ namespace MistIsle.Runtime
             RefreshCompanion();
             if (session.Progress.captureTutorialCompleted) session.World.SetCollected("tutorial-coast-crab");
             if (Stage == OpeningStage.Arrival) Show("arrival", () => SetStage(OpeningStage.MeetWatcher));
+            else if (Stage == OpeningStage.GatherIngredients) Show("gather", CheckIngredients);
             else if (Stage == OpeningStage.FirstEncounter)
             {
                 SetStage(OpeningStage.FollowGuide);

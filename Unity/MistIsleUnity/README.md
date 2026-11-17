@@ -4,7 +4,7 @@
 
 Target: Unity **6.3 LTS / 6000.3.28f1**, URP **17.3.0**, Windows x64.
 
-Open **this directory**, not the parent Git repository, in Unity Hub. Open `Assets/Scenes/CoastalCamp.unity` and press Play. The opening rework is built to `Builds/OpeningPolish/Windows/MistIsle.exe`; the earlier chapter prototype remains in `Builds/Windows`.
+Open **this directory**, not the parent Git repository, in Unity Hub. Open `Assets/Scenes/CoastalCamp.unity` and press Play. The latest verified opening build is `Builds/OpeningPolish/Windows-0.2.1/MistIsle.exe`; the 0.2.0 build remains in `Builds/OpeningPolish/Windows`, and the earlier chapter prototype in `Builds/Windows`.
 
 The current implementation is a playable chapter prototype, not a production-complete release. It connects starter choice, six-member travel party, three active combatants, wild encounters, feeding/capture, campfire crafting, Watcher recovery/storage, XP/evolution, field-ability side paths, four seals, and the Observer's final awakening encounter.
 
@@ -21,6 +21,7 @@ The current implementation is a playable chapter prototype, not a production-com
 | E | Interact with the nearest visible reachable target |
 | E / Space / Enter | Advance dialogue |
 | A / D or left / right, then Enter | Inspect and confirm a companion on the choice screen |
+| Esc on the companion choice screen | Return to the courtyard and meet another companion |
 | Tab | Party and deployment |
 | J | Creature journal |
 | F5 | Save |

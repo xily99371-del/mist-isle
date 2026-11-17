@@ -536,6 +536,7 @@ namespace MistIsle.World
                 layout.AddLandmark("campfire-approach",parent.TransformPoint(new Vector2(-1.6f,-.6f)));
                 layout.AddLandmark("starter-meeting",parent.TransformPoint(new Vector2(5.3f,.2f)));
                 layout.AddLandmark("guide-camp-waypoint",parent.TransformPoint(new Vector2(9f,1.2f)));
+                layout.AddLandmark("guide-exit-wait",parent.TransformPoint(new Vector2(10.8f,2.2f)));
                 layout.AddLandmark("coast-exit",parent.TransformPoint(new Vector2(13f,1.3f)));
             }
             else

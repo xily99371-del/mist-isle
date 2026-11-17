@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using MistIsle.Creatures;
@@ -198,6 +199,88 @@ namespace MistIsle.Tests
             yield return new WaitForSecondsRealtime(.45f);
             Assert.That(Vector2.Distance(guide.position, continuedPosition), Is.GreaterThan(.25f),
                 "The guide must continue catching up while the player remains farther ahead.");
+        }
+
+        [UnityTest]
+        public IEnumerator CampExitRemainsReachableFromLeftAboveAndBelowAfterGuideArrives()
+        {
+            yield return ReachFollowGuide();
+            Vector2 exit = session.World.GetLandmarkPosition("coast-exit");
+            var guide = session.World.GetActor("shiguang");
+            MovePlayer(exit);
+            Vector2 segmentStart = session.World.GetLandmarkPosition("guide-camp-waypoint");
+            Vector2 waitingPoint = session.World.GetLandmarkPosition("guide-exit-wait");
+            var obstacles = Physics2D.CircleCastAll(segmentStart, .28f, (waitingPoint - segmentStart).normalized,
+                    Vector2.Distance(segmentStart, waitingPoint))
+                .Where(hit => hit.collider != null && !hit.collider.isTrigger
+                    && !hit.collider.transform.IsChildOf(guide)
+                    && !hit.collider.transform.IsChildOf(session.PlayerTransform))
+                .Select(hit => hit.collider.name).ToArray();
+            Assert.That(obstacles, Is.Empty, "The guide's new final path intersects solid scenery: " + string.Join(", ", obstacles));
+            float deadline = Time.realtimeSinceStartup + 12f;
+            while (Time.realtimeSinceStartup < deadline)
+            {
+                Vector2 position = guide.position;
+                yield return new WaitForSecondsRealtime(.2f);
+                if (Vector2.Distance(guide.position, position) < .03f &&
+                    Vector2.Distance(guide.position, exit) < 3f) break;
+            }
+            Assert.That(Vector2.Distance(guide.position, exit), Is.LessThan(3f), "The guide never actually led the player to the exit.");
+            Vector2 arrival = guide.position;
+            var director = root.GetComponent<OpeningDirector>();
+            // Keep the real reached waiting pose while checking each independent approach to the same doorway.
+            director.enabled = false;
+            var failures = new List<string>();
+            try
+            {
+                Vector2[] offsets = { Vector2.left, Vector2.up, Vector2.down };
+                string[] names = { "left", "above", "below" };
+                for (int i = 0; i < offsets.Length; i++)
+                {
+                    if (session.Progress.roomId != "camp-0") Assert.That(session.ChangeRoom("camp-0", false), Is.True);
+                    session.World.MoveActorFacing("shiguang", arrival, Vector2.right);
+                    MovePlayer(exit + offsets[i]);
+                    yield return new WaitForSecondsRealtime(.23f);
+                    var sensor = session.PlayerTransform.GetComponent<PlayerInteractionSensor>();
+                    var selected = sensor.Current as WorldInteraction;
+                    string candidate = selected == null ? "none" : selected.Kind + ":" + selected.Id;
+                    bool activated = sensor.TryInteractCurrent();
+                    if (!activated || session.Progress.roomId != "coast-0")
+                        failures.Add(names[i] + ": candidate=" + candidate + ", activated=" + activated + ", room=" + session.Progress.roomId);
+                    yield return OpeningTestDriver.FinishDialogue(session);
+                }
+            }
+            finally { director.enabled = true; }
+            Assert.That(failures, Is.Empty, string.Join("\n", failures));
+        }
+
+        [UnityTest]
+        public IEnumerator RestoringPreCollectedIngredientsReplaysTheRequestThenAdvancesToRealCrafting()
+        {
+            yield return ReachGuide();
+            foreach (string item in new[] { "berry", "dew" })
+                session.World.Interactions.First(x => x.Kind == "resource" && x.Id.StartsWith(item + "-camp-0-")).Interact();
+            Npc("shiguang").Interact();
+            yield return OpeningTestDriver.FinishDialogue(session);
+            session.World.Interactions.Single(x => x.Kind == "starter" && x.Id == "moss-lumi").Interact();
+            yield return OpeningTestDriver.FinishDialogue(session);
+            session.ChooseStarter("moss-lumi");
+            Assert.That(session.OpeningPhase, Is.EqualTo(OpeningStage.GatherIngredients));
+            Assert.That(session.Panel, Is.EqualTo(GamePanel.Dialogue));
+            session.Save(false);
+            yield return RestartFromDisk();
+            Assert.That(session.Panel, Is.EqualTo(GamePanel.Dialogue), "The uncompleted gathering request was silently skipped on reload.");
+            Assert.That(session.OpeningPhase, Is.EqualTo(OpeningStage.GatherIngredients));
+            yield return OpeningTestDriver.FinishDialogue(session);
+            Assert.That(session.OpeningPhase, Is.EqualTo(OpeningStage.CraftTreat),
+                "Already-collected ingredients left the objective asking the player to collect empty nodes.");
+            Assert.That(session.World.Interactions.First(x => x.Kind == "resource" && x.Id.StartsWith("berry-camp-0-")).CanInteract, Is.False);
+            Assert.That(session.World.Interactions.First(x => x.Kind == "resource" && x.Id.StartsWith("dew-camp-0-")).CanInteract, Is.False);
+            session.World.Interactions.Single(x => x.Kind == "campfire" && x.Id == "campfire-camp-0").Interact();
+            session.Craft(session.Recipes.Single(x => x.recipeId == "berry-treat"));
+            yield return OpeningTestDriver.FinishDialogue(session);
+            Assert.That(session.Inventory.GetCount("berry-treat"), Is.EqualTo(1));
+            Assert.That(session.OpeningPhase, Is.EqualTo(OpeningStage.FollowGuide));
         }
 
         [UnityTest]
