@@ -73,6 +73,8 @@ namespace MistIsle.Tests
             Assert.That(session.Battle.Outcome, Is.EqualTo(BattleOutcome.Captured));
             session.LeaveBattle();
             Assert.That(session.World.Interactions.Single(x => x.Id == "tutorial-coast-crab").CanInteract, Is.False, "The rescued crab was still offered as a wild encounter.");
+            Assert.That(session.World.GetActor("tutorial-coast-crab").gameObject.activeSelf, Is.False,
+                "The captured crab's original actor remained visible in the wild.");
             yield return FinishDialogue(session);
             Assert.That(session.OpeningPhase, Is.EqualTo(OpeningStage.ReportWatcher));
             Assert.That(session.ChangeRoom("camp-0", false), Is.True);

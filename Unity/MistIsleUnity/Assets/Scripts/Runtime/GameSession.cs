@@ -236,7 +236,7 @@ namespace MistIsle.Runtime
             PlaySound(kind == "resource" ? "pickup" : "interact");
             switch (kind)
             {
-                case "exit": ChangeRoom(id, true); break;
+                case "exit": ChangeRoom(id, true, enteringFromRoomId: Progress.roomId); break;
                 case "npc":
                     if (id == "watcher") SetPanel(GamePanel.Watcher);
                     else Say("拾光 · 捕获引导", "削弱野生伙伴后使用共鸣胶囊，或者试着投喂莓果点心。观察它的偏好，失败也能积累了解。\n\n旅队最多六只，最多三只参与战斗。未选择的初始伙伴，可在完成区域探索后通过营地的伙伴重逢获得。\n\n" + Objective);
@@ -267,7 +267,7 @@ namespace MistIsle.Runtime
             }
         }
 
-        public bool ChangeRoom(string roomId, bool save)
+        public bool ChangeRoom(string roomId, bool save, string enteringFromRoomId = null)
         {
             if (!World.RoomIds.Contains(roomId)) roomId = "camp-0";
             if (opening != null && !opening.CanTravel(roomId)) return false;
@@ -284,7 +284,7 @@ namespace MistIsle.Runtime
                 }
             Progress.roomId = roomId;
             motor.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
-            var spawn = World.GetSpawn(roomId);
+            var spawn = RoomArrival(roomId, enteringFromRoomId);
             motor.GetComponent<Rigidbody2D>().position = spawn;
             motor.transform.position = spawn;
             Physics2D.SyncTransforms();
@@ -294,6 +294,26 @@ namespace MistIsle.Runtime
             opening?.OnRoomEntered();
             if (save) { Notify(RoomName); Save(false); }
             return true;
+        }
+
+        private Vector2 RoomArrival(string roomId, string enteringFromRoomId)
+        {
+            Vector2 fallback = World.GetSpawn(roomId);
+            // Initial arrival, saved-position restoration and defeat recovery keep their authored spawn.
+            if (string.IsNullOrEmpty(enteringFromRoomId)) return fallback;
+            var reverseExit = World.Interactions.FirstOrDefault(target => target.Kind == "exit"
+                && target.Id == enteringFromRoomId && World.GetRoomId(target.transform.position) == roomId);
+            if (reverseExit == null) return fallback;
+            Vector2 entrance = reverseExit.transform.position;
+            Vector2 inward = (World.GetBounds(roomId).center - entrance).normalized;
+            for (float distance = 1.3f; distance <= 2.51f; distance += .4f)
+            {
+                Vector2 candidate = entrance + inward * distance;
+                bool blocked = Physics2D.OverlapCircleAll(candidate + new Vector2(0f, .17f), .3f)
+                    .Any(shape => !shape.isTrigger && !shape.transform.IsChildOf(motor.transform));
+                if (!blocked) return candidate;
+            }
+            return fallback;
         }
 
         private void PlaySound(string key)

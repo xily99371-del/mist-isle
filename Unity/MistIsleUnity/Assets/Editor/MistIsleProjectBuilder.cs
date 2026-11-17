@@ -105,7 +105,7 @@ namespace MistIsle.Editor
         {
             PlayerSettings.companyName = "MistIsle";
             PlayerSettings.productName = "Mist Isle — 雾屿回响";
-            PlayerSettings.bundleVersion = "0.2.1";
+            PlayerSettings.bundleVersion = "0.2.2";
             PlayerSettings.defaultScreenWidth = 1280;
             PlayerSettings.defaultScreenHeight = 720;
             PlayerSettings.fullScreenMode = FullScreenMode.Windowed;

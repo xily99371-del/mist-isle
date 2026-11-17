@@ -284,6 +284,68 @@ namespace MistIsle.Tests
         }
 
         [UnityTest]
+        public IEnumerator FirstJourneyStillArrivesAtTheAuthoredDock()
+        {
+            session.NewJourney();
+            Assert.That(session.Panel, Is.EqualTo(GamePanel.Dialogue));
+            Assert.That(Vector2.Distance(session.PlayerTransform.position, session.World.GetLandmarkPosition("dock-arrival")),
+                Is.LessThan(.05f), "Initial story arrival must keep the dock spawn.");
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator RealExitRoundTripArrivesAtOppositeDoorAndBringsGuideBackToCamp()
+        {
+            yield return ReachFollowGuide();
+            var outward = session.World.Interactions.Single(target => target.Kind == "exit" && target.Id == "coast-0"
+                && session.World.GetRoomId(target.transform.position) == "camp-0");
+            outward.Interact();
+            Assert.That(session.Progress.roomId, Is.EqualTo("coast-0"));
+            var reverse = session.World.Interactions.Single(target => target.Kind == "exit" && target.Id == "camp-0"
+                && session.World.GetRoomId(target.transform.position) == "coast-0");
+            float arrivingDistance = Vector2.Distance(session.PlayerTransform.position, reverse.transform.position);
+            Assert.That(arrivingDistance, Is.InRange(1.1f, 2.6f), "Door travel must arrive just inside the opposite exit.");
+            Physics2D.SyncTransforms();
+            Assert.That(Physics2D.OverlapCircleAll((Vector2)session.PlayerTransform.position + new Vector2(0f, .17f), .3f)
+                .Any(shape => !shape.isTrigger && !shape.transform.IsChildOf(session.PlayerTransform)), Is.False,
+                "The inward arrival position overlaps solid scenery or a character.");
+
+            reverse.Interact();
+            Assert.That(session.Progress.roomId, Is.EqualTo("camp-0"));
+            float returnDistance = Vector2.Distance(session.PlayerTransform.position, outward.transform.position);
+            Assert.That(returnDistance, Is.InRange(1.1f, 2.6f));
+            Assert.That(Vector2.Distance(session.PlayerTransform.position, session.World.GetLandmarkPosition("dock-arrival")),
+                Is.GreaterThan(10f), "Returning through the coast exit incorrectly restarted the dock arrival.");
+            var guide = session.World.GetActor("shiguang");
+            Assert.That(session.World.GetRoomId(guide.position), Is.EqualTo("camp-0"), "The single guide was left behind in the distant coast room.");
+            Assert.That(Vector2.Distance(guide.position, session.World.GetLandmarkPosition("guide-exit-wait")), Is.LessThan(.1f));
+            yield return new WaitForSecondsRealtime(.25f);
+            Assert.That(Vector2.Distance(guide.position, session.PlayerTransform.position), Is.LessThan(4.2f));
+            outward.Interact();
+            Assert.That(session.Progress.roomId, Is.EqualTo("coast-0"), "The guide's return-to-camp state prevented leaving again.");
+            Assert.That(session.World.GetRoomId(guide.position), Is.EqualTo("coast-0"));
+        }
+
+        [UnityTest]
+        public IEnumerator CapturedCrabActorStaysHiddenAfterReloadAndReturnsOnlyForNewJourney()
+        {
+            yield return OpeningTestDriver.ChooseCompanion(session);
+            yield return OpeningTestDriver.FinishCaptureLesson(session);
+            Assert.That(session.World.GetActor("tutorial-coast-crab").gameObject.activeSelf, Is.False);
+            session.Save(false);
+            yield return RestartFromDisk();
+            Assert.That(session.Progress.captureTutorialCompleted, Is.True);
+            Assert.That(session.World.GetActor("tutorial-coast-crab").gameObject.activeSelf, Is.False,
+                "Reload recreated a visible duplicate of the rescued crab.");
+            Assert.That(session.World.Interactions.Single(target => target.Id == "tutorial-coast-crab").CanInteract, Is.False);
+            session.NewJourney();
+            Assert.That(session.World.GetActor("tutorial-coast-crab").gameObject.activeSelf, Is.True,
+                "Starting a new journey did not restore the new story's wild crab actor.");
+            Assert.That(session.World.Interactions.Single(target => target.Id == "tutorial-coast-crab").CanInteract, Is.True);
+            Assert.That(session.Progress.captureTutorialCompleted, Is.False);
+        }
+
+        [UnityTest]
         public IEnumerator InterruptedWatcherIntroductionReplaysBeforeAdvancingItsSavedStage()
         {
             yield return ReachWatcher();

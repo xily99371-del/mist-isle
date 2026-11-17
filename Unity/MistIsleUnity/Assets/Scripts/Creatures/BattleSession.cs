@@ -222,11 +222,12 @@ namespace MistIsle.Creatures
             float matchup = ElementChart.Multiplier(species.primaryElement, WildSpecies.primaryElement);
             int damage = Mathf.Max(1, Mathf.RoundToInt(
                 (actor.Attack(species) * power - Wild.Defense(WildSpecies) * 0.35f) * matchup));
+            int previousWildHp = Wild.currentHp;
             Wild.currentHp = Mathf.Max(0, Wild.currentHp - damage);
             if (IsCaptureLesson) Wild.currentHp = Mathf.Max(1, Wild.currentHp);
             if (Kind == BattleKind.FinalBoss && FinalStage != FinalBossStage.Awakened)
                 Wild.currentHp = Mathf.Max(1, Wild.currentHp);
-            log.Add(IsCaptureLesson ? actor.nickname + "轻轻牵制它的动作，警戒降低了 " + damage + "。" :
+            log.Add(IsCaptureLesson ? actor.nickname + "轻轻牵制它的动作，警戒降低了 " + (previousWildHp - Wild.currentHp) + "。" :
                 actor.nickname + "使用" + label + "，造成 " + damage + " 点伤害"
                 + (matchup > 1f ? "（克制）" : matchup < 1f ? "（抵抗）" : "") + "。");
             if (Kind == BattleKind.FinalBoss && FinalStage == FinalBossStage.None

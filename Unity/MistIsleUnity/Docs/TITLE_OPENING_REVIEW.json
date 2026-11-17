@@ -47,7 +47,7 @@
                    "protectedAreas":  "Traveler lies left of patch; logo is above patch; actual distant lighthouse lies right of patch. They remain original pixels.",
                    "originalAssetsOverwritten":  false,
                    "manualUnityGuiAcceptancePending":  true,
-                   "pendingReason":  "Window-keyboard traversal reached the first companion meeting. Windows automatically locked again before confirmation, crafting, capture and return. Full window input acceptance remains pending.",
+                   "pendingReason":  "Native foreground-window keyboard/mouse traversal completed the full opening across a lock/resume. Physical hardware input and full chapter completion remain separate pending checks.",
                    "normalEditorUiReplay":  {
                                                 "Passed":  true,
                                                 "BatchMode":  false,
@@ -56,7 +56,9 @@
                                                 "Evidence":  "Builds/Verification/20261117-opening/Captures/NormalEditor/01-title.png",
                                                 "ImportCorrection":  "TextureImporter NPOT=None, original dimensions, uncompressed; opaque viewport letterboxing",
                                                 "PhysicalKeyboardMouseVerified":  false
-                                            }
+                                            },
+                   "windowInputOpeningVerified":  true,
+                   "windowInputOpeningBuild":  "0.2.1"
                },
     "runtime":  {
                     "source":  "Unity/MistIsleUnity/Assets/Scripts/Runtime/TitlePresentation.cs",
@@ -95,6 +97,6 @@
                     "style":  "Programmatically rendered chamfered navy plates, gold double-line trim, ivory text; only focused plate has warm gold fill and dark text.",
                     "focus":  "Mouse and W/S or up/down arrows; Enter/Space activates.",
                     "fallback":  "If the cleaned backdrop is unavailable, display the original complete approved cover and original hit areas.",
-                    "tests":  "0.2.1: 49 EditMode, 19 PlayMode passed; separate normal Editor replay passed with 13 UI frames. Native foreground-window keyboard traversal covered title, dock, Watcher, Shiguang and gecko first meeting; remaining full opening input traversal is pending after a second automatic lock."
+                    "tests":  "0.2.2: 49 EditMode, 22 PlayMode and separate normal Editor UI replay passed. The full opening passed native window keyboard/mouse traversal in 0.2.0/0.2.1, then 0.2.2 was checked through the same save for real exit round trips, correct camp arrival and removal of the rescued crab. Physical hardware input and full chapter human playthrough remain separate."
                 }
 }

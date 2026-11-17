@@ -64,6 +64,7 @@ namespace MistIsle.Runtime
             guideRoom = null;
             session.World.MoveActorFacing("shiguang", session.World.GetLandmarkPosition("shiguang-home"), Vector2.down);
             foreach (string id in GameCatalog.StarterIds) session.World.SetActorVisible(id, true);
+            session.World.SetActorVisible("tutorial-coast-crab", true);
             foreach (var target in session.World.Interactions)
                 if (target.Id == "tutorial-coast-crab") target.SetAvailable(true);
             SetStage(OpeningStage.Arrival);
@@ -75,7 +76,11 @@ namespace MistIsle.Runtime
         {
             guideRoom = null;
             RefreshCompanion();
-            if (session.Progress.captureTutorialCompleted) session.World.SetCollected("tutorial-coast-crab");
+            if (session.Progress.captureTutorialCompleted)
+            {
+                session.World.SetCollected("tutorial-coast-crab");
+                session.World.SetActorVisible("tutorial-coast-crab", false);
+            }
             if (Stage == OpeningStage.Arrival) Show("arrival", () => SetStage(OpeningStage.MeetWatcher));
             else if (Stage == OpeningStage.GatherIngredients) Show("gather", CheckIngredients);
             else if (Stage == OpeningStage.FirstEncounter)
@@ -183,6 +188,7 @@ namespace MistIsle.Runtime
             {
                 session.Progress.captureTutorialCompleted = true;
                 session.World.SetCollected("tutorial-coast-crab");
+                session.World.SetActorVisible("tutorial-coast-crab", false);
                 SetStage(OpeningStage.ReportWatcher);
                 Show("captured");
             }
@@ -206,6 +212,12 @@ namespace MistIsle.Runtime
                 session.World.MoveActorFacing("shiguang", session.World.GetLandmarkPosition("coast-arrival") + new Vector2(1.3f, .5f), Vector2.right);
                 guideRoom = "coast-0";
                 guideWaypoint = 0;
+            }
+            else if (Stage == OpeningStage.FollowGuide && session.Progress.roomId == "camp-0")
+            {
+                session.World.MoveActorFacing("shiguang", session.World.GetLandmarkPosition("guide-exit-wait"), Vector2.right);
+                guideRoom = "camp-0";
+                guideWaypoint = CampGuideRoute.Length - 1;
             }
             else if (Stage == OpeningStage.ReportWatcher && session.Progress.roomId == "camp-0")
                 session.World.MoveActorFacing("shiguang", session.World.GetLandmarkPosition("shiguang-approach"), Vector2.down);
