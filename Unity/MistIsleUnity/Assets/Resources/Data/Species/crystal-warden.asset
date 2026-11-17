@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: crystal-warden
   m_EditorClassIdentifier: MistIsle.Runtime::MistIsle.Creatures.CreatureSpecies
   speciesId: crystal-warden
-  displayName: "\u8F89\u68D8\u8725\u738B"
+  displayName: "棱晶蛇王"
   fieldLore: "\u5B88\u62A4\u533A\u57DF\u5C01\u5370\u7684\u53E4\u8001\u5B58\u5728\uFF0C\u65E0\u6CD5\u6355\u83B7\u3002"
   primaryElement: 6
   artKey: crystal-warden

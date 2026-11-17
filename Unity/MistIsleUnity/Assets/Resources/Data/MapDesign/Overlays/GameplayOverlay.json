@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0.0",
+  "source": "Gameplay metadata overlay; supplied design-pack files remain unchanged.",
+  "nodes": {
+    "M00_SUPPLY_SHOP": { "kind": "shop", "approach_xy": [15, 26], "reward": "camp-supplies" },
+    "M00_TRAVELER_HUT": { "kind": "story", "approach_xy": [27, 34.25] },
+    "M00_STORAGE": { "kind": "story", "approach_xy": [49, 33] },
+    "M00_SHIGUANG_STATION": { "kind": "story", "approach_xy": [45, 28] },
+    "M00_GATHER_SHELL": { "item_id": "shell", "amount": 1, "respawn_seconds": 120 },
+    "M01_GATHER_MEADOW": { "item_id": "berry", "amount": 2, "respawn_seconds": 120 },
+    "M01_ENCOUNTER_GRASS": { "encounter_species_ids": ["wild-01", "wild-02", "wild-03"], "min_level": 2, "max_level": 4 },
+    "M01_TREASURE": { "item_id": "berry", "amount": 3, "reward": "coastal-cache" },
+    "M02_FIREFLY_MEADOW": { "encounter_species_ids": ["wild-04", "wild-05", "wild-06"], "min_level": 3, "max_level": 6 },
+    "M02_ROOT_BRIDGE": { "field_ability": "verdant", "reward": "root-bridge-shortcut" },
+    "M02_GUARDIAN": { "interaction_id": "glowglade-warden", "reward": "forest_seal", "sprite_key": "Creatures/GuardianGrove" },
+    "M02_CHEST": { "item_id": "pollen", "amount": 3, "reward": "forest-cache" },
+    "M03_WATER_CHANNEL": { "field_ability": "tide", "reward": "water-channel-shortcut" },
+    "M03_CONDUIT": { "field_ability": "crystal", "reward": "crystal-conduit-shortcut" },
+    "M03_TIDE_GUARDIAN": { "interaction_id": "tidal-warden", "reward": "tide_seal", "sprite_key": "Creatures/GuardianTide" },
+    "M03_CRYSTAL_GUARDIAN": { "interaction_id": "crystal-warden", "reward": "crystal_seal", "sprite_key": "Creatures/GuardianCrystal" },
+    "M04_BOSS": { "interaction_id": "final-boss", "sprite_key": "Creatures/GuardianLighthouse", "reward": "chapter-complete" }
+  },
+  "extra_nodes": [
+    { "id": "watcher", "map_id": "M00", "name": "守望者", "type": "npc", "kind": "npc", "xy": [27, 33], "sprite_key": "Actors/Watcher" },
+    { "id": "shiguang", "map_id": "M00", "name": "拾光", "type": "npc", "kind": "npc", "xy": [43, 30], "sprite_key": "Actors/ShiguangPixel" },
+    { "id": "moss-lumi", "map_id": "M00", "name": "苔藓灵", "type": "starter", "kind": "starter", "xy": [40, 27], "sprite_key": "Creatures/PixelMossLumi" },
+    { "id": "moatail", "map_id": "M00", "name": "沫尾兽", "type": "starter", "kind": "starter", "xy": [43, 26], "sprite_key": "Creatures/PixelMoatail" },
+    { "id": "crystal-gecko", "map_id": "M00", "name": "鸣晶蜥", "type": "starter", "kind": "starter", "xy": [46, 27], "sprite_key": "Creatures/PixelCrystalGecko" },
+    { "id": "berry-camp-0-0", "map_id": "M00", "name": "营地野莓", "type": "gather", "xy": [38, 20], "item_id": "berry", "amount": 2, "respawn_seconds": 120 },
+    { "id": "dew-camp-0-1", "map_id": "M00", "name": "花叶露水", "type": "gather", "xy": [44, 21], "item_id": "dew", "amount": 2, "respawn_seconds": 120 },
+    { "id": "berry-coast-0-0", "map_id": "M01", "name": "草甸野莓", "type": "gather", "xy": [17, 20], "item_id": "berry", "amount": 2, "respawn_seconds": 120 },
+    { "id": "dew-coast-0-1", "map_id": "M01", "name": "溪畔露水", "type": "gather", "xy": [23, 18], "item_id": "dew", "amount": 2, "respawn_seconds": 120 },
+    { "id": "tutorial-coast-crab", "map_id": "M01", "name": "受困潮壳蟹", "type": "encounter", "kind": "encounter", "xy": [28, 39], "encounter_species_ids": ["wild-03"], "min_level": 1, "max_level": 2, "sprite_key": "Creatures/PixelWildCrab" },
+    { "id": "M02_POLLEN", "map_id": "M02", "name": "萤火花粉", "type": "gather", "xy": [24, 23], "item_id": "pollen", "amount": 2, "respawn_seconds": 120 },
+    { "id": "M03_TIDE_ENCOUNTER", "map_id": "M03", "name": "遗迹浅湾生物", "type": "encounter", "kind": "encounter", "xy": [26, 52], "encounter_species_ids": ["wild-07", "wild-08", "wild-09"], "min_level": 5, "max_level": 8, "sprite_key": "Creatures/wild-07" },
+    { "id": "M03_CRYSTAL_ENCOUNTER", "map_id": "M03", "name": "晶簇生物", "type": "encounter", "kind": "encounter", "xy": [98, 30], "encounter_species_ids": ["wild-10", "wild-11", "wild-12"], "min_level": 6, "max_level": 9, "sprite_key": "Creatures/wild-10" },
+    { "id": "M03_CRYSTAL_RESOURCE", "map_id": "M03", "name": "共鸣晶屑", "type": "gather", "xy": [85, 29], "item_id": "crystal", "amount": 2, "respawn_seconds": 180 },
+    { "id": "lighthouse-warden", "map_id": "M04", "name": "回响观测者·前庭试炼", "type": "guardian_arena", "kind": "guardian", "xy": [40, 55], "sprite_key": "Creatures/GuardianLighthouse", "reward": "lighthouse_seal" }
+  ]
+}

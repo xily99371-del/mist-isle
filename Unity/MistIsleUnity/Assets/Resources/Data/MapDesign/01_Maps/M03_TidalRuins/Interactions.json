@@ -1,0 +1,103 @@
+{
+  "schema_version": "1.0.0",
+  "map_id": "M03",
+  "interactions": [
+    {
+      "id": "M03_WEST_ENTRY",
+      "name": "遗迹前庭",
+      "type": "spawn_transition",
+      "xy": [
+        3,
+        40
+      ]
+    },
+    {
+      "id": "M03_TIDE_TEMPLE",
+      "name": "潮汐神殿",
+      "type": "puzzle_zone",
+      "rect": [
+        18,
+        47,
+        24,
+        19
+      ]
+    },
+    {
+      "id": "M03_WATER_CHANNEL",
+      "name": "控水渠道",
+      "type": "water_level_puzzle",
+      "xy": [
+        38,
+        56
+      ],
+      "footprint": [
+        12,
+        8
+      ]
+    },
+    {
+      "id": "M03_FLOATING_PLATFORMS",
+      "name": "漂浮平台",
+      "type": "moving_platform",
+      "xy": [
+        53,
+        43
+      ]
+    },
+    {
+      "id": "M03_TIDE_GUARDIAN",
+      "name": "断潮蟹王",
+      "type": "guardian_arena",
+      "xy": [
+        66,
+        45
+      ],
+      "footprint": [
+        12,
+        10
+      ]
+    },
+    {
+      "id": "M03_CRYSTAL_ARCHIVE",
+      "name": "晶簇档案馆",
+      "type": "puzzle_zone",
+      "rect": [
+        77,
+        23,
+        28,
+        20
+      ]
+    },
+    {
+      "id": "M03_CONDUIT",
+      "name": "导能机关",
+      "type": "energy_puzzle",
+      "xy": [
+        91,
+        34
+      ]
+    },
+    {
+      "id": "M03_CRYSTAL_GUARDIAN",
+      "name": "棱晶蛇王",
+      "type": "guardian_arena",
+      "xy": [
+        91,
+        56
+      ],
+      "footprint": [
+        12,
+        10
+      ]
+    },
+    {
+      "id": "M03_NORTH_EXIT",
+      "name": "灯塔庭院入口",
+      "type": "gated_exit",
+      "xy": [
+        56,
+        77
+      ]
+    }
+  ]
+}

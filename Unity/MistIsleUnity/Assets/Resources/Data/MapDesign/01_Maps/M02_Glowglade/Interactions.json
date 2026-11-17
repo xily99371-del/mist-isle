@@ -1,0 +1,111 @@
+{
+  "schema_version": "1.0.0",
+  "map_id": "M02",
+  "interactions": [
+    {
+      "id": "M02_SOUTH_ENTRY",
+      "name": "南入口",
+      "type": "spawn_transition",
+      "xy": [
+        47,
+        3
+      ]
+    },
+    {
+      "id": "M02_FIREFLY_MEADOW",
+      "name": "萤火草甸",
+      "type": "encounter_gather",
+      "rect": [
+        12,
+        14,
+        20,
+        13
+      ]
+    },
+    {
+      "id": "M02_ANCIENT_GROVE",
+      "name": "古树环庭",
+      "type": "hub_puzzle",
+      "xy": [
+        47,
+        42
+      ],
+      "footprint": [
+        12,
+        10
+      ]
+    },
+    {
+      "id": "M02_ROOT_BRIDGE",
+      "name": "树根桥",
+      "type": "field_ability_gate",
+      "xy": [
+        60,
+        37
+      ],
+      "footprint": [
+        7,
+        3
+      ]
+    },
+    {
+      "id": "M02_WATERFALL_LOOKOUT",
+      "name": "瀑布观景台",
+      "type": "vantage",
+      "xy": [
+        24,
+        58
+      ],
+      "footprint": [
+        8,
+        6
+      ]
+    },
+    {
+      "id": "M02_HIDDEN_CLEARING",
+      "name": "隐藏空地",
+      "type": "secret",
+      "rect": [
+        10,
+        39,
+        12,
+        10
+      ]
+    },
+    {
+      "id": "M02_SEAL_GATE",
+      "name": "森林封印门",
+      "type": "guardian_gate",
+      "xy": [
+        81,
+        62
+      ],
+      "footprint": [
+        7,
+        5
+      ]
+    },
+    {
+      "id": "M02_GUARDIAN",
+      "name": "花冠鹿灵",
+      "type": "guardian_arena",
+      "xy": [
+        79,
+        51
+      ],
+      "footprint": [
+        12,
+        10
+      ]
+    },
+    {
+      "id": "M02_CHEST",
+      "name": "古树宝箱",
+      "type": "chest",
+      "xy": [
+        29,
+        29
+      ]
+    }
+  ]
+}

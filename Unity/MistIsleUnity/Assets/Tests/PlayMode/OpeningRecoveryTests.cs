@@ -104,7 +104,7 @@ namespace MistIsle.Tests
                 session.World.Interactions.First(x => x.Kind == "resource" && x.Id.StartsWith(item + "-camp-0-")).Interact();
                 yield return OpeningTestDriver.FinishDialogue(session);
             }
-            session.World.Interactions.Single(x => x.Kind == "campfire" && x.Id == "campfire-camp-0").Interact();
+            session.World.Interactions.Single(x => x.Kind == "campfire" && x.Id == "M00_CAMPFIRE").Interact();
             session.Craft(session.Recipes.Single(x => x.recipeId == "berry-treat"));
             yield return OpeningTestDriver.FinishDialogue(session);
             Assert.That(session.OpeningPhase, Is.EqualTo(OpeningStage.FollowGuide));
@@ -188,7 +188,7 @@ namespace MistIsle.Tests
             Assert.That(Vector2.Distance(guide.position, waitingPosition), Is.LessThan(.05f),
                 "The guide must wait when the player is far behind on the route.");
 
-            MovePlayer(session.World.GetLandmarkPosition("coast-exit"));
+            MovePlayer(session.World.GetLandmarkPosition("coast-exit") + Vector2.left * 3f);
             Vector2 beforeCatchUp = guide.position;
             Assert.That(Vector2.Distance(guide.position, session.PlayerTransform.position), Is.GreaterThan(4.2f));
             yield return new WaitForSecondsRealtime(.45f);
@@ -207,7 +207,7 @@ namespace MistIsle.Tests
             yield return ReachFollowGuide();
             Vector2 exit = session.World.GetLandmarkPosition("coast-exit");
             var guide = session.World.GetActor("shiguang");
-            MovePlayer(exit);
+            MovePlayer(exit + Vector2.left * 3f);
             Vector2 segmentStart = session.World.GetLandmarkPosition("guide-camp-waypoint");
             Vector2 waitingPoint = session.World.GetLandmarkPosition("guide-exit-wait");
             var obstacles = Physics2D.CircleCastAll(segmentStart, .28f, (waitingPoint - segmentStart).normalized,
@@ -217,15 +217,16 @@ namespace MistIsle.Tests
                     && !hit.collider.transform.IsChildOf(session.PlayerTransform))
                 .Select(hit => hit.collider.name).ToArray();
             Assert.That(obstacles, Is.Empty, "The guide's new final path intersects solid scenery: " + string.Join(", ", obstacles));
-            float deadline = Time.realtimeSinceStartup + 12f;
+            float routeLength = Vector2.Distance(guide.position, segmentStart) + Vector2.Distance(segmentStart, waitingPoint);
+            float deadline = Time.realtimeSinceStartup + routeLength / 2.05f + 2f;
             while (Time.realtimeSinceStartup < deadline)
             {
                 Vector2 position = guide.position;
                 yield return new WaitForSecondsRealtime(.2f);
                 if (Vector2.Distance(guide.position, position) < .03f &&
-                    Vector2.Distance(guide.position, exit) < 3f) break;
+                    Vector2.Distance(guide.position, waitingPoint) < .15f) break;
             }
-            Assert.That(Vector2.Distance(guide.position, exit), Is.LessThan(3f), "The guide never actually led the player to the exit.");
+            Assert.That(Vector2.Distance(guide.position, waitingPoint), Is.LessThan(.15f), "The guide never actually led the player to its authored exit waiting pose.");
             Vector2 arrival = guide.position;
             var director = root.GetComponent<OpeningDirector>();
             // Keep the real reached waiting pose while checking each independent approach to the same doorway.
@@ -241,6 +242,7 @@ namespace MistIsle.Tests
                     session.World.MoveActorFacing("shiguang", arrival, Vector2.right);
                     MovePlayer(exit + offsets[i]);
                     yield return new WaitForSecondsRealtime(.23f);
+                    if (session.Progress.roomId == "coast-0") continue; // Crossing the design-package trigger is also a successful doorway approach.
                     var sensor = session.PlayerTransform.GetComponent<PlayerInteractionSensor>();
                     var selected = sensor.Current as WorldInteraction;
                     string candidate = selected == null ? "none" : selected.Kind + ":" + selected.Id;
@@ -276,7 +278,7 @@ namespace MistIsle.Tests
                 "Already-collected ingredients left the objective asking the player to collect empty nodes.");
             Assert.That(session.World.Interactions.First(x => x.Kind == "resource" && x.Id.StartsWith("berry-camp-0-")).CanInteract, Is.False);
             Assert.That(session.World.Interactions.First(x => x.Kind == "resource" && x.Id.StartsWith("dew-camp-0-")).CanInteract, Is.False);
-            session.World.Interactions.Single(x => x.Kind == "campfire" && x.Id == "campfire-camp-0").Interact();
+            session.World.Interactions.Single(x => x.Kind == "campfire" && x.Id == "M00_CAMPFIRE").Interact();
             session.Craft(session.Recipes.Single(x => x.recipeId == "berry-treat"));
             yield return OpeningTestDriver.FinishDialogue(session);
             Assert.That(session.Inventory.GetCount("berry-treat"), Is.EqualTo(1));
@@ -304,7 +306,8 @@ namespace MistIsle.Tests
             var reverse = session.World.Interactions.Single(target => target.Kind == "exit" && target.Id == "camp-0"
                 && session.World.GetRoomId(target.transform.position) == "coast-0");
             float arrivingDistance = Vector2.Distance(session.PlayerTransform.position, reverse.transform.position);
-            Assert.That(arrivingDistance, Is.InRange(1.1f, 2.6f), "Door travel must arrive just inside the opposite exit.");
+            Assert.That((Vector2)session.PlayerTransform.position,
+                Is.EqualTo(MistIsle.World.DesignPackCatalog.GetExit("camp-0", "coast-0").Spawn), "Arrival must use the design package's exact paired spawn.");
             Physics2D.SyncTransforms();
             Assert.That(Physics2D.OverlapCircleAll((Vector2)session.PlayerTransform.position + new Vector2(0f, .17f), .3f)
                 .Any(shape => !shape.isTrigger && !shape.transform.IsChildOf(session.PlayerTransform)), Is.False,
@@ -313,7 +316,8 @@ namespace MistIsle.Tests
             reverse.Interact();
             Assert.That(session.Progress.roomId, Is.EqualTo("camp-0"));
             float returnDistance = Vector2.Distance(session.PlayerTransform.position, outward.transform.position);
-            Assert.That(returnDistance, Is.InRange(1.1f, 2.6f));
+            Assert.That((Vector2)session.PlayerTransform.position,
+                Is.EqualTo(MistIsle.World.DesignPackCatalog.GetExit("coast-0", "camp-0").Spawn));
             Assert.That(Vector2.Distance(session.PlayerTransform.position, session.World.GetLandmarkPosition("dock-arrival")),
                 Is.GreaterThan(10f), "Returning through the coast exit incorrectly restarted the dock arrival.");
             var guide = session.World.GetActor("shiguang");

@@ -46,7 +46,7 @@ namespace MistIsle.Creatures
             }
             Add(result, "glowglade-warden", "花冠鹿灵", ElementType.Verdant, 70, 10, 7, capturable: false);
             Add(result, "tidal-warden", "断潮蟹王", ElementType.Tide, 88, 12, 8, capturable: false);
-            Add(result, "crystal-warden", "辉棘蜥王", ElementType.Crystal, 98, 14, 9, capturable: false);
+            Add(result, "crystal-warden", "棱晶蛇王", ElementType.Crystal, 98, 14, 9, capturable: false);
             Add(result, "lighthouse-warden", "回响观测者", ElementType.Radiant, 110, 16, 10, capturable: false);
             Add(result, "final-boss", "回响观测者 · 终局", ElementType.Umbral, 170, 18, 10, capturable: false);
             result["final-boss"].spriteResourcePath = "Art/Creatures/lighthouse-warden";
@@ -109,6 +109,8 @@ namespace MistIsle.Creatures
                 case "dew": return "露水";
                 case "crystal": return "晶尘";
                 case "pollen": return "花粉";
+                case "shell": return "海岸贝壳";
+                case "camp-token": return "共鸣贝";
                 case "berry-treat": return "莓果团";
                 case "resonance-capsule": return "共鸣捕获器";
                 default: return itemId ?? "未知物品";

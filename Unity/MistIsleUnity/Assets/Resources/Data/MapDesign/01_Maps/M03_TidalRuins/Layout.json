@@ -1,0 +1,299 @@
+{
+  "schema_version": "1.0.0",
+  "coordinate_system": "bottom-left; x east; y north; tile indices",
+  "map": {
+    "id": "M03",
+    "size": [
+      112,
+      80
+    ],
+    "routes": [
+      [
+        [
+          3,
+          40
+        ],
+        [
+          14,
+          40
+        ],
+        [
+          24,
+          35
+        ],
+        [
+          34,
+          31
+        ],
+        [
+          45,
+          34
+        ],
+        [
+          55,
+          40
+        ],
+        [
+          66,
+          45
+        ],
+        [
+          78,
+          50
+        ],
+        [
+          91,
+          56
+        ],
+        [
+          105,
+          60
+        ]
+      ],
+      [
+        [
+          34,
+          31
+        ],
+        [
+          28,
+          45
+        ],
+        [
+          28,
+          58
+        ],
+        [
+          39,
+          65
+        ],
+        [
+          52,
+          66
+        ]
+      ],
+      [
+        [
+          66,
+          45
+        ],
+        [
+          77,
+          36
+        ],
+        [
+          89,
+          32
+        ],
+        [
+          101,
+          34
+        ]
+      ],
+      [
+        [
+          52,
+          66
+        ],
+        [
+          60,
+          73
+        ],
+        [
+          76,
+          76
+        ]
+      ]
+    ],
+    "exits": [
+      {
+        "id": "WEST_01",
+        "rect": [
+          0,
+          36,
+          2,
+          8
+        ],
+        "to": "M01.EAST_01",
+        "spawn": [
+          3,
+          40
+        ]
+      },
+      {
+        "id": "NORTH_01",
+        "rect": [
+          50,
+          78,
+          12,
+          2
+        ],
+        "to": "M04.SOUTH_01",
+        "spawn": [
+          56,
+          74
+        ],
+        "requires": [
+          "forest_seal",
+          "tide_seal",
+          "crystal_seal"
+        ]
+      }
+    ],
+    "poi": [
+      {
+        "id": "M03_WEST_ENTRY",
+        "name": "遗迹前庭",
+        "type": "spawn_transition",
+        "xy": [
+          3,
+          40
+        ]
+      },
+      {
+        "id": "M03_TIDE_TEMPLE",
+        "name": "潮汐神殿",
+        "type": "puzzle_zone",
+        "rect": [
+          18,
+          47,
+          24,
+          19
+        ]
+      },
+      {
+        "id": "M03_WATER_CHANNEL",
+        "name": "控水渠道",
+        "type": "water_level_puzzle",
+        "xy": [
+          38,
+          56
+        ],
+        "footprint": [
+          12,
+          8
+        ]
+      },
+      {
+        "id": "M03_FLOATING_PLATFORMS",
+        "name": "漂浮平台",
+        "type": "moving_platform",
+        "xy": [
+          53,
+          43
+        ]
+      },
+      {
+        "id": "M03_TIDE_GUARDIAN",
+        "name": "断潮蟹王",
+        "type": "guardian_arena",
+        "xy": [
+          66,
+          45
+        ],
+        "footprint": [
+          12,
+          10
+        ]
+      },
+      {
+        "id": "M03_CRYSTAL_ARCHIVE",
+        "name": "晶簇档案馆",
+        "type": "puzzle_zone",
+        "rect": [
+          77,
+          23,
+          28,
+          20
+        ]
+      },
+      {
+        "id": "M03_CONDUIT",
+        "name": "导能机关",
+        "type": "energy_puzzle",
+        "xy": [
+          91,
+          34
+        ]
+      },
+      {
+        "id": "M03_CRYSTAL_GUARDIAN",
+        "name": "棱晶蛇王",
+        "type": "guardian_arena",
+        "xy": [
+          91,
+          56
+        ],
+        "footprint": [
+          12,
+          10
+        ]
+      },
+      {
+        "id": "M03_NORTH_EXIT",
+        "name": "灯塔庭院入口",
+        "type": "gated_exit",
+        "xy": [
+          56,
+          77
+        ]
+      }
+    ],
+    "collision_rects": [
+      [
+        0,
+        0,
+        112,
+        2
+      ],
+      [
+        0,
+        0,
+        2,
+        80
+      ],
+      [
+        110,
+        0,
+        2,
+        80
+      ],
+      [
+        0,
+        78,
+        50,
+        2
+      ],
+      [
+        62,
+        78,
+        50,
+        2
+      ],
+      [
+        44,
+        38,
+        4,
+        12
+      ],
+      [
+        71,
+        45,
+        5,
+        6
+      ]
+    ],
+    "camera": {
+      "mode": "confiner",
+      "dead_zone": [
+        0.1,
+        0.1
+      ],
+      "initial_center": [
+        8,
+        40
+      ]
+    },
+    "notes": "地图采用双翼结构：西北/上翼潮汐神殿，东翼晶簇档案馆；中央水渠连接两翼。两位守卫独立触发，各自授予一枚封印。"
+  }
+}

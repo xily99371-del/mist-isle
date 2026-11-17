@@ -1,0 +1,218 @@
+{
+  "schema_version": "1.0.0",
+  "coordinate_system": "bottom-left; x east; y north; tile indices",
+  "map": {
+    "id": "M00",
+    "size": [
+      64,
+      48
+    ],
+    "routes": [
+      [
+        [
+          8,
+          5
+        ],
+        [
+          15,
+          12
+        ],
+        [
+          24,
+          18
+        ],
+        [
+          31,
+          23
+        ],
+        [
+          38,
+          25
+        ],
+        [
+          48,
+          25
+        ],
+        [
+          58,
+          25
+        ]
+      ]
+    ],
+    "exits": [
+      {
+        "id": "EAST_01",
+        "rect": [
+          62,
+          20,
+          2,
+          8
+        ],
+        "to": "M01.WEST_01",
+        "spawn": [
+          59,
+          24
+        ]
+      }
+    ],
+    "poi": [
+      {
+        "id": "M00_SPAWN_DOCK",
+        "name": "出生码头",
+        "type": "spawn",
+        "xy": [
+          9,
+          5
+        ],
+        "footprint": [
+          5,
+          5
+        ]
+      },
+      {
+        "id": "M00_CAMPFIRE",
+        "name": "篝火广场",
+        "type": "save_craft",
+        "xy": [
+          32,
+          24
+        ],
+        "footprint": [
+          5,
+          5
+        ]
+      },
+      {
+        "id": "M00_SUPPLY_SHOP",
+        "name": "补给商店",
+        "type": "shop",
+        "xy": [
+          15,
+          31
+        ],
+        "footprint": [
+          7,
+          6
+        ]
+      },
+      {
+        "id": "M00_TRAVELER_HUT",
+        "name": "旅人小屋",
+        "type": "story_interior",
+        "xy": [
+          27,
+          38
+        ],
+        "footprint": [
+          8,
+          7
+        ]
+      },
+      {
+        "id": "M00_SHIGUANG_STATION",
+        "name": "拾光工作台",
+        "type": "tutorial_crafting",
+        "xy": [
+          43,
+          30
+        ],
+        "footprint": [
+          7,
+          5
+        ]
+      },
+      {
+        "id": "M00_STORAGE",
+        "name": "储物棚",
+        "type": "storage",
+        "xy": [
+          49,
+          38
+        ],
+        "footprint": [
+          5,
+          4
+        ]
+      },
+      {
+        "id": "M00_NOTICE",
+        "name": "任务告示板",
+        "type": "quest_board",
+        "xy": [
+          36,
+          18
+        ],
+        "footprint": [
+          1,
+          1
+        ]
+      },
+      {
+        "id": "M00_GATHER_SHELL",
+        "name": "海岸贝壳",
+        "type": "gather",
+        "xy": [
+          55,
+          7
+        ],
+        "respawn_seconds": 180
+      }
+    ],
+    "collision_rects": [
+      [
+        0,
+        0,
+        64,
+        3
+      ],
+      [
+        0,
+        0,
+        3,
+        48
+      ],
+      [
+        0,
+        45,
+        64,
+        3
+      ],
+      [
+        0,
+        0,
+        8,
+        9
+      ],
+      [
+        12,
+        27,
+        9,
+        8
+      ],
+      [
+        24,
+        35,
+        10,
+        8
+      ],
+      [
+        47,
+        35,
+        8,
+        7
+      ]
+    ],
+    "camera": {
+      "mode": "confiner",
+      "dead_zone": [
+        0.12,
+        0.1
+      ],
+      "initial_center": [
+        32,
+        24
+      ]
+    },
+    "notes": "安全教学区，不生成随机野生战斗；建筑碰撞按建筑地基手工轮廓拆分，不用整张精灵矩形。"
+  }
+}

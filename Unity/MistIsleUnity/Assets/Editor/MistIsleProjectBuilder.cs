@@ -27,6 +27,9 @@ namespace MistIsle.Editor
             EnsureFolder("Assets/Settings");
             EnsureFolder("Assets/Resources/Settings");
             ImportApprovedArtIfAvailable();
+            DesignPackAssetImporter.ImportDesignPack();
+            DesignPackArtAdditionsImporter.ImportAdditions();
+            DesignPackArtAdditionsImporter.ValidateAdditions();
             ConfigureRendering();
             ConfigureProject();
             BakeCatalog();
@@ -106,7 +109,7 @@ namespace MistIsle.Editor
         {
             PlayerSettings.companyName = "MistIsle";
             PlayerSettings.productName = "Mist Isle — 雾屿回响";
-            PlayerSettings.bundleVersion = "0.3.0";
+            PlayerSettings.bundleVersion = "0.4.0";
             PlayerSettings.defaultScreenWidth = 1280;
             PlayerSettings.defaultScreenHeight = 720;
             PlayerSettings.fullScreenMode = FullScreenMode.Windowed;

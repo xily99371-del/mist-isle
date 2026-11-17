@@ -1,0 +1,100 @@
+{
+  "schema_version": "1.0.0",
+  "map_id": "M04",
+  "interactions": [
+    {
+      "id": "M04_SOUTH_ENTRY",
+      "name": "南入口",
+      "type": "spawn_transition",
+      "xy": [
+        39,
+        3
+      ]
+    },
+    {
+      "id": "M04_ASCENT",
+      "name": "登塔阶道",
+      "type": "main_route",
+      "xy": [
+        39,
+        17
+      ]
+    },
+    {
+      "id": "M04_FORECOURT",
+      "name": "前庭回廊",
+      "type": "exploration",
+      "xy": [
+        20,
+        39
+      ]
+    },
+    {
+      "id": "M04_CAMP",
+      "name": "半山营地",
+      "type": "save_craft",
+      "xy": [
+        19,
+        29
+      ]
+    },
+    {
+      "id": "M04_RESONANCE_PLAZA",
+      "name": "共鸣广场",
+      "type": "seal_insert",
+      "xy": [
+        40,
+        34
+      ],
+      "footprint": [
+        15,
+        13
+      ]
+    },
+    {
+      "id": "M04_THREE_SEAL_GATE",
+      "name": "三印之门",
+      "type": "gated_door",
+      "xy": [
+        40,
+        49
+      ],
+      "requires": [
+        "forest_seal",
+        "tide_seal",
+        "crystal_seal"
+      ]
+    },
+    {
+      "id": "M04_LIGHTHOUSE_FORECOURT",
+      "name": "灯塔前庭",
+      "type": "pre_boss",
+      "xy": [
+        40,
+        55
+      ]
+    },
+    {
+      "id": "M04_FINAL_ARENA",
+      "name": "最终战场",
+      "type": "boss_arena",
+      "xy": [
+        40,
+        61
+      ],
+      "footprint": [
+        16,
+        10
+      ]
+    },
+    {
+      "id": "M04_BOSS",
+      "name": "回响观测者",
+      "type": "boss",
+      "xy": [
+        40,
+        61
+      ]
+    }
+  ]
+}

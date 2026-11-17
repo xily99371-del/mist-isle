@@ -1,0 +1,91 @@
+{
+  "schema_version": "1.0.0",
+  "map_id": "M01",
+  "interactions": [
+    {
+      "id": "M01_WEST_ENTRY",
+      "name": "西入口",
+      "type": "spawn_transition",
+      "xy": [
+        4,
+        28
+      ]
+    },
+    {
+      "id": "M01_BRIDGE",
+      "name": "木桥",
+      "type": "traversal",
+      "xy": [
+        38,
+        30
+      ],
+      "footprint": [
+        5,
+        3
+      ]
+    },
+    {
+      "id": "M01_GATHER_MEADOW",
+      "name": "采集草甸",
+      "type": "gather_zone",
+      "rect": [
+        13,
+        13,
+        13,
+        10
+      ],
+      "respawn_seconds": 120
+    },
+    {
+      "id": "M01_ENCOUNTER_GRASS",
+      "name": "野生遭遇草丛",
+      "type": "encounter_zone",
+      "rect": [
+        24,
+        37,
+        9,
+        7
+      ]
+    },
+    {
+      "id": "M01_LOOKOUT",
+      "name": "瞭望高台",
+      "type": "vantage",
+      "xy": [
+        61,
+        43
+      ],
+      "footprint": [
+        8,
+        6
+      ]
+    },
+    {
+      "id": "M01_TREASURE",
+      "name": "溪边宝箱",
+      "type": "chest",
+      "xy": [
+        68,
+        18
+      ]
+    },
+    {
+      "id": "M01_NORTH_EXIT",
+      "name": "辉光林地入口",
+      "type": "exit",
+      "xy": [
+        40,
+        53
+      ]
+    },
+    {
+      "id": "M01_EAST_EXIT",
+      "name": "潮汐遗迹入口",
+      "type": "exit",
+      "xy": [
+        77,
+        28
+      ]
+    }
+  ]
+}

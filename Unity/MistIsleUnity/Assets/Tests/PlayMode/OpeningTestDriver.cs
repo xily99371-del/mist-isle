@@ -52,7 +52,7 @@ namespace MistIsle.Tests
                 yield return FinishDialogue(session);
             }
             Assert.That(session.OpeningPhase, Is.EqualTo(OpeningStage.CraftTreat));
-            session.World.Interactions.Single(x => x.Kind == "campfire" && x.Id == "campfire-camp-0").Interact();
+            session.World.Interactions.Single(x => x.Kind == "campfire" && x.Id == "M00_CAMPFIRE").Interact();
             Assert.That(session.Panel, Is.EqualTo(GamePanel.Campfire));
             session.Craft(session.Recipes.Single(x => x.recipeId == "berry-treat"));
             yield return FinishDialogue(session);

@@ -175,7 +175,7 @@ namespace MistIsle.Tests
                 byte[] original = File.ReadAllBytes(store.Path);
 
                 Assert.That(store.TryLoad(catalog, out var loaded, out var message), Is.True, message);
-                Assert.That(loaded.schemaVersion, Is.EqualTo(3));
+                Assert.That(loaded.schemaVersion, Is.EqualTo(WorldSaveData.CurrentSchemaVersion));
                 Assert.That(loaded.openingStage, Is.EqualTo((int)OpeningStage.Complete));
                 Assert.That(loaded.selectedStarterSpeciesId, Is.EqualTo("moatail"));
                 CollectionAssert.AreEqual(legacy.roster.Select(x => JsonUtility.ToJson(x)).ToArray(),

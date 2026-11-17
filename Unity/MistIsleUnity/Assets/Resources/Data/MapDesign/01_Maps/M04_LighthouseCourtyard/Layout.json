@@ -1,0 +1,253 @@
+{
+  "schema_version": "1.0.0",
+  "coordinate_system": "bottom-left; x east; y north; tile indices",
+  "map": {
+    "id": "M04",
+    "size": [
+      80,
+      64
+    ],
+    "routes": [
+      [
+        [
+          39,
+          3
+        ],
+        [
+          39,
+          12
+        ],
+        [
+          32,
+          19
+        ],
+        [
+          29,
+          27
+        ],
+        [
+          39,
+          33
+        ],
+        [
+          48,
+          39
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          40,
+          55
+        ],
+        [
+          40,
+          61
+        ]
+      ],
+      [
+        [
+          39,
+          33
+        ],
+        [
+          24,
+          37
+        ],
+        [
+          17,
+          44
+        ]
+      ],
+      [
+        [
+          39,
+          33
+        ],
+        [
+          55,
+          37
+        ],
+        [
+          64,
+          44
+        ]
+      ]
+    ],
+    "exits": [
+      {
+        "id": "SOUTH_01",
+        "rect": [
+          34,
+          0,
+          12,
+          2
+        ],
+        "to": "M03.NORTH_01",
+        "spawn": [
+          56,
+          74
+        ]
+      }
+    ],
+    "poi": [
+      {
+        "id": "M04_SOUTH_ENTRY",
+        "name": "南入口",
+        "type": "spawn_transition",
+        "xy": [
+          39,
+          3
+        ]
+      },
+      {
+        "id": "M04_ASCENT",
+        "name": "登塔阶道",
+        "type": "main_route",
+        "xy": [
+          39,
+          17
+        ]
+      },
+      {
+        "id": "M04_FORECOURT",
+        "name": "前庭回廊",
+        "type": "exploration",
+        "xy": [
+          20,
+          39
+        ]
+      },
+      {
+        "id": "M04_CAMP",
+        "name": "半山营地",
+        "type": "save_craft",
+        "xy": [
+          19,
+          29
+        ]
+      },
+      {
+        "id": "M04_RESONANCE_PLAZA",
+        "name": "共鸣广场",
+        "type": "seal_insert",
+        "xy": [
+          40,
+          34
+        ],
+        "footprint": [
+          15,
+          13
+        ]
+      },
+      {
+        "id": "M04_THREE_SEAL_GATE",
+        "name": "三印之门",
+        "type": "gated_door",
+        "xy": [
+          40,
+          49
+        ],
+        "requires": [
+          "forest_seal",
+          "tide_seal",
+          "crystal_seal"
+        ]
+      },
+      {
+        "id": "M04_LIGHTHOUSE_FORECOURT",
+        "name": "灯塔前庭",
+        "type": "pre_boss",
+        "xy": [
+          40,
+          55
+        ]
+      },
+      {
+        "id": "M04_FINAL_ARENA",
+        "name": "最终战场",
+        "type": "boss_arena",
+        "xy": [
+          40,
+          61
+        ],
+        "footprint": [
+          16,
+          10
+        ]
+      },
+      {
+        "id": "M04_BOSS",
+        "name": "回响观测者",
+        "type": "boss",
+        "xy": [
+          40,
+          61
+        ]
+      }
+    ],
+    "collision_rects": [
+      [
+        0,
+        0,
+        80,
+        2
+      ],
+      [
+        0,
+        0,
+        2,
+        64
+      ],
+      [
+        78,
+        0,
+        2,
+        64
+      ],
+      [
+        0,
+        62,
+        80,
+        2
+      ],
+      [
+        0,
+        0,
+        30,
+        8
+      ],
+      [
+        50,
+        0,
+        30,
+        8
+      ],
+      [
+        7,
+        42,
+        12,
+        5
+      ],
+      [
+        61,
+        42,
+        12,
+        5
+      ]
+    ],
+    "camera": {
+      "mode": "confiner",
+      "dead_zone": [
+        0.08,
+        0.08
+      ],
+      "initial_center": [
+        40,
+        8
+      ]
+    },
+    "notes": "最终区使用多层高台。三印门为独立状态物件，锁定时有实体碰撞；解锁后关闭碰撞并播放开门演出。Boss触发区与Boss实体碰撞分离。"
+  }
+}

@@ -1,0 +1,425 @@
+{
+  "package": "Mist Isle Chapter 1 Art Assets",
+  "version": "0.1.0",
+  "status": "prototype_asset_atlases",
+  "engine": "Unity 6.3 LTS / 2D Tilemap",
+  "tile_spec": {
+    "base_px": [
+      16,
+      16
+    ],
+    "pixels_per_unit": 16,
+    "filter_mode": "Point",
+    "compression": "None"
+  },
+  "tilesets": [
+    {
+      "id": "TS_Common",
+      "path": "02_Tilesets/Common/TS_Common_8x8_16px.png",
+      "texture_size_px": [
+        128,
+        128
+      ],
+      "grid": {
+        "columns": 8,
+        "rows": 8,
+        "cell_px": [
+          16,
+          16
+        ]
+      },
+      "pixels_per_unit": 16,
+      "filter_mode": "Point",
+      "compression": "None",
+      "derivation": "authored_base",
+      "notes": "Initial shared terrain atlas."
+    },
+    {
+      "id": "TS_Coastal",
+      "path": "02_Tilesets/Coastal/TS_Coastal_8x8_16px.png",
+      "texture_size_px": [
+        128,
+        128
+      ],
+      "grid": {
+        "columns": 8,
+        "rows": 8,
+        "cell_px": [
+          16,
+          16
+        ]
+      },
+      "pixels_per_unit": 16,
+      "filter_mode": "Point",
+      "compression": "None",
+      "derivation": "palette_variant_from_TS_Common",
+      "notes": "Regional variants currently recolor the common atlas; unique regional terrain autotile edges still need a dedicated production pass."
+    },
+    {
+      "id": "TS_Forest",
+      "path": "02_Tilesets/Forest/TS_Forest_8x8_16px.png",
+      "texture_size_px": [
+        128,
+        128
+      ],
+      "grid": {
+        "columns": 8,
+        "rows": 8,
+        "cell_px": [
+          16,
+          16
+        ]
+      },
+      "pixels_per_unit": 16,
+      "filter_mode": "Point",
+      "compression": "None",
+      "derivation": "palette_variant_from_TS_Common",
+      "notes": "Regional variants currently recolor the common atlas; unique regional terrain autotile edges still need a dedicated production pass."
+    },
+    {
+      "id": "TS_TidalRuins",
+      "path": "02_Tilesets/TidalRuins/TS_TidalRuins_8x8_16px.png",
+      "texture_size_px": [
+        128,
+        128
+      ],
+      "grid": {
+        "columns": 8,
+        "rows": 8,
+        "cell_px": [
+          16,
+          16
+        ]
+      },
+      "pixels_per_unit": 16,
+      "filter_mode": "Point",
+      "compression": "None",
+      "derivation": "palette_variant_from_TS_Common",
+      "notes": "Regional variants currently recolor the common atlas; unique regional terrain autotile edges still need a dedicated production pass."
+    },
+    {
+      "id": "TS_Lighthouse",
+      "path": "02_Tilesets/Lighthouse/TS_Lighthouse_8x8_16px.png",
+      "texture_size_px": [
+        128,
+        128
+      ],
+      "grid": {
+        "columns": 8,
+        "rows": 8,
+        "cell_px": [
+          16,
+          16
+        ]
+      },
+      "pixels_per_unit": 16,
+      "filter_mode": "Point",
+      "compression": "None",
+      "derivation": "palette_variant_from_TS_Common",
+      "notes": "Regional variants currently recolor the common atlas; unique regional terrain autotile edges still need a dedicated production pass."
+    }
+  ],
+  "tile_row_guide": [
+    {
+      "row": 0,
+      "category": "grass",
+      "description": "grass variants and flower patches"
+    },
+    {
+      "row": 1,
+      "category": "dirt_soil",
+      "description": "dirt, packed earth and stony soil"
+    },
+    {
+      "row": 2,
+      "category": "sand_shore",
+      "description": "beach sand, shells and shoreline transition"
+    },
+    {
+      "row": 3,
+      "category": "stone_path",
+      "description": "stone paving, cobbles and mossy path"
+    },
+    {
+      "row": 4,
+      "category": "wooden_floor_dock",
+      "description": "planks, dock boards and wooden platform"
+    },
+    {
+      "row": 5,
+      "category": "water",
+      "description": "shallow and deep water variants"
+    },
+    {
+      "row": 6,
+      "category": "rock_cliff",
+      "description": "rocky ground, boulders and mossy stone"
+    },
+    {
+      "row": 7,
+      "category": "forest_floor",
+      "description": "dark forest earth, leaves and mushrooms"
+    }
+  ],
+  "objects": {
+    "atlas": "03_Objects/Common/Objects_Environment_Atlas.png",
+    "source_reference": "03_Objects/Common/Objects_Environment_Atlas_Source.png",
+    "atlas_size_px": [
+      774,
+      274
+    ],
+    "rect_origin": "bottom-left (Unity Sprite Editor convention)",
+    "rects_are": "approximate starting rectangles; verify and adjust in Sprite Editor before final slicing",
+    "sprites": [
+      {
+        "id": "OBJ_TREE_OAK",
+        "rect": [
+          0,
+          10,
+          95,
+          105
+        ],
+        "pivot": [
+          0.5,
+          0.05
+        ],
+        "sorting": "Props"
+      },
+      {
+        "id": "OBJ_TREE_GOLDEN",
+        "rect": [
+          95,
+          10,
+          105,
+          105
+        ],
+        "pivot": [
+          0.5,
+          0.05
+        ],
+        "sorting": "Props"
+      },
+      {
+        "id": "OBJ_TREE_BLOSSOM",
+        "rect": [
+          205,
+          10,
+          110,
+          105
+        ],
+        "pivot": [
+          0.5,
+          0.05
+        ],
+        "sorting": "Props"
+      },
+      {
+        "id": "OBJ_TREE_PINE",
+        "rect": [
+          315,
+          10,
+          95,
+          105
+        ],
+        "pivot": [
+          0.5,
+          0.05
+        ],
+        "sorting": "Props"
+      },
+      {
+        "id": "OBJ_LANTERN_PAIR",
+        "rect": [
+          425,
+          20,
+          95,
+          105
+        ],
+        "pivot": [
+          0.5,
+          0.05
+        ],
+        "sorting": "Props"
+      },
+      {
+        "id": "OBJ_BANNER",
+        "rect": [
+          515,
+          25,
+          35,
+          125
+        ],
+        "pivot": [
+          0.5,
+          0.05
+        ],
+        "sorting": "Props"
+      },
+      {
+        "id": "OBJ_COASTAL_HOUSE",
+        "rect": [
+          535,
+          30,
+          115,
+          130
+        ],
+        "pivot": [
+          0.5,
+          0.05
+        ],
+        "sorting": "Buildings"
+      },
+      {
+        "id": "OBJ_LIGHTHOUSE",
+        "rect": [
+          645,
+          0,
+          125,
+          165
+        ],
+        "pivot": [
+          0.5,
+          0.05
+        ],
+        "sorting": "Buildings"
+      },
+      {
+        "id": "OBJ_FENCE",
+        "rect": [
+          5,
+          115,
+          135,
+          55
+        ],
+        "pivot": [
+          0.5,
+          0.1
+        ],
+        "sorting": "Props"
+      },
+      {
+        "id": "OBJ_SIGNPOST",
+        "rect": [
+          285,
+          110,
+          80,
+          65
+        ],
+        "pivot": [
+          0.5,
+          0.05
+        ],
+        "sorting": "Props"
+      },
+      {
+        "id": "OBJ_STONE_ARCH",
+        "rect": [
+          380,
+          110,
+          145,
+          115
+        ],
+        "pivot": [
+          0.5,
+          0.05
+        ],
+        "sorting": "Buildings"
+      },
+      {
+        "id": "OBJ_WOODEN_DOCK",
+        "rect": [
+          0,
+          170,
+          135,
+          100
+        ],
+        "pivot": [
+          0.5,
+          0.05
+        ],
+        "sorting": "Buildings"
+      },
+      {
+        "id": "OBJ_WOODEN_BRIDGE",
+        "rect": [
+          140,
+          170,
+          135,
+          100
+        ],
+        "pivot": [
+          0.5,
+          0.05
+        ],
+        "sorting": "Buildings"
+      },
+      {
+        "id": "OBJ_CAMP_TENT",
+        "rect": [
+          275,
+          175,
+          125,
+          95
+        ],
+        "pivot": [
+          0.5,
+          0.05
+        ],
+        "sorting": "Buildings"
+      },
+      {
+        "id": "OBJ_CRATES",
+        "rect": [
+          395,
+          215,
+          120,
+          55
+        ],
+        "pivot": [
+          0.5,
+          0.05
+        ],
+        "sorting": "Props"
+      },
+      {
+        "id": "OBJ_RESONANCE_PLATFORM",
+        "rect": [
+          525,
+          155,
+          130,
+          115
+        ],
+        "pivot": [
+          0.5,
+          0.05
+        ],
+        "sorting": "Buildings"
+      },
+      {
+        "id": "OBJ_STONE_STAIRS",
+        "rect": [
+          650,
+          160,
+          124,
+          110
+        ],
+        "pivot": [
+          0.5,
+          0.05
+        ],
+        "sorting": "Buildings"
+      }
+    ]
+  },
+  "region_object_atlases": {
+    "Coastal": "03_Objects/Coastal/Objects_Coastal_Props.png",
+    "Forest": "03_Objects/Forest/Objects_Forest_Nature.png",
+    "TidalRuins": "03_Objects/TidalRuins/Objects_Ruins_Architecture.png",
+    "Lighthouse": "03_Objects/Lighthouse/Objects_Lighthouse_Architecture.png"
+  },
+  "important_limitations": [
+    "The common tile atlas is the initial terrain base. Four regional PNGs are palette variants of the common sheet, not four fully unique terrain sets.",
+    "The object atlas is extracted from the approved environment concept sheet. Its SpriteRect values are approximate and need visual verification.",
+    "This package is a prototype asset drop, not a final production-ready complete sprite library. Animated water, autotile edge/corner variants, unique building interiors, and several region-specific mechanisms remain to be authored."
+  ]
+}

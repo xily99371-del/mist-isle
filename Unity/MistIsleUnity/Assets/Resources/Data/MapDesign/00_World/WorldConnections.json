@@ -1,0 +1,275 @@
+{
+  "schema_version": "1.0.0",
+  "chapter": 1,
+  "title": "雾屿回响·第一章世界连接定义",
+  "coordinate_system": {
+    "origin": "bottom_left",
+    "x_axis": "east",
+    "y_axis": "north",
+    "tile_size_px": 16,
+    "pixels_per_unit": 16,
+    "cell_size_unity": 1,
+    "coordinates": "integer tile indices; rectangles are [x,y,width,height]"
+  },
+  "maps": [
+    {
+      "id": "M00",
+      "name_zh": "海岸营地",
+      "name_en": "Coastal Camp",
+      "size": {
+        "width": 64,
+        "height": 48
+      },
+      "role": "starting_hub"
+    },
+    {
+      "id": "M01",
+      "name_zh": "潮风小径",
+      "name_en": "Tidewind Path",
+      "size": {
+        "width": 80,
+        "height": 56
+      },
+      "role": "traffic_hub"
+    },
+    {
+      "id": "M02",
+      "name_zh": "辉光林地",
+      "name_en": "Glowglade",
+      "size": {
+        "width": 96,
+        "height": 72
+      },
+      "role": "forest_branch"
+    },
+    {
+      "id": "M03",
+      "name_zh": "潮汐遗迹",
+      "name_en": "Tidal Ruins",
+      "size": {
+        "width": 112,
+        "height": 80
+      },
+      "role": "ruins_branch"
+    },
+    {
+      "id": "M04",
+      "name_zh": "灯塔庭院",
+      "name_en": "Lighthouse Courtyard",
+      "size": {
+        "width": 80,
+        "height": 64
+      },
+      "role": "final_area"
+    }
+  ],
+  "connections": [
+    {
+      "id": "C00_01",
+      "a": {
+        "map": "M00",
+        "exit": "EAST_01",
+        "trigger_rect": [
+          62,
+          20,
+          2,
+          8
+        ]
+      },
+      "b": {
+        "map": "M01",
+        "entry": "WEST_01",
+        "spawn": [
+          3,
+          28
+        ],
+        "facing": "E"
+      },
+      "bidirectional": true,
+      "unlock": "always"
+    },
+    {
+      "id": "C01_00",
+      "a": {
+        "map": "M01",
+        "exit": "WEST_01",
+        "trigger_rect": [
+          0,
+          24,
+          2,
+          8
+        ]
+      },
+      "b": {
+        "map": "M00",
+        "entry": "EAST_01",
+        "spawn": [
+          59,
+          24
+        ],
+        "facing": "W"
+      },
+      "bidirectional": true,
+      "unlock": "always"
+    },
+    {
+      "id": "C01_02",
+      "a": {
+        "map": "M01",
+        "exit": "NORTH_01",
+        "trigger_rect": [
+          35,
+          54,
+          10,
+          2
+        ]
+      },
+      "b": {
+        "map": "M02",
+        "entry": "SOUTH_01",
+        "spawn": [
+          47,
+          3
+        ],
+        "facing": "N"
+      },
+      "bidirectional": true,
+      "unlock": "always"
+    },
+    {
+      "id": "C02_01",
+      "a": {
+        "map": "M02",
+        "exit": "SOUTH_01",
+        "trigger_rect": [
+          43,
+          0,
+          10,
+          2
+        ]
+      },
+      "b": {
+        "map": "M01",
+        "entry": "NORTH_01",
+        "spawn": [
+          40,
+          51
+        ],
+        "facing": "S"
+      },
+      "bidirectional": true,
+      "unlock": "always"
+    },
+    {
+      "id": "C01_03",
+      "a": {
+        "map": "M01",
+        "exit": "EAST_01",
+        "trigger_rect": [
+          78,
+          24,
+          2,
+          8
+        ]
+      },
+      "b": {
+        "map": "M03",
+        "entry": "WEST_01",
+        "spawn": [
+          3,
+          40
+        ],
+        "facing": "E"
+      },
+      "bidirectional": true,
+      "unlock": "always"
+    },
+    {
+      "id": "C03_01",
+      "a": {
+        "map": "M03",
+        "exit": "WEST_01",
+        "trigger_rect": [
+          0,
+          36,
+          2,
+          8
+        ]
+      },
+      "b": {
+        "map": "M01",
+        "entry": "EAST_01",
+        "spawn": [
+          75,
+          28
+        ],
+        "facing": "W"
+      },
+      "bidirectional": true,
+      "unlock": "always"
+    },
+    {
+      "id": "C03_04",
+      "a": {
+        "map": "M03",
+        "exit": "NORTH_01",
+        "trigger_rect": [
+          50,
+          78,
+          12,
+          2
+        ]
+      },
+      "b": {
+        "map": "M04",
+        "entry": "SOUTH_01",
+        "spawn": [
+          39,
+          3
+        ],
+        "facing": "N"
+      },
+      "bidirectional": true,
+      "unlock": "all_seals"
+    },
+    {
+      "id": "C04_03",
+      "a": {
+        "map": "M04",
+        "exit": "SOUTH_01",
+        "trigger_rect": [
+          34,
+          0,
+          12,
+          2
+        ]
+      },
+      "b": {
+        "map": "M03",
+        "entry": "NORTH_01",
+        "spawn": [
+          56,
+          74
+        ],
+        "facing": "S"
+      },
+      "bidirectional": true,
+      "unlock": "always"
+    }
+  ],
+  "progression_logic": {
+    "hub": "M01",
+    "branches": [
+      "M02",
+      "M03"
+    ],
+    "branch_order": "free_choice_after_M01_tutorial",
+    "required_seals": [
+      "forest_seal",
+      "tide_seal",
+      "crystal_seal"
+    ],
+    "final_map": "M04",
+    "final_gate": "M04_THREE_SEAL_GATE"
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "schema_version": "1.0.0",
+  "chapter": 1,
+  "steps": [
+    {
+      "id": "P01",
+      "map": "M00",
+      "title": "抵达海岸营地",
+      "required": true,
+      "objectives": [
+        "与拾光相遇",
+        "完成御三家选择",
+        "学习移动与交互",
+        "首次使用篝火/存档"
+      ]
+    },
+    {
+      "id": "P02",
+      "map": "M01",
+      "title": "探索潮风小径",
+      "required": true,
+      "objectives": [
+        "通过一次资源采集教学",
+        "完成一次野生宠物遭遇教学",
+        "开放辉光林地与潮汐遗迹两条支线"
+      ]
+    },
+    {
+      "id": "P03",
+      "map": "M02",
+      "title": "取得森印",
+      "required": true,
+      "objectives": [
+        "完成树根桥/植物机关",
+        "击败花冠鹿灵",
+        "获得forest_seal"
+      ]
+    },
+    {
+      "id": "P04",
+      "map": "M03",
+      "title": "取得潮印与晶印",
+      "required": true,
+      "objectives": [
+        "完成潮汐水位机关",
+        "击败断潮蟹王并获得tide_seal",
+        "完成晶能导流机关",
+        "击败棱晶蛇王并获得crystal_seal"
+      ]
+    },
+    {
+      "id": "P05",
+      "map": "M04",
+      "title": "开启灯塔并完成第一章",
+      "required": true,
+      "requirements": [
+        "forest_seal",
+        "tide_seal",
+        "crystal_seal"
+      ],
+      "objectives": [
+        "在共鸣广场插入三枚封印",
+        "开启三印之门",
+        "触发回响观测者最终战",
+        "完成初始伙伴觉醒剧情"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "id": "M04_THREE_SEAL_GATE",
+      "map": "M04",
+      "requires_all": [
+        "forest_seal",
+        "tide_seal",
+        "crystal_seal"
+      ],
+      "on_locked": "show_missing_seal_icons",
+      "on_unlocked": "play_three_seal_gate_opening"
+    }
+  ],
+  "seal_rewards": [
+    {
+      "id": "forest_seal",
+      "from": "M02",
+      "guardian": "花冠鹿灵",
+      "emblem": "verdant"
+    },
+    {
+      "id": "tide_seal",
+      "from": "M03",
+      "guardian": "断潮蟹王",
+      "emblem": "tide"
+    },
+    {
+      "id": "crystal_seal",
+      "from": "M03",
+      "guardian": "棱晶蛇王",
+      "emblem": "crystal"
+    }
+  ]
+}

@@ -20,6 +20,7 @@ namespace MistIsle.Player
         }
         public Vector2 Facing { get; private set; } = Vector2.down;
         public bool IsMoving => input.sqrMagnitude > 0f;
+        public void SetFacing(Vector2 direction) { if (direction.sqrMagnitude > .001f) Facing = direction.normalized; }
 
         private void Awake()
         {

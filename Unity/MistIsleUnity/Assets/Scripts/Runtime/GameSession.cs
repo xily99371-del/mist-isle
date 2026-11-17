@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace MistIsle.Runtime
 {
-    public enum GamePanel { Title, Starter, Explore, Dialogue, Campfire, Watcher, Party, Storage, Journal, Battle, Ending }
+    public enum GamePanel { Title, Starter, Explore, Dialogue, Campfire, Watcher, Party, Storage, Journal, Battle, Ending, Shop, WorldMap }
 
     public sealed partial class GameSession : MonoBehaviour
     {
@@ -28,11 +28,8 @@ namespace MistIsle.Runtime
         public string Toast { get; private set; }
         public float ToastUntil { get; private set; }
         public string RoomName => World == null ? "海岸营地" : World.GetRoomName(Progress.roomId);
-        public string Objective => opening != null && opening.Objective != null ? opening.Objective : Progress.chapterCompleted ? "雾散之后：继续探索，补全伙伴图鉴。" :
-            !Progress.seals.HasSeal("glowglade-warden") ? "前往辉光林地，寻找根系圣所的封印守卫。" :
-            !Progress.seals.HasSeal("tidal-warden") ? "穿过潮汐遗迹，解除潮心祭坛的封印。" :
-            !Progress.seals.HasSeal("crystal-warden") ? "前往鸣晶高地，解除晶能封印。" :
-            !Progress.seals.HasSeal("lighthouse-warden") ? "三印已齐：前往灯塔，接受回响观测者的第四封印试炼。" : "四枚封印已齐：进入灯芯圣殿，回应雾海的呼唤。";
+        public string Objective => opening != null && opening.Objective != null ? opening.Objective
+            : DesignPackNarrative.ChapterObjective(Progress.seals, Progress.chapterCompleted);
 
         private TopDownPlayerMotor motor;
         private PlayerInteractionSensor sensor;
@@ -50,12 +47,15 @@ namespace MistIsle.Runtime
             Catalog = GameCatalog.CreateSpecies();
             var authored = Resources.LoadAll<CreatureSpecies>("Data/Species");
             foreach (var species in authored) Catalog[species.speciesId] = species;
+            // Display-only canon update: stable id, art and old creature instances are preserved.
+            Catalog["crystal-warden"].displayName = "棱晶蛇王";
             Recipes = GameCatalog.CreateRecipes();
             var authoredRecipes = Resources.LoadAll<CampfireRecipe>("Data/Recipes");
             if (authoredRecipes.Length > 0) Recipes = new List<CampfireRecipe>(authoredRecipes);
             Saves = new ChapterSaveStore(SaveDirectoryOverride ?? Environment.GetEnvironmentVariable("MIST_ISLE_SAVE_DIRECTORY"));
-            World = CoastalWorldBuilder.Build(transform, HandleWorldAction, id => Progress.collectedNodeIds.Contains(id));
+            World = DesignPackWorldBuilder.Build(transform, HandleWorldAction, id => !NodeAvailable(id));
             CreatePlayer();
+            DesignPackEncounterZone.Install(this, transform);
             CreateCamera();
             opening = gameObject.AddComponent<OpeningDirector>();
             opening.Initialize(this);
@@ -121,6 +121,8 @@ namespace MistIsle.Runtime
         private void Update()
         {
             if (Catalog == null) return;
+            if (Panel == GamePanel.WorldMap && Input.GetKeyDown(KeyCode.M)) { SetPanel(GamePanel.Explore); return; }
+            RefreshDesignNodes();
             if (Panel == GamePanel.Dialogue && (Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return)))
             { AdvanceDialogue(); return; }
             if (Panel != GamePanel.Title && Panel != GamePanel.Starter) Progress.playSeconds += Time.unscaledDeltaTime;
@@ -134,6 +136,7 @@ namespace MistIsle.Runtime
             {
                 if (Input.GetKeyDown(KeyCode.Tab)) OpenParty();
                 if (Input.GetKeyDown(KeyCode.J)) SetPanel(GamePanel.Journal);
+                if (Input.GetKeyDown(KeyCode.M)) SetPanel(GamePanel.WorldMap);
                 if (Input.GetKeyDown(KeyCode.F5)) Save();
                 if (Time.unscaledTime > autosaveAt)
                 {
@@ -150,8 +153,10 @@ namespace MistIsle.Runtime
             Progress = new WorldSaveData();
             Party = new PartyRoster();
             Inventory = new Inventory();
+            Inventory.Add(ShopCatalog.CurrencyItemId, 24);
             World.ResetCollected(_ => false);
             World.ResetFields(_ => false);
+            RestoreDesignObjects();
             Storage = new CompanionStorage();
             opening.Begin();
         }
@@ -180,7 +185,8 @@ namespace MistIsle.Runtime
             for (int i = 0; i < Math.Min(loaded.inventoryItemIds.Count, loaded.inventoryCounts.Count); i++)
                 if (!string.IsNullOrEmpty(loaded.inventoryItemIds[i]) && loaded.inventoryCounts[i] > 0)
                     Inventory.Add(loaded.inventoryItemIds[i], loaded.inventoryCounts[i]);
-            World.ResetCollected(id => Progress.collectedNodeIds.Contains(id));
+            World.ResetCollected(id => !NodeAvailable(id));
+            RestoreDesignObjects();
             World.ResetFields(id => Progress.completedFieldIds.Contains(id));
             if (!ChangeRoom(Progress.roomId, false)) ChangeRoom("camp-0", false);
             var savedPoint = new Vector2(Progress.playerX, Progress.playerY);
@@ -191,6 +197,7 @@ namespace MistIsle.Runtime
             follow.Snap();
             SetPanel(GamePanel.Explore);
             opening.Restore();
+            if (OpeningPhase == OpeningStage.Complete && !string.IsNullOrEmpty(Progress.pendingStoryId)) ObserveDesignStory(Progress.pendingStoryId);
             Notify(message);
         }
 
@@ -230,6 +237,7 @@ namespace MistIsle.Runtime
             if (Panel != GamePanel.Explore) return;
             if (opening.HandleInteraction(kind, id)) return;
             PlaySound(kind == "resource" ? "pickup" : "interact");
+            if (HandleDesignAction(kind, id)) return;
             switch (kind)
             {
                 case "exit": ChangeRoom(id, true, enteringFromRoomId: Progress.roomId); break;
@@ -268,16 +276,8 @@ namespace MistIsle.Runtime
             if (!World.RoomIds.Contains(roomId)) roomId = "camp-0";
             if (opening != null && !opening.CanTravel(roomId)) return false;
             string region = roomId.Split('-')[0];
-            int index = Array.IndexOf(RegionIds, region);
-            if (index < 0) roomId = "camp-0";
-            string[] seals = { "glowglade-warden", "tidal-warden", "crystal-warden", "lighthouse-warden" };
-            int required = roomId == "lighthouse-2" ? 4 : Mathf.Clamp(index - 2, 0, 3);
-            for (int i = 0; i < required; i++)
-                if (!Progress.seals.HasSeal(seals[i]))
-                {
-                    Say("前路仍被浓雾笼罩", "先解除前一区域的封印，再沿着新的光前进。\n\n" + Objective);
-                    return false;
-                }
+            if (roomId == "lighthouse-0" && !HasThreeSeals)
+            { Say("三印仍未齐全", "灯塔通路需要森印、潮印与晶印。\n\n" + Objective); return false; }
             Progress.roomId = roomId;
             motor.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
             var spawn = RoomArrival(roomId, enteringFromRoomId);
@@ -288,6 +288,7 @@ namespace MistIsle.Runtime
             follow.Snap();
             ChangeMusic(region);
             opening?.OnRoomEntered();
+            if (!Progress.visitedMapIds.Contains(roomId)) Progress.visitedMapIds.Add(roomId);
             if (save) { Notify(RoomName); Save(false); }
             return true;
         }
@@ -297,6 +298,13 @@ namespace MistIsle.Runtime
             Vector2 fallback = World.GetSpawn(roomId);
             // Initial arrival, saved-position restoration and defeat recovery keep their authored spawn.
             if (string.IsNullOrEmpty(enteringFromRoomId)) return fallback;
+            var connection = DesignPackCatalog.GetExit(enteringFromRoomId, roomId);
+            if (connection != null)
+            {
+                motor.SetFacing(connection.Facing);
+                motor.GetComponent<SpriteFrameAnimator>()?.Face(connection.Facing);
+                return connection.Spawn;
+            }
             var reverseExit = World.Interactions.FirstOrDefault(target => target.Kind == "exit"
                 && target.Id == enteringFromRoomId && World.GetRoomId(target.transform.position) == roomId);
             if (reverseExit == null) return fallback;
@@ -337,6 +345,14 @@ namespace MistIsle.Runtime
             int index = Mathf.Max(0, Array.IndexOf(RegionIds, region) - 1);
             if (kind == BattleKind.Wild && id != "tutorial-coast-crab")
             {
+                if (DesignPackCatalog.TryGetInteraction(id, out var node) && node.EncounterSpeciesIds.Length > 0)
+                {
+                    var candidates = node.EncounterSpeciesIds.Where(key => Catalog.ContainsKey(key) && Catalog[key].contentReady).ToArray();
+                    if (candidates.Length == 0) { Notify("这片草丛暂时没有新的踪迹。 "); return; }
+                    speciesId = candidates[UnityEngine.Random.Range(0, candidates.Length)];
+                }
+                else
+                {
                 int[][] pools = { new[] { 1, 2, 3 }, new[] { 4, 5, 6 }, new[] { 7, 8, 9 }, new[] { 10, 11 }, new[] { 11, 12 } };
                 var pool = pools[Mathf.Clamp(index, 0, pools.Length - 1)];
                 var candidates = pool.Select(n => "wild-" + n.ToString("00"))
@@ -345,10 +361,14 @@ namespace MistIsle.Runtime
                     .Select(s => s.speciesId).ToArray();
                 if (candidates.Length == 0) { Notify("这片区域暂时没有可遭遇的伙伴。 "); return; }
                 speciesId = candidates[UnityEngine.Random.Range(0, candidates.Length)];
+                }
             }
             if (!Catalog.TryGetValue(speciesId, out var species)) { Notify("这场遭遇的数据尚未就绪。 "); return; }
             Discover(speciesId);
             int level = lesson ? 1 : kind == BattleKind.Wild ? 2 + index * 2 : kind == BattleKind.Guardian ? 4 + index * 2 : 12;
+            if (!lesson && kind == BattleKind.Wild && DesignPackCatalog.TryGetInteraction(id, out var encounterNode))
+                level = UnityEngine.Random.Range(encounterNode.MinLevel, encounterNode.MaxLevel + 1);
+            if (kind == BattleKind.Guardian) level = id == "glowglade-warden" ? 6 : id == "tidal-warden" ? 7 : id == "crystal-warden" ? 8 : 10;
             var wild = new CreatureInstance(species, level, false);
             Battle = new BattleSession(Party, Catalog, Inventory, wild, null, kind, level, lesson);
             SetPanel(GamePanel.Battle);
@@ -383,12 +403,13 @@ namespace MistIsle.Runtime
                 Progress.seals.RecordGuardianVictory(encounterId);
                 Inventory.Add("resonance-capsule", 3);
                 Inventory.Add("berry-treat", 2);
-                Say("区域封印解除", "雾气散开，一条新的道路显露出来。\n\n获得共鸣胶囊 ×3、莓果点心 ×2。\n\n" + Objective);
+                Inventory.Add(ShopCatalog.CurrencyItemId, 25);
+                ObserveDesignStory("after:" + encounterId);
             }
             else if (outcome == BattleOutcome.Victory && kind == BattleKind.FinalBoss)
             {
                 Progress.chapterCompleted = true;
-                SetPanel(GamePanel.Ending);
+                ObserveDesignStory("after:final-boss");
             }
             else if (outcome == BattleOutcome.Defeat)
             {
@@ -397,6 +418,8 @@ namespace MistIsle.Runtime
                 Say("Watcher · 归航之灯", "我把你们接回了营地。伙伴们已经恢复，也没有丢失收集到的物品。准备好了再出发吧。 ");
             }
             opening.OnBattleEnded(outcome, lesson);
+            if (kind == BattleKind.Wild && !lesson && (outcome == BattleOutcome.Victory || outcome == BattleOutcome.Captured))
+            { DepleteNode(encounterId, DesignPackCatalog.TryGetInteraction(encounterId, out var node) ? node.RespawnSeconds : 90); Inventory.Add(ShopCatalog.CurrencyItemId, 3); }
             Save(false);
         }
 
@@ -408,16 +431,15 @@ namespace MistIsle.Runtime
         public void Recover(bool showMessage = true)
         {
             foreach (var c in Party.Members) c.currentHp = CreatureInstance.MaxHp(Catalog[c.speciesId], c.level);
-            Progress.collectedNodeIds.Clear();
-            World.ResetCollected(_ => false);
-            if (showMessage) Notify("Watcher 照料了全部伙伴。休息过后，沿途资源也重新出现。 ");
+            if (showMessage) Notify("Watcher 照料了全部伙伴。沿途资源会随时间自然恢复。 ");
             Save(false);
         }
 
         public void Craft(CampfireRecipe recipe)
         {
-            if (CraftingService.TryCraft(Inventory, recipe, out var reason)) { opening.OnCrafted(recipe.recipeId); Save(false); }
+            bool crafted = CraftingService.TryCraft(Inventory, recipe, out var reason);
             Notify(reason);
+            if (crafted) { opening.OnCrafted(recipe.recipeId); Save(false); }
         }
 
         public void OpenParty() { previousPanel = Panel; SetPanel(GamePanel.Party); }
@@ -451,10 +473,12 @@ namespace MistIsle.Runtime
         public void ReuniteStarter(string id)
         {
             if (Progress.seals.Count < 2) { Notify("完成两个区域封印后，拾光会带来新的伙伴线索。 "); return; }
-            if (Party.Members.Any(c => c.speciesId == id || c.speciesId == id + "-evolved")) { Notify("这位伙伴已经在队伍中。 "); return; }
+            if (Party.Members.Concat(Storage.Members).Any(c => c.speciesId == id || c.speciesId == id + "-evolved")
+                || Progress.storyFlags.Contains("reunited:" + id)) { Notify("这位伙伴已经与你重逢。 "); return; }
             var c = new CreatureInstance(Catalog[id], 5, false);
             if (!Party.TryAdd(c)) { Notify("旅队已经满员。 "); return; }
             Discover(id);
+            Progress.storyFlags.Add("reunited:" + id);
             Notify("循着拾光的线索，" + Catalog[id].displayName + "回应了你的邀请。 ");
             Save(false);
         }

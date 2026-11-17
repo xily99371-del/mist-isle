@@ -8,7 +8,7 @@ using UnityEngine;
 namespace MistIsle.Runtime
 {
     // Presentation only: all mutations go through GameSession and the gameplay services.
-    public sealed class ChapterInterface : MonoBehaviour
+    public sealed partial class ChapterInterface : MonoBehaviour
     {
         public GameSession Session;
         public int DrawnFrameCount { get; private set; }
@@ -100,6 +100,8 @@ namespace MistIsle.Runtime
                     case GamePanel.Dialogue: DrawDialogue(); break;
                     case GamePanel.Campfire: DrawCampfire(); break;
                     case GamePanel.Watcher: DrawWatcher(); break;
+                    case GamePanel.Shop: DrawShop(); break;
+                    case GamePanel.WorldMap: DrawWorldMap(); break;
                     case GamePanel.Party: DrawParty(); break;
                     case GamePanel.Storage: DrawStorage(); break;
                     case GamePanel.Journal: DrawJournal(); break;
@@ -193,7 +195,7 @@ namespace MistIsle.Runtime
             if (Session.Panel == GamePanel.Explore)
             {
                 GUI.DrawTexture(new Rect(274, 679, 732, 32), dark);
-                GUI.Label(new Rect(289, 685, 710, 24), "WASD 移动    E 交互    Tab 伙伴    J 图鉴    F5 保存    ·    同行 " + Session.Party.Count + "/6", new GUIStyle(accent) { fontSize = 14 });
+                GUI.Label(new Rect(289, 685, 710, 24), "WASD 移动  E 交互  Tab 伙伴  J 图鉴  M 地图  F5 保存  ·  同行 " + Session.Party.Count + "/6", new GUIStyle(accent) { fontSize = 14 });
             }
         }
 
@@ -473,6 +475,7 @@ namespace MistIsle.Runtime
 
         private void OnDestroy()
         {
+            foreach (var map in mapTextures.Values) if (map != null) Destroy(map);
             titlePresentation.Dispose();
             if (dark != null) Destroy(dark);
             if (paper != null) Destroy(paper);

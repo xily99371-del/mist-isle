@@ -7,3 +7,7 @@
 *.unity text eol=lf whitespace=-blank-at-eol
 *.mat text eol=lf whitespace=-blank-at-eol
 .gitattributes text eol=lf
+
+# Keep the supplied design reference and runtime source copies byte-identical to the archive.
+/Docs/MapDesignSource/v01/** -text
+/Assets/Resources/Data/MapDesign/** -text

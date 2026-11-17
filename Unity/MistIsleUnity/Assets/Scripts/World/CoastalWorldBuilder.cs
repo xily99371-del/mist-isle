@@ -1025,6 +1025,7 @@ namespace MistIsle.World
         internal void AddLandmark(string id,Vector2 position) => landmarks[id]=position;
         internal void RegisterField(string id, GameObject barrier, WorldInteraction interaction, GameObject openMarker)
             => fields.Add(id, new FieldRoute { Barrier = barrier, Interaction = interaction, OpenMarker = openMarker });
+        internal void RegisterBarrierOnly(string id, GameObject barrier) => RegisterField(id, barrier, null, null);
         public Vector2 GetSpawn(string id) => rooms.TryGetValue(id ?? "", out var room) ? room.Spawn : rooms["camp-0"].Spawn;
         public Rect GetBounds(string id) => rooms.TryGetValue(id ?? "", out var room) ? room.Bounds : rooms["camp-0"].Bounds;
         public string GetRoomName(string id) => rooms.TryGetValue(id ?? "", out var room) ? room.Name : "海岸营地";
@@ -1068,6 +1069,12 @@ namespace MistIsle.World
             SetFieldState(route, true);
             return true;
         }
+        public bool SetFieldOpen(string id, bool open)
+        {
+            if (!fields.TryGetValue(id ?? "", out var route)) return false;
+            if (route.Open != open) SetFieldState(route, open);
+            return true;
+        }
         public bool IsFieldOpen(string id) => fields.TryGetValue(id ?? "", out var route) && route.Open;
         public void ResetFields(Func<string, bool> isOpen)
         {
@@ -1077,7 +1084,7 @@ namespace MistIsle.World
         {
             route.Open = open;
             route.Barrier.SetActive(!open);
-            route.Interaction.SetAvailable(!open);
+            route.Interaction?.SetAvailable(!open);
             if (route.OpenMarker != null) route.OpenMarker.SetActive(open);
         }
         private sealed class FieldRoute { public GameObject Barrier; public WorldInteraction Interaction; public GameObject OpenMarker; public bool Open; }

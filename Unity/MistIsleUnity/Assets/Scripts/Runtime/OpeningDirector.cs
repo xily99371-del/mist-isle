@@ -21,8 +21,8 @@ namespace MistIsle.Runtime
         public void Initialize(GameSession owner)
         {
             session = owner;
-            story = Resources.Load<OpeningStory>("Data/OpeningStory");
-            if (story == null) story = OpeningStory.CreateDefault();
+            story = Resources.Load<OpeningStory>("Data/DesignPackOpeningStory");
+            if (story == null) story = DesignPackNarrative.CreateOpeningStory();
         }
 
         public string Objective
@@ -122,7 +122,7 @@ namespace MistIsle.Runtime
                 else if (Stage == OpeningStage.MeetWatcher) session.Say("拾光", "你刚上岸吧？先去照护屋前找 Watcher，他一直在看着栈桥。我们等你暖和些再聊。");
                 else if (Stage == OpeningStage.GatherIngredients) Show("gather");
                 else if (Stage == OpeningStage.CraftTreat) Show("ingredients");
-                else if (Stage == OpeningStage.FollowGuide) session.Say("拾光", "准备好了就跟上我。小家伙在东侧海边的礁石旁，还不敢回到水里。");
+                else if (Stage == OpeningStage.FollowGuide) session.Say("拾光", "准备好了就跟上我。小家伙在潮风小径的溪边，还不敢回到水里。");
                 else if (Stage == OpeningStage.ReportWatcher) session.Say("拾光", "先带它回 Watcher 那里吧。它很努力地跟着你，一定也累了。");
                 return true;
             }

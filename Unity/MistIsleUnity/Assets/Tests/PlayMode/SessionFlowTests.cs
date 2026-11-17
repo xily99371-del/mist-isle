@@ -64,7 +64,8 @@ namespace MistIsle.Tests
             yield return OpeningTestDriver.FinishCaptureLesson(session);
             Assert.That(session.Panel, Is.EqualTo(GamePanel.Explore));
 
-            var resource = session.World.Interactions.First(item => item.Kind == "resource" && item.Id.StartsWith("berry-camp-0-"));
+            Assert.That(session.ChangeRoom("coast-0", false), Is.True);
+            var resource = session.World.Interactions.First(item => item.Kind == "resource" && item.Id.StartsWith("berry-coast-0-"));
             int berries = session.Inventory.GetCount("berry");
             resource.Interact();
             Assert.That(session.Inventory.GetCount("berry"), Is.EqualTo(berries + 2));
@@ -73,7 +74,8 @@ namespace MistIsle.Tests
             resource.Interact();
             Assert.That(session.Inventory.GetCount("berry"), Is.EqualTo(berries + 2), "A collected pickup was duplicated.");
 
-            var fire = session.World.Interactions.First(item => item.Kind == "campfire" && item.Id == "campfire-camp-0");
+            Assert.That(session.ChangeRoom("camp-0", false), Is.True);
+            var fire = session.World.Interactions.First(item => item.Kind == "campfire" && item.Id == "M00_CAMPFIRE");
             fire.Interact();
             Assert.That(session.Panel, Is.EqualTo(GamePanel.Campfire));
             var recipe = session.Recipes.Single(item => item.recipeId == "berry-treat");
@@ -83,11 +85,11 @@ namespace MistIsle.Tests
             session.ClosePanel();
             yield return OpeningTestDriver.FinishDialogue(session);
 
-            Assert.That(session.ChangeRoom("glowglade-1", false), Is.True);
-            var field = session.World.Interactions.Single(item => item.Kind == "field" && item.Id == "field-glowglade");
+            Assert.That(session.ChangeRoom("glowglade-0", false), Is.True);
+            var field = session.World.Interactions.Single(item => item.Kind == "field" && item.Id == "M02_ROOT_BRIDGE");
             field.Interact();
-            Assert.That(session.Progress.completedFieldIds, Does.Contain("field-glowglade"));
-            Assert.That(session.World.IsFieldOpen("field-glowglade"), Is.True,
+            Assert.That(session.Progress.completedFieldIds, Does.Contain("M02_ROOT_BRIDGE"));
+            Assert.That(session.World.IsFieldOpen("M02_ROOT_BRIDGE"), Is.True,
                 "Ability dialogue completed without physically opening the route.");
             yield return OpeningTestDriver.FinishDialogue(session);
             session.Save(false);
@@ -102,10 +104,10 @@ namespace MistIsle.Tests
             session.World.ResetCollected(_ => false);
             session.ContinueJourney();
             Assert.That(session.Panel, Is.EqualTo(GamePanel.Explore));
-            Assert.That(session.Progress.roomId, Is.EqualTo("glowglade-1"));
+            Assert.That(session.Progress.roomId, Is.EqualTo("glowglade-0"));
             Assert.That(session.Party.Members[0].instanceId, Is.EqualTo(starterInstanceId));
             Assert.That(session.Inventory.GetCount("berry-treat"), Is.EqualTo(savedTreats));
-            Assert.That(session.World.IsFieldOpen("field-glowglade"), Is.True, "Reloading did not restore the opened branch.");
+            Assert.That(session.World.IsFieldOpen("M02_ROOT_BRIDGE"), Is.True, "Reloading did not restore the opened branch.");
             Assert.That(resource.CanInteract, Is.False, "Reloading respawned a saved collected resource.");
             CollectionAssert.AreEqual(legacyBytes, File.ReadAllBytes(legacyPath), "Unity save flow modified the legacy C save file.");
             yield return null;

@@ -82,7 +82,7 @@ namespace MistIsle.Tests
                 yield return OpeningTestDriver.FinishDialogue(session);
             }
             PlaceTraveler("campfire-approach");
-            session.World.Interactions.Single(x => x.Id == "campfire-camp-0").Interact();
+            session.World.Interactions.Single(x => x.Id == "M00_CAMPFIRE").Interact();
             yield return Capture("07-campfire-crafting", GamePanel.Campfire);
             session.Craft(session.Recipes.Single(x => x.recipeId == "berry-treat"));
             yield return OpeningTestDriver.FinishDialogue(session);
@@ -109,19 +109,26 @@ namespace MistIsle.Tests
             Assert.That(session.Panel, Is.EqualTo(GamePanel.Explore));
             var traveler = root.transform.Find("Traveler");
             Assert.That(traveler, Is.Not.Null);
-            traveler.position = new Vector2(1.4f,-.8f);
-            Physics2D.SyncTransforms();
+            PlaceTraveler("campfire-approach");
             yield return Capture("12-coastal-camp", GamePanel.Explore);
 
-            Assert.That(session.ChangeRoom("coast-1", false), Is.True);
+            var shop = session.World.Interactions.Single(item => item.Kind == "shop");
+            PlaceTraveler((Vector2)shop.transform.position + Vector2.down);
+            shop.Interact();
+            yield return Capture("13-supply-shop", GamePanel.Shop);
+            session.ClosePanel();
+            session.SetPanel(GamePanel.WorldMap);
+            yield return Capture("14-camp-world-map", GamePanel.WorldMap);
+            session.ClosePanel();
+            Assert.That(session.ChangeRoom("coast-0", false), Is.True);
             var encounter = session.World.Interactions.First(item => item.Kind == "encounter" &&
-                session.World.GetRoomId(item.transform.position) == "coast-1");
+                item.Id != "tutorial-coast-crab" && session.World.GetRoomId(item.transform.position) == "coast-0");
             traveler.position = encounter.transform.position + Vector3.down;
             Physics2D.SyncTransforms();
             encounter.Interact();
             Assert.That(session.Panel, Is.EqualTo(GamePanel.Battle));
             Assert.That(session.Battle, Is.Not.Null);
-            yield return Capture("13-wild-encounter", GamePanel.Battle);
+            yield return Capture("15-wild-encounter", GamePanel.Battle);
             File.WriteAllText(Path.Combine(captureDirectory, "opening-replay-kind.txt"),
                 "Normal Editor Play Mode; application ScreenCapture includes IMGUI when raster checks pass.\n" +
                 "Story progression uses session commands and explicit traveler placement. This is not physical keyboard/mouse playthrough acceptance.\n");
@@ -157,6 +164,10 @@ namespace MistIsle.Tests
         private IEnumerator Capture(string name, GamePanel expectedPanel)
         {
             Assert.That(session.Panel, Is.EqualTo(expectedPanel), "The story skipped the intended presentation: " + name);
+            // This replay places the traveler explicitly; settle the real follow camera at that authored pose.
+            var follow = Object.FindObjectsByType<MistIsle.Player.CoastalCamera>(FindObjectsSortMode.None)
+                .FirstOrDefault(camera => camera.Target == session.PlayerTransform);
+            follow?.Snap();
             var ui = root.GetComponent<ChapterInterface>();
             int repaintCountBefore = ui == null ? 0 : ui.DrawnFrameCount;
             // Let camera follow, IMGUI layout, glyph atlases and sprite uploads settle first.

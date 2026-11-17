@@ -1,0 +1,280 @@
+{
+  "schema_version": "1.0.0",
+  "coordinate_system": "bottom-left; x east; y north; tile indices",
+  "map": {
+    "id": "M02",
+    "size": [
+      96,
+      72
+    ],
+    "routes": [
+      [
+        [
+          47,
+          3
+        ],
+        [
+          47,
+          12
+        ],
+        [
+          39,
+          19
+        ],
+        [
+          31,
+          27
+        ],
+        [
+          36,
+          36
+        ],
+        [
+          47,
+          42
+        ],
+        [
+          59,
+          48
+        ],
+        [
+          70,
+          55
+        ],
+        [
+          80,
+          61
+        ]
+      ],
+      [
+        [
+          39,
+          19
+        ],
+        [
+          25,
+          25
+        ],
+        [
+          17,
+          34
+        ],
+        [
+          19,
+          45
+        ]
+      ],
+      [
+        [
+          47,
+          42
+        ],
+        [
+          58,
+          36
+        ],
+        [
+          68,
+          31
+        ],
+        [
+          80,
+          27
+        ]
+      ],
+      [
+        [
+          59,
+          48
+        ],
+        [
+          70,
+          43
+        ],
+        [
+          83,
+          42
+        ]
+      ]
+    ],
+    "exits": [
+      {
+        "id": "SOUTH_01",
+        "rect": [
+          43,
+          0,
+          10,
+          2
+        ],
+        "to": "M01.NORTH_01",
+        "spawn": [
+          47,
+          3
+        ]
+      }
+    ],
+    "poi": [
+      {
+        "id": "M02_SOUTH_ENTRY",
+        "name": "南入口",
+        "type": "spawn_transition",
+        "xy": [
+          47,
+          3
+        ]
+      },
+      {
+        "id": "M02_FIREFLY_MEADOW",
+        "name": "萤火草甸",
+        "type": "encounter_gather",
+        "rect": [
+          12,
+          14,
+          20,
+          13
+        ]
+      },
+      {
+        "id": "M02_ANCIENT_GROVE",
+        "name": "古树环庭",
+        "type": "hub_puzzle",
+        "xy": [
+          47,
+          42
+        ],
+        "footprint": [
+          12,
+          10
+        ]
+      },
+      {
+        "id": "M02_ROOT_BRIDGE",
+        "name": "树根桥",
+        "type": "field_ability_gate",
+        "xy": [
+          60,
+          37
+        ],
+        "footprint": [
+          7,
+          3
+        ]
+      },
+      {
+        "id": "M02_WATERFALL_LOOKOUT",
+        "name": "瀑布观景台",
+        "type": "vantage",
+        "xy": [
+          24,
+          58
+        ],
+        "footprint": [
+          8,
+          6
+        ]
+      },
+      {
+        "id": "M02_HIDDEN_CLEARING",
+        "name": "隐藏空地",
+        "type": "secret",
+        "rect": [
+          10,
+          39,
+          12,
+          10
+        ]
+      },
+      {
+        "id": "M02_SEAL_GATE",
+        "name": "森林封印门",
+        "type": "guardian_gate",
+        "xy": [
+          81,
+          62
+        ],
+        "footprint": [
+          7,
+          5
+        ]
+      },
+      {
+        "id": "M02_GUARDIAN",
+        "name": "花冠鹿灵",
+        "type": "guardian_arena",
+        "xy": [
+          79,
+          51
+        ],
+        "footprint": [
+          12,
+          10
+        ]
+      },
+      {
+        "id": "M02_CHEST",
+        "name": "古树宝箱",
+        "type": "chest",
+        "xy": [
+          29,
+          29
+        ]
+      }
+    ],
+    "collision_rects": [
+      [
+        0,
+        0,
+        96,
+        2
+      ],
+      [
+        0,
+        0,
+        2,
+        72
+      ],
+      [
+        94,
+        0,
+        2,
+        72
+      ],
+      [
+        0,
+        70,
+        96,
+        2
+      ],
+      [
+        31,
+        30,
+        4,
+        12
+      ],
+      [
+        62,
+        0,
+        5,
+        22
+      ],
+      [
+        75,
+        58,
+        3,
+        7
+      ]
+    ],
+    "camera": {
+      "mode": "confiner",
+      "dead_zone": [
+        0.1,
+        0.1
+      ],
+      "initial_center": [
+        47,
+        8
+      ]
+    },
+    "notes": "林地采用环形主路线，古树环庭作为中心枢纽；根桥和封印门用可开关碰撞状态，Boss区触发后锁门。"
+  }
+}
