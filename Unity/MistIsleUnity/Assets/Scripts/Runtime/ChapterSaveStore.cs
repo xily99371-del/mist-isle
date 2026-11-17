@@ -50,6 +50,9 @@ namespace MistIsle.Runtime
 
         public static void Validate(WorldSaveData data, IReadOnlyDictionary<string, CreatureSpecies> catalog)
         {
+            if (data.schemaVersion < 3 && !string.IsNullOrEmpty(data.selectedStarterSpeciesId))
+                data.openingStage = (int)OpeningStage.Complete;
+            data.openingStage = Mathf.Clamp(data.openingStage, 0, (int)OpeningStage.Complete);
             data.roster = data.roster ?? new List<CreatureInstance>();
             var ids = new HashSet<string>();
             data.roster.RemoveAll(c => c == null || string.IsNullOrEmpty(c.instanceId)

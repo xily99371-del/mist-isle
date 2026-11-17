@@ -30,6 +30,8 @@ namespace MistIsle.Editor
             ConfigureRendering();
             ConfigureProject();
             BakeCatalog();
+            if (AssetDatabase.LoadAssetAtPath<MistIsle.Runtime.OpeningStory>("Assets/Resources/Data/OpeningStory.asset") == null)
+                AssetDatabase.CreateAsset(MistIsle.Runtime.OpeningStory.CreateDefault(), "Assets/Resources/Data/OpeningStory.asset");
             if (!File.Exists(MainScene)) CreateMainScene();
             else EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(MainScene, true) };
             AssetDatabase.SaveAssets();
@@ -43,6 +45,7 @@ namespace MistIsle.Editor
             var method = importer?.GetMethod("ImportApprovedArt", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
             method?.Invoke(null, null);
             importer?.GetMethod("ValidateImportedArt", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)?.Invoke(null, null);
+            importer?.GetMethod("ValidateOriginalPixelActors", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)?.Invoke(null, null);
         }
 
         private static void ConfigureRendering()
@@ -102,7 +105,7 @@ namespace MistIsle.Editor
         {
             PlayerSettings.companyName = "MistIsle";
             PlayerSettings.productName = "Mist Isle — 雾屿回响";
-            PlayerSettings.bundleVersion = "0.1.0";
+            PlayerSettings.bundleVersion = "0.2.0";
             PlayerSettings.defaultScreenWidth = 1280;
             PlayerSettings.defaultScreenHeight = 720;
             PlayerSettings.fullScreenMode = FullScreenMode.Windowed;
@@ -237,6 +240,13 @@ namespace MistIsle.Editor
             Debug.Log("MIST_ISLE_BUILD_RESULT: " + report.summary.result + ", " + report.summary.totalErrors + " errors, " + report.summary.totalSize + " bytes");
             if (report.summary.result != BuildResult.Succeeded)
                 throw new InvalidOperationException("Windows build failed: " + report.summary.result);
+        }
+
+        [MenuItem("Mist Isle/Play Opening")]
+        public static void PlayOpening()
+        {
+            EditorSceneManager.OpenScene(MainScene);
+            EditorApplication.isPlaying = true;
         }
 
         private static Type FindType(string name)

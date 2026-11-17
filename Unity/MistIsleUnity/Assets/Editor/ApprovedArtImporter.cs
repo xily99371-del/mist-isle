@@ -13,6 +13,22 @@ namespace MistIsle.Editor
         private const string Prepared = "Assets/Art/Prepared/";
         private const string Output = "Assets/Resources/Art/";
         private static string preparedRebuildBackup;
+        private static string originalPixelRebuildBackup;
+
+        [MenuItem("Mist Isle/Rebuild Original Pixel Actors With Backup")]
+        public static void RebuildOriginalPixelActorsWithBackup()
+        {
+            originalPixelRebuildBackup = Path.Combine("Builds", "ArtBackups", "original-pixels-" + DateTime.UtcNow.ToString("yyyyMMdd-HHmmssfff"));
+            try
+            {
+                ImportApprovedPixelActors();
+                ImportOriginalOpeningEnvironment();
+                ValidateOriginalPixelActors();
+                ValidateOriginalPixelCreatures();
+                Debug.Log("MIST_ISLE_ORIGINAL_PIXEL_BACKUP: " + originalPixelRebuildBackup);
+            }
+            finally { originalPixelRebuildBackup = null; }
+        }
 
         [MenuItem("Mist Isle/Rebuild Prepared Cutouts With Backup")]
         public static void RebuildPreparedCutouts()
@@ -25,6 +41,9 @@ namespace MistIsle.Editor
         [MenuItem("Mist Isle/Import Approved Art")]
         public static void ImportApprovedArt()
         {
+            ImportApprovedPixelActors();
+            ImportOriginalOpeningEnvironment();
+            ConfigureTitleTextures();
             ImportFrames("TravelerLegacy.png", "Actors/Traveler", "Traveler", 64, 80, 4, 4);
             ImportFrames("Watcher.png", "Actors/Watcher", "Watcher", 64, 80, 4, 4);
             ImportFrames("Ground.png", "Tiles/Ground", "Ground", 56, 56, 4, 12, true);
@@ -58,6 +77,286 @@ namespace MistIsle.Editor
             Alias("Creatures/wild-02.png", "Creatures/WildBird.png");
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
             Debug.Log("MIST_ISLE_ART_IMPORTED: independent actor frames, terrain, environment and available curated cutouts.");
+        }
+
+        private static void ConfigureTitleTextures()
+        {
+            foreach (string file in new[] { "TitleCover.png", "TitleBackdrop-v2.png" })
+            {
+                string path = Output + "UI/" + file;
+                if (!File.Exists(path)) continue;
+                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceSynchronousImport);
+                var importer = (TextureImporter)AssetImporter.GetAtPath(path);
+                importer.textureType = TextureImporterType.Default;
+                importer.npotScale = TextureImporterNPOTScale.None;
+                importer.textureCompression = TextureImporterCompression.Uncompressed;
+                importer.mipmapEnabled = false;
+                importer.wrapMode = TextureWrapMode.Clamp;
+                importer.maxTextureSize = 4096;
+                importer.SaveAndReimport();
+            }
+        }
+
+        /// <summary>Uses the original board pixels; no AI repaint, resampling, palette change or invented frames.</summary>
+        [MenuItem("Mist Isle/Import Original Pixel Characters")]
+        public static void ImportApprovedPixelActors()
+        {
+            string path = Source + "PixelPeopleApproved.png";
+            if (!File.Exists(path)) throw new FileNotFoundException("The approved pixel character board is required.", path);
+            Texture2D board = ReadTexture(path);
+            try
+            {
+                if (board.width != 1484 || board.height != 1060)
+                    throw new InvalidDataException("The approved character board must be the original 1484x1060 image.");
+                // Source rows are North, South, West, East. Runtime rows are South, West, East, North.
+                // Rectangles are reviewed top-left pixel coordinates in the 1484 x 1060 original.
+                int[] columns = { 1008, 1130, 1254 };
+                RectInt[] shiguang = { new RectInt(0, 84, 112, 108), new RectInt(0, 193, 112, 104),
+                    new RectInt(0, 298, 112, 104), new RectInt(0, 405, 112, 112) };
+                RectInt[] traveler = { new RectInt(0, 558, 112, 112), new RectInt(0, 675, 112, 112),
+                    new RectInt(0, 787, 112, 122), new RectInt(0, 910, 112, 124) };
+                ImportBoardActor(board, columns, traveler, "ApprovedTraveler");
+                ImportBoardActor(board, columns, shiguang, "ShiguangPixel");
+            }
+            finally { UnityEngine.Object.DestroyImmediate(board); }
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+            Debug.Log("MIST_ISLE_ORIGINAL_PIXEL_ACTORS: 24 original frames, 128x128 canvas, 64 PPU, South/West/East/North x 3, foot baseline 3px; retained RGB unchanged.");
+        }
+
+        [MenuItem("Mist Isle/Validate Original Pixel Characters")]
+        public static void ValidateOriginalPixelActors()
+        {
+            Texture2D board = ReadTexture(Source + "PixelPeopleApproved.png");
+            try
+            {
+                int[] columns = { 1008, 1130, 1254 };
+                RectInt[] shiguang = { new RectInt(0, 84, 112, 108), new RectInt(0, 193, 112, 104),
+                    new RectInt(0, 298, 112, 104), new RectInt(0, 405, 112, 112) };
+                RectInt[] traveler = { new RectInt(0, 558, 112, 112), new RectInt(0, 675, 112, 112),
+                    new RectInt(0, 787, 112, 122), new RectInt(0, 910, 112, 124) };
+                ValidateBoardActor(board, columns, traveler, "ApprovedTraveler");
+                ValidateBoardActor(board, columns, shiguang, "ShiguangPixel");
+            }
+            finally { UnityEngine.Object.DestroyImmediate(board); }
+            Debug.Log("MIST_ISLE_ORIGINAL_PIXEL_ACTORS_VALIDATED: all 24 independent PNGs match the approved board pixels exactly after boundary-only alpha cleanup and canvas placement; direction order, pivot, PPU and point sampling validated.");
+        }
+
+        private static void ValidateBoardActor(Texture2D board, int[] columns, RectInt[] sourceRows, string actor)
+        {
+            int[] order = { 1, 2, 3, 0 };
+            for (int direction = 0; direction < 4; direction++) for (int frame = 0; frame < 3; frame++)
+            {
+                RectInt rect = sourceRows[order[direction]]; rect.x = columns[frame];
+                Color32[] source = ReadTopLeftPixels(board, rect);
+                ClearConnectedBoardBackground(source, rect.width, rect.height);
+                Color32[] expected = AlignOnCanvas(source, rect.width, rect.height, 128, 128, 3);
+                string path = Output + "Actors/" + actor + "/" + actor + "_" + (direction * 3 + frame).ToString("00") + ".png";
+                Texture2D image = ReadTexture(path);
+                try
+                {
+                    Color32[] actual = image.GetPixels32();
+                    if (image.width != 128 || image.height != 128 || actual.Length != expected.Length)
+                        throw new InvalidDataException("Original pixel character canvas differs: " + path);
+                    for (int pixel = 0; pixel < expected.Length; pixel++)
+                        if (!actual[pixel].Equals(expected[pixel]))
+                            throw new InvalidDataException("Original pixel colors were changed at pixel " + pixel + ": " + path);
+                }
+                finally { UnityEngine.Object.DestroyImmediate(image); }
+                Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+                var settings = AssetImporter.GetAtPath(path) as TextureImporter;
+                if (sprite == null || settings == null || sprite.pixelsPerUnit != 64f || settings.filterMode != FilterMode.Point
+                    || settings.mipmapEnabled || sprite.pivot != new Vector2(64f, 0f))
+                    throw new InvalidDataException("Original pixel character import settings differ: " + path);
+            }
+        }
+
+        [MenuItem("Mist Isle/Import Original Opening Environment")]
+        public static void ImportOriginalOpeningEnvironment()
+        {
+            // Every rectangle selects pixels from an existing course-edition or approved reference file.
+            Crop(Source + "CliffsAndFencesSource.png", new RectInt(185, 190, 80, 62), "Environment/Dock.png", false);
+            // Reviewed source components: fence x859..1005/y169..219; the next prop starts at y226.
+            // Grass cliff components have real gaps at x128..137 and x235..243, preventing cut seams.
+            Crop(Source + "CliffsAndFencesSource.png", new RectInt(852, 160, 162, 64), "Environment/FenceTimber.png", true);
+            Crop(Source + "CliffsAndFencesSource.png", new RectInt(8, 17, 124, 125), "Environment/GrassCliff.png", true);
+            Crop(Source + "CliffsAndFencesSource.png", new RectInt(131, 17, 109, 125), "Environment/GrassCliffCorner.png", true);
+            Crop(Source + "OriginalProps16.png", new RectInt(32, 0, 32, 32), "Environment/Boat.png", true);
+            Crop(Source + "CampRuinsLighthouseSource.png", new RectInt(5, 27, 330, 232), "Environment/Tent.png", true);
+            Crop(Source + "FloraAndPropsSource.png", new RectInt(17, 60, 128, 91), "Environment/BushPink.png", true);
+            Crop(Source + "FloraAndPropsSource.png", new RectInt(146, 61, 92, 90), "Environment/BushWhite.png", true);
+            Crop(Source + "FloraAndPropsSource.png", new RectInt(233, 149, 64, 62), "Environment/FlowerBlue.png", true);
+            Crop(Source + "FloraAndPropsSource.png", new RectInt(27, 148, 64, 64), "Environment/FlowerWhite.png", true);
+            Crop(Source + "NaturePropsSource.png", new RectInt(20, 670, 220, 160), "Environment/RockLarge.png", true);
+            Crop(Source + "NaturePropsSource.png", new RectInt(260, 710, 160, 110), "Environment/RockSmall.png", true);
+            Crop(Source + "FloraAndPropsSource.png", new RectInt(907, 211, 92, 92), "Environment/Crate.png", true);
+            Crop(Source + "FloraAndPropsSource.png", new RectInt(1003, 211, 92, 92), "Environment/Barrel.png", true);
+            Crop(Source + "FloraAndPropsSource.png", new RectInt(785, 174, 122, 136), "Environment/Lantern.png", true);
+            Crop(Source + "FloraAndPropsSource.png", new RectInt(347, 213, 172, 88), "Environment/Log.png", true);
+            ImportOriginalBoardSprite("PixelCompanionsApproved.png", new RectInt(442, 121, 60, 62), "Creatures/PixelMossLumi.png");
+            ImportOriginalBoardSprite("PixelCompanionsApproved.png", new RectInt(442, 442, 60, 62), "Creatures/PixelMoatail.png");
+            ImportOriginalBoardSprite("PixelCompanionsApproved.png", new RectInt(441, 748, 62, 65), "Creatures/PixelCrystalGecko.png");
+            // On pixel_other the direction diamonds occupy x460..482; the first crab is x495..545.
+            // This is a different column layout from pixel_initial_companition: never reuse its x442 crop.
+            ImportOriginalBoardSprite("pixel_other.png", new RectInt(485, 435, 72, 72), "Creatures/PixelWildCrab.png");
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+            Debug.Log("MIST_ISLE_ORIGINAL_OPENING_ART: 16 environment cutouts and 4 original pixel creature cutouts imported without repainting.");
+        }
+
+        private static void ImportOriginalBoardSprite(string sourceName, RectInt rect, string relative)
+        {
+            Texture2D board = ReadTexture(Source + sourceName);
+            try
+            {
+                Color32[] pixels = ReadTopLeftPixels(board, rect);
+                ClearConnectedBoardBackground(pixels, rect.width, rect.height);
+                // A tight canvas lets world scaling use the actual creature silhouette.
+                int left = rect.width, right = -1, bottom = rect.height, top = -1;
+                for (int y = 0; y < rect.height; y++) for (int x = 0; x < rect.width; x++)
+                    if (pixels[y * rect.width + x].a != 0)
+                    { left = Mathf.Min(left, x); right = Mathf.Max(right, x); bottom = Mathf.Min(bottom, y); top = Mathf.Max(top, y); }
+                if (right < left || top < bottom) throw new InvalidDataException("Original pixel creature crop was empty: " + relative);
+                int width = right - left + 1, height = top - bottom + 1;
+                WriteOriginalPixels(AlignOnCanvas(pixels, rect.width, rect.height, width, height, 0), width, height, relative);
+            }
+            finally { UnityEngine.Object.DestroyImmediate(board); }
+        }
+
+        [MenuItem("Mist Isle/Validate Original Pixel Creatures")]
+        public static void ValidateOriginalPixelCreatures()
+        {
+            ValidateOriginalBoardSprite("PixelCompanionsApproved.png", new RectInt(442, 121, 60, 62), "Creatures/PixelMossLumi.png");
+            ValidateOriginalBoardSprite("PixelCompanionsApproved.png", new RectInt(442, 442, 60, 62), "Creatures/PixelMoatail.png");
+            ValidateOriginalBoardSprite("PixelCompanionsApproved.png", new RectInt(441, 748, 62, 65), "Creatures/PixelCrystalGecko.png");
+            ValidateOriginalBoardSprite("pixel_other.png", new RectInt(485, 435, 72, 72), "Creatures/PixelWildCrab.png");
+            Debug.Log("MIST_ISLE_ORIGINAL_PIXEL_CREATURES_VALIDATED: all 4 independent PNGs match original RGB/alpha; every source silhouette has at least 3 transparent pixels on all sides, with no cropped body or directional label.");
+        }
+
+        private static void ValidateOriginalBoardSprite(string sourceName, RectInt rect, string relative)
+        {
+            Texture2D board = ReadTexture(Source + sourceName);
+            try
+            {
+                Color32[] pixels = ReadTopLeftPixels(board, rect);
+                ClearConnectedBoardBackground(pixels, rect.width, rect.height);
+                int left = rect.width, right = -1, bottom = rect.height, top = -1;
+                for (int y = 0; y < rect.height; y++) for (int x = 0; x < rect.width; x++)
+                    if (pixels[y * rect.width + x].a != 0)
+                    { left = Mathf.Min(left, x); right = Mathf.Max(right, x); bottom = Mathf.Min(bottom, y); top = Mathf.Max(top, y); }
+                if (right < left || top < bottom || left < 3 || bottom < 3 || rect.width - 1 - right < 3 || rect.height - 1 - top < 3)
+                    throw new InvalidDataException("Pixel creature touches its source crop boundary; inspect the original board before importing: " + relative);
+                int width = right - left + 1, height = top - bottom + 1;
+                Color32[] expected = AlignOnCanvas(pixels, rect.width, rect.height, width, height, 0);
+                Texture2D output = ReadTexture(Output + relative);
+                try
+                {
+                    Color32[] actual = output.GetPixels32();
+                    if (output.width != width || output.height != height || actual.Length != expected.Length)
+                        throw new InvalidDataException("Pixel creature crop is stale or incomplete; rebuild with backup: " + relative);
+                    for (int index = 0; index < expected.Length; index++)
+                        if (!actual[index].Equals(expected[index]))
+                            throw new InvalidDataException("Pixel creature differs from the reviewed source; rebuild with backup: " + relative);
+                }
+                finally { UnityEngine.Object.DestroyImmediate(output); }
+            }
+            finally { UnityEngine.Object.DestroyImmediate(board); }
+        }
+
+        private static void ImportBoardActor(Texture2D board, int[] columns, RectInt[] sourceRows, string actor)
+        {
+            int[] sourceRowOrder = { 1, 2, 3, 0 };
+            for (int direction = 0; direction < 4; direction++)
+                for (int frame = 0; frame < 3; frame++)
+                {
+                    RectInt rect = sourceRows[sourceRowOrder[direction]];
+                    rect.x = columns[frame];
+                    Color32[] pixels = ReadTopLeftPixels(board, rect);
+                    ClearConnectedBoardBackground(pixels, rect.width, rect.height);
+                    Color32[] canvas = AlignOnCanvas(pixels, rect.width, rect.height, 128, 128, 3);
+                    WriteOriginalPixels(canvas, 128, 128, "Actors/" + actor + "/" + actor + "_" + (direction * 3 + frame).ToString("00") + ".png");
+                }
+        }
+
+        private static Color32[] ReadTopLeftPixels(Texture2D board, RectInt rect)
+        {
+            if (rect.x < 0 || rect.y < 0 || rect.xMax > board.width || rect.yMax > board.height)
+                throw new ArgumentOutOfRangeException(nameof(rect));
+            Color32[] all = board.GetPixels32();
+            var pixels = new Color32[rect.width * rect.height];
+            for (int y = 0; y < rect.height; y++)
+                Array.Copy(all, (board.height - rect.yMax + y) * board.width + rect.x, pixels, y * rect.width, rect.width);
+            return pixels;
+        }
+
+        // Flood only the cream paper / printed drop-shadow colors connected to the crop boundary.
+        // Enclosed skin, cream clothes, blond hair, bow colors and all outlines retain their exact RGB.
+        private static void ClearConnectedBoardBackground(Color32[] pixels, int width, int height)
+        {
+            var visited = new bool[pixels.Length];
+            var queue = new int[pixels.Length];
+            int read = 0, write = 0;
+            void Enqueue(int index)
+            {
+                if (visited[index]) return;
+                visited[index] = true;
+                Color32 p = pixels[index];
+                bool paper = p.a == 0 || (p.r >= 160 && p.g >= 145 && p.b >= 135 && p.r >= p.g && p.g >= p.b
+                    && p.r - p.g <= 50 && p.g - p.b <= 30);
+                if (!paper) return;
+                // Removed background has no retained character color. Clear its hidden RGB as well:
+                // image previews and texture alpha-bleed must not display the original paper rectangle.
+                pixels[index] = new Color32(0, 0, 0, 0);
+                queue[write++] = index;
+            }
+            for (int x = 0; x < width; x++) { Enqueue(x); Enqueue((height - 1) * width + x); }
+            for (int y = 1; y < height - 1; y++) { Enqueue(y * width); Enqueue(y * width + width - 1); }
+            while (read < write)
+            {
+                int index = queue[read++], x = index % width, y = index / width;
+                if (x > 0) Enqueue(index - 1);
+                if (x + 1 < width) Enqueue(index + 1);
+                if (y > 0) Enqueue(index - width);
+                if (y + 1 < height) Enqueue(index + width);
+            }
+        }
+
+        private static Color32[] AlignOnCanvas(Color32[] pixels, int width, int height, int canvasWidth, int canvasHeight, int footMargin)
+        {
+            int left = width, right = -1, bottom = height, top = -1;
+            for (int y = 0; y < height; y++) for (int x = 0; x < width; x++)
+                if (pixels[y * width + x].a != 0)
+                { left = Mathf.Min(left, x); right = Mathf.Max(right, x); bottom = Mathf.Min(bottom, y); top = Mathf.Max(top, y); }
+            if (right < left || top < bottom) throw new InvalidDataException("Original sprite was empty after board cleanup.");
+            int contentWidth = right - left + 1, contentHeight = top - bottom + 1;
+            if (contentWidth > canvasWidth || contentHeight + footMargin > canvasHeight)
+                throw new InvalidDataException("Original sprite exceeds its common canvas; refusing to resample or clip it.");
+            var canvas = new Color32[canvasWidth * canvasHeight];
+            int targetX = (canvasWidth - contentWidth) / 2;
+            for (int y = 0; y < contentHeight; y++)
+                Array.Copy(pixels, (bottom + y) * width + left, canvas, (footMargin + y) * canvasWidth + targetX, contentWidth);
+            return canvas;
+        }
+
+        private static void WriteOriginalPixels(Color32[] pixels, int width, int height, string relative)
+        {
+            string target = Output + relative;
+            Directory.CreateDirectory(Path.GetDirectoryName(target));
+            bool rebuilding = originalPixelRebuildBackup != null && (relative.StartsWith("Actors/ApprovedTraveler/", StringComparison.Ordinal)
+                || relative.StartsWith("Actors/ShiguangPixel/", StringComparison.Ordinal) || relative.StartsWith("Creatures/Pixel", StringComparison.Ordinal));
+            if (rebuilding && File.Exists(target))
+            {
+                string backup = Path.Combine(originalPixelRebuildBackup, relative);
+                Directory.CreateDirectory(Path.GetDirectoryName(backup));
+                if (!File.Exists(backup)) File.Copy(target, backup, false);
+                if (File.Exists(target + ".meta") && !File.Exists(backup + ".meta")) File.Copy(target + ".meta", backup + ".meta", false);
+            }
+            if (!File.Exists(target) || rebuilding)
+            {
+                var image = new Texture2D(width, height, TextureFormat.RGBA32, false);
+                image.SetPixels32(pixels); image.Apply(false);
+                try { File.WriteAllBytes(target, image.EncodeToPNG()); }
+                finally { UnityEngine.Object.DestroyImmediate(image); }
+            }
+            ConfigureSprite(target, false);
         }
 
         private static void ImportPrepared(string name, string destination)
@@ -171,6 +470,11 @@ namespace MistIsle.Editor
                 File.WriteAllBytes(target, result.EncodeToPNG());
                 UnityEngine.Object.DestroyImmediate(result);
             }
+            ConfigureSprite(target, center);
+        }
+
+        private static void ConfigureSprite(string target, bool center)
+        {
             AssetDatabase.ImportAsset(target, ImportAssetOptions.ForceSynchronousImport);
             var importer = (TextureImporter)AssetImporter.GetAtPath(target);
             importer.textureType = TextureImporterType.Sprite;

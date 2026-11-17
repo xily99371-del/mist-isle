@@ -4,11 +4,13 @@
 
 Target: Unity **6.3 LTS / 6000.3.28f1**, URP **17.3.0**, Windows x64.
 
-Open **this directory**, not the parent Git repository, in Unity Hub. Open `Assets/Scenes/CoastalCamp.unity` and press Play. The Windows playable is written to `Builds/Windows/MistIsle.exe`.
+Open **this directory**, not the parent Git repository, in Unity Hub. Open `Assets/Scenes/CoastalCamp.unity` and press Play. The opening rework is built to `Builds/OpeningPolish/Windows/MistIsle.exe`; the earlier chapter prototype remains in `Builds/Windows`.
 
 The current implementation is a playable chapter prototype, not a production-complete release. It connects starter choice, six-member travel party, three active combatants, wild encounters, feeding/capture, campfire crafting, Watcher recovery/storage, XP/evolution, field-ability side paths, four seals, and the Observer's final awakening encounter.
 
 - **Watcher** remains the camp's recovery and party-storage character. **拾光 / Shiguang** is a separate capture guide, with the approved champagne hair, goggles, yellow bow and scarf.
+- The opening now starts at the arrival dock, with Watcher's welcome, Shiguang's introduction, individual companion meetings and a confirmed choice. Preparing food for a frightened stranded crab leads into a guided first feeding/capture and a return to Watcher. The companion travels with the player.
+- The traveler and Shiguang use the original `pixel_people.png` artwork as 24 independent direction/animation frames. The camp and first coast use existing approved pixel creatures and environment cutouts; the title uses the original approved cover with live menu controls.
 - The world contains six regions and eighteen connected rooms. The eighteen collectible forms include three starters, three evolved forms and twelve wild creatures. Six newly added wild designs are explicitly candidates awaiting art approval.
 - The four guardians are 花冠鹿灵, 断潮蟹王, 辉棘蜥王 and 回响观测者. The Observer also appears in the final phase, preserving the same identity and approved design.
 - Chapter length, production animation, complete narrative pacing and final balance still need player testing. A 60–90 minute playthrough has not been established.
@@ -17,18 +19,20 @@ The current implementation is a playable chapter prototype, not a production-com
 |---|---|
 | WASD / arrow keys | Four-direction movement |
 | E | Interact with the nearest visible reachable target |
+| E / Space / Enter | Advance dialogue |
+| A / D or left / right, then Enter | Inspect and confirm a companion on the choice screen |
 | Tab | Party and deployment |
 | J | Creature journal |
 | F5 | Save |
 | Esc | Close a menu / open party while exploring |
 
-Start by choosing a companion, speak to Shiguang and Watcher, gather resources, and craft at the campfire. Follow the exits through the coast and forest; the forest, tide and crystal seals unlock subsequent regions. At the lighthouse, win the fourth seal before entering the Observer's final phase. During the telegraphed silence, call the starter, then command the final counter yourself.
+Follow the opening objective through the dock, Watcher's shelter and Shiguang's companion courtyard. Choose a companion, gather berries and dew, make a berry treat at the fire and accompany Shiguang to the coast. Once the rescued crab has been checked by Watcher, the rest of the chapter opens. The forest, tide and crystal seals unlock subsequent regions. At the lighthouse, win the fourth seal before entering the Observer's final phase. During the telegraphed silence, call the starter, then command the final counter yourself.
 
-Unity saves live in `Application.persistentDataPath/UnityChapter/chapter-01.json`, with schema migration, a backup and an archive before starting a new journey. The C edition's `mist_isle_save.dat` is never read or written.
+Unity saves live in `Application.persistentDataPath/UnityChapter/chapter-01.json`, with schema 3 migration, opening checkpoints, a backup and an archive before starting a new journey. Versions 1 and 2 retain existing parties and chapter progress and skip the new opening. The C edition's `mist_isle_save.dat` is never read or written.
 
 Editor commands: `Mist Isle > Build Chapter One Content`, `Import Approved Art`, `Validate Imported Art`, and `Build Windows Playable`. Content generation preserves an existing entrance scene and authored data. Generated sprite outputs come from the isolated `Assets/Art` inputs; original C assets and `E:/Projects/美术设定` stay untouched.
 
-Run `powershell -File Tools/Verify-Unity.ps1 -BuildWindows` to verify an isolated project copy. The tool retains the copy, logs, NUnit reports and captures for inspection. See `Docs/CHAPTER_ONE_STATUS.md` for current verification and remaining work.
+Run `powershell -File Tools/Verify-Unity.ps1 -BuildWindows` to verify an isolated project copy. Add `-VisualReplay` to run normal Editor Play Mode and capture the opening's UI with the application's own frame capture. This replay uses session commands and explicit placement; physical keyboard/mouse playthrough remains a separate check. The tool retains the copy, logs, NUnit reports and captures for inspection. See `Docs/CHAPTER_ONE_STATUS.md` for current verification and remaining work.
 
 This is the new production line for 雾屿回响 / Mist Isle. The C + raylib v3.0.1 course edition remains frozen and is not replaced by this project.
 

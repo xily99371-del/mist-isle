@@ -42,6 +42,8 @@ namespace MistIsle.Creatures
         public CreatureInstance Wild { get; }
         public CreatureSpecies WildSpecies { get; }
         public BattleKind Kind { get; }
+        public bool IsCaptureLesson { get; }
+        public bool CaptureLessonWeakened => 1f - (float)Wild.currentHp / CreatureInstance.MaxHp(WildSpecies, Wild.level) >= .25f;
         public BattleOutcome Outcome { get; private set; }
         public FinalBossStage FinalStage { get; private set; }
         public IReadOnlyList<string> Log => log;
@@ -51,7 +53,7 @@ namespace MistIsle.Creatures
 
         public BattleSession(PartyRoster party, IReadOnlyDictionary<string, CreatureSpecies> catalog,
             Inventory inventory, CreatureInstance wild, Func<float> rng = null,
-            BattleKind kind = BattleKind.Wild, int battleLevel = 0)
+            BattleKind kind = BattleKind.Wild, int battleLevel = 0, bool captureLesson = false)
         {
             this.party = party ?? throw new ArgumentNullException(nameof(party));
             this.catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
@@ -61,6 +63,7 @@ namespace MistIsle.Creatures
                 throw new ArgumentException("Wild creature species is not in the catalog.", nameof(wild));
             WildSpecies = species;
             Kind = kind;
+            IsCaptureLesson = captureLesson && kind == BattleKind.Wild && species.capturable;
             this.rng = rng ?? (() => UnityEngine.Random.value);
             if (battleLevel > 0)
             { Wild.level = Mathf.Clamp(battleLevel, 1, GrowthRules.LevelCap); Wild.currentHp = CreatureInstance.MaxHp(species, Wild.level); }
@@ -108,6 +111,8 @@ namespace MistIsle.Creatures
                     break;
                 case BattleAction.Capture:
                 case BattleAction.Feed:
+                    if (IsCaptureLesson && !CaptureLessonWeakened)
+                        return Result(false, "拾光轻声提醒：它还在乱撞。先让伙伴轻轻牵制一下，再慢慢靠近。");
                     if (Kind != BattleKind.Wild || !WildSpecies.capturable)
                         return Result(false, "封印守卫和最终守卫不能被捕获或投喂收服。");
                     if (party.Count >= PartyRoster.Capacity)
@@ -123,7 +128,8 @@ namespace MistIsle.Creatures
                     var context = new CaptureContext(1f - (float)Wild.currentHp / CreatureInstance.MaxHp(WildSpecies, Wild.level),
                         affinity + foodTrust, rooted || weakenedRounds > 0 ? 0.6f : 0f, 0.65f,
                         WildSpecies.temperamentResistance);
-                    bool captured = Mathf.Clamp01(rng()) < CaptureCalculator.Calculate(context, feeding);
+                    bool captured = (IsCaptureLesson && CaptureLessonWeakened)
+                        || Mathf.Clamp01(rng()) < CaptureCalculator.Calculate(context, feeding);
                     if (captured)
                     {
                         Wild.currentHp = Mathf.Max(1, Wild.currentHp);
@@ -217,9 +223,11 @@ namespace MistIsle.Creatures
             int damage = Mathf.Max(1, Mathf.RoundToInt(
                 (actor.Attack(species) * power - Wild.Defense(WildSpecies) * 0.35f) * matchup));
             Wild.currentHp = Mathf.Max(0, Wild.currentHp - damage);
+            if (IsCaptureLesson) Wild.currentHp = Mathf.Max(1, Wild.currentHp);
             if (Kind == BattleKind.FinalBoss && FinalStage != FinalBossStage.Awakened)
                 Wild.currentHp = Mathf.Max(1, Wild.currentHp);
-            log.Add(actor.nickname + "使用" + label + "，造成 " + damage + " 点伤害"
+            log.Add(IsCaptureLesson ? actor.nickname + "轻轻牵制它的动作，警戒降低了 " + damage + "。" :
+                actor.nickname + "使用" + label + "，造成 " + damage + " 点伤害"
                 + (matchup > 1f ? "（克制）" : matchup < 1f ? "（抵抗）" : "") + "。");
             if (Kind == BattleKind.FinalBoss && FinalStage == FinalBossStage.None
                 && Wild.currentHp <= CreatureInstance.MaxHp(WildSpecies, Wild.level) * 0.6f)
@@ -342,12 +350,12 @@ namespace MistIsle.Creatures
         {
             if (rewardsGranted) return;
             rewardsGranted = true;
-            int experience = Kind == BattleKind.Wild ? 16 + Wild.level * 8 : 45 + Wild.level * 10;
+            int experience = IsCaptureLesson ? 8 : Kind == BattleKind.Wild ? 16 + Wild.level * 8 : 45 + Wild.level * 10;
             foreach (var member in contributors)
             {
                 var species = catalog[member.speciesId];
                 int levels = GrowthRules.GrantExperience(member, species, experience);
-                member.bond = Mathf.Clamp(member.bond + (Kind == BattleKind.Wild ? 4 : 8), 0, 100);
+                member.bond = Mathf.Clamp(member.bond + (IsCaptureLesson ? 2 : Kind == BattleKind.Wild ? 4 : 8), 0, 100);
                 log.Add(member.nickname + "获得 " + experience + " 经验" + (levels > 0 ? "，升至 Lv." + member.level : "") + "。");
                 if (GrowthRules.TryEvolve(member, catalog, out var evolved))
                     log.Add(member.nickname + "进化为 " + evolved.displayName + "！");

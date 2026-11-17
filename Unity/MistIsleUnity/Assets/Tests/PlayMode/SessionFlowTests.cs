@@ -58,12 +58,10 @@ namespace MistIsle.Tests
             byte[] legacyBytes = { 0x4d, 0x49, 0x53, 0x54, 0x03, 0x00, 0x01, 0xff };
             File.WriteAllBytes(legacyPath, legacyBytes);
 
-            session.NewJourney();
-            Assert.That(session.Panel, Is.EqualTo(GamePanel.Starter));
-            session.ChooseStarter("moss-lumi");
+            yield return OpeningTestDriver.ChooseCompanion(session);
             Assert.That(session.Party.Count, Is.EqualTo(1));
             Assert.That(session.Progress.selectedStarterSpeciesId, Is.EqualTo("moss-lumi"));
-            session.ClosePanel();
+            yield return OpeningTestDriver.FinishCaptureLesson(session);
             Assert.That(session.Panel, Is.EqualTo(GamePanel.Explore));
 
             var resource = session.World.Interactions.First(item => item.Kind == "resource" && item.Id.StartsWith("berry-camp-0-"));
@@ -83,6 +81,7 @@ namespace MistIsle.Tests
             session.Craft(recipe);
             Assert.That(session.Inventory.GetCount(recipe.outputItemId), Is.EqualTo(treats + recipe.outputAmount));
             session.ClosePanel();
+            yield return OpeningTestDriver.FinishDialogue(session);
 
             Assert.That(session.ChangeRoom("glowglade-1", false), Is.True);
             var field = session.World.Interactions.Single(item => item.Kind == "field" && item.Id == "field-glowglade");
@@ -90,7 +89,7 @@ namespace MistIsle.Tests
             Assert.That(session.Progress.completedFieldIds, Does.Contain("field-glowglade"));
             Assert.That(session.World.IsFieldOpen("field-glowglade"), Is.True,
                 "Ability dialogue completed without physically opening the route.");
-            session.ClosePanel();
+            yield return OpeningTestDriver.FinishDialogue(session);
             session.Save(false);
             Assert.That(File.Exists(session.Saves.Path), Is.True);
             int savedTreats = session.Inventory.GetCount("berry-treat");
@@ -115,12 +114,25 @@ namespace MistIsle.Tests
         [UnityTest]
         public IEnumerator StarterSelectionCannotBeAppliedTwiceByRepeatedCallbacks()
         {
-            session.NewJourney();
-            session.ChooseStarter("moss-lumi");
+            yield return OpeningTestDriver.ChooseCompanion(session);
             session.ChooseStarter("moatail");
             Assert.That(session.Party.Count, Is.EqualTo(1), "Repeated starter input added a second initial partner.");
             Assert.That(session.Progress.selectedStarterSpeciesId, Is.EqualTo("moss-lumi"));
             yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator JourneyBeforeChoosingCanBeSavedAndContinuedWithoutInventingAPartner()
+        {
+            session.NewJourney();
+            yield return OpeningTestDriver.FinishDialogue(session);
+            session.Save(false);
+            session.ContinueJourney();
+            Assert.That(session.Party.Count, Is.Zero);
+            Assert.That(session.OpeningPhase, Is.EqualTo(OpeningStage.MeetWatcher));
+            Assert.That(session.Panel, Is.EqualTo(GamePanel.Explore));
+            Assert.That(session.PlayerTransform.GetComponentInChildren<SpriteRenderer>().sprite.name, Does.StartWith("ApprovedTraveler_"));
+            Assert.That(session.World.GetActor("shiguang").GetComponentInChildren<SpriteRenderer>().sprite.name, Does.StartWith("ShiguangPixel_"));
         }
     }
 }

@@ -23,9 +23,16 @@ namespace MistIsle.Tests
         [UnityTest]
         public IEnumerator CaptureTitleCoastalCampAndWildEncounter()
         {
+            if (Application.isBatchMode)
+                Assert.Ignore("IMGUI screenshots require normal Unity Play Mode or a normal Windows player. Batchmode is not visual acceptance.");
             allCapturesIncludeUI = true;
             if (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null)
                 Assert.Ignore("Visual capture requires a graphics device; run this test without -nographics.");
+#if UNITY_EDITOR
+            // This is the application's own frame capture, not a desktop/lock-screen capture.
+            UnityEditor.EditorApplication.ExecuteMenuItem("Window/General/Game");
+#endif
+            Application.runInBackground = true;
             previousCameras = Object.FindObjectsByType<Camera>(FindObjectsSortMode.None);
             temporarySaveDirectory = Path.Combine(Path.GetTempPath(), "MistIsleVisualSmoke-" + Guid.NewGuid().ToString("N"));
             captureDirectory = Environment.GetEnvironmentVariable("MIST_ISLE_CAPTURE_DIR");
@@ -47,17 +54,64 @@ namespace MistIsle.Tests
             yield return null;
             Assert.That(session.Panel, Is.EqualTo(GamePanel.Title));
             Assert.That(session.Saves.Path, Is.EqualTo(Path.Combine(temporarySaveDirectory, "chapter-01.json")));
-            yield return Capture("01-title");
+            yield return Capture("01-title", GamePanel.Title);
 
             session.NewJourney();
+            yield return Capture("02-dock-arrival", GamePanel.Dialogue);
+            yield return OpeningTestDriver.FinishDialogue(session);
+            PlaceTraveler("watcher-approach");
+            session.World.Interactions.Single(x => x.Id == "watcher").Interact();
+            yield return Capture("03-watcher-first-meeting", GamePanel.Dialogue);
+            yield return OpeningTestDriver.FinishDialogue(session);
+            PlaceTraveler("shiguang-approach");
+            session.World.Interactions.Single(x => x.Id == "shiguang").Interact();
+            yield return Capture("04-shiguang-first-meeting", GamePanel.Dialogue);
+            yield return OpeningTestDriver.FinishDialogue(session);
+            session.World.Interactions.Single(x => x.Kind == "starter" && x.Id == "moss-lumi").Interact();
+            yield return OpeningTestDriver.FinishDialogue(session);
+            Assert.That(session.Panel, Is.EqualTo(GamePanel.Starter));
+            yield return Capture("05-partner-choice", GamePanel.Starter);
             session.ChooseStarter("moss-lumi");
-            session.ClosePanel();
+            yield return Capture("06-partner-bond", GamePanel.Dialogue);
+            yield return OpeningTestDriver.FinishDialogue(session);
+            foreach (string item in new[] { "berry", "dew" })
+            {
+                var resource = session.World.Interactions.First(x => x.Kind == "resource" && x.Id.StartsWith(item + "-camp-0-"));
+                PlaceTraveler(resource.transform.position + Vector3.down);
+                resource.Interact();
+                yield return OpeningTestDriver.FinishDialogue(session);
+            }
+            PlaceTraveler("campfire-approach");
+            session.World.Interactions.Single(x => x.Id == "campfire-camp-0").Interact();
+            yield return Capture("07-campfire-crafting", GamePanel.Campfire);
+            session.Craft(session.Recipes.Single(x => x.recipeId == "berry-treat"));
+            yield return OpeningTestDriver.FinishDialogue(session);
+            Assert.That(session.ChangeRoom("coast-0", false), Is.True);
+            // Walk behind the actual guide rather than teleporting past her for a misleading scene.
+            yield return AccompanyGuideAlongCoast();
+            PlaceTraveler(session.World.GetLandmarkPosition("tutorial-viewpoint") + Vector2.left * 1.2f);
+            session.World.Interactions.Single(x => x.Id == "tutorial-coast-crab").Interact();
+            yield return Capture("08-crab-story", GamePanel.Dialogue);
+            yield return OpeningTestDriver.FinishDialogue(session);
+            Assert.That(session.Panel, Is.EqualTo(GamePanel.Battle));
+            yield return Capture("09-capture-lesson", GamePanel.Battle);
+            session.Act(MistIsle.Creatures.BattleAction.Attack);
+            session.Act(MistIsle.Creatures.BattleAction.Feed, "berry-treat");
+            session.LeaveBattle();
+            yield return Capture("10-crab-trust", GamePanel.Dialogue);
+            yield return OpeningTestDriver.FinishDialogue(session);
+            Assert.That(session.ChangeRoom("camp-0", false), Is.True);
+            PlaceTraveler("watcher-approach");
+            session.World.Interactions.Single(x => x.Id == "watcher").Interact();
+            yield return Capture("11-return-to-watcher", GamePanel.Dialogue);
+            yield return OpeningTestDriver.FinishDialogue(session);
+            Assert.That(session.OpeningPhase, Is.EqualTo(OpeningStage.Complete));
             Assert.That(session.Panel, Is.EqualTo(GamePanel.Explore));
             var traveler = root.transform.Find("Traveler");
             Assert.That(traveler, Is.Not.Null);
             traveler.position = new Vector2(1.4f,-.8f);
             Physics2D.SyncTransforms();
-            yield return Capture("02-coastal-camp");
+            yield return Capture("12-coastal-camp", GamePanel.Explore);
 
             Assert.That(session.ChangeRoom("coast-1", false), Is.True);
             var encounter = session.World.Interactions.First(item => item.Kind == "encounter" &&
@@ -67,18 +121,47 @@ namespace MistIsle.Tests
             encounter.Interact();
             Assert.That(session.Panel, Is.EqualTo(GamePanel.Battle));
             Assert.That(session.Battle, Is.Not.Null);
-            yield return Capture("03-wild-encounter");
+            yield return Capture("13-wild-encounter", GamePanel.Battle);
+            File.WriteAllText(Path.Combine(captureDirectory, "opening-replay-kind.txt"),
+                "Normal Editor Play Mode; application ScreenCapture includes IMGUI when raster checks pass.\n" +
+                "Story progression uses session commands and explicit traveler placement. This is not physical keyboard/mouse playthrough acceptance.\n");
             Debug.Log("MIST_ISLE_VISUAL_CAPTURES: " + captureDirectory);
             if (!allCapturesIncludeUI)
                 Assert.Ignore("World captures were saved, but this runner did not prove that IMGUI was rendered into every image. UI visual acceptance requires a normal Windows player capture.");
         }
 
-        private IEnumerator Capture(string name)
+        private void PlaceTraveler(string landmark) => PlaceTraveler(session.World.GetLandmarkPosition(landmark));
+
+        private IEnumerator AccompanyGuideAlongCoast()
         {
+            var guide = session.World.GetActor("shiguang");
+            Vector2 destination = session.World.GetLandmarkPosition("tutorial-viewpoint");
+            float deadline = Time.realtimeSinceStartup + 30f;
+            while (Vector2.Distance(guide.position, destination) > .2f && Time.realtimeSinceStartup < deadline)
+            {
+                Vector2 following = (Vector2)guide.position + Vector2.left * 1.15f;
+                PlaceTraveler(Vector2.MoveTowards(session.PlayerTransform.position, following, 3f * Time.unscaledDeltaTime));
+                yield return null;
+            }
+            Assert.That(Vector2.Distance(guide.position, destination), Is.LessThan(.2f), "The actual guide never reached the lesson viewpoint.");
+        }
+
+        private void PlaceTraveler(Vector2 position)
+        {
+            var player = session.PlayerTransform;
+            player.GetComponent<Rigidbody2D>().position = position;
+            player.position = position;
+            Physics2D.SyncTransforms();
+        }
+
+        private IEnumerator Capture(string name, GamePanel expectedPanel)
+        {
+            Assert.That(session.Panel, Is.EqualTo(expectedPanel), "The story skipped the intended presentation: " + name);
             var ui = root.GetComponent<ChapterInterface>();
             int repaintCountBefore = ui == null ? 0 : ui.DrawnFrameCount;
             // Let camera follow, IMGUI layout, glyph atlases and sprite uploads settle first.
             for (int frame = 0; frame < 8; frame++) yield return null;
+            Assert.That(session.Panel, Is.EqualTo(expectedPanel), "The intended presentation closed before capture: " + name);
             string pending = Path.Combine(captureDirectory, name + "-" + Guid.NewGuid().ToString("N") + ".png");
             string target = Path.Combine(captureDirectory, name + ".png");
             ScreenCapture.CaptureScreenshot(pending);
@@ -113,7 +196,8 @@ namespace MistIsle.Tests
             allCapturesIncludeUI &= hasVerifiedUI;
             File.WriteAllBytes(target, bytes);
             File.WriteAllText(Path.Combine(captureDirectory, name + ".capture-mode.txt"), mode + "\n" + Screen.width + "x" + Screen.height +
-                "\nui-repaints=" + repaintCountBefore + "->" + repaintCountAfter + "\nhud-pixels-present=" + uiPixelsPresent);
+                "\nui-repaints=" + repaintCountBefore + "->" + repaintCountAfter + "\nhud-pixels-present=" + uiPixelsPresent +
+                "\npanel=" + expectedPanel + "\nspeaker=" + session.DialogueSpeakerId);
             if (File.Exists(pending)) File.Delete(pending);
             Assert.That(new FileInfo(target).Length, Is.GreaterThan(1024), "Screenshot file is unexpectedly empty.");
             Debug.Log("MIST_ISLE_CAPTURE: " + target + " [" + mode + "]");
@@ -124,13 +208,21 @@ namespace MistIsle.Tests
         private static bool HasHudPixels(byte[] bytes, GamePanel panel)
         {
             // Rendering an OnGUI callback is insufficient: the captured target must contain its
-            // dark top/bottom bars, and battle must also contain the large cream battle panel.
+            // dark HUD cards, and battle must also contain the large cream battle panel.
             var texture = new Texture2D(2,2,TextureFormat.RGBA32,false);
             try
             {
                 if (!texture.LoadImage(bytes)) return false;
-                Vector2[] probes = { new Vector2(8,15), new Vector2(1270,15), new Vector2(8,92),
-                    new Vector2(1270,92), new Vector2(8,700), new Vector2(1270,700) };
+                if (panel == GamePanel.Title) return HasApprovedTitlePixels(texture);
+                if (panel == GamePanel.Starter)
+                {
+                    Color paper = PixelAt(texture, new Vector2(100, 110));
+                    Color edge = PixelAt(texture, new Vector2(20, 110));
+                    return paper.r > .7f && paper.g > .65f && paper.r > edge.r + .18f;
+                }
+                // Insets avoid labels, buttons, the exploration-only footer and the temporary toast.
+                Vector2[] probes = { new Vector2(26,20), new Vector2(730,90),
+                    new Vector2(1060,90), new Vector2(1250,22) };
                 Color first = PixelAt(texture,probes[0]);
                 foreach (Vector2 point in probes)
                 {
@@ -142,7 +234,7 @@ namespace MistIsle.Tests
                 }
                 if (panel == GamePanel.Battle)
                 {
-                    Color paper = PixelAt(texture,new Vector2(90,130));
+                    Color paper = PixelAt(texture,new Vector2(138,132));
                     if (paper.r < .72f || paper.g < .70f || paper.b < .58f || paper.r < paper.b + .025f) return false;
                 }
                 return true;
@@ -150,10 +242,35 @@ namespace MistIsle.Tests
             finally { Object.Destroy(texture); }
         }
 
+        private static bool HasApprovedTitlePixels(Texture2D frame)
+        {
+            var original = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+            try
+            {
+                original.LoadImage(File.ReadAllBytes(Path.Combine(Application.dataPath, "Resources/Art/UI/TitleCover.png")));
+                // Protected illustration and logo regions, outside the live menu patch.
+                Vector2[] probes = { new Vector2(180, 400), new Vector2(310, 620), new Vector2(1120, 75),
+                    new Vector2(760, 120), new Vector2(1070, 290), new Vector2(1000, 620) };
+                foreach (var point in probes)
+                {
+                    Color expected = original.GetPixel(Mathf.RoundToInt(point.x / 1280f * original.width),
+                        Mathf.RoundToInt((1f - point.y / 720f) * original.height));
+                    Color actual = PixelAt(frame, point);
+                    if (Mathf.Abs(expected.r - actual.r) + Mathf.Abs(expected.g - actual.g) + Mathf.Abs(expected.b - actual.b) > .28f)
+                        return false;
+                }
+                return true;
+            }
+            finally { Object.Destroy(original); }
+        }
+
         private static Color PixelAt(Texture2D texture, Vector2 logicalPoint)
         {
-            int x = Mathf.Clamp(Mathf.RoundToInt(logicalPoint.x/1280f*texture.width),0,texture.width-1);
-            int y = Mathf.Clamp(Mathf.RoundToInt((1f-logicalPoint.y/720f)*texture.height),0,texture.height-1);
+            float scale = Mathf.Min(texture.width / 1280f, texture.height / 720f);
+            float offsetX = (texture.width - 1280f * scale) * .5f;
+            float offsetY = (texture.height - 720f * scale) * .5f;
+            int x = Mathf.Clamp(Mathf.RoundToInt(offsetX + logicalPoint.x * scale), 0, texture.width - 1);
+            int y = Mathf.Clamp(Mathf.RoundToInt(texture.height - offsetY - logicalPoint.y * scale), 0, texture.height - 1);
             return texture.GetPixel(x,y);
         }
 

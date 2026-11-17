@@ -1,6 +1,7 @@
 param(
     [string]$EditorPath = 'E:\unityHubinstall\6000.3.28f1\Editor\Unity.exe',
-    [switch]$BuildWindows
+    [switch]$BuildWindows,
+    [switch]$VisualReplay
 )
 $ErrorActionPreference = 'Stop'
 $sourceProject = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
@@ -21,6 +22,15 @@ Invoke-UnityStage 'content' @('-nographics','-quit','-executeMethod','MistIsle.E
 Invoke-UnityStage 'editmode' @('-nographics','-runTests','-testPlatform','EditMode','-testResults',('"' + (Join-Path $outputDirectory 'editmode.xml') + '"'))
 $env:MIST_ISLE_CAPTURE_DIR = Join-Path $outputDirectory 'Captures'
 Invoke-UnityStage 'playmode' @('-runTests','-testPlatform','PlayMode','-testResults',('"' + (Join-Path $outputDirectory 'playmode.xml') + '"'))
+if ($VisualReplay) {
+    $visualLog = Join-Path $outputDirectory 'normal-editor-visual-replay.log'
+    $visualArguments = @('-projectPath',('"' + $verificationProject + '"'),'-runTests','-testPlatform','PlayMode',
+        '-testFilter','MistIsle.Tests.VisualSmokeTests','-testResults',('"' + (Join-Path $outputDirectory 'normal-editor-visual-replay.xml') + '"'),
+        '-logFile',('"' + $visualLog + '"'))
+    $process = Start-Process -FilePath $EditorPath -ArgumentList $visualArguments -WindowStyle Hidden -PassThru -Wait
+    if ($process.ExitCode -ne 0) { Get-Content -LiteralPath $visualLog -Tail 30; throw "Normal Editor visual replay failed ($($process.ExitCode)): $visualLog" }
+    Write-Output "Normal Editor replay finished; inspect captures and capture-mode files: $($env:MIST_ISLE_CAPTURE_DIR)"
+}
 if ($BuildWindows) {
     $env:MIST_ISLE_BUILD_PATH = Join-Path $sourceProject 'Builds\Windows\MistIsle.exe'
     Invoke-UnityStage 'windows' @('-nographics','-quit','-executeMethod','MistIsle.Editor.MistIsleProjectBuilder.BuildWindows')

@@ -7,7 +7,7 @@ namespace MistIsle.World
     [Serializable]
     public sealed class WorldSaveData
     {
-        public const int CurrentSchemaVersion = 2;
+        public const int CurrentSchemaVersion = 3;
         public int schemaVersion = CurrentSchemaVersion;
         public string lastSceneId = "coastal-camp";
         public string selectedStarterSpeciesId;
@@ -27,5 +27,6 @@ namespace MistIsle.World
         public List<string> completedFieldIds = new List<string>();
         public bool chapterCompleted;
         public float playSeconds;
+        public int openingStage;
     }
 }

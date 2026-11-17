@@ -1,0 +1,100 @@
+{
+    "schemaVersion":  1,
+    "reviewDate":  "2026-11-17",
+    "task":  "Remove baked central title-menu controls and preserve approved cover identity.",
+    "skill":  "imagegen",
+    "skillSource":  "C:/Users/24017/.codex/skills/.system/imagegen/SKILL.md",
+    "generationMode":  "built-in image_gen edit",
+    "prompt":  "Use case: precise-object-edit.\nAsset type: Unity game title backdrop, a conservative edit of the supplied approved cover.\nEdit target: E:/Projects/mist-isle/assets/ui/title_cover.png, original 1672 x 941 wide canvas.\n\nPrimary request: Remove ONLY the FOUR central menu buttons and their lettering, borders, glow, and play-arrow. The removable elements are the central stack reading “开始冒险”, “继续旅程”, “设置”, “退出”, approximately x=690..1080, y=374..690 in the original image. Fill ONLY the removed stack with a seamless continuation of the existing distant blue moonlit mist, low sea clouds, and subtle water haze behind it. Keep this center naturally quiet so actual interactive buttons can be rendered over it.\n\nAbsolute invariants: Preserve the top logo “雾屿回响” and “Mist Isle” exactly, including all letter shapes, decorative lighthouse emblem and gold orbit. Preserve the approved traveler at left EXACTLY: chestnut-brown hair, the large blue hair bow and its square gold buckle, face silhouette and pose, cream outfit, dark gloves, leather backpack, glowing lantern and all accessories. Preserve every silhouette of the traveler and backpack, the left tree and banner, moon, distant lighthouse, beam, ruined arch, foreground rocks and sea. No redesigned character. No restyled logo. No changed palette, lighting, framing, crop or camera. Copy all image areas outside the menu-removal patch unchanged rather than repainting them. Preserve the existing pixel-art painterly texture and original wide aspect ratio. Output the full composition, opaque PNG. No new text, symbols, menu frames, characters or objects.",
+    "input":  {
+                  "path":  "assets/ui/title_cover.png",
+                  "workspaceCopy":  "Unity/MistIsleUnity/Assets/Resources/Art/UI/TitleCover.png",
+                  "sha256":  "52373edc2423dcd2ff7c3be88b12228ee6d478097c1593f75a92b967836d3d1e",
+                  "width":  1672,
+                  "height":  941
+              },
+    "generated":  {
+                      "defaultPath":  "C:/Users/24017/.codex/generated_images/01a1e557-fdf8-7b22-aa72-55975e6a55e4/exec-608788d3-1c6d-435d-85f1-3c1ead96413b.png",
+                      "workspacePath":  "Unity/MistIsleUnity/Assets/Resources/Art/UI/TitleBackdrop-v2.png",
+                      "resourceKey":  "Art/UI/TitleBackdrop-v2",
+                      "sha256":  "2250175e30b641baaf9b682a79a3b6dbf4783823e8787d25349b8b7b0907c36c",
+                      "width":  1672,
+                      "height":  941
+                  },
+    "review":  {
+                   "status":  "accepted_for_menu_patch_only",
+                   "fullImageAcceptedAsPixelIdenticalReplacement":  false,
+                   "visualInspectionCompleted":  true,
+                   "observations":  [
+                                        "Four central baked menu frames, lettering, glow, and play arrow were removed.",
+                                        "The generated image visually retains chestnut hair, blue bow with gold buckle, cream costume, backpack and lantern.",
+                                        "The generated logo still reads 雾屿回响 / Mist Isle, and the lighthouse, moon and overall composition remain visually aligned.",
+                                        "Pixel comparison nevertheless detects resampling outside the requested menu region; those pixels are excluded from the runtime presentation."
+                                    ],
+                   "meanAbsoluteRgbDifferenceOfFullGeneratedImage":  {
+                                                                         "traveler":  8.521,
+                                                                         "logo":  6.04,
+                                                                         "lighthouse":  6.398,
+                                                                         "menu":  59.129
+                                                                     },
+                   "policy":  "The approved original is always drawn first. Only the generated central menu-removal patch is composited. No generated character, logo or lighthouse pixels are displayed.",
+                   "patchInOriginalTopLeftPixels":  {
+                                                        "x":  680,
+                                                        "y":  366,
+                                                        "width":  420,
+                                                        "height":  336
+                                                    },
+                   "protectedAreas":  "Traveler lies left of patch; logo is above patch; actual distant lighthouse lies right of patch. They remain original pixels.",
+                   "originalAssetsOverwritten":  false,
+                   "manualUnityGuiAcceptancePending":  true,
+                   "pendingReason":  "Physical keyboard/mouse walkthrough is still pending because the Windows desktop is locked; normal Editor application-frame replay and image review are completed.",
+                   "normalEditorUiReplay":  {
+                                                "Passed":  true,
+                                                "BatchMode":  false,
+                                                "UiFramesVerified":  13,
+                                                "TitleViewed":  true,
+                                                "Evidence":  "Builds/Verification/20261117-opening/Captures/NormalEditor/01-title.png",
+                                                "ImportCorrection":  "TextureImporter NPOT=None, original dimensions, uncompressed; opaque viewport letterboxing",
+                                                "PhysicalKeyboardMouseVerified":  false
+                                            }
+               },
+    "runtime":  {
+                    "source":  "Unity/MistIsleUnity/Assets/Scripts/Runtime/TitlePresentation.cs",
+                    "menus":  [
+                                  "开始冒险",
+                                  "继续旅程",
+                                  "设置",
+                                  "退出"
+                              ],
+                    "boundsOn1280x720":  [
+                                             {
+                                                 "x":  533,
+                                                 "y":  291,
+                                                 "width":  290,
+                                                 "height":  54
+                                             },
+                                             {
+                                                 "x":  558,
+                                                 "y":  355,
+                                                 "width":  249,
+                                                 "height":  52
+                                             },
+                                             {
+                                                 "x":  558,
+                                                 "y":  414,
+                                                 "width":  249,
+                                                 "height":  49
+                                             },
+                                             {
+                                                 "x":  558,
+                                                 "y":  471,
+                                                 "width":  249,
+                                                 "height":  50
+                                             }
+                                         ],
+                    "style":  "Programmatically rendered chamfered navy plates, gold double-line trim, ivory text; only focused plate has warm gold fill and dark text.",
+                    "focus":  "Mouse and W/S or up/down arrows; Enter/Space activates.",
+                    "fallback":  "If the cleaned backdrop is unavailable, display the original complete approved cover and original hit areas.",
+                    "tests":  "49 EditMode and 17 PlayMode tests passed; normal Editor Play Mode visual replay passed separately with 13 verified UI captures. Title input hit areas reviewed in code and actual image; physical keyboard/mouse walkthrough remains pending."
+                }
+}

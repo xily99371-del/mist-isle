@@ -10,6 +10,7 @@ namespace MistIsle.Player
         public Sprite[] Up;
         private TopDownPlayerMotor motor;
         private SpriteRenderer visual;
+        private SpriteFrameAnimator frameAnimator;
 
         private void Awake()
         {
@@ -20,10 +21,15 @@ namespace MistIsle.Player
         private void LateUpdate()
         {
             if (visual == null || motor == null) return;
-            Sprite[] frames = motor.Facing.y > 0f ? Up : motor.Facing.x < 0f ? Left : motor.Facing.x > 0f ? Right : Down;
-            if (frames != null && frames.Length > 0)
-                visual.sprite = frames[motor.IsMoving ? (int)(Time.time * 8f) % frames.Length : 0];
-            visual.sortingOrder = 100 - Mathf.RoundToInt(transform.position.y * 10f);
+            if (frameAnimator == null && Down != null && Left != null && Right != null && Up != null)
+            {
+                var frames = new System.Collections.Generic.List<Sprite>();
+                frames.AddRange(Down); frames.AddRange(Left); frames.AddRange(Right); frames.AddRange(Up);
+                frameAnimator = gameObject.AddComponent<SpriteFrameAnimator>();
+                frameAnimator.Configure(visual, frames.ToArray(), Down.Length, 8f, false);
+            }
+            if (frameAnimator != null) frameAnimator.SetMotion(motor.Facing, motor.IsMoving);
+            visual.sortingOrder = Mathf.RoundToInt(-transform.position.y * 100f);
         }
     }
 }

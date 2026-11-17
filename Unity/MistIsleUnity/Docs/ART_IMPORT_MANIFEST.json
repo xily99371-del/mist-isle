@@ -868,5 +868,241 @@
       ],
       "generated_original": "C:\\Users\\24017\\.codex\\generated_images\\01a1e558-23a2-7f70-86ba-cdeecfb35d5e\\exec-53d93027-1ff4-4832-9dc1-bee37cc50c49.png"
     }
+  ],
+  "preferred_world_actor_revision": {
+    "source": "Assets/Art/SourceReference/PixelPeopleApproved.png",
+    "source_sha256": "84474e5507c7c25589a8de99f3dea33db198de0b05d7939c57c058425e628256",
+    "preferred_resources": [
+      "Art/Actors/ApprovedTraveler",
+      "Art/Actors/ShiguangPixel"
+    ],
+    "frame_count_per_actor": 12,
+    "canvas_size": [
+      128,
+      128
+    ],
+    "pixels_per_unit": 64,
+    "pivot": [
+      0.5,
+      0
+    ],
+    "foot_baseline_pixels": 3,
+    "runtime_direction_rows": [
+      "south",
+      "west",
+      "east",
+      "north"
+    ],
+    "source_direction_rows": [
+      "north",
+      "south",
+      "west",
+      "east"
+    ],
+    "frames_per_direction": 3,
+    "source_column_x": [
+      1008,
+      1130,
+      1254
+    ],
+    "source_rows_top_left_shiguang": [
+      [
+        84,
+        108
+      ],
+      [
+        193,
+        104
+      ],
+      [
+        298,
+        104
+      ],
+      [
+        405,
+        112
+      ]
+    ],
+    "source_rows_top_left_traveler": [
+      [
+        558,
+        112
+      ],
+      [
+        675,
+        112
+      ],
+      [
+        787,
+        122
+      ],
+      [
+        910,
+        124
+      ]
+    ],
+    "source_rect_width": 112,
+    "method": "Unity Color32 lossless crop, boundary-connected cream-paper/drop-shadow alpha cleanup, and unscaled common-canvas placement. No imagegen or repainting.",
+    "deprecated_for_world_use": [
+      "Art/Actors/Shiguang",
+      "Art/Actors/Traveler"
+    ],
+    "import_entrypoint": "MistIsle.Editor.ApprovedArtImporter.ImportApprovedPixelActors",
+    "validation_entrypoint": "MistIsle.Editor.ApprovedArtImporter.ValidateOriginalPixelActors",
+    "validation": "24 decoded PNGs compared byte-for-byte to the source-derived expected Color32 canvas; metadata checked for point sampling, 64PPU, 128x128 canvas and bottom-center pivot.",
+    "verification_status": "QA Unity import completed. Actual South/West/East/North PNGs visually inspected: original silhouettes and clothing intact, no visible paper rectangles. Read-only audit of all 24 resulting PNGs passed: 128x128 canvas, bottom margin 3px, alpha unchanged versus backed-up crop, surviving RGB unchanged, no nonzero hidden RGB in transparent pixels.",
+    "cleared_background_rgba": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "retained_character_rgb_policy": "All surviving original character pixels retain their exact original RGB; removed boundary-connected background is normalized to RGBA zero.",
+    "rebuild_entrypoint": "MistIsle.Editor.ApprovedArtImporter.RebuildOriginalPixelActorsWithBackup",
+    "rebuild_policy": "Back up existing derived actor and pixel creature PNG/meta files to Builds/ArtBackups/original-pixels-* before rebuilding. Original reference files are never modified.",
+    "verified_qa_project": "E:/Projects/MistIsle-Opening-Verification-20261117",
+    "verification_counts": {
+      "actor_frames": 24,
+      "canvas_size": [
+        128,
+        128
+      ],
+      "foot_margin_pixels": 3,
+      "alpha_changed_vs_prior_backup": 0,
+      "visible_rgb_changed_vs_prior_backup": 0,
+      "transparent_pixels_with_hidden_nonzero_rgb": 0
+    }
+  },
+  "original_pixel_creature_crops": {
+    "method": "Direct Unity crop and boundary-connected paper-alpha cleanup, with no repainting or resampling.",
+    "resources": [
+      {
+        "key": "Art/Creatures/PixelMossLumi",
+        "source": "Assets/Art/SourceReference/PixelCompanionsApproved.png",
+        "rect_top_left": [
+          442,
+          121,
+          60,
+          62
+        ]
+      },
+      {
+        "key": "Art/Creatures/PixelMoatail",
+        "source": "Assets/Art/SourceReference/PixelCompanionsApproved.png",
+        "rect_top_left": [
+          442,
+          442,
+          60,
+          62
+        ]
+      },
+      {
+        "key": "Art/Creatures/PixelCrystalGecko",
+        "source": "Assets/Art/SourceReference/PixelCompanionsApproved.png",
+        "rect_top_left": [
+          441,
+          748,
+          62,
+          65
+        ]
+      },
+      {
+        "key": "Art/Creatures/PixelWildCrab",
+        "source": "Assets/Art/SourceReference/pixel_other.png",
+        "rect_top_left": [
+          485,
+          435,
+          72,
+          72
+        ],
+        "source_silhouette_bbox_top_left": [
+          495,
+          442,
+          548,
+          498
+        ],
+        "source_margin_pixels": [
+          10,
+          7,
+          9,
+          9
+        ]
+      }
+    ],
+    "validation_entrypoint": "MistIsle.Editor.ApprovedArtImporter.ValidateOriginalPixelCreatures",
+    "verification_status": "Isolated Unity rebuild and ValidateOriginalPixelCreatures completed successfully, exit code 0 reported by the world integration agent. All four original pixel pets rebuilt; corrected crab output and its actual coast render visually inspected by art agent.",
+    "verified_output": {
+      "qa_project": "E:\\Projects\\MistIsle-Verification-20261117",
+      "resource": "Art/Creatures/PixelWildCrab",
+      "png_size": [
+        53,
+        56
+      ],
+      "sha256": "b214ae806491eb52c75eb67b5200df787f7ee1aa7f037792cc8aea7401e1dc3e",
+      "hidden_rgb_in_transparent_pixels": 0,
+      "visual_review": "Actual rebuilt PNG inspected: complete front-facing crab, coral and shell, both claws and feet intact, no direction diamond or partial neighboring creature. Actual coast world-only render also inspected with the corrected pixel crab."
+    }
+  },
+  "additional_opening_environment_crops": [
+    {
+      "key": "Art/Environment/FenceTimber",
+      "source": "Assets/Art/SourceReference/CliffsAndFencesSource.png",
+      "rect_top_left": [
+        852,
+        160,
+        162,
+        64
+      ],
+      "review_notes": "Full thick horizontal timber fence. Ends before y226 lower-row prop; avoids second object included by the former suggested 88px height.",
+      "verified_output": {
+        "png_size": [
+          152,
+          51
+        ],
+        "sha256": "6e5448e9a5c109906921cab1ceb1c72653602018683ead8ca36ee2382b8c9f3f",
+        "qa_project": "E:\\Projects\\MistIsle-Verification-20261117",
+        "visual_review": "Actual independent output PNG and actual camp/coast world-only render inspected; original full prop/cliff component retained without neighboring source prop."
+      }
+    },
+    {
+      "key": "Art/Environment/GrassCliff",
+      "source": "Assets/Art/SourceReference/CliffsAndFencesSource.png",
+      "rect_top_left": [
+        8,
+        17,
+        124,
+        125
+      ],
+      "review_notes": "First independent original grass cliff; opaque silhouette x19..127. Ends in real gap x128..137 before the next cliff.",
+      "verified_output": {
+        "png_size": [
+          110,
+          111
+        ],
+        "sha256": "95b67e121e90fe5035760b2aee7e2cbe28c8c462022a9f2477c15183a8a02f6a",
+        "qa_project": "E:\\Projects\\MistIsle-Verification-20261117",
+        "visual_review": "Actual independent output PNG and actual camp/coast world-only render inspected; original full prop/cliff component retained without neighboring source prop."
+      }
+    },
+    {
+      "key": "Art/Environment/GrassCliffCorner",
+      "source": "Assets/Art/SourceReference/CliffsAndFencesSource.png",
+      "rect_top_left": [
+        131,
+        17,
+        109,
+        125
+      ],
+      "review_notes": "Second independent cliff variant; opaque silhouette x138..234. Ends before the next object begins at x244.",
+      "verified_output": {
+        "png_size": [
+          102,
+          109
+        ],
+        "sha256": "35d558117758cd68211bdc0aee3ea12da1f8e221f1d135d9d7b5403cc1743049",
+        "qa_project": "E:\\Projects\\MistIsle-Verification-20261117",
+        "visual_review": "Actual independent output PNG and actual camp/coast world-only render inspected; original full prop/cliff component retained without neighboring source prop."
+      }
+    }
   ]
 }

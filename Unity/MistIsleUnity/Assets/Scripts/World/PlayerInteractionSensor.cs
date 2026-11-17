@@ -9,6 +9,8 @@ namespace MistIsle.World
         [SerializeField] private LayerMask interactableLayers;
         private readonly Collider2D[] hits = new Collider2D[16];
         private readonly RaycastHit2D[] obstructions = new RaycastHit2D[16];
+        private int suppressedThroughFrame = -1;
+        private float interactionAllowedAt;
         public IWorldInteractable Current { get; private set; }
         public bool InputEnabled { get; set; } = true;
 
@@ -24,13 +26,17 @@ namespace MistIsle.World
             {
                 var candidate = hits[i].GetComponentInParent<IWorldInteractable>();
                 if (candidate == null || !candidate.CanInteract) continue;
+                var candidateComponent = candidate as Component;
                 int wallCount = Physics2D.Linecast(point, hits[i].bounds.center,
                     new ContactFilter2D { useTriggers = false }, obstructions);
                 bool blocked = false;
                 for (int w = 0; w < wallCount; w++)
                 {
                     var wall = obstructions[w].collider;
-                    if (wall != null && !wall.transform.IsChildOf(transform)
+                    bool sameBody = wall != null && candidateComponent != null &&
+                        (candidateComponent.transform.IsChildOf(wall.transform) || wall.transform.IsChildOf(candidateComponent.transform));
+                    if (candidate is WorldInteraction worldTarget && worldTarget.OwnsCollider(wall)) sameBody = true;
+                    if (wall != null && !sameBody && !wall.transform.IsChildOf(transform)
                         && wall.GetComponentInParent<IWorldInteractable>() != candidate)
                     { blocked = true; break; }
                 }
@@ -38,7 +44,22 @@ namespace MistIsle.World
                 float distance = Vector2.SqrMagnitude((Vector2)hits[i].bounds.center - point);
                 if (distance < bestDistance) { bestDistance = distance; Current = candidate; }
             }
-            if (Current != null && Input.GetKeyDown(KeyCode.E)) Current.Interact();
+            if (Input.GetKeyDown(KeyCode.E)) TryInteractCurrent();
+        }
+
+        // Input adapters and keyboard controls share this entry point. Suppression never hides the prompt.
+        public bool TryInteractCurrent()
+        {
+            if (!InputEnabled || Time.frameCount <= suppressedThroughFrame || Time.unscaledTime < interactionAllowedAt
+                || Current == null || !Current.CanInteract) return false;
+            Current.Interact();
+            return true;
+        }
+
+        public void SuppressInteraction(float seconds = .2f)
+        {
+            suppressedThroughFrame = Time.frameCount;
+            interactionAllowedAt = Mathf.Max(interactionAllowedAt, Time.unscaledTime + Mathf.Max(0f, seconds));
         }
 
         public void Configure(LayerMask layers, float interactionRadius = 1.4f)

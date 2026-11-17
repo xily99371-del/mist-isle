@@ -8,7 +8,16 @@ namespace MistIsle.Player
         [SerializeField, Min(0.1f)] private float moveSpeed = 4.2f;
         private Rigidbody2D body;
         private Vector2 input;
-        public bool InputEnabled { get; set; } = true;
+        private bool inputEnabled = true;
+        public bool InputEnabled
+        {
+            get => inputEnabled;
+            set
+            {
+                inputEnabled = value;
+                if (!value) { input = Vector2.zero; if (body != null) body.linearVelocity = Vector2.zero; }
+            }
+        }
         public Vector2 Facing { get; private set; } = Vector2.down;
         public bool IsMoving => input.sqrMagnitude > 0f;
 

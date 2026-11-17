@@ -85,7 +85,7 @@ namespace MistIsle.Tests
                 .Single(shape => shape.name == "ShelterFootprint" && world.GetRoomId(shape.transform.position) == "camp-0");
             var player = new GameObject("CollisionTestPlayer", typeof(Rigidbody2D), typeof(CapsuleCollider2D));
             player.transform.SetParent(root.transform, false);
-            player.transform.position = new Vector2(-7f, 1.5f);
+            player.transform.position = new Vector2(-8f, 1.5f);
             var body = player.GetComponent<Rigidbody2D>();
             body.gravityScale = 0f;
             body.freezeRotation = true;
@@ -178,6 +178,120 @@ namespace MistIsle.Tests
                 .Single(shape => shape.name == "FieldBarrier-field-tidal");
             Assert.That(restored.gameObject.activeInHierarchy, Is.True, "Loading a closed gate did not restore its collider.");
             yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator ArrivalDockAndOpeningLandmarksHaveRealWalkingRoutesAndSolidWater()
+        {
+            Assert.That(world.GetSpawn("camp-0"),Is.EqualTo(world.GetLandmarkPosition("dock-arrival")));
+            Vector2 water=new Vector2(-14f,-6f);
+            Assert.That(Physics2D.OverlapCircleAll(water,.15f).Any(shape=>!shape.isTrigger&&
+                shape is CompositeCollider2D&&shape.transform.IsChildOf(root.transform)),Is.True,
+                "The bay is visually water but does not physically stop the player.");
+            string[] campTargets={"dock-end","watcher-approach","campfire-approach","shiguang-approach",
+                "starter-meeting","berry-camp-0-0","dew-camp-0-1","pollen-camp-0-2","guide-camp-waypoint","coast-exit"};
+            foreach(string id in campTargets)
+                Assert.That(HasWalkingPath(world.GetSpawn("camp-0"),world.GetLandmarkPosition(id),world.GetBounds("camp-0")),
+                    Is.True,"The opening route cannot reach "+id+" with the player's footprint.");
+            string[] coastTargets={"coast-waypoint-1","coast-waypoint-2","coast-waypoint-3","tutorial-viewpoint",
+                "berry-coast-0-0","dew-coast-0-1","pollen-coast-0-2"};
+            foreach(string id in coastTargets)
+                Assert.That(HasWalkingPath(world.GetSpawn("coast-0"),world.GetLandmarkPosition(id),world.GetBounds("coast-0")),
+                    Is.True,"The coast teaching path cannot reach "+id);
+            var tutorial=world.Interactions.Single(item=>item.Kind=="encounter"&&item.Id=="tutorial-coast-crab");
+            Assert.That(world.GetRoomId(tutorial.transform.position),Is.EqualTo("coast-0"));
+            Assert.That(world.Interactions.Count(item=>item.Kind=="encounter"&&world.GetRoomId(item.transform.position)=="coast-0"),
+                Is.EqualTo(1),"Unscripted encounters distract from the first capture lesson.");
+            var northernEdges=root.GetComponentsInChildren<BoxCollider2D>().Where(shape=>shape.name=="NorthernCliffFootprint").ToArray();
+            Assert.That(northernEdges.Length,Is.EqualTo(32),"Both opening rooms need a physical northern cliff edge.");
+            foreach(var edge in northernEdges)
+                Assert.That(edge.bounds.min.y,Is.GreaterThan(6.1f),"Northern cliff collision encroached on the task area.");
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator StoryActorsMoveTheirPhysicalFootprintAndTheThreeStartersAreRealInteractables()
+        {
+            var actor=world.GetActor("shiguang");
+            Assert.That(actor,Is.Not.Null);
+            var footprint=actor.GetComponent<CapsuleCollider2D>();
+            Assert.That(footprint,Is.Not.Null);
+            var interaction=world.Interactions.Single(item=>item.Kind=="npc"&&item.Id=="shiguang");
+            Vector2 original=actor.position;
+            Vector2 triggerOffset=(Vector2)interaction.transform.position-original;
+            Vector2 moved=original+new Vector2(-.8f,-.3f);
+            world.MoveActorFacing("shiguang",moved,Vector2.left);
+            Physics2D.SyncTransforms();
+            Assert.That(Vector2.Distance(interaction.transform.position,moved+triggerOffset),Is.LessThan(.001f));
+            Assert.That(Vector2.Distance(footprint.bounds.center,moved+footprint.offset),Is.LessThan(.001f));
+            world.SetActorVisible("shiguang",false);
+            Assert.That(actor.gameObject.activeInHierarchy,Is.False);
+            world.SetActorVisible("shiguang",true);
+            foreach(string id in new[] {"moss-lumi","moatail","crystal-gecko"})
+            {
+                Assert.That(world.GetActor(id),Is.Not.Null,"Starter has no actual courtyard entity: "+id);
+                var starter=world.Interactions.Single(item=>item.Kind=="starter"&&item.Id==id);
+                starter.Interact();
+                Assert.That(events,Does.Contain("starter:"+id));
+            }
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator SensorSeesActorsAndBothCampfireLayoutsWithoutTheirOwnBodiesOccludingThem()
+        {
+            var player=new GameObject("RealConversationSensor",typeof(PlayerInteractionSensor));
+            player.transform.SetParent(root.transform,false);
+            var sensor=player.GetComponent<PlayerInteractionSensor>();
+            sensor.Configure(Physics2D.AllLayers,1.4f);
+            string[] targets={"watcher","shiguang","moss-lumi","moatail","crystal-gecko","campfire-camp-0","campfire-glowglade-0"};
+            foreach(string id in targets)
+            {
+                var target=world.Interactions.Single(item=>item.Id==id);
+                Vector2 approach=(Vector2)target.transform.position+
+                    (id=="campfire-glowglade-0"?Vector2.up:Vector2.down)*.95f;
+                player.transform.position=approach;
+                Physics2D.SyncTransforms();
+                yield return null;
+                Assert.That(sensor.Current,Is.SameAs(target),
+                    "The real proximity/line-of-sight query cannot acquire "+id+" from an open approach.");
+            }
+            var watcher=world.Interactions.Single(item=>item.Id=="watcher");
+            player.transform.position=watcher.transform.position+Vector3.down;
+            var wall=new GameObject("ActualWallBetweenConversation",typeof(BoxCollider2D));
+            wall.transform.SetParent(root.transform,false);
+            wall.transform.position=watcher.transform.position+Vector3.down*.5f;
+            wall.GetComponent<BoxCollider2D>().size=new Vector2(1.5f,.12f);
+            Physics2D.SyncTransforms();
+            yield return null;
+            Assert.That(sensor.Current,Is.Not.SameAs(watcher),"Ignoring a target's own body also ignored a real wall.");
+        }
+
+        private bool HasWalkingPath(Vector2 start,Vector2 goal,Rect bounds)
+        {
+            const float step=.5f;
+            int width=Mathf.RoundToInt(bounds.width/step),height=Mathf.RoundToInt(bounds.height/step);
+            Vector2Int Cell(Vector2 point)=>new Vector2Int(Mathf.Clamp(Mathf.RoundToInt((point.x-bounds.xMin)/step),0,width-1),
+                Mathf.Clamp(Mathf.RoundToInt((point.y-bounds.yMin)/step),0,height-1));
+            Vector2 Point(Vector2Int cell)=>new Vector2(bounds.xMin+cell.x*step,bounds.yMin+cell.y*step);
+            var from=Cell(start); var target=Cell(goal);
+            var pending=new Queue<Vector2Int>(); var seen=new HashSet<Vector2Int>();
+            pending.Enqueue(from);seen.Add(from);
+            Vector2Int[] directions={Vector2Int.left,Vector2Int.right,Vector2Int.up,Vector2Int.down};
+            while(pending.Count>0)
+            {
+                var at=pending.Dequeue();
+                if(at==target) return true;
+                foreach(var direction in directions)
+                {
+                    var next=at+direction;
+                    if(next.x<0||next.y<0||next.x>=width||next.y>=height||!seen.Add(next)) continue;
+                    bool blocked=Physics2D.OverlapCircleAll(Point(next)+Vector2.up*.17f,.22f)
+                        .Any(shape=>!shape.isTrigger&&shape.transform.IsChildOf(root.transform));
+                    if(!blocked) pending.Enqueue(next);
+                }
+            }
+            return false;
         }
     }
 }
