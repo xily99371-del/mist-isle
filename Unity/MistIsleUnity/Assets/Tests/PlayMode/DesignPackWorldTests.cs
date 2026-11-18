@@ -36,7 +36,7 @@ namespace MistIsle.Tests
                 Assert.That(grid.cellSize, Is.EqualTo(Vector3.one));
                 foreach (string layer in DesignPackWorldBuilder.LayerNames) Assert.That(grid.transform.Find(layer), Is.Not.Null, map.Id + "/" + layer);
             }
-            Vector2 water = DesignPackCatalog.GetMap("M01").Origin + new Vector2(36f, 10f);
+            Vector2 water = DesignPackCatalog.GetMap("M01").Origin + new Vector2(33f, 10f);
             Assert.That(SolidsAt(water, .1f).Any(), Is.True, "The stream is decorative and has no real collision.");
             yield return null;
         }
@@ -57,7 +57,7 @@ namespace MistIsle.Tests
         [UnityTest]
         public IEnumerator TrunksGardenFencesAndGuideWorkbenchHaveIndependentPhysicalFootprints()
         {
-            foreach (string name in new[] { "TreeTrunkFootprint", "CompanionGardenFenceFootprint", "GuideWorkstationFootprint", "AncientTreeTrunk" }) {
+            foreach (string name in new[] { "TreeTrunkFootprint", "CompanionGardenFenceFootprint", "GuideStationLeftPost", "GuideStationRightPost", "AncientTreeTrunk" }) {
                 var bodies = root.GetComponentsInChildren<BoxCollider2D>().Where(body => body.name == name).ToArray();
                 Assert.That(bodies, Is.Not.Empty, name + " has no real collision.");
                 foreach (var body in bodies) {
@@ -65,6 +65,9 @@ namespace MistIsle.Tests
                     Assert.That(Physics2D.OverlapPointAll(body.bounds.center), Does.Contain(body));
                 }
             }
+            var guideDesk = root.GetComponentsInChildren<PolygonCollider2D>().Single(body => body.name == "Foundation-M00_SHIGUANG_STATION");
+            Assert.That(guideDesk.isTrigger, Is.False);
+            Assert.That(Physics2D.OverlapPointAll(guideDesk.bounds.center), Does.Contain(guideDesk));
             yield return null;
         }
 

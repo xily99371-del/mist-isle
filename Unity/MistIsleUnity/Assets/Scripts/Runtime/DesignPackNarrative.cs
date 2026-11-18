@@ -92,7 +92,7 @@ namespace MistIsle.Runtime
                 case "glowglade-warden": return Lines(
                     L("narrator", "花冠鹿灵收起枝冠，将森印轻轻推向你。根系中的微光接续成线，穿过幼苗，也照向林地的归路。"),
                     L("traveler", "我会告诉营地的人，这条路可以一起照看了。药草要留根，走路也慢一点。"),
-                    L("narrator", "森印留下生长的见证：一条路重新开放时，路旁的生命也应得到照顾。鹿灵仍守着这片林地，你们可以继续探索，或先回营地补给。"));
+                    L("narrator", "古树环庭的森息药草舒展开花穗。轻取花粉，清凉的草香也能让受伤的同行者缓一口气；留下根，过一会儿还会再开。鹿灵仍守着林地，把这条可以共同照看的路交给你们。"));
                 case "tidal-warden": return Lines(
                     L("narrator", "断潮蟹王松开钳子，潮印在石槽里浮现。它让开一段水道，水声沿渠道传回前庭，浅湾里也重新有了来去的余地。"),
                     L("traveler", "这一次，水能走自己的路，小家伙们也能回去。谢谢你一直守在这里。"),
@@ -233,6 +233,60 @@ namespace MistIsle.Runtime
                 case "M04_BOSS": return BeforeGuardian("final-boss");
                 default: return Array.Empty<StoryLine>();
             }
+        }
+
+        public static StoryLine[] Observe(string stablePoiId, SealProgression seals, bool completed)
+            => stablePoiId == "M00_NOTICE" ? Notice(seals, completed) : Observe(stablePoiId);
+
+        /// <summary>The board reports changes the player has actually earned, in either branch order.</summary>
+        public static StoryLine[] Notice(SealProgression seals, bool completed)
+        {
+            if (completed) return Lines(
+                L("narrator", "原来的求援航单旁，多了一张填好日期的回执：‘灯塔已恢复航路预警，港口可以接收补给与返航请求。’底下还留着今天的风浪提醒。"),
+                L("traveler", "这次我能带回一封有回答的信了。路上帮过我们的伙伴，也都该被写进回执里。"));
+            bool forest = seals != null && seals.HasSeal("glowglade-warden");
+            bool tide = seals != null && seals.HasSeal("tidal-warden");
+            bool crystal = seals != null && seals.HasSeal("crystal-warden");
+            var pages = new List<StoryLine> {
+                L("narrator", forest ? "采药便笺补上了新字：‘古树根桥恢复，森息药草重新开花。采集请留根，往返时绕开幼苗。’"
+                    : "采药便笺仍压在板上：‘林间采集路失修，请带熟悉根系的伙伴查看古树环庭。’"),
+                L("narrator", tide ? "水路便笺已改为：‘渠道恢复调节，浅湾留出了缓流。通行时留意潮头，也给水里的生命留路。’"
+                    : "旧水道的回报仍未更新：‘浅湾失去连续的潮声，需要巡看神殿渠道。’"),
+                L("narrator", crystal ? "导能便笺记下了新脉冲：‘晶簇档案馆重新送出回报。请继续检查灯塔是否确认收讫。’"
+                    : "导能便笺留着一栏空白：‘灯塔收不到沿路回报，请查看晶簇档案馆与旧导槽。’")
+            };
+            pages.Add(L("traveler", forest && tide && crystal
+                ? "三处都重新回应了。现在得把复航的请求送到灯前，让这张航单真正收到回答。"
+                : "每补上一条回报，等待就少了一处。剩下的路，我和伙伴们接着走。"));
+            return pages.ToArray();
+        }
+
+        /// <summary>Reactions to the carried seals; these pages never award or repeat progression rewards.</summary>
+        public static StoryLine[] ReturnToCamp(string actorId, SealProgression seals, bool completed)
+        {
+            bool watcher = actorId == "watcher";
+            if (completed) return watcher ? Lines(
+                L("watcher", "你们平安回来了。灯光已经照向外海，我把回执的纸留在桌上。等补给船靠岸，就把你们沿路找回的声音一起送出去。"),
+                L("watcher", "路还很长，先让我看看伙伴的伤势。归来的位置一直给你们留着。")) : Lines(
+                L("shiguang", "收到回执以后，外面的人也能知道，雾屿还有大家在生活。那只潮壳蟹到这里的第一段路，和灯塔这最后一段，原来都接上了。"),
+                L("shiguang", "接下来想走哪儿，就和伙伴们一起选吧。遇到新朋友，仍然先观察它的回应。"));
+            var pages = new List<StoryLine>();
+            if (seals != null && seals.HasSeal("glowglade-warden")) pages.Add(watcher
+                ? L("watcher", "森印也跟着你们回来了。古树脚下重新开花的消息，我会写到采药便笺上。采集的人能回林子，也要一起留住那些幼苗。")
+                : L("shiguang", "花冠鹿灵认可你们了？下次经过古树，看看新开的森息药草吧。花粉能补上捕获器的材料，草香也能让受伤的伙伴缓一口气。"));
+            if (seals != null && seals.HasSeal("tidal-warden")) pages.Add(watcher
+                ? L("watcher", "潮印的纹路很安稳。能调节的水道，比一味堵住潮水更能照顾浅湾。这个回报也该让等水的人知道。")
+                : L("shiguang", "蟹王把潮印交给你们了。那只小潮壳蟹如果回去看看，也能认出更平缓的岸了。保护它们，确实得给来往留地方。"));
+            if (seals != null && seals.HasSeal("crystal-warden")) pages.Add(watcher
+                ? L("watcher", "晶印已经亮起来，沿路的回报也终于有机会送出去。等灯塔回应了，我们就把最早那张求援补上回执。")
+                : L("shiguang", "档案馆的导槽接上了。林地和水道不用各说各的话，灯塔也该听见完整的岛了。你们把这份请求继续带上去吧。"));
+            if (pages.Count == 0) pages.Add(watcher
+                ? L("watcher", "回来就好。林地与遗迹都在等巡路的消息，先后由你们选。需要补给先在营地备齐，受了伤就回来找我。")
+                : L("shiguang", "潮风小径向北是林地，向东是遗迹。先去感兴趣的地方，看看当地需要怎样的伙伴；缺少帮手，也可以回来整理队伍。"));
+            pages.Add(watcher
+                ? L("watcher", "先让伙伴们歇一歇吧。恢复、整理旅队或寄养，都交给我。")
+                : L("shiguang", "旅队可以带六位伙伴，三位同时出战。留出不同伙伴的位置，新的路就会多一些；不急着用捕获器，食物和耐心也能建立信任。"));
+            return pages.ToArray();
         }
 
         public static string ChapterObjective(SealProgression seals, bool completed)

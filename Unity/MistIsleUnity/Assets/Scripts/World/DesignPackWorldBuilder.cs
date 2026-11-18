@@ -44,9 +44,11 @@ namespace MistIsle.World
                 BuildFoundations(map, layers["Collision"]);
                 BuildLandmarks(map, layers, layout, art, plan);
                 BuildInteractions(map, layers, layout, art, onInteract, wasCollected);
+                if (map.Id == "M02") DesignPackWorldConsequences.Attach(mapRoot);
                 BuildExits(map, layers["Triggers"], layout, art, onInteract);
                 SetOpeningLandmarks(map, layout);
                 DesignPackAtmosphere.Attach(mapRoot, map.Id, map.Bounds);
+                if (map.Id == "M00") DesignPackCoastalComposition.Attach(mapRoot);
             }
             layout.Spawn = layout.GetSpawn("camp-0");
             layout.CameraBounds = layout.GetBounds("camp-0");
@@ -88,18 +90,23 @@ namespace MistIsle.World
                     bool route = plan.OnRoute(point, 1.8f);
                     bool wet = plan.Water(point);
                     bool rootGap = plan.RootBridgeGap(point);
+                    bool dockRamp = map.Index == 0 && point.y < 11f && point.x > 5f && point.x < 13f;
+                    bool coastalDeepWater = map.Index == 0 && wet && !dockRamp;
+                    // Access spurs lead to shore pickups; they must not create new piers
+                    // or punch holes in deep-water collision beside the one authored dock.
+                    if (coastalDeepWater) route = false;
                     int variant = (x * 3 + y * 5) % 4;
                     int row = 0;
                     if (map.Index == 0 && point.y < 12f) row = 2;
                     if (plan.Plaza(point)) row = map.Index <= 1 ? 2 : 3;
-                    if (route) row = wet || (map.Index == 0 && point.y < 11f) ? 4 : map.Index >= 3 ? 3 : 1;
+                    if (route) row = wet || dockRamp ? 4 : map.Index >= 3 ? 3 : 1;
                     // Row 1's first four cells are grass/dirt transitions, not full path
                     // surfaces. Water row 5 also mixes shallow and deep hues. Curate
                     // continuous surfaces instead of alternating incompatible cells.
                     int cell = row == 1 ? 12 + (variant % 2) : row == 0 ? 4 : row * 8 + variant;
                     ground[index] = tiles[cell];
                     if (wet && (!route || rootGap)) water[index] = tiles[44 + variant % 2];
-                    if (plan.Blocked(point))
+                    if (coastalDeepWater || plan.Blocked(point))
                     {
                         collision[index] = collider;
                         if (!wet) cliff[index] = tiles[6 * 8 + variant];
@@ -127,13 +134,12 @@ namespace MistIsle.World
             Foundation(collision, "M00_TRAVELER_HUT", new[] {
                 new Vector2(24.55f,37.05f), new Vector2(32.85f,37.05f), new Vector2(33.55f,38.05f),
                 new Vector2(33.15f,39.35f), new Vector2(25.35f,39.45f), new Vector2(24.55f,38.55f) });
-            // Provisional cloth-and-crate footprint: the current visual is still a tent,
-            // not the finished wooden storage shed requested by the blueprint.
+            // Reviewed against the independent wooden shed: the roof is visual only;
+            // the stepped front and both side approaches remain outside the ground hull.
             Foundation(collision, "M00_STORAGE", new[] {
-                new Vector2(46.90f,35.45f), new Vector2(49.85f,35.45f), new Vector2(49.85f,37.10f),
-                new Vector2(52.65f,37.10f), new Vector2(52.65f,35.80f), new Vector2(54.50f,36.15f),
-                new Vector2(54.50f,37.60f), new Vector2(53.10f,38.70f), new Vector2(49.90f,38.70f),
-                new Vector2(47.55f,37.35f), new Vector2(46.90f,36.95f) });
+                new Vector2(47.15f,35.50f), new Vector2(49.05f,35.50f), new Vector2(49.25f,35.10f),
+                new Vector2(52.20f,35.10f), new Vector2(54.65f,35.60f), new Vector2(54.65f,37.30f),
+                new Vector2(53.95f,37.85f), new Vector2(48.25f,37.90f), new Vector2(47.15f,36.70f) });
         }
 
         private static void Foundation(Transform parent, string sourceId, Vector2[] points)
@@ -157,8 +163,8 @@ namespace MistIsle.World
                     case "M00_SPAWN_DOCK": sprite = art.Get("MapDesignAdditions/Dock") ?? art.Get("Environment/DockPlatform"); height = 5f; placement = new Vector2(9f, 3f); break;
                     case "M00_SUPPLY_SHOP": sprite = art.Get("MapDesignAdditions/SupplyShopV1") ?? art.Get("Environment/CampSupply"); height = 6f; placement = new Vector2(16.5f, 27f); break;
                     case "M00_TRAVELER_HUT": sprite = art.Get("Environment/House"); height = 9f; placement = new Vector2(29f, 35f); break;
-                    case "M00_STORAGE": sprite = art.Get("Environment/Tent"); height = 6.5f; placement = new Vector2(51f, 35f); break;
-                    case "M00_SHIGUANG_STATION": sprite = art.Get("Environment/CampSupply"); height = 3f; placement = new Vector2(45f, 31.5f); break;
+                    case "M00_STORAGE": sprite = art.Get("MapDesignAdditions/StorageShedV1"); height = 6.5f; placement = new Vector2(51f, 35f); break;
+                    case "M00_SHIGUANG_STATION": sprite = art.Get("MapDesignAdditions/GuideStationV1"); height = 4.6f; placement = new Vector2(45f, 31.5f); break;
                     case "M00_NOTICE": sprite = art.Get("Environment/Signpost"); height = 1.7f; break;
                     case "M01_BRIDGE": sprite = art.Get("MapDesignAdditions/Bridge") ?? art.Get("Environment/DockPlatform"); height = 3.5f; placement = new Vector2(38f, 28.5f); break;
                     case "M01_LOOKOUT": sprite = art.Get("Environment/DockPlatform"); height = 5f; placement = new Vector2(61f, 41f); break;
@@ -175,7 +181,13 @@ namespace MistIsle.World
                         visual.GetComponent<SpriteRenderer>().sortingOrder = -29900;
                 }
                 if (node.SourceId == "M00_SHIGUANG_STATION")
-                    Box(layers["Collision"], "GuideWorkstationFootprint", placement + Vector2.up * .25f, new Vector2(2.5f, .6f));
+                {
+                    Foundation(layers["Collision"], "M00_SHIGUANG_STATION", new[] {
+                        new Vector2(43.35f,31.58f), new Vector2(46.15f,31.58f), new Vector2(46.8f,32f),
+                        new Vector2(46.8f,32.85f), new Vector2(43.35f,32.85f) });
+                    Box(layers["Collision"], "GuideStationLeftPost", new Vector2(42.85f,32.1f), new Vector2(.3f,.5f));
+                    Box(layers["Collision"], "GuideStationRightPost", new Vector2(47.15f,32.15f), new Vector2(.35f,.5f));
+                }
                 if (node.SourceId == "M02_ANCIENT_GROVE")
                     Box(layers["Collision"], "AncientTreeTrunk", placement + Vector2.up * .45f, new Vector2(1.8f, .9f));
                 if (node.SourceId == "M00_SPAWN_DOCK")
@@ -263,7 +275,8 @@ namespace MistIsle.World
                 }
                 GameObject visual = null;
                 if (node.Kind == "resource")
-                    visual = Prop(layers["Objects"], node.Id + "_Pickup", art.Resource(node.ItemId), local, .8f, art.Material);
+                    visual = Prop(layers["Objects"], node.Id + "_Pickup", node.SpriteKey != "" ? art.Get(node.SpriteKey) : art.Resource(node.ItemId),
+                        local, node.ItemId == "shell" ? .55f : node.ItemId == "crystal" ? 1f : .8f, art.Material);
                 else if (node.Kind == "encounter")
                     visual = Prop(layers["Objects"], node.Id + "_EncounterGrass", art.Get("Environment/BushWhite"), local, 1.8f, art.Material);
                 else if (node.Kind == "chest")
@@ -271,6 +284,7 @@ namespace MistIsle.World
                 else if (node.Kind == "campfire")
                     visual = Prop(layers["Objects"], node.Id + "_Campfire", art.Get("Environment/CampfireRing") ?? art.Get("Environment/Campfire"), local, 2.3f, art.Material);
                 var interaction = Interaction(layers["Triggers"], layout, node.Kind, node.Id, node.DisplayName, local, .6f, onInteract, visual);
+                DesignPackWorldConsequences.DecorateRecord(interaction.transform, node);
                 if (node.Kind == "campfire")
                 {
                     var foot = Box(layers["Collision"], node.Id + "_Foot", local + Vector2.up * .22f, new Vector2(.7f, .45f));
@@ -469,8 +483,20 @@ namespace MistIsle.World
             {
                 if (RootBridgeGap(point)) return true;
                 switch (map.Id) {
-                    case "M00": return point.y < 8f + Mathf.Sin(point.x * .12f) * 1.6f;
-                    case "M01": return Mathf.Abs(point.x - (36f + Mathf.Sin(point.y * .13f) * 2f)) < 2f;
+                    case "M00":
+                        float shore = 8f + Mathf.Sin(point.x * .12f) * 1.6f;
+                        // The supplied shell bank is a beach, not an unplanned second dock.
+                        // Keep its original gathering anchor on land beside the low eastern shore.
+                        if (point.x > 48f) shore = Mathf.Lerp(shore, 5.75f, Mathf.Clamp01((point.x - 48f) / 6f));
+                        return point.y < shore;
+                    // Authored bends keep the stream centred on the supplied bridge,
+                    // then turn east of the northern footpath instead of erasing it.
+                    case "M01":
+                        float streamX = point.y <= 16f ? Mathf.Lerp(32f, 33f, point.y / 16f)
+                            : point.y <= 30f ? Mathf.Lerp(33f, 38f, (point.y - 16f) / 14f)
+                            : point.y <= 38f ? Mathf.Lerp(38f, 43f, (point.y - 30f) / 8f)
+                            : Mathf.Lerp(43f, 49f, (point.y - 38f) / 18f);
+                        return Mathf.Abs(point.x - streamX) < 2f;
                     case "M02": return new Rect(18f, 54f, 9f, 14f).Contains(point) ||
                         (point.y > 26f && point.y < 59f && Mathf.Abs(point.x - (25f + Mathf.Sin(point.y * .2f) * 3f)) < 1.6f);
                     case "M03": return new Rect(51f, 9f, 9f, 66f).Contains(point) || new Rect(35f, 49f, 64f, 4f).Contains(point) ||
@@ -507,7 +533,6 @@ namespace MistIsle.World
         {
             public readonly Material Material = Resources.Load<Material>("Settings/MistIsleSpriteLit");
             private readonly Dictionary<int, Tile[]> tiles = new Dictionary<int, Tile[]>();
-            private readonly Dictionary<string, Sprite> markers = new Dictionary<string, Sprite>();
             public Sprite Get(string key) => key == "" ? null : Resources.Load<Sprite>("Art/" + key);
             public Sprite[] Frames(string key) { var frames = Resources.LoadAll<Sprite>("Art/" + key); System.Array.Sort(frames, (a, b) => string.CompareOrdinal(a.name, b.name)); return frames; }
             public Tile[] Tiles(int map)
@@ -529,14 +554,12 @@ namespace MistIsle.World
             }
             public Sprite Resource(string item)
             {
-                var imported = Get("Items/" + (item == "berry" ? "Berry" : item == "dew" ? "Dew" : item == "crystal" ? "Crystal" : "Pollen"));
-                if (imported != null) return imported;
-                if (markers.TryGetValue(item, out var sprite)) return sprite;
-                var texture = new Texture2D(12, 12, TextureFormat.RGBA32, false) { filterMode = FilterMode.Point, name = "PickupMarker-" + item };
-                var pixels = new Color[144]; Color color = item == "berry" ? new Color(.84f, .24f, .4f) : item == "dew" ? new Color(.3f, .79f, .95f) : item == "crystal" ? new Color(.72f, .47f, 1f) : new Color(.94f, .85f, .4f);
-                for (int y = 2; y < 10; y++) for (int x = 2; x < 10; x++) if (Mathf.Abs(x - 5.5f) + Mathf.Abs(y - 5.5f) < 5f) pixels[y * 12 + x] = color;
-                texture.SetPixels(pixels); texture.Apply(); sprite = Sprite.Create(texture, new Rect(0f, 0f, 12f, 12f), new Vector2(.5f, 0f), 16f);
-                markers.Add(item, sprite); return sprite;
+                string key = item == "berry" ? "Environment/BushPink" : item == "dew" ? "Environment/FlowerBlue"
+                    : item == "pollen" ? "Environment/FlowerWhite" : item == "shell" ? "MapDesignAdditions/ShellBankV1"
+                    : item == "crystal" ? "MapDesignAdditions/CrystalClusterV1"
+                    : item == "resonance-capsule" || item == "berry-treat" || item == "camp-token" ? "Environment/Crate" : null;
+                if (key == null) throw new InvalidOperationException("No gathering prop configured for " + item);
+                return Get(key) ?? throw new InvalidOperationException("Import the independent gathering prop: " + key);
             }
         }
     }

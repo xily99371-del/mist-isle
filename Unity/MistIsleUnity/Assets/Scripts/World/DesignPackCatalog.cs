@@ -112,6 +112,8 @@ namespace MistIsle.World
                 Amount = Number(extra, "amount", 1), RespawnSeconds = Number(extra, "respawn_seconds", Number(source, "respawn_seconds", kind == "encounter" ? 120 : 0)),
                 EncounterSpeciesIds = Strings(extra, "encounter_species_ids"), MinLevel = Number(extra, "min_level", 1),
                 MaxLevel = Number(extra, "max_level", 3), FieldAbility = Text(extra, "field_ability"),
+                RequiredGuardianId = Text(extra, "requires_guardian"),
+                IsNarrativeRecord = extra.TryGetValue("narrative_record", out var record) && record is bool marked && marked,
                 Reward = Text(extra, "reward"), SpriteKey = Text(extra, "sprite_key"), Raw = source
             };
         }
@@ -192,6 +194,8 @@ namespace MistIsle.World
         public int MinLevel { get; internal set; }
         public int MaxLevel { get; internal set; }
         public string FieldAbility { get; internal set; }
+        public string RequiredGuardianId { get; internal set; }
+        public bool IsNarrativeRecord { get; internal set; }
         public string Reward { get; internal set; }
         public string SpriteKey { get; internal set; }
         public IReadOnlyDictionary<string, object> Raw { get; internal set; }

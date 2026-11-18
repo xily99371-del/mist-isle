@@ -36,6 +36,7 @@ namespace MistIsle.Creatures
         private int chargeRound;
         private int weakenedRounds;
         private bool rooted;
+        private int rootRecoveryUntilRound;
         private float foodTrust;
         private bool rewardsGranted;
 
@@ -47,7 +48,8 @@ namespace MistIsle.Creatures
         public BattleOutcome Outcome { get; private set; }
         public FinalBossStage FinalStage { get; private set; }
         public IReadOnlyList<string> Log => log;
-        public string WildStatus => rooted ? "缠绕" : weakenedRounds > 0 ? "弱化" : foodTrust > 0 ? "平静" : "正常";
+        public string WildStatus => rooted ? "缠绕" : weakenedRounds > 0 ? "弱化"
+            : round <= rootRecoveryUntilRound ? "挣脱中 · 本轮不再缠绕" : foodTrust > 0 ? "平静" : "正常";
         public CreatureInstance CurrentActor => FinalStage == FinalBossStage.Silence || Outcome != BattleOutcome.Ongoing
             ? null : pending.Find(x => x.currentHp > 0);
 
@@ -198,8 +200,13 @@ namespace MistIsle.Creatures
                 foreach (var ally in participants)
                     if (ally.currentHp > 0) ally.currentHp = Mathf.Min(
                         CreatureInstance.MaxHp(catalog[ally.speciesId], ally.level), ally.currentHp + healing);
-                rooted = true;
-                log.Add(actor.nickname + "施展藤光：回复出战伙伴，并缠绕对手一轮。");
+                if (round > rootRecoveryUntilRound)
+                {
+                    rooted = true;
+                    log.Add(actor.nickname + "施展藤光：回复出战伙伴，并缠绕对手一轮。");
+                }
+                else
+                    log.Add(actor.nickname + "施展藤光，回复出战伙伴；对手正在挣脱，暂时不会再次被缠绕。");
                 DamageWild(actor, species, 0.7f, "藤光");
             }
             else if (species.primaryElement == ElementType.Tide)
@@ -265,7 +272,12 @@ namespace MistIsle.Creatures
                 return;
             }
             if (rooted)
-            { log.Add(WildSpecies.displayName + "被藤蔓缠绕，没能行动。"); rooted = false; }
+            {
+                log.Add(WildSpecies.displayName + "被藤蔓缠绕，没能行动。下一轮它会挣脱藤蔓。");
+                rooted = false;
+                // Shared by the opponent, so rotating several Verdant companions cannot prevent every response.
+                rootRecoveryUntilRound = round + 1;
+            }
             else
             {
                 int targetIndex = Mathf.Min(living.Count - 1, Mathf.FloorToInt(Mathf.Clamp01(rng()) * living.Count));
@@ -342,6 +354,7 @@ namespace MistIsle.Creatures
             guarding.Clear();
             weakenedRounds = 0;
             rooted = false;
+            rootRecoveryUntilRound = 0;
             round++;
             BeginRound();
             log.Add(starter.nickname + "因羁绊完成超进化，唤醒了倒下的伙伴！最终反击仍需你的指挥。");

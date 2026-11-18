@@ -1,5 +1,7 @@
 # Mist Isle Unity reboot — vertical-slice plan
 
+> 2026-11-18 map handoff: the supplied five-map design now controls dimensions, POIs and connections. The room counts below are historical targets; use MAP_DESIGN_EXECUTION.md for current construction and CHAPTER_ONE_NARRATIVE.md for the traveler's purpose and guardian trials. The first chapter keeps four guardians, with the Observer's final phase following its fourth trial.
+
 > 2026-11-17 handoff update: the active target is the full first chapter. Watcher is retained for recovery and storage; Shiguang remains a separate capture guide. The four guardians are forest, tide, crystal and lighthouse. The lighthouse Observer also serves as the final boss after the fourth seal battle. The smaller milestones below are historical planning steps, not a claim that content or playthrough duration has been completed. See CHAPTER_ONE_STATUS.md for actual implementation and verification.
 
 ## Product direction

@@ -15,6 +15,8 @@ namespace MistIsle.Runtime
         public bool NodeAvailable(string id)
         {
             if (id == "tutorial-coast-crab") return !Progress.captureTutorialCompleted;
+            if (DesignPackCatalog.TryGetInteraction(id, out var node) && !string.IsNullOrEmpty(node.RequiredGuardianId)
+                && !Progress.seals.HasSeal(node.RequiredGuardianId)) return false;
             if (Progress.openedChestIds.Contains(id)) return false;
             var state = Progress.nodeRefreshStates.FirstOrDefault(value => value.id == id);
             return state != null ? DateTimeOffset.UtcNow.ToUnixTimeSeconds() >= state.availableAtUtc : !Progress.collectedNodeIds.Contains(id);
@@ -51,6 +53,18 @@ namespace MistIsle.Runtime
             SyncDesignExitGates();
             foreach (var target in World.Interactions.Where(value => value.Kind == "encounter"))
                 target.SetAvailable(NodeAvailable(target.Id));
+            RefreshDesignWorldConsequences();
+        }
+
+        /// <summary>Called after a recorded guardian victory as well as restoration of an existing save.</summary>
+        public void RefreshDesignWorldConsequences()
+        {
+            bool forest = Progress.seals.HasSeal("glowglade-warden");
+            foreach (var consequence in GetComponentsInChildren<DesignPackWorldConsequences>(true))
+                consequence.ApplyForestRecovery(forest);
+            if (World == null) return;
+            foreach (var target in World.Interactions.Where(value => value.Id == "M02_RECOVERY_HERBS"))
+                target.SetAvailable(NodeAvailable(target.Id));
         }
 
         private void SyncDesignExitGates()
@@ -65,6 +79,25 @@ namespace MistIsle.Runtime
 
         private bool HandleDesignAction(string kind, string id)
         {
+            if (kind == "npc" && (id == "watcher" || id == "shiguang")
+                && (OpeningPhase == OpeningStage.None || OpeningPhase == OpeningStage.Complete))
+            {
+                string returnKey = "camp-return:" + id + ":"
+                    + (Progress.seals.HasSeal("glowglade-warden") ? "f" : "")
+                    + (Progress.seals.HasSeal("tidal-warden") ? "t" : "")
+                    + (Progress.seals.HasSeal("crystal-warden") ? "c" : "")
+                    + (Progress.seals.HasSeal("lighthouse-warden") ? "l" : "")
+                    + (Progress.chapterCompleted ? ":home" : ":journey");
+                if (id == "watcher" && Progress.storyFlags.Contains(returnKey))
+                { SetPanel(GamePanel.Watcher); return true; }
+                SayPages(DesignPackNarrative.ReturnToCamp(id, Progress.seals, Progress.chapterCompleted),
+                    () => {
+                        if (!Progress.storyFlags.Contains(returnKey)) Progress.storyFlags.Add(returnKey);
+                        Save(false);
+                        if (id == "watcher") SetPanel(GamePanel.Watcher);
+                    });
+                return true;
+            }
             if (kind == "exit")
             {
                 if (DesignPackCatalog.GetExit(Progress.roomId, id) == null) return true;
@@ -94,7 +127,16 @@ namespace MistIsle.Runtime
                     if (string.IsNullOrEmpty(node.ItemId)) { Notify("这处资源尚未配置。 "); return true; }
                     Inventory.Add(node.ItemId, node.Amount);
                     DepleteNode(id, node.RespawnSeconds);
-                    Notify("采集 " + GameCatalog.ItemName(node.ItemId) + " ×" + node.Amount);
+                    int recovered = 0;
+                    if (id == "M02_RECOVERY_HERBS")
+                        foreach (var companion in Party.Members.Where(creature => creature.currentHp > 0))
+                        {
+                            int before = companion.currentHp;
+                            companion.currentHp = Mathf.Min(CreatureInstance.MaxHp(Catalog[companion.speciesId], companion.level), before + 4);
+                            recovered += companion.currentHp - before;
+                        }
+                    Notify("采集 " + GameCatalog.ItemName(node.ItemId) + " ×" + node.Amount
+                        + (id == "M02_RECOVERY_HERBS" ? recovered > 0 ? "，草香让伙伴共恢复体力 " + recovered + "。" : "。轻取花穗，留下的根还会再开。" : ""));
                     opening.CheckIngredients(); Save(false); return true;
                 case "encounter":
                     if (!NodeAvailable(id)) { Notify("草丛暂时安静了，稍后再回来看看。 "); return true; }
@@ -114,7 +156,10 @@ namespace MistIsle.Runtime
                     if (node.SourceId == "M02_ANCIENT_GROVE")
                     {
                         DesignPackCatalog.TryGetInteraction("M02_ROOT_BRIDGE", out var rootBridge);
-                        return OpenDesignField(rootBridge);
+                        if (Progress.storyFlags.Contains(node.SourceId)) return OpenDesignField(rootBridge);
+                        ObserveDesignStory(node.SourceId, () => OpenDesignField(rootBridge));
+                        Save(false);
+                        return true;
                     }
                     if (node.SourceId == "M04_RESONANCE_PLAZA" || node.SourceId == "M04_THREE_SEAL_GATE")
                     {
@@ -153,9 +198,10 @@ namespace MistIsle.Runtime
             Save(false); return true;
         }
 
-        private void ObserveDesignStory(string id)
+        private void ObserveDesignStory(string id, Action after = null)
         {
-            var pages = id.StartsWith("after:", StringComparison.Ordinal) ? DesignPackNarrative.AfterGuardian(id.Substring(6)) : DesignPackNarrative.Observe(id);
+            var pages = id.StartsWith("after:", StringComparison.Ordinal) ? DesignPackNarrative.AfterGuardian(id.Substring(6))
+                : DesignPackNarrative.Observe(id, Progress.seals, Progress.chapterCompleted);
             // Mark after the final page: quitting during a clue must not permanently swallow that clue.
             Progress.pendingStoryId = id;
             SayPages(pages, () => {
@@ -163,6 +209,7 @@ namespace MistIsle.Runtime
                 Progress.pendingStoryId = null;
                 if (id == "after:final-boss") SetPanel(GamePanel.Ending);
                 Save(false);
+                after?.Invoke();
             });
         }
 

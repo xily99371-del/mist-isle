@@ -319,6 +319,8 @@ namespace MistIsle.Runtime
         {
             var battle = Session.Battle;
             if (battle == null) return;
+            RefreshBattlePartySelection(battle);
+            if (battlePartyOpen) { DrawBattleParty(); return; }
             GUI.Box(new Rect(80, 118, 1120, 545), GUIContent.none, panel);
             GUI.Label(new Rect(108, 135, 1000, 45), (battle.Kind == BattleKind.Wild ? "野生遭遇 · " : "封印回响 · ") + battle.WildSpecies.displayName, heading);
             if (!string.IsNullOrEmpty(Session.TutorialHint))
@@ -327,6 +329,7 @@ namespace MistIsle.Runtime
             GUI.Label(new Rect(840, 408, 290, 36), battle.IsCaptureLesson
                 ? "警戒 " + battle.Wild.currentHp + "/" + CreatureInstance.MaxHp(battle.WildSpecies, battle.Wild.level)
                 : "Lv." + battle.Wild.level + "   HP " + battle.Wild.currentHp + "/" + CreatureInstance.MaxHp(battle.WildSpecies, battle.Wild.level), body);
+            GUI.Label(new Rect(840, 446, 320, 28), "状态 · " + battle.WildStatus, small);
             for (int i = 0; i < Session.Party.DeployedIds.Count; i++)
             {
                 string id = Session.Party.DeployedIds[i];
@@ -357,9 +360,7 @@ namespace MistIsle.Runtime
             BattleButton(641, "投喂点心\n建立信任", BattleAction.Feed, "berry-treat");
             BattleButton(818, "共鸣捕获\n邀请它同行", BattleAction.Capture, "resonance-capsule");
             BattleButton(995, "撤离\n退回探索", BattleAction.Flee);
-            var reserve = Session.Party.Members.FirstOrDefault(c => c.currentHp > 0 && !Session.Party.DeployedIds.Contains(c.instanceId));
-            if (reserve != null && battle.CurrentActor != null && GUI.Button(new Rect(110, 598, 420, 37), "换入后备 · " + Session.Catalog[reserve.speciesId].displayName, button))
-                Session.SwapBattle(battle.CurrentActor.instanceId, reserve.instanceId);
+            DrawBattlePartyButton(battle);
             if (battle.FinalStage == FinalBossStage.Awakened && battle.CurrentActor != null && battle.CurrentActor.isStarter)
             {
                 if (GUI.Button(new Rect(550, 598, 340, 37), "归航回响 · 羁绊反击", button)) Session.Act(BattleAction.Resonance);

@@ -91,19 +91,52 @@ namespace MistIsle.Tests
         }
 
         [UnityTest]
-        public IEnumerator TheProvisionalStorageTentKeepsItsDoorBayAndRearClearButBlocksTheClothAndCrates()
+        public IEnumerator TheWoodenStorageShedKeepsItsFrontStepsAndRoofSidesClearButBlocksItsBase()
         {
             var polygon = Foundation("M00_STORAGE");
             Assert.That(polygon.points.Length, Is.GreaterThan(4));
-            yield return ClearLeg(new Vector2(46.3f,34.95f),new Vector2(55f,34.95f));
-            yield return ClearLeg(new Vector2(46.3f,34.95f),new Vector2(46.3f,39.2f));
-            yield return ClearLeg(new Vector2(55f,34.95f),new Vector2(55f,39.2f));
-            yield return ClearLeg(new Vector2(46.3f,39.2f),new Vector2(55f,39.2f));
-            yield return ClearLeg(new Vector2(51.35f,34.95f),new Vector2(51.35f,36.6f));
-            yield return SolidLeg(new Vector2(47.4f,34.6f),new Vector2(47.4f,36f),polygon);
-            yield return SolidLeg(new Vector2(51.2f,39.4f),new Vector2(51.2f,38f),polygon);
-            yield return SolidLeg(new Vector2(55.2f,37f),new Vector2(53.7f,37f),polygon);
+            yield return ClearLeg(new Vector2(46.5f,34.45f),new Vector2(55.3f,34.45f));
+            yield return ClearLeg(new Vector2(46.5f,34.45f),new Vector2(46.5f,38.5f));
+            yield return ClearLeg(new Vector2(55.3f,34.45f),new Vector2(55.3f,38.5f));
+            yield return ClearLeg(new Vector2(46.5f,38.5f),new Vector2(55.3f,38.5f));
+            yield return ClearLeg(new Vector2(49.5f,33.8f),new Vector2(49.5f,34.45f));
+            yield return SolidLeg(new Vector2(47.6f,34.3f),new Vector2(47.6f,35.9f),polygon);
+            yield return SolidLeg(new Vector2(51.2f,38.8f),new Vector2(51.2f,37.4f),polygon);
+            yield return SolidLeg(new Vector2(55.4f,36.7f),new Vector2(54f,36.7f),polygon);
             Assert.That(polygon.OverlapPoint(new Vector2(51f,41.7f)), Is.False);
+            var visual = root.GetComponentsInChildren<SpriteRenderer>().Single(value => value.name == "M00_STORAGE_Art");
+            Assert.That(visual.sprite, Is.SameAs(Resources.Load<Sprite>("Art/MapDesignAdditions/StorageShedV1")), "Storage still uses the provisional tent.");
+        }
+
+        [UnityTest]
+        public IEnumerator GuideDeskAndPostsBlockBodiesWithoutMakingTheCanopyAnAirWall()
+        {
+            var polygon = Foundation("M00_SHIGUANG_STATION");
+            yield return ClearLeg(new Vector2(42.2f,30.9f),new Vector2(47.8f,30.9f));
+            // The garden's real fence ends at x42.6/y33.25, beside the west canopy.
+            // Walk to that fence rather than expecting to pass through its timber.
+            yield return ClearLeg(new Vector2(42.2f,30.9f),new Vector2(42.2f,32.3f));
+            yield return ClearLeg(new Vector2(47.8f,30.9f),new Vector2(47.8f,33.5f));
+            yield return ClearLeg(new Vector2(42.2f,33.5f),new Vector2(47.8f,33.5f));
+            yield return SolidLeg(new Vector2(45f,30.9f),new Vector2(45f,32f),polygon);
+            Assert.That(polygon.OverlapPoint(new Vector2(45f,35f)), Is.False, "The canvas roof became a full-height air wall.");
+            var visual = root.GetComponentsInChildren<SpriteRenderer>().Single(value => value.name == "M00_SHIGUANG_STATION_Art");
+            Assert.That(visual.sprite, Is.SameAs(Resources.Load<Sprite>("Art/MapDesignAdditions/GuideStationV1")));
+        }
+
+        [UnityTest]
+        public IEnumerator TidewindBridgeCrossesItsStreamAndWaterOnBothSidesRemainsSolid()
+        {
+            Vector2 origin = DesignPackCatalog.GetMap("M01").Origin;
+            var grid = root.transform.Find("DesignPackWorld/M01 — " + DesignPackCatalog.GetMap("M01").Name);
+            var water = grid.Find("Water").GetComponent<UnityEngine.Tilemaps.Tilemap>();
+            var collision = grid.Find("Collision").GetComponent<UnityEngine.Tilemaps.Tilemap>();
+            foreach (var point in new[] {new Vector3Int(35,24,0),new Vector3Int(43,38,0)})
+            {
+                Assert.That(water.HasTile(point), Is.True, "The bridge no longer connects visible banks.");
+                Assert.That(collision.HasTile(point), Is.True, "Stream is only a decorative surface.");
+            }
+            yield return ClearLeg(origin + new Vector2(34f,29f),origin + new Vector2(42f,29f));
         }
 
         [UnityTest]

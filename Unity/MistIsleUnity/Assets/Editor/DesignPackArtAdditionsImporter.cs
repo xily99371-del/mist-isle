@@ -17,13 +17,17 @@ namespace MistIsle.Editor
         public static void ImportAdditions()
         {
             Import(Source + "SupplyShopV1-source.png", null, "SupplyShopV1");
+            Import(Source + "StorageShedV1-source.png", null, "StorageShedV1");
+            Import(Source + "GuideStationV1-source.png", null, "GuideStationV1");
+            Import(Source + "ShellBankV1-source.png", null, "ShellBankV1");
+            Import(Source + "CrystalClusterV1-source.png", null, "CrystalClusterV1");
             // Top-left rectangles were reviewed against the real 774x274 transparent atlas, not its approximate manifest.
             Import(Source + "ApprovedEnvironmentAtlas.png", new RectInt(638, 0, 126, 156), "Lighthouse");
             Import(Source + "ApprovedEnvironmentAtlas.png", new RectInt(388, 111, 122, 109), "StoneArch");
             Import(Source + "ApprovedEnvironmentAtlas.png", new RectInt(123, 171, 154, 96), "Bridge");
             Import(Source + "ApprovedEnvironmentAtlas.png", new RectInt(0, 171, 122, 96), "Dock");
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
-            Debug.Log("MIST_ISLE_DESIGN_ADDITIONS: independent SupplyShopV1, Lighthouse, StoneArch, Bridge and Dock imported with real alpha, 16PPU and bottom pivots.");
+            Debug.Log("MIST_ISLE_DESIGN_ADDITIONS: 9 independent props imported with real alpha, 16PPU and bottom pivots.");
         }
 
         [MenuItem("Mist Isle/Design Pack/Rebuild Art Additions With Backup")]
@@ -90,7 +94,7 @@ namespace MistIsle.Editor
         [MenuItem("Mist Isle/Design Pack/Validate Art Additions")]
         public static void ValidateAdditions()
         {
-            foreach (string name in new[] { "SupplyShopV1", "Lighthouse", "StoneArch", "Bridge", "Dock" })
+            foreach (string name in new[] { "SupplyShopV1", "StorageShedV1", "GuideStationV1", "ShellBankV1", "CrystalClusterV1", "Lighthouse", "StoneArch", "Bridge", "Dock" })
             {
                 string path = Output + name + ".png";
                 Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
@@ -109,7 +113,7 @@ namespace MistIsle.Editor
                 }
                 finally { UnityEngine.Object.DestroyImmediate(texture); }
             }
-            Debug.Log("MIST_ISLE_DESIGN_ADDITIONS_VALIDATED: 4 independent sprites with actual clear alpha and point imports. Visual rectangle review is separate from this check.");
+            Debug.Log("MIST_ISLE_DESIGN_ADDITIONS_VALIDATED: 9 independent sprites with actual clear alpha and point imports. Visual rectangle review is separate from this check.");
         }
     }
 }

@@ -401,6 +401,7 @@ namespace MistIsle.Runtime
             if (outcome == BattleOutcome.Victory && kind == BattleKind.Guardian)
             {
                 Progress.seals.RecordGuardianVictory(encounterId);
+                RefreshDesignWorldConsequences();
                 Inventory.Add("resonance-capsule", 3);
                 Inventory.Add("berry-treat", 2);
                 Inventory.Add(ShopCatalog.CurrencyItemId, 25);
